@@ -1,0 +1,35 @@
+<?xml version="1.0" ?>
+<argos-configuration>
+
+  <!-- ************************* -->
+  <!-- * General configuration * -->
+  <!-- ************************* -->
+  <framework>
+    <experiment length="0" ticks_per_second="5" random_seed="1"/>
+  </framework>
+
+  <!-- *************** -->
+  <!-- * Controllers * -->
+  <!-- *************** -->
+  <controllers>
+    <lua_controller id="stigbot">
+      <actuators>
+        <radios implementation="default"/>
+      </actuators>
+      <sensors>
+        <radios implementation="default"/>
+        <!--cameras implementation="default" show_frustum="true">
+          <camera id="ov5640" anchor="base" range="0.025:0.10" resolution="640,360"
+                  position="0.05,0,0.05" orientation="-90,135,0"
+                  focal_length="883.961,883.961" principle_point="319.5,179.5">
+            <directional_led_detector medium="leds" show_rays="true"/>
+            <tag_detector medium="tags" show_rays="true"/>
+          </camera>
+        </cameras-->
+      </sensors>
+      <params script="experiment.lua"/>
+      <!--params script="../../src/testing/experiment.lua"/-->
+    </lua_controller>
+  </controllers>
+
+</argos-configuration>

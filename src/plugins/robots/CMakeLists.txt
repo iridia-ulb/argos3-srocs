@@ -1,0 +1,4 @@
+
+if(ARGOS_BUILD_FOR_SIMULATOR OR ARGOS_BUILD_FOR STREQUAL "stigbot")
+  add_subdirectory(stigbot)
+endif(ARGOS_BUILD_FOR_SIMULATOR OR ARGOS_BUILD_FOR STREQUAL "stigbot")
