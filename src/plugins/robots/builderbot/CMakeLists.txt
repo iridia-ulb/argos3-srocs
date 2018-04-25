@@ -73,7 +73,7 @@ endif(ARGOS_BUILD_FOR_SIMULATOR)
 
 if(ARGOS_BUILD_FOR_HARDWARE)
   # Create an ARGoS executable for the robot  
-  add_executable(argos3 SHARED ${ARGOS3_SOURCES_PLUGINS_ROBOTS_BUILDERBOT})
+  add_executable(argos3 ${ARGOS3_SOURCES_PLUGINS_ROBOTS_BUILDERBOT})
   target_link_libraries(argos3
     argos3core_${ARGOS_BUILD_FOR})
   install(TARGETS argos3

@@ -1,5 +1,5 @@
 /**
- * @file <argos3/plugins/robots/builderbot/hardware/builderbot_entity.h>
+ * @file <argos3/plugins/robots/builderbot/simulator/builderbot_entity.h>
  *
  * @author Michael Allwright - <allsey87@gmail.com>
  */
