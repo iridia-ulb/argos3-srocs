@@ -30,11 +30,6 @@ include(${CMAKE_SOURCE_DIR}/cmake/ARGoSBuildFlags.cmake)
 #
 include(${CMAKE_SOURCE_DIR}/cmake/ARGoSBuildChecks.cmake)
 
-#
-# Set up CPack for later use
-#
-include(${CMAKE_SOURCE_DIR}/cmake/ARGoSPackaging.cmake)
-
 # Set up ARGoS compilation information
 include_directories(BEFORE ${CMAKE_SOURCE_DIR})
 
