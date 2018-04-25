@@ -37,4 +37,4 @@ include_directories(BEFORE ${CMAKE_SOURCE_DIR})
 # Compile stuff
 #
 add_subdirectory(plugins)
-add_subdirectory(testing)
+#add_subdirectory(testing)
