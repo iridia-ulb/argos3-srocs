@@ -33,6 +33,15 @@ elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
 endif()
 
 #
+# Check if ARGoS is installed
+#
+find_package(ARGoS)
+if(NOT ARGOS_FOUND)
+  message(FATAL_ERROR "ARGoS was not found.")
+endif(NOT ARGOS_FOUND)
+include_directories(${ARGOS_INCLUDE_DIR})
+
+#
 # Check for dynamic library loading facility
 #
 if(ARGOS_DYNAMIC_LIBRARY_LOADING)

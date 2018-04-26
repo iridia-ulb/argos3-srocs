@@ -53,6 +53,7 @@ if(ARGOS_BUILD_FOR_HARDWARE)
     ${ARGOS3_SOURCES_PLUGINS_ROBOTS_BUILDERBOT}
     ${ARGOS3_HEADERS_PLUGINS_ROBOTS_BUILDERBOT_HARDWARE}
     hardware/builderbot.cpp
+    hardware/builderbot_main.cpp
     hardware/builderbot_lar_default_sensor.cpp)
 endif(ARGOS_BUILD_FOR_HARDWARE)
 
@@ -75,7 +76,7 @@ if(ARGOS_BUILD_FOR_HARDWARE)
   # Create an ARGoS executable for the robot  
   add_executable(argos3 ${ARGOS3_SOURCES_PLUGINS_ROBOTS_BUILDERBOT})
   target_link_libraries(argos3
-    argos3core_${ARGOS_BUILD_FOR})
+    ${ARGOS_CORE_LIBRARY})
   install(TARGETS argos3
     RUNTIME DESTINATION bin
     LIBRARY DESTINATION lib/argos3

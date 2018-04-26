@@ -8,10 +8,9 @@
 #define BUILDERBOT_H
 
 namespace argos {
-
 }
 
-#include <argos3/core/config.h>
+#include <argos3/core/utility/configuration/argos_configuration.h>
 
 namespace argos {
 

@@ -10,16 +10,20 @@
 
 SET (ARGOS_FOUND 0)
 
-FIND_PATH (ARGOS_INCLUDE_DIR
-  NAMES ARGoS.h
-  PATH_SUFFIXES ARGoS
-  DOC "The ARGoS include directory"
-)
+FIND_PATH (ARGOS_INCLUDE_DIR argos3/core/config.h)
 
-FIND_LIBRARY (ARGOS_LIB
-  NAMES ARGoS
+FIND_LIBRARY (argos3core_${ARGOS_BUILD_FOR}
+  NAMES argos3core_${ARGOS_BUILD_FOR}
+  PATH_SUFFIXES argos3
   DOC "The ARGoS core library"
 )
+
+FIND_LIBRARY (argos3plugin_${ARGOS_BUILD_FOR}_genericrobot
+  NAMES argos3plugin_${ARGOS_BUILD_FOR}_genericrobot
+  PATH_SUFFIXES argos3
+  DOC "The ARGoS generic robot library"
+)
+
 
 #=============================================================================
 
@@ -27,7 +31,9 @@ INCLUDE (FindPackageHandleStandardArgs)
 FIND_PACKAGE_HANDLE_STANDARD_ARGS (
   ARGoS
   FOUND_VAR ARGOS_FOUND
-  REQUIRED_VARS ARGOS_LIB ARGOS_INCLUDE_DIR)
+  REQUIRED_VARS ARGOS_INCLUDE_DIR
+    argos3core_${ARGOS_BUILD_FOR}
+    argos3plugin_${ARGOS_BUILD_FOR}_genericrobot)
 
 IF (NOT ARGOS_FOUND)
   MESSAGE (WARNING "The ARGoS Library has not been found!")
