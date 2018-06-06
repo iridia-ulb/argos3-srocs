@@ -4,7 +4,7 @@
 # argos3/plugins/robots/builderbot/control_interface
 set(ARGOS3_HEADERS_PLUGINS_ROBOTS_BUILDERBOT_CONTROLINTERFACE
   control_interface/ci_builderbot_lar_sensor.h
-)
+  control_interface/ci_builderbot_dds_actuator.h)
 # argos3/plugins/robots/builderbot/simulator
 if(ARGOS_BUILD_FOR_SIMULATOR)
   set(ARGOS3_HEADERS_PLUGINS_ROBOTS_BUILDERBOT_SIMULATOR
@@ -23,7 +23,8 @@ endif(ARGOS_BUILD_FOR_SIMULATOR)
 if(ARGOS_BUILD_FOR_HARDWARE)
   set(ARGOS3_HEADERS_PLUGINS_ROBOTS_BUILDERBOT_HARDWARE
     hardware/builderbot.h
-    hardware/builderbot_lar_default_sensor.h)
+    hardware/builderbot_lar_default_sensor.h
+    hardware/builderbot_dds_default_actuator.h)
 endif(ARGOS_BUILD_FOR_HARDWARE)
 
 #
@@ -31,7 +32,8 @@ endif(ARGOS_BUILD_FOR_HARDWARE)
 #
 set(ARGOS3_SOURCES_PLUGINS_ROBOTS_BUILDERBOT
   ${ARGOS3_HEADERS_PLUGINS_ROBOTS_BUILDERBOT_CONTROLINTERFACE}
-  control_interface/ci_builderbot_lar_sensor.cpp)
+  control_interface/ci_builderbot_lar_sensor.cpp
+  control_interface/ci_builderbot_dds_actuator.cpp)
 
 if(ARGOS_BUILD_FOR_SIMULATOR)
   set(ARGOS3_SOURCES_PLUGINS_ROBOTS_BUILDERBOT
@@ -54,7 +56,8 @@ if(ARGOS_BUILD_FOR_HARDWARE)
     ${ARGOS3_HEADERS_PLUGINS_ROBOTS_BUILDERBOT_HARDWARE}
     hardware/main.cpp
     hardware/builderbot.cpp
-    hardware/builderbot_lar_default_sensor.cpp)
+    hardware/builderbot_lar_default_sensor.cpp
+    hardware/builderbot_dds_default_actuator.cpp)
 endif(ARGOS_BUILD_FOR_HARDWARE)
 
 if(ARGOS_BUILD_FOR_SIMULATOR)
@@ -73,9 +76,9 @@ if(ARGOS_BUILD_FOR_SIMULATOR)
 endif(ARGOS_BUILD_FOR_SIMULATOR)
 
 if(ARGOS_BUILD_FOR_HARDWARE)
-  # Create an ARGoS executable for the robot  
+  # Create an ARGoS executable for the robot
   add_executable(argos3 ${ARGOS3_SOURCES_PLUGINS_ROBOTS_BUILDERBOT})
-  target_link_libraries(argos3 ${ARGOS_CORE_LIBRARY})
+  target_link_libraries(argos3 ${ARGOS_CORE_LIBRARY} ${LUA_LIBRARIES} ${PTHREADS_LIBRARY} stdc++fs)
   install(TARGETS argos3
     RUNTIME DESTINATION bin
     LIBRARY DESTINATION lib/argos3

@@ -8,9 +8,15 @@
 
 #include <sys/time.h>
 #include <unistd.h>
+#include <list>
+#include <thread>
+#include <future>
+#include <chrono>
 
 #include <argos3/core/utility/logging/argos_log.h>
 #include <argos3/core/utility/plugins/factory.h>
+#include <argos3/core/utility/rate.h>
+
 #include <argos3/core/control_interface/ci_controller.h>
 
 #include <argos3/core/hardware/actuator.h>
@@ -65,11 +71,9 @@ namespace argos {
          LOG << "[INFO] Using random seed = " << unRandomSeed << std::endl;
          m_pcRNG = CRandom::CreateRNG("argos");
          /* Set the target tick length */
-         UInt32 unTicksPerSec;
          GetNodeAttribute(tExperiment,
                           "ticks_per_second",
-                          unTicksPerSec);
-         m_fTargetTickLength = Real(1.0) / static_cast<Real>(unTicksPerSec);
+                          m_unTicksPerSec);
       }
       catch(CARGoSException& ex) {
          THROW_ARGOSEXCEPTION_NESTED("Failed to initialize BuilderBot", ex);
@@ -119,7 +123,7 @@ namespace argos {
                THROW_ARGOSEXCEPTION("BUG: actuator \"" << itAct->Value() << "\" does not inherit from CCI_Actuator");
             }
             pcCIAct->Init(*itAct);
-            m_mapActuators[itAct->Value()] = pcAct;
+            m_vecActuators.emplace_back(pcAct);
             m_pcController->AddActuator(itAct->Value(), pcCIAct);
          }
          /* Go through sensors */
@@ -136,20 +140,20 @@ namespace argos {
                THROW_ARGOSEXCEPTION("BUG: sensor \"" << itSens->Value() << "\" does not inherit from CCI_Sensor");
             }
             pcCISens->Init(*itSens);
-            m_mapSensors[itSens->Value()] = pcSens;
+            m_vecSensors.emplace_back(pcSens);
             m_pcController->AddSensor(itSens->Value(), pcCISens);
          }
 
         /* Set the controller id */
         char pchBuffer[32];
         if (::gethostname(pchBuffer, 32) == 0) {
-           LOG << "[INFO] Setting robot id to its hostname \""
+           LOG << "[INFO] Setting controller id to hostname \""
                << pchBuffer << "\""
                << std::endl;
            m_pcController->SetId(pchBuffer);
         } else {
            LOGERR << "[WARNING] Failed to get the hostname."
-                  << "Setting default robot id \"builderbot\""
+                  << "Setting controller id to \"builderbot\""
                   << std::endl;
            m_pcController->SetId("builderbot");
         }
@@ -166,8 +170,55 @@ namespace argos {
    /****************************************/
 
    void CBuilderBot::Execute() {
-      m_pcController->ControlStep();
-      m_pcController->ControlStep();
+      /* definition of an active task */
+      struct SActiveTask {
+         std::thread Thread;
+         std::future<void> Future;
+      };
+
+      CRate cRate(m_unTicksPerSec);
+
+      std::vector<SActiveTask> vecActiveTasks(2);
+
+      std::list<std::packaged_task<void()> > lstTasks;
+
+      for(;;) {
+         /* create a packaged task for each sensor to be updated */
+         for(CPhysicalSensor* pc_sensor : m_vecSensors) {
+            lstTasks.emplace_back(std::bind(&CPhysicalSensor::Update, pc_sensor));
+         }
+         /* spawn up to X threads and execute the tasks */
+         while(!lstTasks.empty()) {
+            /* activate tasks */
+            for(SActiveTask& s_active_task : vecActiveTasks) {
+               if((s_active_task.Future.valid() == false) ||
+                  (s_active_task.Future.wait_for(std::chrono::milliseconds(0)) ==
+                     std::future_status::ready)) {
+                  /* activate a task */
+                  s_active_task.Future = lstTasks.front().get_future();
+                  std::thread cTaskThread(std::move(lstTasks.front()));
+                  s_active_task.Thread = std::move(cTaskThread);
+                  lstTasks.pop_front();
+                  break;
+               }
+            }
+         }
+         /* wait for the last tasks to complete */
+         for(SActiveTask& s_active_task : vecActiveTasks) {
+            if(s_active_task.Thread.joinable()) {
+               s_active_task.Thread.join();
+            }
+         }
+         /* sleep if required */
+         cRate.Sleep();
+         m_pcController->ControlStep();
+         /* actuator update */
+         for(CPhysicalActuator* pc_actuator : m_vecActuators) {
+            lstTasks.emplace_back(std::bind(&CPhysicalActuator::Update, pc_actuator));
+         }
+         LOG.Flush();
+         LOGERR.Flush();
+      }
    }
 
    /****************************************/

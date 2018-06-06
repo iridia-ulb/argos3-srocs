@@ -1,10 +1,10 @@
 /**
- * @file <argos3/plugins/robots/builderbot/hardware/builderbot_lar_default_sensor.cpp>
+ * @file <argos3/plugins/robots/builderbot/hardware/builderbot_lar_default_actuator.cpp>
  *
  * @author Michael Allwright - <allsey87@gmail.com>
  */
 
-#include "builderbot_lar_default_sensor.h"
+#include "builderbot_dds_default_sensor.h"
 
 #define NUM_SENSORS 15
 //#define SYSFS_ROOT "/dev/sys"
@@ -16,12 +16,12 @@ namespace argos {
    /****************************************/
    /****************************************/
 
-   CBuilderBotLARDefaultSensor::CBuilderBotLARDefaultSensor() {}
+   CBuilderBotDDSDefaultActuator::CBuilderBotDDSDefaultActuator() {}
 
    /****************************************/
    /****************************************/
 
-   void CBuilderBotLARDefaultSensor::Init(TConfigurationNode& t_tree) {
+   void CBuilderBotDDSDefaultActuator::Init(TConfigurationNode& t_tree) {
       try {
          CCI_BuilderBotLARSensor::Init(t_tree);
  
@@ -40,13 +40,13 @@ namespace argos {
    /****************************************/
    /****************************************/
    
-   void CBuilderBotLARDefaultSensor::Update() {
+   void CBuilderBotDDSDefaultActuator::Update() {
    }
 
    /****************************************/
    /****************************************/
 
-   void CBuilderBotLARDefaultSensor::Reset() {
+   void CBuilderBotDDSDefaultActuator::Reset() {
       for(SInterface& s_interface : m_tInterfaces) {
          s_interface.Light = Real(0);
          s_interface.Range = Real(0);
@@ -56,7 +56,7 @@ namespace argos {
    /****************************************/
    /****************************************/
 
-   REGISTER_SENSOR(CBuilderBotLARDefaultSensor,
+   REGISTER_SENSOR(CBuilderBotDDSDefaultActuator,
                    "builderbot_lar", "default",
                    "Michael Allwright [allsey87@gmail.com]",
                    "1.0",

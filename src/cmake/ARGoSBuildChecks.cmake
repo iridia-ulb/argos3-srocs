@@ -54,16 +54,13 @@ endif(ARGOS_DYNAMIC_LIBRARY_LOADING)
 
 #
 # Check for PThreads
-# It is required only when compiling the simulator
 #
-if(ARGOS_BUILD_FOR_SIMULATOR)
-  find_package(Pthreads)
-  if(NOT PTHREADS_FOUND)
-    message(FATAL_ERROR "Required library pthreads not found.")
-  endif(NOT PTHREADS_FOUND)
-  add_definitions(${PTHREADS_DEFINITIONS})
-  include_directories(${PTHREADS_INCLUDE_DIR})
-endif(ARGOS_BUILD_FOR_SIMULATOR)
+find_package(Pthreads)
+if(NOT PTHREADS_FOUND)
+ message(FATAL_ERROR "Required library pthreads not found.")
+endif(NOT PTHREADS_FOUND)
+add_definitions(${PTHREADS_DEFINITIONS})
+include_directories(${PTHREADS_INCLUDE_DIR})
 
 #
 # Check for Doxygen

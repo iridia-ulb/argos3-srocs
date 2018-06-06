@@ -5,6 +5,7 @@
 */
 
 #include <argos3/core/utility/configuration/command_line_arg_parser.h>
+#include <argos3/core/utility/plugins/dynamic_loading.h>
 #include <argos3/plugins/robots/builderbot/hardware/builderbot.h>
 
 using namespace argos;
@@ -57,6 +58,8 @@ int main(int n_argc, char** ppch_argv) {
    } catch (CARGoSException& ex) {
       THROW_ARGOSEXCEPTION_NESTED("Error while parsing arguments", ex);
    }
+   /* Load all libraries */
+   CDynamicLoading::LoadAllLibraries();
    /* Create the configuration with the provided file */
    ticpp::Document tConfiguration = ticpp::Document(strConfigurationFile);
    /* Load the file */
@@ -67,6 +70,8 @@ int main(int n_argc, char** ppch_argv) {
    cBuilderBot.Execute();
    /* Clean up resources */
    cBuilderBot.Destroy();
+   /* Load all libraries */
+   CDynamicLoading::UnloadAllLibraries();
    /* Exit */
    return EXIT_SUCCESS;
 }

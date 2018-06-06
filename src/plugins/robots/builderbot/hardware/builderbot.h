@@ -33,6 +33,8 @@ namespace argos {
       void InitFramework(TConfigurationNode& t_tree);
       void InitController(TConfigurationNode& t_tree,
                           const std::string& str_controller_id);
+      void InitHardware();
+
 
       void Execute();
 
@@ -47,20 +49,16 @@ namespace argos {
       /* The random number generator */
       CRandom::CRNG* m_pcRNG;
       /* Target tick length for the controller */
-      Real m_fTargetTickLength;
+      UInt32 m_unTicksPerSec;
       /*  Pointer to the controller */
       CCI_Controller* m_pcController;
 
-      /* The map of actuators, indexed by actuator type */
-      std::map<std::string, CPhysicalActuator*> m_mapActuators;
-      /* The map of sensors, indexed by sensor type */
-      std::map<std::string, CPhysicalSensor*> m_mapSensors;
+      UInt32 m_unNumThreads = 2;
 
-      CRemoteLink m_pcSensactRemoteLink;
-      CRemoteLink m_pcManipulatorRemoteLink;
-      CRemoteLink m_pcPowerManagementRemoteLink;
-      
-
+      /* The vector of actuators */
+      std::vector<CPhysicalActuator*> m_vecActuators;
+      /* The vector of sensors */
+      std::vector<CPhysicalSensor*> m_vecSensors;
    };
 
 }

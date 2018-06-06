@@ -6,11 +6,7 @@ end
 --[[ This function is executed at each time step
      It must contain the logic of your controller ]]
 function step()
-	log("robot.lar.sensor1.light = " .. string.format("%.2f", robot.random.uniform()))
-	log("robot.lar.sensor1.light = " .. string.format("%.2f", robot.random.uniform()))
-	log("robot.lar.sensor1.light = " .. string.format("%.2f", robot.random.uniform()))
-	log("robot.lar.sensor1.light = " .. string.format("%.2f", robot.random.uniform()))
-	log("robot.lar.sensor1.light = " .. string.format("%.2f", robot.random.uniform()))
+	robot.dds.set_target_velocity(robot.random.uniform() * 10 - 5, robot.random.uniform() * 10 - 5)
 end
 
 --[[ This function is executed every time you press the 'reset'
