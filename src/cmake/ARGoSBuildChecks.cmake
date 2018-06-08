@@ -63,6 +63,18 @@ add_definitions(${PTHREADS_DEFINITIONS})
 include_directories(${PTHREADS_INCLUDE_DIR})
 
 #
+# Check for the AprilTag library
+# It is required only when compiling for the hardware
+#
+if(NOT ARGOS_BUILD_FOR_SIMULATOR)
+  find_package(AprilTag)
+  if(NOT APRILTAG_FOUND)
+    message(FATAL_ERROR "Required library AprilTag not found.")
+  endif(NOT APRILTAG_FOUND)
+  include_directories(${APRILTAG_INCLUDE_DIR})
+endif(NOT ARGOS_BUILD_FOR_SIMULATOR)
+
+#
 # Check for Doxygen
 #
 set(ARGOS_BUILD_API OFF)

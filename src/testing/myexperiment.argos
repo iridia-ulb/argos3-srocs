@@ -20,14 +20,12 @@
       </actuators>
       <sensors>
         <builderbot_lar implementation="default"/>
-        <!--cameras implementation="default" show_frustum="true">
-          <camera id="ov5640" anchor="base" range="0.025:0.10" resolution="640,360"
-                  position="0.05,0,0.05" orientation="-90,135,0"
-                  focal_length="883.961,883.961" principle_point="319.5,179.5">
-            <directional_led_detector medium="leds" show_rays="true"/>
-            <tag_detector medium="tags" show_rays="true"/>
-          </camera>
-        </cameras-->
+        <builderbot_camera implementation="default" resolution="640,360">
+          <frame src="tags2.pgm" />
+          <frame src="tags4.pgm" />
+          <frame src="tags6.pgm" />
+          <device id="ov5640"/>
+        </builderbot_camera>
       </sensors>
       <params script="src/testing/mycontroller.lua"/>
     </lua_controller>

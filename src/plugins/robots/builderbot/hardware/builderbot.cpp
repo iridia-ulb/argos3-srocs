@@ -12,6 +12,8 @@
 #include <thread>
 #include <future>
 #include <chrono>
+#include <memory>
+#include <utility>
 
 #include <argos3/core/utility/logging/argos_log.h>
 #include <argos3/core/utility/plugins/factory.h>
@@ -170,43 +172,44 @@ namespace argos {
    /****************************************/
 
    void CBuilderBot::Execute() {
-      /* definition of an active task */
-      struct SActiveTask {
-         std::thread Thread;
-         std::future<void> Future;
-      };
+      /* futures of the active tasks */
 
       CRate cRate(m_unTicksPerSec);
 
-      std::vector<SActiveTask> vecActiveTasks(2);
-
-      std::list<std::packaged_task<void()> > lstTasks;
+      std::list<std::future<void> > lstActiveTasks;
 
       for(;;) {
          /* create a packaged task for each sensor to be updated */
          for(CPhysicalSensor* pc_sensor : m_vecSensors) {
-            lstTasks.emplace_back(std::bind(&CPhysicalSensor::Update, pc_sensor));
-         }
-         /* spawn up to X threads and execute the tasks */
-         while(!lstTasks.empty()) {
-            /* activate tasks */
-            for(SActiveTask& s_active_task : vecActiveTasks) {
-               if((s_active_task.Future.valid() == false) ||
-                  (s_active_task.Future.wait_for(std::chrono::milliseconds(0)) ==
-                     std::future_status::ready)) {
-                  /* activate a task */
-                  s_active_task.Future = lstTasks.front().get_future();
-                  std::thread cTaskThread(std::move(lstTasks.front()));
-                  s_active_task.Thread = std::move(cTaskThread);
-                  lstTasks.pop_front();
+            /* loop until we can launch a thread */
+            for(;;) {
+               std::list<std::future<void> >::iterator itFuture =
+                  std::begin(lstActiveTasks);
+               for(; itFuture != std::end(lstActiveTasks); ++itFuture) {
+                  if(itFuture->wait_for(std::chrono::milliseconds(0)) ==
+                     std::future_status::ready) {
+                     /* handle any possible exceptions */
+                     try {
+                        itFuture->get();
+                     } catch(CARGoSException& ex) {
+                        LOGERR << "[ERROR] Could not update sensor:" << std::endl << ex.what() << std::endl;
+                        LOGERR.Flush();
+                        // TODO initiate safe shutdown
+                        return;
+                     }
+                     break;
+                  }
+                  std::this_thread::sleep_for(std::chrono::milliseconds(5));
+               }
+               if(itFuture != std::end(lstActiveTasks)) {
+                  lstActiveTasks.erase(itFuture);
+               }
+               if(lstActiveTasks.size() < 2) { /* there is a thread available */
+                  lstActiveTasks.emplace_back(
+                     std::async(std::launch::async,
+                        std::bind(&CPhysicalSensor::Update, pc_sensor)));
                   break;
                }
-            }
-         }
-         /* wait for the last tasks to complete */
-         for(SActiveTask& s_active_task : vecActiveTasks) {
-            if(s_active_task.Thread.joinable()) {
-               s_active_task.Thread.join();
             }
          }
          /* sleep if required */
@@ -214,7 +217,7 @@ namespace argos {
          m_pcController->ControlStep();
          /* actuator update */
          for(CPhysicalActuator* pc_actuator : m_vecActuators) {
-            lstTasks.emplace_back(std::bind(&CPhysicalActuator::Update, pc_actuator));
+            //lstTasks.emplace_back(std::bind(&CPhysicalActuator::Update, pc_actuator));
          }
          LOG.Flush();
          LOGERR.Flush();

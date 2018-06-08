@@ -2,21 +2,21 @@
 # - Find the AprilTag Library
 #=============================================================================
 # This module defines
-# 	AprilTag_INCLUDE_DIR, where to find TagDetector.h, etc.
-# 	AprilTag_LIB, libraries to link against to use AprilTag.
-# 	AprilTag_FOUND, libraries to link against to use AprilTag.
+# 	APRILTAG_INCLUDE_DIR, where to find TagDetector.h, etc.
+# 	APRILTAG_LIB, libraries to link against to use AprilTag.
+# 	APRILTAG_FOUND, libraries to link against to use AprilTag.
 #
 #=============================================================================
 
-SET (AprilTag_FOUND 0)
+SET (APRILTAG_FOUND 0)
 
-FIND_PATH (AprilTag_INCLUDE_DIR
+FIND_PATH (APRILTAG_INCLUDE_DIR
   NAMES apriltag.h
   PATH_SUFFIXES apriltag
   DOC "The AprilTag include directory"
 )
 
-FIND_LIBRARY (AprilTag_LIB
+FIND_LIBRARY (APRILTAG_LIBRARY
   NAMES apriltag
   DOC "The AprilTag shared library"
 )
@@ -26,9 +26,9 @@ FIND_LIBRARY (AprilTag_LIB
 INCLUDE (FindPackageHandleStandardArgs)
 FIND_PACKAGE_HANDLE_STANDARD_ARGS (
   AprilTag
-  FOUND_VAR AprilTag_FOUND
-  REQUIRED_VARS AprilTag_LIB AprilTag_INCLUDE_DIR)
+  FOUND_VAR APRILTAG_FOUND
+  REQUIRED_VARS APRILTAG_LIBRARY APRILTAG_INCLUDE_DIR)
 
-IF (NOT AprilTag_FOUND)
-  MESSAGE (WARNING "The AprilTag Library has not been found!")
-ENDIF (NOT AprilTag_FOUND)
+IF (NOT APRILTAG_FOUND)
+  MESSAGE (WARNING "The AprilTag library could not be found!")
+ENDIF (NOT APRILTAG_FOUND)

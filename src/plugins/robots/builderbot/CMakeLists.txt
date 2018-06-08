@@ -3,65 +3,66 @@
 #
 # argos3/plugins/robots/builderbot/control_interface
 set(ARGOS3_HEADERS_PLUGINS_ROBOTS_BUILDERBOT_CONTROLINTERFACE
+  control_interface/ci_builderbot_camera_sensor.h
   control_interface/ci_builderbot_lar_sensor.h
   control_interface/ci_builderbot_dds_actuator.h)
-# argos3/plugins/robots/builderbot/simulator
 if(ARGOS_BUILD_FOR_SIMULATOR)
+  # argos3/plugins/robots/builderbot/simulator
   set(ARGOS3_HEADERS_PLUGINS_ROBOTS_BUILDERBOT_SIMULATOR
     simulator/dynamics3d_builderbot_model.h
     simulator/builderbot_entity.h
     simulator/builderbot_lar_default_sensor.h)
-  # Compile the graphical visualization only if Qt and OpenGL have been found
   if(ARGOS_COMPILE_QTOPENGL)
     set(ARGOS3_HEADERS_PLUGINS_ROBOTS_BUILDERBOT_SIMULATOR
       ${ARGOS3_HEADERS_PLUGINS_ROBOTS_BUILDERBOT_SIMULATOR}
       simulator/qtopengl_builderbot.h)
   endif(ARGOS_COMPILE_QTOPENGL)
-endif(ARGOS_BUILD_FOR_SIMULATOR)
-
-# argos3/plugins/robots/builderbot/hardware
-if(ARGOS_BUILD_FOR_HARDWARE)
+else(ARGOS_BUILD_FOR_SIMULATOR)
+  # argos3/plugins/robots/builderbot/hardware
   set(ARGOS3_HEADERS_PLUGINS_ROBOTS_BUILDERBOT_HARDWARE
     hardware/builderbot.h
+    hardware/builderbot_camera_default_sensor.h
     hardware/builderbot_lar_default_sensor.h
     hardware/builderbot_dds_default_actuator.h)
-endif(ARGOS_BUILD_FOR_HARDWARE)
+endif(ARGOS_BUILD_FOR_SIMULATOR)
 
 #
 # BuilderBot sources
 #
+# argos3/plugins/robots/builderbot/control_interface
 set(ARGOS3_SOURCES_PLUGINS_ROBOTS_BUILDERBOT
   ${ARGOS3_HEADERS_PLUGINS_ROBOTS_BUILDERBOT_CONTROLINTERFACE}
+  control_interface/ci_builderbot_camera_sensor.cpp
   control_interface/ci_builderbot_lar_sensor.cpp
   control_interface/ci_builderbot_dds_actuator.cpp)
-
 if(ARGOS_BUILD_FOR_SIMULATOR)
+  # argos3/plugins/robots/builderbot/simulator
   set(ARGOS3_SOURCES_PLUGINS_ROBOTS_BUILDERBOT
     ${ARGOS3_SOURCES_PLUGINS_ROBOTS_BUILDERBOT}
     ${ARGOS3_HEADERS_PLUGINS_ROBOTS_BUILDERBOT_SIMULATOR}
-    simulator/dynamics3d_builderbot_model.cpp
+    simulator/builderbot_camera_default_sensor.cpp
     simulator/builderbot_entity.cpp
-    simulator/builderbot_lar_default_sensor.cpp)
-  # Compile the graphical visualization only if Qt and OpenGL have been found
+    simulator/builderbot_lar_default_sensor.cpp
+    simulator/dynamics3d_builderbot_model.cpp)
   if(ARGOS_COMPILE_QTOPENGL)
     set(ARGOS3_SOURCES_PLUGINS_ROBOTS_BUILDERBOT
       ${ARGOS3_SOURCES_PLUGINS_ROBOTS_BUILDERBOT}
       simulator/qtopengl_builderbot.cpp)
   endif(ARGOS_COMPILE_QTOPENGL)
-endif(ARGOS_BUILD_FOR_SIMULATOR)
-
-if(ARGOS_BUILD_FOR_HARDWARE)
+else(ARGOS_BUILD_FOR_SIMULATOR)
+  # argos3/plugins/robots/builderbot/hardware
   set(ARGOS3_SOURCES_PLUGINS_ROBOTS_BUILDERBOT
     ${ARGOS3_SOURCES_PLUGINS_ROBOTS_BUILDERBOT}
     ${ARGOS3_HEADERS_PLUGINS_ROBOTS_BUILDERBOT_HARDWARE}
-    hardware/main.cpp
     hardware/builderbot.cpp
+    hardware/builderbot_camera_default_sensor.cpp
     hardware/builderbot_lar_default_sensor.cpp
-    hardware/builderbot_dds_default_actuator.cpp)
-endif(ARGOS_BUILD_FOR_HARDWARE)
+    hardware/builderbot_dds_default_actuator.cpp
+    hardware/main.cpp)
+endif(ARGOS_BUILD_FOR_SIMULATOR)
 
 if(ARGOS_BUILD_FOR_SIMULATOR)
-  # Create the BuilderBot plug-in for the simulator
+  # Create a plug-in for the simulator
   add_library(argos3plugin_${ARGOS_BUILD_FOR}_builderbot SHARED ${ARGOS3_SOURCES_PLUGINS_ROBOTS_BUILDERBOT})
   target_link_libraries(argos3plugin_${ARGOS_BUILD_FOR}_builderbot
     argos3plugin_${ARGOS_BUILD_FOR}_genericrobot
@@ -73,25 +74,21 @@ if(ARGOS_BUILD_FOR_SIMULATOR)
     RUNTIME DESTINATION bin
     LIBRARY DESTINATION lib/argos3
     ARCHIVE DESTINATION lib/argos3)
-endif(ARGOS_BUILD_FOR_SIMULATOR)
-
-if(ARGOS_BUILD_FOR_HARDWARE)
-  # Create an ARGoS executable for the robot
+else(ARGOS_BUILD_FOR_SIMULATOR)
+  # Create an executable for the robot
   add_executable(argos3 ${ARGOS3_SOURCES_PLUGINS_ROBOTS_BUILDERBOT})
-  target_link_libraries(argos3 ${ARGOS_CORE_LIBRARY} ${LUA_LIBRARIES} ${PTHREADS_LIBRARY} stdc++fs)
+  target_link_libraries(argos3 ${ARGOS_CORE_LIBRARY} ${LUA_LIBRARIES} ${PTHREADS_LIBRARY} ${APRILTAG_LIBRARY} stdc++fs)
   install(TARGETS argos3
     RUNTIME DESTINATION bin
     LIBRARY DESTINATION lib/argos3
     ARCHIVE DESTINATION lib/argos3)
-endif(ARGOS_BUILD_FOR_HARDWARE)
+endif(ARGOS_BUILD_FOR_SIMULATOR)
 
 install(FILES ${ARGOS3_HEADERS_PLUGINS_ROBOTS_BUILDERBOT_CONTROLINTERFACE} DESTINATION include/argos3/plugins/robots/builderbot/control_interface)
 
 if(ARGOS_BUILD_FOR_SIMULATOR)
   install(FILES ${ARGOS3_HEADERS_PLUGINS_ROBOTS_BUILDERBOT_SIMULATOR} DESTINATION include/argos3/plugins/robots/builderbot/simulator)
-endif(ARGOS_BUILD_FOR_SIMULATOR)
-
-if(ARGOS_BUILD_FOR_HARDWARE)
+else(ARGOS_BUILD_FOR_SIMULATOR)
   install(FILES ${ARGOS3_HEADERS_PLUGINS_ROBOTS_BUILDERBOT_HARDWARE} DESTINATION include/argos3/plugins/robots/builderbot/hardware)
-endif(ARGOS_BUILD_FOR_HARDWARE)
+endif(ARGOS_BUILD_FOR_SIMULATOR)
 

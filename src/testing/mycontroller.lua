@@ -1,12 +1,16 @@
 --[[ This function is executed every time you press the 'execute' button ]]
 function init()
-	log("lua init")
 end
 
 --[[ This function is executed at each time step
      It must contain the logic of your controller ]]
 function step()
-	robot.dds.set_target_velocity(robot.random.uniform() * 10 - 5, robot.random.uniform() * 10 - 5)
+   local pixels = robot.camera.get_pixels(1,2,3,4)
+   for index,pixel in ipairs(pixels) do 
+      log(index .. ": " .. pixel.y .. " " .. pixel.u .. " " .. pixel.v)
+   end
+   log("tags = " .. #robot.camera.tags)
+--	robot.dds.set_target_velocity(robot.random.uniform() * 10 - 5, robot.random.uniform() * 10 - 5)
 end
 
 --[[ This function is executed every time you press the 'reset'
