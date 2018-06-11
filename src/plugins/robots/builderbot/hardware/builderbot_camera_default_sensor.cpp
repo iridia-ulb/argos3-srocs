@@ -52,6 +52,8 @@ namespace argos {
    /****************************************/
 
    void CBuilderBotCameraDefaultSensor::Init(TConfigurationNode& t_tree) {
+      std::cerr << "INIT!" << std::endl;
+
       try {
          /* Parent class init */
          CCI_BuilderBotCameraSensor::Init(t_tree);
@@ -83,7 +85,6 @@ namespace argos {
    /****************************************/
 
    void CBuilderBotCameraDefaultSensor::Update() {
-      // TODO update m_sCurrentFrame from camera / from file?
       if(m_itInputFrameIterator != std::end(m_vecInputFrames)) {
          image_u8_t* ptFrame = 
             image_u8_create_from_pnm(m_itInputFrameIterator->c_str());
@@ -93,6 +94,9 @@ namespace argos {
          }
          else {
             m_sCurrentFrame.Y.reset(ptFrame);
+            /* other channels not defined */
+            m_sCurrentFrame.U.release();
+            m_sCurrentFrame.V.release();
             m_itInputFrameIterator++;
          }
       }
@@ -108,6 +112,8 @@ namespace argos {
          apriltag_detector_detect(m_psTagDetector, m_sCurrentFrame.Y.get());
       /* get the detected tags count */
       size_t unTagCount = static_cast<size_t>(zarray_size(psDetectionArray));
+      /* clear out previous readings */
+      m_tTags.clear();
       /* reserve space for the tags */
       m_tTags.reserve(unTagCount);
       /* process detections */
@@ -134,21 +140,32 @@ namespace argos {
    void CBuilderBotCameraDefaultSensor::GetPixels(const CVector2& c_offset,
                                                   const CVector2& c_size,
                                                   std::vector<SPixel>& vec_pixels) {
-      /* round the given coordinates for looking up the pixels */     
+      /* round the given coordinates to look up the pixels */     
       UInt32 unOffsetX = std::round(c_offset.GetX());
       UInt32 unOffsetY = std::round(c_offset.GetY());
       UInt32 unWidth = std::round(c_size.GetX());
       UInt32 unHeight = std::round(c_size.GetY());
       UInt32 unFrameStride = m_sCurrentFrame.Y->stride;
       /* copy the requested pixels */
-      for(UInt32 un_y = 0; un_y < unOffsetX + unWidth; un_y++) {
-         for(UInt32 un_x = 0; un_x < unOffsetY + unHeight; un_x++) {
+      for(UInt32 un_y = unOffsetY; un_y < unOffsetY + unHeight; un_y++) {
+         for(UInt32 un_x = unOffsetX; un_x < unOffsetX + unWidth; un_x++) {
             vec_pixels.emplace_back(
                m_sCurrentFrame.Y->buf[un_y * unFrameStride + un_x],
-               m_sCurrentFrame.U->buf[un_y * unFrameStride + un_x],
-               m_sCurrentFrame.V->buf[un_y * unFrameStride + un_x]);
+               m_sCurrentFrame.U ? m_sCurrentFrame.U->buf[un_y * unFrameStride + un_x] : 0,
+               m_sCurrentFrame.V ? m_sCurrentFrame.V->buf[un_y * unFrameStride + un_x] : 0);
          }
       }
+   }
+
+   /****************************************/
+   /****************************************/
+
+   void CBuilderBotCameraDefaultSensor::Write(const CBuilderBotCameraDefaultSensor::SFrame& s_frame,
+                                              const std::string& str_file) {
+      /* write to PNM file */
+      static int frame = 0;
+      image_u8_write_pnm(s_frame.Y.get(), (str_file + std::to_string(frame)).c_str());
+      frame++;
    }
 
    /****************************************/

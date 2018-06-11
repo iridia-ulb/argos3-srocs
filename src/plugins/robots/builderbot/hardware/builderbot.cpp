@@ -142,7 +142,13 @@ namespace argos {
                THROW_ARGOSEXCEPTION("BUG: sensor \"" << itSens->Value() << "\" does not inherit from CCI_Sensor");
             }
             pcCISens->Init(*itSens);
-            m_vecSensors.emplace_back(pcSens);
+            if(itSens->Value() == "builderbot_camera") {
+               m_pcCamera = pcSens;
+            }
+            else {
+               m_vecSensors.emplace_back(pcSens);
+            }
+               
             m_pcController->AddSensor(itSens->Value(), pcCISens);
          }
 
@@ -173,54 +179,36 @@ namespace argos {
 
    void CBuilderBot::Execute() {
       /* futures of the active tasks */
-
       CRate cRate(m_unTicksPerSec);
-
-      std::list<std::future<void> > lstActiveTasks;
-
-      for(;;) {
-         /* create a packaged task for each sensor to be updated */
-         for(CPhysicalSensor* pc_sensor : m_vecSensors) {
-            /* loop until we can launch a thread */
-            for(;;) {
-               std::list<std::future<void> >::iterator itFuture =
-                  std::begin(lstActiveTasks);
-               for(; itFuture != std::end(lstActiveTasks); ++itFuture) {
-                  if(itFuture->wait_for(std::chrono::milliseconds(0)) ==
-                     std::future_status::ready) {
-                     /* handle any possible exceptions */
-                     try {
-                        itFuture->get();
-                     } catch(CARGoSException& ex) {
-                        LOGERR << "[ERROR] Could not update sensor:" << std::endl << ex.what() << std::endl;
-                        LOGERR.Flush();
-                        // TODO initiate safe shutdown
-                        return;
-                     }
-                     break;
-                  }
-                  std::this_thread::sleep_for(std::chrono::milliseconds(5));
-               }
-               if(itFuture != std::end(lstActiveTasks)) {
-                  lstActiveTasks.erase(itFuture);
-               }
-               if(lstActiveTasks.size() < 2) { /* there is a thread available */
-                  lstActiveTasks.emplace_back(
-                     std::async(std::launch::async,
-                        std::bind(&CPhysicalSensor::Update, pc_sensor)));
-                  break;
-               }
+      try {
+         for(;;) {
+            /* start the camera update on a separate thread */
+            std::future<void> cCameraUpdate = 
+               std::async(std::launch::async, std::bind(&CPhysicalSensor::Update, m_pcCamera));
+            /* update the remaining sensors on this thread */
+            for(CPhysicalSensor* pc_sensor : m_vecSensors) {
+               pc_sensor->Update();
             }
+            /* wait for the camera update to complete */
+            cCameraUpdate.wait();      
+            /* check if there are any exceptions */
+            cCameraUpdate.get();
+            /* sleep if required */
+            cRate.Sleep();
+            m_pcController->ControlStep();
+            /* actuator update */
+            //for(CPhysicalActuator* pc_actuator : m_vecActuators) {
+               //lstTasks.emplace_back(std::bind(&CPhysicalActuator::Update, pc_actuator));
+            //}
+            LOG.Flush();
+            LOGERR.Flush();
          }
-         /* sleep if required */
-         cRate.Sleep();
-         m_pcController->ControlStep();
-         /* actuator update */
-         for(CPhysicalActuator* pc_actuator : m_vecActuators) {
-            //lstTasks.emplace_back(std::bind(&CPhysicalActuator::Update, pc_actuator));
-         }
-         LOG.Flush();
+      }
+      catch(CARGoSException& ex) {
+         LOGERR << "[FATAL] Exception thrown in the control loop" << std::endl
+                << ex.what() << std::endl;
          LOGERR.Flush();
+         return;
       }
    }
 

@@ -64,6 +64,8 @@ namespace argos {
          }
       };
 
+      void Write(const SFrame& s_frame, const std::string& str_file);
+
       SFrame m_sCurrentFrame;
 
       UInt32 m_unImageHeight;

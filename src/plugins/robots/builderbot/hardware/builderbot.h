@@ -59,6 +59,8 @@ namespace argos {
       std::vector<CPhysicalActuator*> m_vecActuators;
       /* The vector of sensors */
       std::vector<CPhysicalSensor*> m_vecSensors;
+
+      CPhysicalSensor* m_pcCamera;
    };
 
 }
