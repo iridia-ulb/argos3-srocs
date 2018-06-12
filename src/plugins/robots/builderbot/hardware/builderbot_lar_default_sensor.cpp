@@ -6,10 +6,7 @@
 
 #include "builderbot_lar_default_sensor.h"
 
-#define NUM_SENSORS 15
-//#define SYSFS_ROOT "/dev/sys"
-#define SYSFS_ROOT "/home/allsey87/Workspace/sysfs"
-
+static const std::string STR_IIO_PATH("/sys/bus/iio");
 
 namespace argos {
 

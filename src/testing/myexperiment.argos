@@ -21,13 +21,13 @@
       <sensors>
         <builderbot_lar implementation="default"/>
         <builderbot_camera implementation="default" resolution="640,360">
-          <frame src="tags6.pgm" />
-          <frame src="tags4.pgm" />
-          <frame src="tags2.pgm" />
+          <!--frame image="src/testing/tags6.pgm" />
+          <frame image="src/testing/tags4.pgm" />
+          <frame image="src/testing/tags2.pgm" /-->
           <device id="ov5640"/>
         </builderbot_camera>
       </sensors>
-      <params script="src/testing/mycontroller.lua"/>
+      <params script="mycontroller.lua"/>
     </lua_controller>
   </controllers>
 

@@ -8,10 +8,8 @@
 #include "builderbot_dds_default_actuator.h"
 #include <argos3/core/utility/logging/argos_log.h>
 
-static const std::string STR_IIO_PATH("/home/allsey87/Workspace/sysfs/bus/iio");
-//static const std::string STR_IIO_PATH("/sys/bus/iio");
-
-
+//static const std::string STR_IIO_PATH("/home/allsey87/Workspace/sysfs/bus/iio");
+static const std::string STR_IIO_PATH("/sys/bus/iio");
 
 namespace argos {
 
