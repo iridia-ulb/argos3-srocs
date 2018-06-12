@@ -8,21 +8,20 @@
 
 #include <sys/time.h>
 #include <unistd.h>
+
+#include <chrono>
+#include <functional>
+#include <future>
+#include <memory>
 #include <list>
 #include <thread>
-#include <future>
-#include <chrono>
-#include <memory>
-#include <utility>
 
+#include <argos3/core/control_interface/ci_controller.h>
+#include <argos3/core/hardware/actuator.h>
+#include <argos3/core/hardware/sensor.h>
 #include <argos3/core/utility/logging/argos_log.h>
 #include <argos3/core/utility/plugins/factory.h>
 #include <argos3/core/utility/rate.h>
-
-#include <argos3/core/control_interface/ci_controller.h>
-
-#include <argos3/core/hardware/actuator.h>
-#include <argos3/core/hardware/sensor.h>
 
 namespace argos {
 
@@ -142,7 +141,7 @@ namespace argos {
                THROW_ARGOSEXCEPTION("BUG: sensor \"" << itSens->Value() << "\" does not inherit from CCI_Sensor");
             }
             pcCISens->Init(*itSens);
-            if(itSens->Value() == "builderbot_camera") {
+            if(itSens->Value() == "builderbot_cam") {
                m_pcCamera = pcSens;
             }
             else {
@@ -178,34 +177,37 @@ namespace argos {
    /****************************************/
 
    void CBuilderBot::Execute() {
-      /* futures of the active tasks */
+      /* initialize the tick rate */
       CRate cRate(m_unTicksPerSec);
+      /* start the main control loop */
       try {
          for(;;) {
             /* start the camera update on a separate thread */
-            std::future<void> cCameraUpdate = 
-               std::async(std::launch::async, std::bind(&CPhysicalSensor::Update, m_pcCamera));
-            /* update the remaining sensors on this thread */
+            //std::future<void> cCameraUpdate = 
+            //   std::async(std::launch::async, std::bind(&CPhysicalSensor::Update, m_pcCamera));
+            /* meanwhile update the remaining sensors on this thread */
             for(CPhysicalSensor* pc_sensor : m_vecSensors) {
                pc_sensor->Update();
             }
-            /* wait for the camera update to complete */
-            cCameraUpdate.wait();      
-            /* check if there are any exceptions */
-            cCameraUpdate.get();
+            /* wait for the camera update thread to complete */
+            //cCameraUpdate.wait();
+            /* forward any exceptions from the update thread to this thread */
+            //cCameraUpdate.get();
             /* sleep if required */
             cRate.Sleep();
+            /* step the internal state machine */
             m_pcController->ControlStep();
             /* actuator update */
-            //for(CPhysicalActuator* pc_actuator : m_vecActuators) {
-               //lstTasks.emplace_back(std::bind(&CPhysicalActuator::Update, pc_actuator));
-            //}
+            for(CPhysicalActuator* pc_actuator : m_vecActuators) {
+               pc_actuator->Update();
+            }
             LOG.Flush();
             LOGERR.Flush();
          }
       }
       catch(CARGoSException& ex) {
-         LOGERR << "[FATAL] Exception thrown in the control loop" << std::endl
+         /* if cCameraUpdate valid, wait, get, catch all exceptions */
+         LOGERR << "[FATAL] Exception thrown in the main control loop" << std::endl
                 << ex.what() << std::endl;
          LOGERR.Flush();
          return;

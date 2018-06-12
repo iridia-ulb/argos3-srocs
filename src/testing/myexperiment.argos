@@ -5,27 +5,34 @@
   <!-- * General configuration * -->
   <!-- ************************* -->
   <framework>
-    <experiment length="0" ticks_per_second="1" random_seed="0"/>
+    <experiment length="0" ticks_per_second="10" random_seed="0"/>
   </framework>
 
-  <!-- *************** -->
-  <!-- * Controllers * -->
-  <!-- *************** -->
+  <!-- ************** -->
+  <!-- * Controller * -->
+  <!-- ************** -->
   <controllers>
     <lua_controller id="mycontroller">
       <actuators>
-        <!--radios implementation="default"/-->
-        <builderbot_dds_actuator implementation="default" device="dds"
-          left_chan="out_anglvel0_raw" right_chan="out_anglvel1_raw" />
+        <builderbot_dds implementation="default"
+                        device="dds"
+                        left="out_anglvel0_raw"
+                        right="out_anglvel1_raw" />
+        <builderbot_ems implementation="default" 
+                        device="ems" />
       </actuators>
       <sensors>
+        <builderbot_ems implementation="default" 
+                        device="ems"
+                        voltage="in_voltage_raw" />
         <builderbot_lar implementation="default"/>
-        <builderbot_camera implementation="default" resolution="640,360">
-          <!--frame image="src/testing/tags6.pgm" />
-          <frame image="src/testing/tags4.pgm" />
-          <frame image="src/testing/tags2.pgm" /-->
+        <builderbot_cam implementation="default"
+                        resolution="640,360">
+          <frame src="tags6.pgm" />
+          <frame src="tags4.pgm" />
+          <frame src="tags2.pgm" />
           <device id="ov5640"/>
-        </builderbot_camera>
+        </builderbot_cam>
       </sensors>
       <params script="mycontroller.lua"/>
     </lua_controller>

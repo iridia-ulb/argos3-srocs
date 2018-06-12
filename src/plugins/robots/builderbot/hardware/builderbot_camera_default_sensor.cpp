@@ -52,8 +52,6 @@ namespace argos {
    /****************************************/
 
    void CBuilderBotCameraDefaultSensor::Init(TConfigurationNode& t_tree) {
-      std::cerr << "INIT!" << std::endl;
-
       try {
          /* Parent class init */
          CCI_BuilderBotCameraSensor::Init(t_tree);
@@ -172,7 +170,7 @@ namespace argos {
    /****************************************/
 
    REGISTER_SENSOR(CBuilderBotCameraDefaultSensor,
-                   "builderbot_camera", "default",
+                   "builderbot_cam", "default",
                    "Michael Allwright [allsey87@gmail.com]",
                    "1.0",
                    "Camera sensor for the BuilderBot Robot",

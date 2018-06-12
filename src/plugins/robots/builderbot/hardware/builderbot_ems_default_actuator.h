@@ -1,32 +1,39 @@
 /**
- * @file <argos3/plugins/robots/builderbot/hardware/builderbot_dds_default_actuator.h>
+ * @file <argos3/plugins/robots/builderbot/hardware/builderbot_ems_default_actuator.h>
  *
  * @author Michael Allwright - <allsey87@gmail.com>
  */
 
-#ifndef BUILDERBOT_DDS_DEFAULT_ACTUATOR_H
-#define BUILDERBOT_DDS_DEFAULT_ACTUATOR_H
+#ifndef BUILDERBOT_EMS_DEFAULT_ACTUATOR_H
+#define BUILDERBOT_EMS_DEFAULT_ACTUATOR_H
 
-#include <string>
-#include <map>
+#include <experimental/filesystem>
+
+namespace fs = std::experimental::filesystem;
 
 namespace argos {
-   class CBuilderBotDDSDefaultActuator;
+   class CBuilderBotEMSDefaultActuator;
 }
 
+#include <argos3/plugins/robots/builderbot/control_interface/ci_builderbot_ems_actuator.h>
 #include <argos3/core/hardware/actuator.h>
-#include <argos3/plugins/robots/builderbot/control_interface/ci_builderbot_dds_actuator.h>
 
 namespace argos {
 
-   class CBuilderBotDDSDefaultActuator : public CPhysicalActuator,
-                                         public CCI_BuilderBotDDSActuator {
+   class CBuilderBotEMSDefaultActuator : public CPhysicalActuator,
+                                         public CCI_BuilderBotEMSActuator {
 
    public:
 
-      CBuilderBotDDSDefaultActuator();
+      /**
+       * @brief Constructor.
+       */
+      CBuilderBotEMSDefaultActuator();
 
-      virtual ~CBuilderBotDDSDefaultActuator() {}
+      /**
+       * @brief Destructor.
+       */
+      virtual ~CBuilderBotEMSDefaultActuator();
 
       virtual void Init(TConfigurationNode& t_tree);
 
@@ -34,8 +41,11 @@ namespace argos {
 
       virtual void Reset();
 
-   };
+   private:
 
+      fs::path m_fpChargeMode;
+      fs::path m_fpDischargeMode;
+   };
 }
 
 #endif

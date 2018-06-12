@@ -4,11 +4,12 @@
  * @author Michael Allwright - <allsey87@gmail.com>
  */
 
-#include <cmath>
 #include "builderbot_dds_default_actuator.h"
+
 #include <argos3/core/utility/logging/argos_log.h>
 
-//static const std::string STR_IIO_PATH("/home/allsey87/Workspace/sysfs/bus/iio");
+#include <cmath>
+
 static const std::string STR_IIO_PATH("/sys/bus/iio");
 
 namespace argos {
@@ -19,6 +20,15 @@ namespace argos {
    CBuilderBotDDSDefaultActuator::CBuilderBotDDSDefaultActuator() {
 
    }
+
+   /****************************************/
+   /****************************************/
+
+   CBuilderBotDDSDefaultActuator::~CBuilderBotDDSDefaultActuator() {
+      if(fs::exists(m_fpEnable)) {
+         std::ofstream(m_fpEnable) << false;
+      }
+   }
    
    /****************************************/
    /****************************************/
@@ -27,11 +37,11 @@ namespace argos {
       try {
          CCI_BuilderBotDDSActuator::Init(t_tree);
          /* Find the specified device and parse the IIO attributes */
-         std::string strDevice, strLeftChannel, strRightChannel; 
-         /* Parse the device name, enable, and output channels */
+         std::string strDevice, strLeft, strRight; 
+         /* Parse the device name and output channels */
          GetNodeAttribute(t_tree, "device", strDevice);
-         GetNodeAttribute(t_tree, "left_chan", strLeftChannel);
-         GetNodeAttribute(t_tree, "right_chan", strRightChannel);
+         GetNodeAttribute(t_tree, "left", strLeft);
+         GetNodeAttribute(t_tree, "right", strRight);
          /* Find the device path */
          fs::path fpDevice;
          /* Find the path to the IIO device's files */
@@ -45,26 +55,34 @@ namespace argos {
                std::ifstream(fpDeviceName) >> strCurrentDevice;
                if(strCurrentDevice == strDevice) {
                   fpDevice = fde_device_directory.path();
-                  break;                
+                  break;
                }
             }
          }
          if(!fpDevice.empty()) {
             LOG << "[INFO] BuilderBot DDS actuator attached to " << fpDevice << std::endl;
-            /* */
-            (m_fpEnable = fpDevice) /= "enable";
-            (m_fpLeftVelocity = fpDevice) /= strLeftChannel;
-            (m_fpRightVelocity = fpDevice) /= strRightChannel;
-            if(!fs::exists(m_fpEnable)) {
-               THROW_ARGOSEXCEPTION("IIO device's enable file not found.");
-            }
+            /* build paths to IIO files */
+            m_fpLeftVelocity = fpDevice;
+            m_fpLeftVelocity /= strLeft;
+            m_fpRightVelocity = fpDevice;
+            m_fpRightVelocity /= strRight;
+            m_fpEnable = fpDevice;
+            m_fpEnable /= "enable";
+            /* check if paths exist */
             if(!fs::exists(m_fpLeftVelocity)) {
-               THROW_ARGOSEXCEPTION("IIO device's left channel file not found.");
+               THROW_ARGOSEXCEPTION(m_fpLeftVelocity << " does not exist.");
             }
             if(!fs::exists(m_fpRightVelocity)) {
-               THROW_ARGOSEXCEPTION("IIO device's right channel file not found.");
+               THROW_ARGOSEXCEPTION(m_fpRightVelocity << " does not exist.");
             }
-          }
+            if(!fs::exists(m_fpEnable)) {
+               THROW_ARGOSEXCEPTION(m_fpEnable << " does not exist.");
+            }
+            else {
+               /* enable the DDS */
+               std::ofstream(m_fpEnable) << true;
+            }
+         }
          else {
             THROW_ARGOSEXCEPTION("Could not find IIO device.");
          }
@@ -98,7 +116,7 @@ namespace argos {
 }
 
 REGISTER_ACTUATOR(CBuilderBotDDSDefaultActuator,
-                  "builderbot_dds_actuator", "default",
+                  "builderbot_dds", "default",
                   "Michael Allwright [allsey87@gmail.com]",
                   "1.0",
                   "The builderbot DDS actuator.",

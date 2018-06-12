@@ -33,7 +33,7 @@ namespace argos {
       /**
        * @brief Destructor.
        */
-      virtual ~CBuilderBotDDSDefaultActuator() {}
+      virtual ~CBuilderBotDDSDefaultActuator();
 
       virtual void Init(TConfigurationNode& t_tree);
 
