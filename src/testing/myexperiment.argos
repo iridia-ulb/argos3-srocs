@@ -20,18 +20,28 @@
                         right="out_anglvel1_raw" />
         <builderbot_ems implementation="default" 
                         device="ems" />
+        <builderbot_las implementation="default"
+                        device="las"
+                        distance="out_distance_raw"
+                        velocity="out_velocity_raw" />
       </actuators>
       <sensors>
         <builderbot_ems implementation="default" 
                         device="ems"
                         voltage="in_voltage_raw" />
+        <builderbot_las implementation="default" 
+                        device="las"
+                        distance="in_distance_raw" />
         <builderbot_lar implementation="default"/>
         <builderbot_cam implementation="default"
-                        resolution="640,360">
-          <frame src="tags6.pgm" />
+                        format="UYVY"
+                        resolution="1280,720">
+          <setup device="CSI2a" />
+          <setup device="ov5640" />
+          <link source="OMAP4 ISS CSI2a:1" sink="OMAP4 ISS CSI2a output:0"/>
+          <!--frame src="tags6.pgm" />
           <frame src="tags4.pgm" />
-          <frame src="tags2.pgm" />
-          <device id="ov5640"/>
+          <frame src="tags2.pgm" /-->
         </builderbot_cam>
       </sensors>
       <params script="mycontroller.lua"/>

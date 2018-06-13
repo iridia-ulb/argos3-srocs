@@ -36,17 +36,17 @@ namespace argos {
    /****************************************/
 
    void CBuilderBot::Destroy() {
+      /* delete actuators */
+      for(CPhysicalActuator* pc_actuator : m_vecActuators)
+         delete pc_actuator;
+      /* delete sensors */
+      for(CPhysicalSensor* pc_sensor : m_vecSensors)
+         delete pc_sensor;
+      /* uninitialize the RNG */
       CRandom::RemoveCategory("argos");
       LOG << "[INFO] Controller terminated" << std::endl;
    }
   
-   /****************************************/
-   /****************************************/
-
-   void CBuilderBot::InitHardware() {
-      
-   }
-
    /****************************************/
    /****************************************/
 
@@ -188,6 +188,9 @@ namespace argos {
             /* meanwhile update the remaining sensors on this thread */
             for(CPhysicalSensor* pc_sensor : m_vecSensors) {
                pc_sensor->Update();
+               if(m_bSignalRaised) {
+                  THROW_ARGOSEXCEPTION("Signal " << m_nSignal << " raised during sensor update");
+               }
             }
             /* wait for the camera update thread to complete */
             //cCameraUpdate.wait();
@@ -200,14 +203,18 @@ namespace argos {
             /* actuator update */
             for(CPhysicalActuator* pc_actuator : m_vecActuators) {
                pc_actuator->Update();
+               if(m_bSignalRaised) {
+                  THROW_ARGOSEXCEPTION("Signal " << m_nSignal << " raised during actuator update");
+               }
+
             }
             LOG.Flush();
             LOGERR.Flush();
          }
       }
       catch(CARGoSException& ex) {
-         /* if cCameraUpdate valid, wait, get, catch all exceptions */
-         LOGERR << "[FATAL] Exception thrown in the main control loop" << std::endl
+         LOG.Flush();
+         LOGERR << "[FATAL] Exception thrown in the control loop" << std::endl
                 << ex.what() << std::endl;
          LOGERR.Flush();
          return;

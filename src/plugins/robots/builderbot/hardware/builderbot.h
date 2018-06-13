@@ -27,6 +27,11 @@ namespace argos {
          return cBuilderBot;
       }
 
+      void SetSignal(int n_signal) {
+         m_bSignalRaised = true;
+         m_nSignal = n_signal;
+      }
+
       void Init(TConfigurationNode& t_tree,
                 const std::string& str_controller_id);
       void Destroy();
@@ -40,20 +45,25 @@ namespace argos {
 
    private:
 
-      CBuilderBot() {}
+      CBuilderBot() :
+         m_bSignalRaised(false),
+         m_nSignal(0),
+         m_pcRNG(nullptr),
+         m_unTicksPerSec(0),
+         m_pcController(nullptr) {}
 
       virtual ~CBuilderBot() {}
 
    private:
-
-      /* The random number generator */
+      /* signal handling variables */
+      bool m_bSignalRaised;
+      int m_nSignal;
+      /* Pointer to the RNG */
       CRandom::CRNG* m_pcRNG;
       /* Target tick length for the controller */
       UInt32 m_unTicksPerSec;
       /*  Pointer to the controller */
       CCI_Controller* m_pcController;
-
-      UInt32 m_unNumThreads = 2;
 
       /* The vector of actuators */
       std::vector<CPhysicalActuator*> m_vecActuators;
@@ -61,6 +71,8 @@ namespace argos {
       std::vector<CPhysicalSensor*> m_vecSensors;
 
       CPhysicalSensor* m_pcCamera;
+
+
    };
 
 }
