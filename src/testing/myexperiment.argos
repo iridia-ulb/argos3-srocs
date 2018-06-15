@@ -5,7 +5,7 @@
   <!-- * General configuration * -->
   <!-- ************************* -->
   <framework>
-    <experiment length="0" ticks_per_second="10" random_seed="0"/>
+    <experiment length="0" ticks_per_second="2" random_seed="0"/>
   </framework>
 
   <!-- ************** -->
@@ -24,6 +24,8 @@
                         device="las"
                         distance="out_distance_raw"
                         velocity="out_velocity_raw" />
+        <builderbot_nfc implementation="default"
+                        device="/dev/nfc" />
       </actuators>
       <sensors>
         <builderbot_ems implementation="default" 

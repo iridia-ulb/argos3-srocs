@@ -1,22 +1,19 @@
 --[[ This function is executed every time you press the 'execute' button ]]
-fsmstate = 0
+local string = "0"
 
 function init()
-   robot.las.calibrate()
 end
 
 --[[ This function is executed at each time step
      It must contain the logic of your controller ]]
 function step()
-   --log("limit switches = " .. robot.las.limit_switches["top"] .. " " .. robot.las.limit_switches["bottom"])
-   log("state = " .. robot.las.state)
-   if fsmstate == 0 and robot.las.state == "inactive" then
-      robot.las.set_position(0)
-      fsmstate = 1
-   elseif fsmstate == 1 and robot.las.state == "inactive" then
-      robot.las.set_position(140)
-      fsmstate = 0
+   log("string = " .. string)
+   robot.nfc.write(string);
+   string = tostring(string + 1)
+   if string == "5" then
+      string = "0"
    end
+   
 end
 
 function print_tag_info()
