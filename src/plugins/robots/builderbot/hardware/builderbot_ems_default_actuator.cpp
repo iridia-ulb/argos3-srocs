@@ -22,12 +22,12 @@ namespace argos {
    /****************************************/
 
    CBuilderBotEMSDefaultActuator::~CBuilderBotEMSDefaultActuator() {
-      if(fs::exists(m_fpChargeMode)) {
+      /* disable charging */
+      if(fs::exists(m_fpChargeMode))
          std::ofstream(m_fpChargeMode) << "disable" << std::flush;
-      }
-      if(fs::exists(m_fpDischargeMode)) {
+      /* disable discharging */
+      if(fs::exists(m_fpDischargeMode))
          std::ofstream(m_fpDischargeMode) << "disable" << std::flush;
-      }
    }
    
    /****************************************/

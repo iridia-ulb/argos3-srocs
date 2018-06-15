@@ -85,7 +85,7 @@ namespace argos {
    /****************************************/
 
    void CBuilderBot::InitController(TConfigurationNode& t_tree, const std::string& str_controller_id) {
-      //      try {
+      //try {
       std::string strControllerLabel;
      
       TConfigurationNodeIterator itController;

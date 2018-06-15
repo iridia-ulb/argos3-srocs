@@ -113,7 +113,7 @@ namespace argos {
    
    void CBuilderBotLASDefaultActuator::Reset() {
       if(fs::exists(m_fpStop)) {
-         std::ofstream(m_fpStop) << "1" << std::flush;
+         std::ofstream(m_fpStop) << true << std::flush;
       }
       m_bCalibrationReq = false;
       m_bStopReq = false;
