@@ -7,13 +7,9 @@ end
 --[[ This function is executed at each time step
      It must contain the logic of your controller ]]
 function step()
-   log("string = " .. string)
-   robot.nfc.write(string);
-   string = tostring(string + 1)
-   if string == "5" then
-      string = "0"
+   for k, v in pairs(robot.pai) do
+      log(k .. " " .. v.proximity .. ", " .. v.illuminance)
    end
-   
 end
 
 function print_tag_info()

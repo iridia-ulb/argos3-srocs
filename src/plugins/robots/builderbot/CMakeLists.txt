@@ -7,16 +7,16 @@ set(ARGOS3_HEADERS_PLUGINS_ROBOTS_BUILDERBOT_CONTROLINTERFACE
   control_interface/ci_builderbot_dds_actuator.h
   control_interface/ci_builderbot_ems_actuator.h
   control_interface/ci_builderbot_ems_sensor.h
-  control_interface/ci_builderbot_lar_sensor.h
   control_interface/ci_builderbot_las_actuator.h
   control_interface/ci_builderbot_las_sensor.h
-  control_interface/ci_builderbot_nfc_actuator.h)
+  control_interface/ci_builderbot_nfc_actuator.h
+  control_interface/ci_builderbot_pai_sensor.h)
 if(ARGOS_BUILD_FOR_SIMULATOR)
   # argos3/plugins/robots/builderbot/simulator
   set(ARGOS3_HEADERS_PLUGINS_ROBOTS_BUILDERBOT_SIMULATOR
     simulator/dynamics3d_builderbot_model.h
     simulator/builderbot_entity.h
-    simulator/builderbot_lar_default_sensor.h)
+    simulator/builderbot_pai_default_sensor.h)
   if(ARGOS_COMPILE_QTOPENGL)
     set(ARGOS3_HEADERS_PLUGINS_ROBOTS_BUILDERBOT_SIMULATOR
       ${ARGOS3_HEADERS_PLUGINS_ROBOTS_BUILDERBOT_SIMULATOR}
@@ -30,10 +30,10 @@ else(ARGOS_BUILD_FOR_SIMULATOR)
     hardware/builderbot_dds_default_actuator.h
     hardware/builderbot_ems_default_actuator.h
     hardware/builderbot_ems_default_sensor.h
-    hardware/builderbot_lar_default_sensor.h
     hardware/builderbot_las_default_actuator.h
     hardware/builderbot_las_default_sensor.h
-    hardware/builderbot_nfc_default_actuator.h)
+    hardware/builderbot_nfc_default_actuator.h
+    hardware/builderbot_pai_default_sensor.h)
 endif(ARGOS_BUILD_FOR_SIMULATOR)
 
 #
@@ -46,10 +46,10 @@ set(ARGOS3_SOURCES_PLUGINS_ROBOTS_BUILDERBOT
   control_interface/ci_builderbot_dds_actuator.cpp
   control_interface/ci_builderbot_ems_actuator.cpp
   control_interface/ci_builderbot_ems_sensor.cpp
-  control_interface/ci_builderbot_lar_sensor.cpp
   control_interface/ci_builderbot_las_actuator.cpp
   control_interface/ci_builderbot_las_sensor.cpp
-  control_interface/ci_builderbot_nfc_actuator.cpp)
+  control_interface/ci_builderbot_nfc_actuator.cpp
+  control_interface/ci_builderbot_pai_sensor.cpp)
 if(ARGOS_BUILD_FOR_SIMULATOR)
   # argos3/plugins/robots/builderbot/simulator
   set(ARGOS3_SOURCES_PLUGINS_ROBOTS_BUILDERBOT
@@ -57,8 +57,8 @@ if(ARGOS_BUILD_FOR_SIMULATOR)
     ${ARGOS3_HEADERS_PLUGINS_ROBOTS_BUILDERBOT_SIMULATOR}
     simulator/builderbot_camera_default_sensor.cpp
     simulator/builderbot_entity.cpp
-    simulator/builderbot_lar_default_sensor.cpp
-    simulator/dynamics3d_builderbot_model.cpp)
+    simulator/dynamics3d_builderbot_model.cpp
+    simulator/builderbot_pai_default_sensor.cpp)
   if(ARGOS_COMPILE_QTOPENGL)
     set(ARGOS3_SOURCES_PLUGINS_ROBOTS_BUILDERBOT
       ${ARGOS3_SOURCES_PLUGINS_ROBOTS_BUILDERBOT}
@@ -74,10 +74,10 @@ else(ARGOS_BUILD_FOR_SIMULATOR)
     hardware/builderbot_dds_default_actuator.cpp
     hardware/builderbot_ems_default_actuator.cpp
     hardware/builderbot_ems_default_sensor.cpp
-    hardware/builderbot_lar_default_sensor.cpp
     hardware/builderbot_las_default_actuator.cpp
     hardware/builderbot_las_default_sensor.cpp
     hardware/builderbot_nfc_default_actuator.cpp
+    hardware/builderbot_pai_default_sensor.cpp
     hardware/main.cpp)
 endif(ARGOS_BUILD_FOR_SIMULATOR)
 

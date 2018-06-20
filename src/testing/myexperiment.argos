@@ -14,10 +14,10 @@
   <controllers>
     <lua_controller id="mycontroller">
       <actuators>
-        <builderbot_dds implementation="default"
+        <!--builderbot_dds implementation="default"
                         device="dds"
                         left="out_anglvel0_raw"
-                        right="out_anglvel1_raw" />
+                        right="out_anglvel1_raw" /-->
         <builderbot_ems implementation="default" 
                         device="ems" />
         <builderbot_las implementation="default"
@@ -34,13 +34,13 @@
         <builderbot_las implementation="default" 
                         device="las"
                         distance="in_distance_raw" />
-        <builderbot_lar implementation="default"/>
+        <builderbot_pai implementation="default"/>
         <builderbot_cam implementation="default"
                         format="UYVY"
                         resolution="1280,720">
-          <setup device="CSI2a" />
-          <setup device="ov5640" />
-          <link source="OMAP4 ISS CSI2a:1" sink="OMAP4 ISS CSI2a output:0"/>
+          <media_set_format device="CSI2a" />
+          <media_set_format device="ov5640" />
+          <media_link source="OMAP4 ISS CSI2a:1" sink="OMAP4 ISS CSI2a output:0"/>
           <!--frame src="tags6.pgm" />
           <frame src="tags4.pgm" />
           <frame src="tags2.pgm" /-->
