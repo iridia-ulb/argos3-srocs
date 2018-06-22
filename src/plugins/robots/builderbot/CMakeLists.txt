@@ -97,7 +97,7 @@ if(ARGOS_BUILD_FOR_SIMULATOR)
 else(ARGOS_BUILD_FOR_SIMULATOR)
   # Create an executable for the robot
   add_executable(argos3 ${ARGOS3_SOURCES_PLUGINS_ROBOTS_BUILDERBOT})
-  target_link_libraries(argos3 ${ARGOS_CORE_LIBRARY} ${LUA_LIBRARIES} ${PTHREADS_LIBRARY} ${APRILTAG_LIBRARY} stdc++fs)
+  target_link_libraries(argos3 ${ARGOS_CORE_LIBRARY} ${LUA_LIBRARIES} ${PTHREADS_LIBRARY} ${APRILTAG_LIBRARY} ${IIO_LIBRARY} stdc++fs)
   install(TARGETS argos3
     RUNTIME DESTINATION bin
     LIBRARY DESTINATION lib/argos3

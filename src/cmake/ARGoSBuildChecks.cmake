@@ -75,6 +75,18 @@ if(NOT ARGOS_BUILD_FOR_SIMULATOR)
 endif(NOT ARGOS_BUILD_FOR_SIMULATOR)
 
 #
+# Check for Analog Device's IIO library
+# It is required only when compiling for the hardware
+#
+if(NOT ARGOS_BUILD_FOR_SIMULATOR)
+  find_package(IIO)
+  if(NOT IIO_FOUND)
+    message(FATAL_ERROR "Required library IIO not found.")
+  endif(NOT IIO_FOUND)
+  include_directories(${IIO_INCLUDE_DIR})
+endif(NOT ARGOS_BUILD_FOR_SIMULATOR)
+
+#
 # Check for Doxygen
 #
 set(ARGOS_BUILD_API OFF)

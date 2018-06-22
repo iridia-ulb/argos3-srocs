@@ -9,6 +9,8 @@
 #include <fstream>
 #include <future>
 
+#include <iio.h>
+
 namespace argos {
 
    /****************************************/
@@ -20,6 +22,17 @@ namespace argos {
    /****************************************/
 
    void CBuilderBotPAIDefaultSensor::Init(TConfigurationNode& t_tree) {
+      struct iio_context *context = iio_create_local_context();
+
+      UInt32 unIIODeviceCount = iio_context_get_devices_count(context);
+
+      for(UInt32 un_index = 0; un_index < unIIODeviceCount; un_index++) {
+         struct iio_device* device = iio_context_get_device(context, un_index);
+         std::cerr << iio_device_get_name(device) << std::endl;
+      }
+
+      iio_context_destroy(context);
+
       try {
          CCI_BuilderBotPAISensor::Init(t_tree);
          /* Find the path to the IIO device's files */
