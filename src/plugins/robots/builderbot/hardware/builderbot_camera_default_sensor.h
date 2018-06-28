@@ -50,7 +50,7 @@ namespace argos {
       /* buffers for the YUV pixel data */
       struct SFrame {
          /* pointers to pixel data */
-         std::unique_ptr<image_u8_t, void (&)(image_u8_t*)> Y, U, V;
+         std::unique_ptr<image_u8_t, void (*)(image_u8_t*)> Y, U, V;
          /* default constructor */
          SFrame() :
             Y(image_u8_create(0, 0), image_u8_destroy),

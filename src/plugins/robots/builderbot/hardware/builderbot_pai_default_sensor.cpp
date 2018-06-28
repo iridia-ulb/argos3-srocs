@@ -6,66 +6,67 @@
 
 #include "builderbot_pai_default_sensor.h"
 
+
+
 #include <fstream>
 #include <future>
 
 #include <iio.h>
+#include <sys/stat.h>
 
 namespace argos {
 
    /****************************************/
    /****************************************/
 
-   static const fs::path IIO_DEVICE_PATH("/sys/bus/iio/devices");
+   static const std::string PAI_DEVICE_NAME("vcnl4000");
 
    /****************************************/
    /****************************************/
 
    void CBuilderBotPAIDefaultSensor::Init(TConfigurationNode& t_tree) {
-      struct iio_context *context = iio_create_local_context();
+      /* name of the device we are looking for */
+      
+      CBuilderBot::TContext& tContext = CBuilderBot::GetInstance().GetContext();
+      UInt32 unTicksPerSec = CBuilderBot::GetInstance().GetTicksPerSec();
+   
+      UInt32 unIIODeviceCount = iio_context_get_devices_count(tContext.get());
 
-      UInt32 unIIODeviceCount = iio_context_get_devices_count(context);
-
+      /* get devices */
       for(UInt32 un_index = 0; un_index < unIIODeviceCount; un_index++) {
-         struct iio_device* device = iio_context_get_device(context, un_index);
-         std::cerr << iio_device_get_name(device) << std::endl;
+         iio_device* device = iio_context_get_device(tContext.get(), un_index);
+         std::cerr << "device: " << iio_device_get_name(device);
+         if(PAI_DEVICE_NAME == iio_device_get_name(device)) {
+            char label[32];
+            iio_device_attr_read(device, "label", label, 32);
+            std::cerr << ", label: " << label;
+            m_vecPhysicalInterfaces.emplace_back(device, label);
+         }
+         std::cerr << std::endl;
+      }
+      /* create device triggers */
+      for(SPhysicalInterface& s_interface : m_vecPhysicalInterfaces) {
+         std::string strTriggerName = "vcnl4000_" + s_interface.Id + "_trigger";
+         /* create trigger */
+         mkdir(("/sys/kernel/config/iio/triggers/hrtimer/" + strTriggerName).c_str(),
+            S_IRWXU | S_IRWXG | S_IRWXO);
+
+         iio_device* device = iio_context_find_device(tContext.get(), strTriggerName.c_str());
+
+         if(device == nullptr) {
+            std::cerr << "meh" << std::endl;
+         }
+         else {
+            std::cerr << "yeah!" << std::endl;
+         }
+
       }
 
-      iio_context_destroy(context);
-
-      try {
-         CCI_BuilderBotPAISensor::Init(t_tree);
-         /* Find the path to the IIO device's files */
-         for(const fs::directory_entry& fde_device : fs::directory_iterator(IIO_DEVICE_PATH)) {
-            fs::path fpName = fde_device.path() / "name";
-            if(fs::exists(fpName)) {
-               std::string strDeviceName;
-               std::ifstream(fpName) >> strDeviceName;
-               if(strDeviceName == "vcnl4000") {
-                  fs::path fpProximity = fde_device.path() / "in_proximity_raw";
-                  fs::path fpIlluminance = fde_device.path() / "in_illuminance_raw";
-                  fs::path fpLabel = fde_device.path() / "label";
-                  /* check if the necessary files exist */
-                  if(fs::exists(fpProximity) && 
-                     fs::exists(fpIlluminance) &&
-                     fs::exists(fpLabel)) {
-                     std::string strLabel;
-                     std::ifstream(fpLabel) >> strLabel;
-                     m_vecPhysicalInterfaces.emplace_back(fpProximity, fpIlluminance, strLabel);
-                  }
-                  else {
-                     THROW_ARGOSEXCEPTION("Error adding IIO device " << fde_device.path());
-                  }
-               }
-            }
-         }
-         /* create pointers to the phyiscal interfaces and store them in the base class */
-         for(SPhysicalInterface& s_interface : m_vecPhysicalInterfaces) {
-            m_tInterfaces.push_back(&s_interface);
-         }
-      }
-      catch(CARGoSException& ex) {
-         THROW_ARGOSEXCEPTION_NESTED("Initialization error in the BuilderBot PAI sensor.", ex);
+      unIIODeviceCount = iio_context_get_devices_count(tContext.get());
+      for(UInt32 un_index = 0; un_index < unIIODeviceCount; un_index++) {
+         iio_device* device = iio_context_get_device(tContext.get(), un_index);
+         std::cerr << "device: " << iio_device_get_name(device);
+         std::cerr << std::endl;
       }
    }
 
@@ -74,16 +75,6 @@ namespace argos {
    
    void CBuilderBotPAIDefaultSensor::Update() {
       /* todo consider using triggered buffer in IIO layer */
-      std::vector<std::future<void> > vecTasks;
-      for(SPhysicalInterface& s_interface : m_vecPhysicalInterfaces) {
-         vecTasks.emplace_back(std::async(std::launch::async, [&s_interface] {
-            std::ifstream(s_interface.ProximityPath) >> s_interface.Proximity;
-            std::ifstream(s_interface.IlluminancePath) >> s_interface.Illuminance;
-         }));
-      }
-      for(auto& t_task : vecTasks) {
-         t_task.get();
-      }
    }
 
    /****************************************/

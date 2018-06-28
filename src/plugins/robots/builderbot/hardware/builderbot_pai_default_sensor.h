@@ -10,13 +10,11 @@
 #include <string>
 #include <map>
 
-#include <experimental/filesystem>
-
-namespace fs = std::experimental::filesystem;
-
 namespace argos {
    class CBuilderBotPAIDefaultSensor;
 }
+
+#include <argos3/plugins/robots/builderbot/hardware/builderbot.h>
 
 #include <argos3/core/hardware/sensor.h>
 #include <argos3/plugins/robots/builderbot/control_interface/ci_builderbot_pai_sensor.h>
@@ -29,14 +27,14 @@ namespace argos {
    public:
 
       struct SPhysicalInterface : SInterface {
-         SPhysicalInterface(fs::path fp_proximity_path,
-                            fs::path fp_illuminance_path,
+         SPhysicalInterface(iio_device* ps_iio_device,
                             const std::string& str_label) :
             SInterface(str_label),
-            ProximityPath(fp_proximity_path),
-            IlluminancePath(fp_illuminance_path) {}
-         fs::path ProximityPath;
-         fs::path IlluminancePath;
+            Device(ps_iio_device),
+            Trigger(nullptr) {}
+
+         iio_device* Device;
+         iio_device* Trigger;
       };
 
       CBuilderBotPAIDefaultSensor() {}

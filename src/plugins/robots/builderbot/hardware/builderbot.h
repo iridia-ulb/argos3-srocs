@@ -16,11 +16,15 @@ namespace argos {
 #include <argos3/core/utility/math/rng.h>
 #include <argos3/core/utility/configuration/argos_configuration.h>
 
+#include <iio.h>
+
 namespace argos {
 
    class CBuilderBot {
 
    public:
+
+      using TContext = std::unique_ptr<iio_context, void (*)(iio_context*)>;
 
       static CBuilderBot& GetInstance() {
          static CBuilderBot cBuilderBot;
@@ -43,6 +47,14 @@ namespace argos {
 
       void Execute();
 
+      TContext& GetContext() {
+         return m_tContext;
+      }
+
+      UInt32 GetTicksPerSec() {
+         return m_unTicksPerSec;
+      }
+
    private:
 
       CBuilderBot() :
@@ -50,7 +62,8 @@ namespace argos {
          m_nSignal(0),
          m_pcRNG(nullptr),
          m_unTicksPerSec(0),
-         m_pcController(nullptr) {}
+         m_pcController(nullptr),
+         m_tContext(iio_create_local_context(), iio_context_destroy) {}
 
       virtual ~CBuilderBot() {}
 
@@ -72,7 +85,7 @@ namespace argos {
 
       CPhysicalSensor* m_pcCamera;
 
-
+      TContext m_tContext;
    };
 
 }

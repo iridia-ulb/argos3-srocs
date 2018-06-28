@@ -6,6 +6,7 @@
   <!-- ************************* -->
   <framework>
     <experiment length="0" ticks_per_second="2" random_seed="0"/>
+    <scripts init="init.sh" exit="exit.sh"/>
   </framework>
 
   <!-- ************** -->
