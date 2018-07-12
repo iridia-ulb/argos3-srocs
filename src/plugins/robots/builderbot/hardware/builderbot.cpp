@@ -22,6 +22,7 @@
 #include <argos3/core/utility/logging/argos_log.h>
 #include <argos3/core/utility/plugins/factory.h>
 #include <argos3/core/utility/rate.h>
+#include <argos3/core/wrappers/lua/lua_controller.h>
 
 namespace argos {
 
@@ -107,8 +108,11 @@ namespace argos {
       
       LOG << "[INFO] Creating a " << strControllerLabel << " with id = \"" << str_controller_id << "\"" << std::endl;
       /* Create the controller */
-      m_pcController = CFactory<CCI_Controller>::New(strControllerLabel);
-
+      CCI_Controller* pcController = CFactory<CCI_Controller>::New(strControllerLabel);
+      m_pcController = dynamic_cast<CLuaController*>(pcController);
+      if(m_pcController == nullptr) {
+         THROW_ARGOSEXCEPTION("ERROR: controller \"" << strControllerLabel << "\" is not a Lua controller");
+      }
       std::string strImpl;
          /* Go through actuators */
          TConfigurationNode& tActuators = GetNode(*itController, "actuators");
@@ -120,7 +124,7 @@ namespace argos {
             GetNodeAttribute(*itAct, "implementation", strImpl);
             CPhysicalActuator* pcAct = CFactory<CPhysicalActuator>::New(itAct->Value() + " (" + strImpl + ")");
             CCI_Actuator* pcCIAct = dynamic_cast<CCI_Actuator*>(pcAct);
-            if(pcCIAct == NULL) {
+            if(pcCIAct == nullptr) {
                THROW_ARGOSEXCEPTION("BUG: actuator \"" << itAct->Value() << "\" does not inherit from CCI_Actuator");
             }
             pcCIAct->Init(*itAct);
@@ -137,7 +141,7 @@ namespace argos {
             GetNodeAttribute(*itSens, "implementation", strImpl);
             CPhysicalSensor* pcSens = CFactory<CPhysicalSensor>::New(itSens->Value() + " (" + strImpl + ")");
             CCI_Sensor* pcCISens = dynamic_cast<CCI_Sensor*>(pcSens);
-            if(pcCISens == NULL) {
+            if(pcCISens == nullptr) {
                THROW_ARGOSEXCEPTION("BUG: sensor \"" << itSens->Value() << "\" does not inherit from CCI_Sensor");
             }
             pcCISens->Init(*itSens);
@@ -171,6 +175,10 @@ namespace argos {
         }
         /* Init the controller with the parameters */
         m_pcController->Init(GetNode(*itController, "params"));
+        /* check for errors */
+        if(!m_pcController->IsOK()) {
+           THROW_ARGOSEXCEPTION("Controller: " << m_pcController->GetErrorMessage());
+        }
    }
 
    /****************************************/
@@ -200,13 +208,16 @@ namespace argos {
             cRate.Sleep();
             /* step the internal state machine */
             m_pcController->ControlStep();
+            /* check for errors */
+            if(!m_pcController->IsOK()) {
+               THROW_ARGOSEXCEPTION("Controller: " << m_pcController->GetErrorMessage());
+            }
             /* actuator update */
             for(CPhysicalActuator* pc_actuator : m_vecActuators) {
                pc_actuator->Update();
                if(m_bSignalRaised) {
                   THROW_ARGOSEXCEPTION("Signal " << m_nSignal << " raised during actuator update");
                }
-
             }
             LOG.Flush();
             LOGERR.Flush();

@@ -13,41 +13,38 @@
   <!-- * Controller * -->
   <!-- ************** -->
   <controllers>
-    <lua_controller id="mycontroller">
+    <lua_controller id="test_differential_drive">
       <actuators>
-        <!--builderbot_dds implementation="default"
-                        device="dds"
-                        left="out_anglvel0_raw"
-                        right="out_anglvel1_raw" /-->
-        <builderbot_ems implementation="default" 
-                        device="ems" />
-        <builderbot_las implementation="default"
+        <builderbot_differential_drive implementation="iio" device="dds" left="anglvel0" right="anglvel1" />
+        <!--builderbot_ems implementation="default" 
+                        device="ems" /-->
+        <!--builderbot_las implementation="default"
                         device="las"
                         distance="out_distance_raw"
-                        velocity="out_velocity_raw" />
-        <builderbot_nfc implementation="default"
-                        device="/dev/nfc" />
+                        velocity="out_velocity_raw" /-->
+        <!--builderbot_nfc implementation="default"
+                        device="/dev/nfc" /-->
       </actuators>
       <sensors>
-        <builderbot_ems implementation="default" 
+        <!--builderbot_ems implementation="default" 
                         device="ems"
-                        voltage="in_voltage_raw" />
-        <builderbot_las implementation="default" 
+                        voltage="in_voltage_raw" /-->
+        <!--builderbot_las implementation="default" 
                         device="las"
-                        distance="in_distance_raw" />
-        <builderbot_pai implementation="default"/>
-        <builderbot_cam implementation="default"
+                        distance="in_distance_raw" /-->
+        <!-- builderbot_pai implementation="default"/ -->
+        <!-- builderbot_cam implementation="default"
                         format="UYVY"
                         resolution="1280,720">
           <media_set_format device="CSI2a" />
           <media_set_format device="ov5640" />
           <media_link source="OMAP4 ISS CSI2a:1" sink="OMAP4 ISS CSI2a output:0"/>
-          <!--frame src="tags6.pgm" />
+          <frame src="tags6.pgm" />
           <frame src="tags4.pgm" />
-          <frame src="tags2.pgm" /-->
-        </builderbot_cam>
+          <frame src="tags2.pgm" />
+        </builderbot_cam-->
       </sensors>
-      <params script="mycontroller.lua"/>
+      <params script="test_differential_drive.lua"/>
     </lua_controller>
   </controllers>
 

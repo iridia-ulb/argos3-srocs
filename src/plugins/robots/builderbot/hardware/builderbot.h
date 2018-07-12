@@ -8,7 +8,7 @@
 #define BUILDERBOT_H
 
 namespace argos {
-   class CCI_Controller;
+   class CLuaController;
 }
 
 #include <argos3/core/hardware/sensor.h>
@@ -76,7 +76,7 @@ namespace argos {
       /* Target tick length for the controller */
       UInt32 m_unTicksPerSec;
       /*  Pointer to the controller */
-      CCI_Controller* m_pcController;
+      CLuaController* m_pcController;
 
       /* The vector of actuators */
       std::vector<CPhysicalActuator*> m_vecActuators;

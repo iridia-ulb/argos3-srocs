@@ -1,25 +1,25 @@
 /**
- * @file <argos3/plugins/robots/builderbot/control_interface/ci_builderbot_dds_actuator.h>
+ * @file <argos3/plugins/robots/builderbot/control_interface/ci_builderbot_differential_drive_actuator.h>
  *
  * @author Michael Allwright <allsey87@gmail.com>
  */
 
-#ifndef CCI_BUILDERBOT_DDS_ACTUATOR_H
-#define CCI_BUILDERBOT_DDS_ACTUATOR_H
+#ifndef CCI_BUILDERBOT_DIFFERENTIAL_DRIVE_ACTUATOR_H
+#define CCI_BUILDERBOT_DIFFERENTIAL_DRIVE_ACTUATOR_H
 
 namespace argos {
-   class CCI_BuilderBotDDSActuator;
+   class CCI_BuilderBotDifferentialDriveActuator;
 }
 
 #include <argos3/core/control_interface/ci_actuator.h>
 
 namespace argos {
 
-   class CCI_BuilderBotDDSActuator : public CCI_Actuator {
+   class CCI_BuilderBotDifferentialDriveActuator : public CCI_Actuator {
 
    public:
 
-      virtual ~CCI_BuilderBotDDSActuator() {}
+      virtual ~CCI_BuilderBotDifferentialDriveActuator() {}
 
       virtual void SetTargetVelocity(Real f_target_velocity_left,
                                      Real f_target_velocity_right) {
