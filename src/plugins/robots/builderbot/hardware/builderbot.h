@@ -23,9 +23,6 @@ namespace argos {
    class CBuilderBot {
 
    public:
-
-      using TContext = std::unique_ptr<iio_context, void (*)(iio_context*)>;
-
       static CBuilderBot& GetInstance() {
          static CBuilderBot cBuilderBot;
          return cBuilderBot;
@@ -47,8 +44,12 @@ namespace argos {
 
       void Execute();
 
-      TContext& GetContext() {
-         return m_tContext;
+      iio_context* GetContext() {
+         return m_psContext;
+      }
+
+      iio_device* GetActuatorUpdateTrigger() {
+         return m_psActuatorUpdateTrigger;
       }
 
       UInt32 GetTicksPerSec() {
@@ -63,7 +64,9 @@ namespace argos {
          m_pcRNG(nullptr),
          m_unTicksPerSec(0),
          m_pcController(nullptr),
-         m_tContext(iio_create_local_context(), iio_context_destroy) {}
+         m_psContext(nullptr),
+         m_psSensorUpdateTrigger(nullptr),
+         m_psActuatorUpdateTrigger(nullptr) {}
 
       virtual ~CBuilderBot() {}
 
@@ -83,9 +86,12 @@ namespace argos {
       /* The vector of sensors */
       std::vector<CPhysicalSensor*> m_vecSensors;
 
-      CPhysicalSensor* m_pcCamera;
+      /* Triggers for updating the sensors and actuators */
+      iio_context* m_psContext;
+      iio_device* m_psSensorUpdateTrigger;
+      iio_device* m_psActuatorUpdateTrigger;
 
-      TContext m_tContext;
+      CPhysicalSensor* m_pcCamera;
    };
 
 }

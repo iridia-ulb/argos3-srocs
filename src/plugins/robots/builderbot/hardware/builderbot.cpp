@@ -24,6 +24,12 @@
 #include <argos3/core/utility/rate.h>
 #include <argos3/core/wrappers/lua/lua_controller.h>
 
+#define ADD_TRIGGER_PATH "/sys/bus/iio/devices/iio_sysfs_trigger/add_trigger"
+#define REMOVE_TRIGGER_PATH "/sys/bus/iio/devices/iio_sysfs_trigger/remove_trigger"
+
+#define SENSOR_TRIGGER_IDX 0
+#define ACTUATOR_TRIGGER_IDX 1
+
 namespace argos {
 
    void CBuilderBot::Init(TConfigurationNode& t_tree, const std::string& str_controller_id) {
@@ -43,6 +49,16 @@ namespace argos {
       /* delete sensors */
       for(CPhysicalSensor* pc_sensor : m_vecSensors)
          delete pc_sensor;
+      /* delete the IIO library's context */
+      iio_context_destroy(m_psContext);
+      /* remove triggers */
+      std::ofstream cRemoveTrigger;
+      cRemoveTrigger.open(REMOVE_TRIGGER_PATH);
+      cRemoveTrigger << std::to_string(SENSOR_TRIGGER_IDX) << std::flush;
+      cRemoveTrigger.close();
+      cRemoveTrigger.open(REMOVE_TRIGGER_PATH);
+      cRemoveTrigger << std::to_string(ACTUATOR_TRIGGER_IDX) << std::flush;
+      cRemoveTrigger.close();
       /* uninitialize the RNG */
       CRandom::RemoveCategory("argos");
       LOG << "[INFO] Controller terminated" << std::endl;
@@ -50,6 +66,8 @@ namespace argos {
   
    /****************************************/
    /****************************************/
+
+//    <triggers sensors="sysfstrig0" actuators="sysfstrig1"/>
 
    void CBuilderBot::InitFramework(TConfigurationNode& t_tree) {
       try {
@@ -76,9 +94,40 @@ namespace argos {
          GetNodeAttribute(tExperiment,
                           "ticks_per_second",
                           m_unTicksPerSec);
+         /* Create the triggers */
+         std::ofstream cAddTrigger;
+         cAddTrigger.open(ADD_TRIGGER_PATH);
+         cAddTrigger << std::to_string(SENSOR_TRIGGER_IDX) << std::flush;
+         cAddTrigger.close();
+         cAddTrigger.open(ADD_TRIGGER_PATH);
+         cAddTrigger << std::to_string(ACTUATOR_TRIGGER_IDX) << std::flush;
+         cAddTrigger.close();
+         /* Create a local context for the IIO library */
+         m_psContext = iio_create_local_context();
+         /* validate the sensor update trigger */
+         std::string strSensorUpdateTrigger("sysfstrig" + std::to_string(SENSOR_TRIGGER_IDX));
+         std::string strActuatorUpdateTrigger("sysfstrig" + std::to_string(ACTUATOR_TRIGGER_IDX));
+
+         m_psSensorUpdateTrigger = 
+            ::iio_context_find_device(m_psContext, strSensorUpdateTrigger.c_str());
+         if(m_psSensorUpdateTrigger == nullptr) { 
+            THROW_ARGOSEXCEPTION("Could not find IIO trigger \"" << strSensorUpdateTrigger << "\"");
+         }
+         if(!::iio_device_is_trigger(m_psSensorUpdateTrigger)) {
+            THROW_ARGOSEXCEPTION("IIO device \"" << strSensorUpdateTrigger << "\" is not a trigger");
+         }
+         /* validate the sensor update trigger */
+         m_psActuatorUpdateTrigger = 
+            ::iio_context_find_device(m_psContext, strActuatorUpdateTrigger.c_str());
+         if(m_psActuatorUpdateTrigger == nullptr) { 
+            THROW_ARGOSEXCEPTION("Could not find IIO trigger \"" << strActuatorUpdateTrigger << "\"");
+         }
+         if(!::iio_device_is_trigger(m_psActuatorUpdateTrigger)) {
+            THROW_ARGOSEXCEPTION("IIO device \"" << strActuatorUpdateTrigger << "\" is not a trigger");
+         }
       }
       catch(CARGoSException& ex) {
-         THROW_ARGOSEXCEPTION_NESTED("Failed to initialize BuilderBot", ex);
+         THROW_ARGOSEXCEPTION_NESTED("Failed to initialize framework", ex);
       }
    }
 
@@ -86,34 +135,30 @@ namespace argos {
    /****************************************/
 
    void CBuilderBot::InitController(TConfigurationNode& t_tree, const std::string& str_controller_id) {
-      //try {
-      std::string strControllerLabel;
-     
-      TConfigurationNodeIterator itController;
-      for(itController = itController.begin(&t_tree);
-          itController != itController.end();
-          ++itController) {
-         std::string strControllerId;
-         GetNodeAttributeOrDefault(*itController, "id", strControllerId, strControllerId);
-         if(strControllerId == str_controller_id) {
-            strControllerLabel = itController->Value();
-            break;
+      try {
+         std::string strControllerLabel;
+         TConfigurationNodeIterator itController;
+         for(itController = itController.begin(&t_tree);
+             itController != itController.end();
+             ++itController) {
+            std::string strControllerId;
+            GetNodeAttributeOrDefault(*itController, "id", strControllerId, strControllerId);
+            if(strControllerId == str_controller_id) {
+               strControllerLabel = itController->Value();
+               break;
+            }
          }
-      }
-
-      if(strControllerLabel.empty()) {
-         THROW_ARGOSEXCEPTION("controller with id = \"" << str_controller_id << "\" not found")
-      }
-      
-      
-      LOG << "[INFO] Creating a " << strControllerLabel << " with id = \"" << str_controller_id << "\"" << std::endl;
-      /* Create the controller */
-      CCI_Controller* pcController = CFactory<CCI_Controller>::New(strControllerLabel);
-      m_pcController = dynamic_cast<CLuaController*>(pcController);
-      if(m_pcController == nullptr) {
-         THROW_ARGOSEXCEPTION("ERROR: controller \"" << strControllerLabel << "\" is not a Lua controller");
-      }
-      std::string strImpl;
+         if(strControllerLabel.empty()) {
+            THROW_ARGOSEXCEPTION("controller with id = \"" << str_controller_id << "\" not found")
+         }
+         LOG << "[INFO] Creating a " << strControllerLabel << " with id = \"" << str_controller_id << "\"" << std::endl;
+         /* Create the controller */
+         CCI_Controller* pcController = CFactory<CCI_Controller>::New(strControllerLabel);
+         m_pcController = dynamic_cast<CLuaController*>(pcController);
+         if(m_pcController == nullptr) {
+            THROW_ARGOSEXCEPTION("ERROR: controller \"" << strControllerLabel << "\" is not a Lua controller");
+         }
+         std::string strImpl;
          /* Go through actuators */
          TConfigurationNode& tActuators = GetNode(*itController, "actuators");
          TConfigurationNodeIterator itAct;
@@ -151,34 +196,37 @@ namespace argos {
             else {
                m_vecSensors.emplace_back(pcSens);
             }
-               
             m_pcController->AddSensor(itSens->Value(), pcCISens);
          }
-
-        /* Set the controller id */
-        char pchBuffer[32];
-        if (::gethostname(pchBuffer, 32) == 0) {
-           LOG << "[INFO] Setting controller id to hostname \""
-               << pchBuffer << "\""
-               << std::endl;
-           m_pcController->SetId(pchBuffer);
-        } else {
-           LOGERR << "[WARNING] Failed to get the hostname."
-                  << "Setting controller id to \"builderbot\""
-                  << std::endl;
-           m_pcController->SetId("builderbot");
-        }
-        /* If the parameters node doesn't exist, create one */
-        if(!NodeExists(*itController, "params")) {
-           TConfigurationNode tParamsNode("params");
-           AddChildNode(*itController, tParamsNode);
-        }
-        /* Init the controller with the parameters */
-        m_pcController->Init(GetNode(*itController, "params"));
-        /* check for errors */
-        if(!m_pcController->IsOK()) {
-           THROW_ARGOSEXCEPTION("Controller: " << m_pcController->GetErrorMessage());
-        }
+         /* Set the controller id */
+         char pchBuffer[32];
+         if (::gethostname(pchBuffer, 32) == 0) {
+            LOG << "[INFO] Setting controller id to hostname \""
+                << pchBuffer << "\""
+                << std::endl;
+            m_pcController->SetId(pchBuffer);
+         } 
+         else {
+            LOGERR << "[WARNING] Failed to get the hostname."
+                   << "Setting controller id to \"builderbot\""
+                   << std::endl;
+            m_pcController->SetId("builderbot");
+         }
+         /* If the parameters node doesn't exist, create one */
+         if(!NodeExists(*itController, "params")) {
+            TConfigurationNode tParamsNode("params");
+            AddChildNode(*itController, tParamsNode);
+         }
+         /* Init the controller with the parameters */
+         m_pcController->Init(GetNode(*itController, "params"));
+         /* check for errors */
+         if(!m_pcController->IsOK()) {
+            THROW_ARGOSEXCEPTION("Controller: " << m_pcController->GetErrorMessage());
+         }
+      }
+      catch(CARGoSException& ex) {
+         THROW_ARGOSEXCEPTION_NESTED("Failed to initialize framework", ex);
+      }
    }
 
    /****************************************/
@@ -204,6 +252,9 @@ namespace argos {
             //cCameraUpdate.wait();
             /* forward any exceptions from the update thread to this thread */
             //cCameraUpdate.get();
+
+            /* pull in samples from the sensor buffers */
+            ::iio_device_attr_write_bool(m_psSensorUpdateTrigger, "trigger_now", true);
             /* sleep if required */
             cRate.Sleep();
             /* step the internal state machine */
@@ -219,6 +270,9 @@ namespace argos {
                   THROW_ARGOSEXCEPTION("Signal " << m_nSignal << " raised during actuator update");
                }
             }
+            /* push actuator buffers to hardware */
+            ::iio_device_attr_write_bool(m_psActuatorUpdateTrigger, "trigger_now", true);
+            /* flush the logs */
             LOG.Flush();
             LOGERR.Flush();
          }

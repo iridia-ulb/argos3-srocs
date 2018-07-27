@@ -27,47 +27,9 @@ namespace argos {
    void CBuilderBotPAIDefaultSensor::Init(TConfigurationNode& t_tree) {
       /* name of the device we are looking for */
       
-      CBuilderBot::TContext& tContext = CBuilderBot::GetInstance().GetContext();
-      UInt32 unTicksPerSec = CBuilderBot::GetInstance().GetTicksPerSec();
+      //CBuilderBot::TContext& tContext = CBuilderBot::GetInstance().GetContext();
    
-      UInt32 unIIODeviceCount = iio_context_get_devices_count(tContext.get());
-
-      /* get devices */
-      for(UInt32 un_index = 0; un_index < unIIODeviceCount; un_index++) {
-         iio_device* device = iio_context_get_device(tContext.get(), un_index);
-         std::cerr << "device: " << iio_device_get_name(device);
-         if(PAI_DEVICE_NAME == iio_device_get_name(device)) {
-            char label[32];
-            iio_device_attr_read(device, "label", label, 32);
-            std::cerr << ", label: " << label;
-            m_vecPhysicalInterfaces.emplace_back(device, label);
-         }
-         std::cerr << std::endl;
-      }
-      /* create device triggers */
-      for(SPhysicalInterface& s_interface : m_vecPhysicalInterfaces) {
-         std::string strTriggerName = "vcnl4000_" + s_interface.Id + "_trigger";
-         /* create trigger */
-         mkdir(("/sys/kernel/config/iio/triggers/hrtimer/" + strTriggerName).c_str(),
-            S_IRWXU | S_IRWXG | S_IRWXO);
-
-         iio_device* device = iio_context_find_device(tContext.get(), strTriggerName.c_str());
-
-         if(device == nullptr) {
-            std::cerr << "meh" << std::endl;
-         }
-         else {
-            std::cerr << "yeah!" << std::endl;
-         }
-
-      }
-
-      unIIODeviceCount = iio_context_get_devices_count(tContext.get());
-      for(UInt32 un_index = 0; un_index < unIIODeviceCount; un_index++) {
-         iio_device* device = iio_context_get_device(tContext.get(), un_index);
-         std::cerr << "device: " << iio_device_get_name(device);
-         std::cerr << std::endl;
-      }
+      UInt32 unIIODeviceCount = 0; //iio_context_get_devices_count(tContext.get());
    }
 
    /****************************************/
