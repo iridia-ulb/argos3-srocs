@@ -1,7 +1,7 @@
 /**
  * @file <argos3/plugins/robots/builderbot/control_interface/ci_builderbot_differential_drive_actuator.h>
  *
- * @author Michael Allwright <allsey87@gmail.com>
+ * @author Michael Allwright - <allsey87@gmail.com>
  */
 
 #ifndef CCI_BUILDERBOT_DIFFERENTIAL_DRIVE_ACTUATOR_H
