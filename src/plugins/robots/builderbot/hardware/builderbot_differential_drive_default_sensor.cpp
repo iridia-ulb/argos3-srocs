@@ -1,57 +1,57 @@
 /**
- * @file <argos3/plugins/robots/builderbot/hardware/builderbot_differential_drive_iio_actuator.cpp>
+ * @file <argos3/plugins/robots/builderbot/hardware/builderbot_differential_drive_default_sensor.cpp>
  *
  * @author Michael Allwright - <allsey87@gmail.com>
  */
 
-#include "builderbot_differential_drive_iio_actuator.h"
+#include "builderbot_differential_drive_default_sensor.h"
 
 #include <argos3/core/utility/logging/argos_log.h>
 
 #include <cmath>
 #include <cerrno>
 
-#include <iio-private.h>
-
 namespace argos {
 
    /****************************************/
    /****************************************/
 
-   CBuilderBotDifferentialDriveIIOActuator::CBuilderBotDifferentialDriveIIOActuator() :
+   CBuilderBotDifferentialDriveDefaultSensor::CBuilderBotDifferentialDriveDefaultSensor() :
       m_psDevice(nullptr),
-      m_psLeftChannel(nullptr),
-      m_psRightChannel(nullptr),
-      m_psBuffer(nullptr) {}
+      m_psBuffer(nullptr),
+      m_psLeft(nullptr),
+      m_psRight(nullptr) {}
 
    /****************************************/
    /****************************************/
 
-   CBuilderBotDifferentialDriveIIOActuator::~CBuilderBotDifferentialDriveIIOActuator() {
-      /* unset trigger */
-      ::iio_device_set_trigger(m_psDevice, nullptr);
+   CBuilderBotDifferentialDriveDefaultSensor::~CBuilderBotDifferentialDriveDefaultSensor() {
       /* destroy buffer */
       if(m_psBuffer != nullptr) {
          ::iio_buffer_destroy(m_psBuffer);
       }
-      /* disable channels */
-      if(m_psLeftChannel != nullptr) {
-         ::iio_channel_disable(m_psLeftChannel);
+      /* unset trigger */
+      if(m_psDevice != nullptr) {
+         ::iio_device_set_trigger(m_psDevice, nullptr);         
       }
-      if(m_psRightChannel != nullptr) {
-         ::iio_channel_disable(m_psRightChannel);
+      /* disable channels */
+      if(m_psLeft != nullptr) {
+         ::iio_channel_disable(m_psLeft);
+      }
+      if(m_psRight != nullptr) {
+         ::iio_channel_disable(m_psRight);
       }
    }
    
    /****************************************/
    /****************************************/
    
-   void CBuilderBotDifferentialDriveIIOActuator::Init(TConfigurationNode& t_tree) {
+   void CBuilderBotDifferentialDriveDefaultSensor::Init(TConfigurationNode& t_tree) {
       try {
-         CCI_BuilderBotDifferentialDriveActuator::Init(t_tree);
+         CCI_BuilderBotDifferentialDriveSensor::Init(t_tree);
+         /* Get context and trigger */
          iio_context* psContext = CBuilderBot::GetInstance().GetContext();
-         iio_device* psUpdateTrigger = CBuilderBot::GetInstance().GetActuatorUpdateTrigger();
-
+         iio_device* psUpdateTrigger = CBuilderBot::GetInstance().GetSensorUpdateTrigger();
          /* Parse the device name and channel names */
          std::string strDevice, strLeft, strRight;
          GetNodeAttribute(t_tree, "device", strDevice);
@@ -63,19 +63,19 @@ namespace argos {
             THROW_ARGOSEXCEPTION("Could not find IIO device \"" << strDevice << "\"");
          }
          /* get the channels */
-         m_psLeftChannel = ::iio_device_find_channel(m_psDevice, strLeft.c_str(), true);
-         if(m_psLeftChannel == nullptr) {
+         m_psLeft = ::iio_device_find_channel(m_psDevice, strLeft.c_str(), true);
+         if(m_psLeft == nullptr) {
             THROW_ARGOSEXCEPTION("Could not find IIO channel \"" << strLeft <<
                                  "\" for device \"" << strDevice << "\"");
          }
-         m_psRightChannel = ::iio_device_find_channel(m_psDevice, strRight.c_str(), true);
-         if(m_psRightChannel == nullptr) {
+         m_psRight = ::iio_device_find_channel(m_psDevice, strRight.c_str(), true);
+         if(m_psRight == nullptr) {
             THROW_ARGOSEXCEPTION("Could not find IIO channel \"" << strRight <<
                                  "\" for device \"" << strDevice << "\"");
          }
          /* enable channels */
-         ::iio_channel_enable(m_psLeftChannel);
-         ::iio_channel_enable(m_psRightChannel);
+         ::iio_channel_enable(m_psLeft);
+         ::iio_channel_enable(m_psRight);
          /* set trigger */
          ::iio_device_set_trigger(m_psDevice, psUpdateTrigger);
          /* create buffer */
@@ -85,27 +85,30 @@ namespace argos {
          }
       }
       catch(CARGoSException& ex) {
-         THROW_ARGOSEXCEPTION_NESTED("Initialization error in the BuilderBot differential drive actuator.", ex);
+         THROW_ARGOSEXCEPTION_NESTED("Initialization error in the BuilderBot differential drive sensor.", ex);
       }
    }
   
    /****************************************/
    /****************************************/
    
-   void CBuilderBotDifferentialDriveIIOActuator::Update() {
-      SInt16 nLeftVelocity = std::round(m_sTargetVelocity.Left);
-      SInt16 nRightVelocity = std::round(m_sTargetVelocity.Right);
-      ::iio_channel_write(m_psLeftChannel, m_psBuffer, &nLeftVelocity, 2);
-      ::iio_channel_write(m_psRightChannel, m_psBuffer, &nRightVelocity, 2);
-      ::iio_buffer_push(m_psBuffer);
+   void CBuilderBotDifferentialDriveDefaultSensor::Update() {
+      SInt16 nLeftVelocityRaw, nRightVelocityRaw;
+      /* fetch samples from the driver */
+      ::iio_buffer_refill(m_psBuffer);
+      ::iio_channel_read(m_psLeft, m_psBuffer, &nLeftVelocityRaw, 2);
+      ::iio_channel_read(m_psRight, m_psBuffer, &nRightVelocityRaw, 2);
+      /* convert samples to meters per second */
+      m_sVelocity.Left = ConvertToMetersPerSecond(nLeftVelocityRaw);
+      m_sVelocity.Right = ConvertToMetersPerSecond(nRightVelocityRaw);
    }
 
    /****************************************/
    /****************************************/
    
-   void CBuilderBotDifferentialDriveIIOActuator::Reset() {
-      m_sTargetVelocity.Left = Real(0);
-      m_sTargetVelocity.Right = Real(0);
+   void CBuilderBotDifferentialDriveDefaultSensor::Reset() {
+      m_sVelocity.Left = Real(0);
+      m_sVelocity.Right = Real(0);
    }
    
    /****************************************/
@@ -113,12 +116,12 @@ namespace argos {
    
 }
 
-REGISTER_ACTUATOR(CBuilderBotDifferentialDriveIIOActuator,
-                  "builderbot_differential_drive", "iio",
+REGISTER_SENSOR(CBuilderBotDifferentialDriveDefaultSensor,
+                  "builderbot_differential_drive", "default",
                   "Michael Allwright [allsey87@gmail.com]",
                   "1.0",
-                  "The builderbot differential drive actuator.",
-                  "This actuator controls the differential drive of the builderbot.",
+                  "The builderbot differential drive sensor.",
+                  "This sensor monitors the differential drive of the builderbot.",
                   "Usable"
    );
    
