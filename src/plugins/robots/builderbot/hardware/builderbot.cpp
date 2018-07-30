@@ -67,8 +67,6 @@ namespace argos {
    /****************************************/
    /****************************************/
 
-//    <triggers sensors="sysfstrig0" actuators="sysfstrig1"/>
-
    void CBuilderBot::InitFramework(TConfigurationNode& t_tree) {
       try {
          /* Get the experiment node */

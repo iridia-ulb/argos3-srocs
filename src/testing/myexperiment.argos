@@ -1,47 +1,47 @@
 <?xml version="1.0" ?>
 <argos-configuration>
 
-  <!-- ************************* -->
-  <!-- * General configuration * -->
-  <!-- ************************* -->
+  <!-- General configuration -->
   <framework>
     <experiment length="0" ticks_per_second="5" random_seed="0"/>
   </framework>
 
-  <!-- ************** -->
-  <!-- * Controller * -->
-  <!-- ************** -->
+  <!-- Controller -->
   <controllers>
     <lua_controller id="test_differential_drive">
       <actuators>
-        <builderbot_differential_drive implementation="iio" device="dds-actr" left="anglvel0" right="anglvel1" />
-        <!--builderbot_ems implementation="default" 
-                        device="ems" /-->
-        <!--builderbot_las implementation="default"
-                        device="las"
-                        distance="out_distance_raw"
-                        velocity="out_velocity_raw" /-->
-        <!--builderbot_nfc implementation="default"
-                        device="/dev/nfc" /-->
+        <builderbot_differential_drive
+          implementation="default"
+          device="dds-actr"
+          left="anglvel0"
+          right="anglvel1" />
+        <builderbot_lift_system
+          implementation="default"
+          device="las-actr" />
+        <builderbot_nfc_interface
+          implementation="default"
+          device="/dev/nfc" />
       </actuators>
       <sensors>
-        <!--builderbot_ems implementation="default" 
-                        device="ems"
-                        voltage="in_voltage_raw" /-->
-        <!--builderbot_las implementation="default" 
-                        device="las"
-                        distance="in_distance_raw" /-->
-        <!-- builderbot_pai implementation="default"/ -->
-        <!-- builderbot_cam implementation="default"
-                        format="UYVY"
-                        resolution="1280,720">
-          <media_set_format device="CSI2a" />
-          <media_set_format device="ov5640" />
-          <media_link source="OMAP4 ISS CSI2a:1" sink="OMAP4 ISS CSI2a output:0"/>
-          <frame src="tags6.pgm" />
-          <frame src="tags4.pgm" />
-          <frame src="tags2.pgm" />
-        </builderbot_cam-->
+        <builderbot_differential_drive
+          implementation="default"
+          device="dds-sens"
+          left="anglvel0"
+          right="anglvel1" />
+        <builderbot_electromagnet_system
+          implementation="default"
+          device="ems-sens"
+          voltage="voltage0" />
+        <builderbot_lift_system
+          implementation="default" 
+          device="las-sens"
+          distance="distance0"
+          top_limit_switch="proximity0"
+          bottom_limit_switch="proximity1"
+          state = "index0" />
+        <builderbot_camera_system
+          implementation="default"
+          device="/dev/video0" />
       </sensors>
       <params script="test_differential_drive.lua"/>
     </lua_controller>
