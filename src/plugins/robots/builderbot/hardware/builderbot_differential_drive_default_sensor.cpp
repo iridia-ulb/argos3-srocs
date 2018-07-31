@@ -6,10 +6,12 @@
 
 #include "builderbot_differential_drive_default_sensor.h"
 
-#include <argos3/core/utility/logging/argos_log.h>
+#include <iio.h>
 
 #include <cmath>
 #include <cerrno>
+
+#include <argos3/core/utility/logging/argos_log.h>
 
 namespace argos {
 

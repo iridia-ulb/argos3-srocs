@@ -4,8 +4,13 @@
  * @author Michael Allwright - <allsey87@gmail.com>
  */
 
-#include <cmath>
 #include "builderbot_electromagnet_system_default_actuator.h"
+
+#include <iio.h>
+
+#include <cmath>
+#include <cerrno>
+
 #include <argos3/core/utility/logging/argos_log.h>
 
 namespace argos {
