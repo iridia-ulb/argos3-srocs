@@ -1,28 +1,28 @@
 /**
- * @file <argos3/plugins/robots/builderbot/control_interface/ci_builderbot_ems_sensor.h>
+ * @file <argos3/plugins/robots/builderbot/control_interface/ci_builderbot_electromagnet_system_sensor.h>
  *
  * @author Michael Allwright <allsey87@gmail.com>
  */
 
-#ifndef CCI_BUILDERBOT_EMS_SENSOR_H
-#define CCI_BUILDERBOT_EMS_SENSOR_H
+#ifndef CCI_BUILDERBOT_ELECTROMAGNET_SYSTEM_SENSOR_H
+#define CCI_BUILDERBOT_ELECTROMAGNET_SYSTEM_SENSOR_H
 
 namespace argos {
-   class CCI_BuilderBotEMSSensor;
+   class CCI_BuilderBotElectromagnetSystemSensor;
 }
 
 #include <argos3/core/control_interface/ci_sensor.h>
 
 namespace argos {
 
-   class CCI_BuilderBotEMSSensor : public CCI_Sensor {
+   class CCI_BuilderBotElectromagnetSystemSensor : public CCI_Sensor {
 
    public:
 
-      CCI_BuilderBotEMSSensor() :
+      CCI_BuilderBotElectromagnetSystemSensor() :
          m_fVoltage(0.0f) {}
 
-      virtual ~CCI_BuilderBotEMSSensor() {}
+      virtual ~CCI_BuilderBotElectromagnetSystemSensor() {}
 
       Real GetVoltage() const;
 

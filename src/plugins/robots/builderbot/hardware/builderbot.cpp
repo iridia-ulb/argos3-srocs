@@ -6,6 +6,7 @@
 
 #include "builderbot.h"
 
+#include <iio.h>
 #include <sys/time.h>
 #include <unistd.h>
 

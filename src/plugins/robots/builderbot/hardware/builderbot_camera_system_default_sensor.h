@@ -1,14 +1,14 @@
 /**
- * @file <argos3/plugins/robots/builderbot/hardware/builderbot_camera_default_sensor.h>
+ * @file <argos3/plugins/robots/builderbot/hardware/builderbot_camera_system_default_sensor.h>
  *
  * @author Michael Allwright - <allsey87@gmail.com>
  */
 
-#ifndef BUILDERBOT_CAMERA_DEFAULT_SENSOR_H
-#define BUILDERBOT_CAMERA_DEFAULT_SENSOR_H
+#ifndef BUILDERBOT_CAMERA_SYSTEM_DEFAULT_SENSOR_H
+#define BUILDERBOT_CAMERA_SYSTEM_DEFAULT_SENSOR_H
 
 namespace argos {
-   class CBuilderBotCameraDefaultSensor;
+   class CBuilderBotCameraSystemDefaultSensor;
 }
 
 /* forward declarations for the apriltag library */
@@ -21,18 +21,18 @@ struct apriltag_detector;
 
 #include <argos3/core/utility/math/rng.h>
 #include <argos3/core/hardware/sensor.h>
-#include <argos3/plugins/robots/builderbot/control_interface/ci_builderbot_camera_sensor.h>
+#include <argos3/plugins/robots/builderbot/control_interface/ci_builderbot_camera_system_sensor.h>
 
 namespace argos {
 
-   class CBuilderBotCameraDefaultSensor : public CPhysicalSensor,
-                                          public CCI_BuilderBotCameraSensor {
+   class CBuilderBotCameraSystemDefaultSensor : public CPhysicalSensor,
+                                                public CCI_BuilderBotCameraSystemSensor {
 
    public:
 
-      CBuilderBotCameraDefaultSensor();
+      CBuilderBotCameraSystemDefaultSensor();
 
-      virtual ~CBuilderBotCameraDefaultSensor();
+      virtual ~CBuilderBotCameraSystemDefaultSensor();
 
       virtual void Init(TConfigurationNode& t_tree);
 

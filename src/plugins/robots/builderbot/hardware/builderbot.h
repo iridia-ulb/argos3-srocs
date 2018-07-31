@@ -11,12 +11,13 @@ namespace argos {
    class CLuaController;
 }
 
+struct iio_context;
+struct iio_device;
+
 #include <argos3/core/hardware/sensor.h>
 #include <argos3/core/hardware/actuator.h>
 #include <argos3/core/utility/math/rng.h>
 #include <argos3/core/utility/configuration/argos_configuration.h>
-
-#include <iio.h>
 
 namespace argos {
 
@@ -50,6 +51,10 @@ namespace argos {
 
       iio_device* GetActuatorUpdateTrigger() {
          return m_psActuatorUpdateTrigger;
+      }
+
+      iio_device* GetSensorUpdateTrigger() {
+         return m_psSensorUpdateTrigger;
       }
 
       UInt32 GetTicksPerSec() {

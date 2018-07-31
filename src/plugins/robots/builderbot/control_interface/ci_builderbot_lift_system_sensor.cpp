@@ -28,7 +28,7 @@ namespace argos {
    void CCI_BuilderBotLiftSystemSensor::ReadingsToLuaState(lua_State* pt_lua_state) {
       CLuaUtility::OpenRobotStateTable(pt_lua_state, "lift_system");
       CLuaUtility::AddToTable(pt_lua_state, "state", m_arrStateStrings[m_unState].c_str());
-      CLuaUtility::AddToTable(pt_lua_state, "position", m_unPosition);
+      CLuaUtility::AddToTable(pt_lua_state, "position", m_fPosition);
       CLuaUtility::StartTable(pt_lua_state, "limit_switches");
       CLuaUtility::AddToTable(pt_lua_state, "top", m_arrLimitSwitches[0]);
       CLuaUtility::AddToTable(pt_lua_state, "bottom", m_arrLimitSwitches[1]);

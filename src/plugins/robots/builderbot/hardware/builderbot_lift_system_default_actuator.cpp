@@ -5,7 +5,7 @@
  */
 
 #include <cmath>
-#include "builderbot_las_default_actuator.h"
+#include "builderbot_lift_system_default_actuator.h"
 #include <argos3/core/utility/logging/argos_log.h>
 
 namespace argos {

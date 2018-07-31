@@ -1,10 +1,10 @@
 /**
- * @file <argos3/plugins/robots/builderbot/control_interface/ci_builderbot_camera_sensor.cpp>
+ * @file <argos3/plugins/robots/builderbot/control_interface/ci_builderbot_camera_system_sensor.cpp>
  *
  * @author Michael Allwright <allsey87@gmail.com>
  */
 
-#include "ci_builderbot_camera_sensor.h"
+#include "ci_builderbot_camera_system_sensor.h"
 
 #ifdef ARGOS_WITH_LUA
 #include <argos3/core/wrappers/lua/lua_utility.h>
@@ -15,7 +15,7 @@ namespace argos {
    /****************************************/
    /****************************************/
 
-   const CCI_BuilderBotCameraSensor::STag::TVector& CCI_BuilderBotCameraSensor::GetTags() const {
+   const CCI_BuilderBotCameraSystemSensor::STag::TVector& CCI_BuilderBotCameraSystemSensor::GetTags() const {
       return m_tTags;
    }
 
@@ -30,10 +30,10 @@ namespace argos {
     * 3. The width (a number)
     * 4. The height (a number)
     */
-   int LuaGetBuilderBotCameraSensorPixels(lua_State* pt_lua_state) {
+   int LuaGetBuilderBotCameraSystemSensorPixels(lua_State* pt_lua_state) {
       /* Check parameters */
       if(lua_gettop(pt_lua_state) != 4) {
-         return luaL_error(pt_lua_state, "robot.camera.get_pixels() expects 4 arguments");
+         return luaL_error(pt_lua_state, "robot.camera_system.get_pixels() expects 4 arguments");
       }
       luaL_checktype(pt_lua_state, 1, LUA_TNUMBER);
       luaL_checktype(pt_lua_state, 2, LUA_TNUMBER);
@@ -45,13 +45,13 @@ namespace argos {
       CVector2 cSize(lua_tonumber(pt_lua_state, 3),
                      lua_tonumber(pt_lua_state, 4));
       /* Prepare buffer for holding the pixels */
-      std::vector<CCI_BuilderBotCameraSensor::SPixel> vecPixelBuffer;
+      std::vector<CCI_BuilderBotCameraSystemSensor::SPixel> vecPixelBuffer;
       /* Allocate memory to the buffer */
       vecPixelBuffer.reserve(static_cast<size_t>(cSize.GetX()) *
                              static_cast<size_t>(cSize.GetY()));
       /* Get the camera sensor */
-      CCI_BuilderBotCameraSensor* pcCameraSensor = 
-         CLuaUtility::GetDeviceInstance<CCI_BuilderBotCameraSensor>(pt_lua_state, "camera");
+      CCI_BuilderBotCameraSystemSensor* pcCameraSensor = 
+         CLuaUtility::GetDeviceInstance<CCI_BuilderBotCameraSystemSensor>(pt_lua_state, "camera_system");
       /* Get the pixels */
       pcCameraSensor->GetPixels(cOffset, cSize, vecPixelBuffer);
       /* Create a table for the pixel data */
@@ -72,12 +72,12 @@ namespace argos {
    /****************************************/
 
 #ifdef ARGOS_WITH_LUA
-   void CCI_BuilderBotCameraSensor::CreateLuaState(lua_State* pt_lua_state) {
-      CLuaUtility::OpenRobotStateTable(pt_lua_state, "camera");
+   void CCI_BuilderBotCameraSystemSensor::CreateLuaState(lua_State* pt_lua_state) {
+      CLuaUtility::OpenRobotStateTable(pt_lua_state, "camera_system");
       CLuaUtility::AddToTable(pt_lua_state, "_instance", this);
       CLuaUtility::AddToTable(pt_lua_state,
                               "get_pixels",
-                              &LuaGetBuilderBotCameraSensorPixels);
+                              &LuaGetBuilderBotCameraSystemSensorPixels);
       CLuaUtility::StartTable(pt_lua_state, "tags");
       for(size_t i = 0; i < m_tTags.size(); ++i) {
          CLuaUtility::StartTable(pt_lua_state, i + 1);
@@ -101,8 +101,8 @@ namespace argos {
    /****************************************/
 
 #ifdef ARGOS_WITH_LUA
-   void CCI_BuilderBotCameraSensor::ReadingsToLuaState(lua_State* pt_lua_state) {
-      CLuaUtility::OpenRobotStateTable(pt_lua_state, "camera");
+   void CCI_BuilderBotCameraSystemSensor::ReadingsToLuaState(lua_State* pt_lua_state) {
+      CLuaUtility::OpenRobotStateTable(pt_lua_state, "camera_system");
       /* TODO check that this doesn't clobber the "get_pixels" entry */
       CLuaUtility::StartTable(pt_lua_state, "tags");
       /* get the tag count from last time */

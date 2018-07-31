@@ -7,6 +7,9 @@
 #ifndef CCI_BUILDERBOT_LIFT_SYSTEM_SENSOR_H
 #define CCI_BUILDERBOT_LIFT_SYSTEM_SENSOR_H
 
+#include <string>
+#include <array>
+
 namespace argos {
    class CCI_BuilderBotLiftSystemSensor;
 }
@@ -22,7 +25,7 @@ namespace argos {
       CCI_BuilderBotLiftSystemSensor() :
          m_unState(0),
          m_fPosition(140.0f),
-         m_arrLimitSwitches({false, false}) {}
+         m_arrLimitSwitches({0, 0}) {}
 
       virtual ~CCI_BuilderBotLiftSystemSensor() {}
 
@@ -50,7 +53,7 @@ namespace argos {
       Real m_fPosition;
       std::array<UInt8, 2> m_arrLimitSwitches;
 
-      static const std::array<const std::string, 5> m_arrStateStrings = {
+      std::array<std::string, 5> m_arrStateStrings = {
          "inactive", "position_control", "speed_control",
          "calibration_search_top", "calibration_search_bottom" 
       };

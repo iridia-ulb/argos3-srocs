@@ -1,14 +1,14 @@
 /**
- * @file <argos3/plugins/robots/builderbot/control_interface/ci_builderbot_camera_sensor.h>
+ * @file <argos3/plugins/robots/builderbot/control_interface/ci_builderbot_camera_system_sensor.h>
  *
  * @author Michael Allwright <allsey87@gmail.com>
  */
 
-#ifndef CCI_BUILDERBOT_CAMERA_SENSOR_H
-#define CCI_BUILDERBOT_CAMERA_SENSOR_H
+#ifndef CCI_BUILDERBOT_CAMERA_SYSTEM_SENSOR_H
+#define CCI_BUILDERBOT_CAMERA_SYSTEM_SENSOR_H
 
 namespace argos {
-   class CCI_BuilderBotCameraSensor;
+   class CCI_BuilderBotCameraSystemSensor;
 }
 
 #include <string>
@@ -17,7 +17,7 @@ namespace argos {
 
 namespace argos {
 
-   class CCI_BuilderBotCameraSensor : public CCI_Sensor {
+   class CCI_BuilderBotCameraSystemSensor : public CCI_Sensor {
 
    public:
 
@@ -42,7 +42,7 @@ namespace argos {
          UInt8 Y,U,V;
       };
 
-      virtual ~CCI_BuilderBotCameraSensor() {}
+      virtual ~CCI_BuilderBotCameraSystemSensor() {}
 
       virtual void GetPixels(const CVector2& c_center,
                              const CVector2& c_size,

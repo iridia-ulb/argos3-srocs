@@ -1,10 +1,10 @@
 /**
- * @file <argos3/plugins/robots/builderbot/hardware/builderbot_camera_default_sensor.cpp>
+ * @file <argos3/plugins/robots/builderbot/hardware/builderbot_camera_system_default_sensor.cpp>
  *
  * @author Michael Allwright - <allsey87@gmail.com>
  */
 
-#include "builderbot_camera_default_sensor.h"
+#include "builderbot_camera_system_default_sensor.h"
 
 #include <argos3/core/utility/logging/argos_log.h>
 
@@ -18,7 +18,7 @@ namespace argos {
    /****************************************/
    /****************************************/
 
-   CBuilderBotCameraDefaultSensor::CBuilderBotCameraDefaultSensor() {
+   CBuilderBotCameraSystemDefaultSensor::CBuilderBotCameraSystemDefaultSensor() {
       /* initialize the apriltag components */
       m_psTagFamily = tag36h11_create();
       m_psTagFamily->black_border = 1;
@@ -39,7 +39,7 @@ namespace argos {
    /****************************************/
    /****************************************/
 
-   CBuilderBotCameraDefaultSensor::~CBuilderBotCameraDefaultSensor() {
+   CBuilderBotCameraSystemDefaultSensor::~CBuilderBotCameraSystemDefaultSensor() {
       /* uninitialize the apriltag components */
       apriltag_detector_remove_family(m_psTagDetector, m_psTagFamily);
       /* destroy the tag detector */
@@ -51,10 +51,9 @@ namespace argos {
    /****************************************/
    /****************************************/
 
-   void CBuilderBotCameraDefaultSensor::Init(TConfigurationNode& t_tree) {
+   void CBuilderBotCameraSystemDefaultSensor::Init(TConfigurationNode& t_tree) {
       try {
-         /* Parent class init */
-         CCI_BuilderBotCameraSensor::Init(t_tree);
+         CCI_BuilderBotCameraSystemSensor::Init(t_tree);
          /* parse and set the resolution */
          CVector2 cResolution;
          GetNodeAttribute(t_tree, "resolution", cResolution);
@@ -82,7 +81,7 @@ namespace argos {
    /****************************************/
    /****************************************/
 
-   void CBuilderBotCameraDefaultSensor::Update() {
+   void CBuilderBotCameraSystemDefaultSensor::Update() {
       if(m_itInputFrameIterator != std::end(m_vecInputFrames)) {
          image_u8_t* ptFrame = 
             image_u8_create_from_pnm(m_itInputFrameIterator->c_str());
@@ -135,7 +134,7 @@ namespace argos {
    /****************************************/
    /****************************************/
 
-   void CBuilderBotCameraDefaultSensor::GetPixels(const CVector2& c_offset,
+   void CBuilderBotCameraSystemDefaultSensor::GetPixels(const CVector2& c_offset,
                                                   const CVector2& c_size,
                                                   std::vector<SPixel>& vec_pixels) {
       /* round the given coordinates to look up the pixels */     
@@ -158,8 +157,8 @@ namespace argos {
    /****************************************/
    /****************************************/
 
-   void CBuilderBotCameraDefaultSensor::Write(const CBuilderBotCameraDefaultSensor::SFrame& s_frame,
-                                              const std::string& str_file) {
+   void CBuilderBotCameraSystemDefaultSensor::Write(const CBuilderBotCameraSystemDefaultSensor::SFrame& s_frame,
+                                                    const std::string& str_file) {
       /* write to PNM file */
       static int frame = 0;
       image_u8_write_pnm(s_frame.Y.get(), (str_file + std::to_string(frame)).c_str());
@@ -169,8 +168,8 @@ namespace argos {
    /****************************************/
    /****************************************/
 
-   REGISTER_SENSOR(CBuilderBotCameraDefaultSensor,
-                   "builderbot_cam", "default",
+   REGISTER_SENSOR(CBuilderBotCameraSystemDefaultSensor,
+                   "builderbot_camera_system", "default",
                    "Michael Allwright [allsey87@gmail.com]",
                    "1.0",
                    "Camera sensor for the BuilderBot Robot",

@@ -50,7 +50,7 @@ namespace argos {
       bool m_bStopReq;
       bool m_bSetPositionReq;
 
-      UInt8 m_unTargetPosition;
+      Real m_fTargetPosition;
    };
 
 }

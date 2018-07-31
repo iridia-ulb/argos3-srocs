@@ -1,10 +1,10 @@
 /**
- * @file <argos3/plugins/robots/builderbot/control_interface/ci_builderbot_las_actuator.cpp>
+ * @file <argos3/plugins/robots/builderbot/control_interface/ci_builderbot_lift_system_actuator.cpp>
  *
  * @author Michael Allwright - <allsey87@gmail.com>
  */
 
-#include "ci_builderbot_las_actuator.h"
+#include "ci_builderbot_lift_system_actuator.h"
 
 #ifdef ARGOS_WITH_LUA
 #include <argos3/core/wrappers/lua/lua_utility.h>
@@ -27,7 +27,7 @@ namespace argos {
       }
       luaL_checktype(pt_lua_state, 1, LUA_TNUMBER);
       /* Perform action */
-      CLuaUtility::GetDeviceInstance<CCI_BuilderBotLASActuator>(pt_lua_state, "lift_system")->
+      CLuaUtility::GetDeviceInstance<CCI_BuilderBotLiftSystemActuator>(pt_lua_state, "lift_system")->
          SetPosition(lua_tonumber(pt_lua_state, 1));
       return 0;
    }
@@ -39,7 +39,7 @@ namespace argos {
 #ifdef ARGOS_WITH_LUA
    int LuaStopBuilderBotLiftSystemActuator(lua_State* pt_lua_state) {
       /* Perform action */
-      CLuaUtility::GetDeviceInstance<CCI_BuilderBotLASActuator>(pt_lua_state, "lift_system")->Stop();
+      CLuaUtility::GetDeviceInstance<CCI_BuilderBotLiftSystemActuator>(pt_lua_state, "lift_system")->Stop();
       return 0;
    }
 #endif
@@ -50,7 +50,7 @@ namespace argos {
 #ifdef ARGOS_WITH_LUA
    int LuaCalibrateBuilderBotLiftSystemActuator(lua_State* pt_lua_state) {
       /* Perform action */
-      CLuaUtility::GetDeviceInstance<CCI_BuilderBotLASActuator>(pt_lua_state, "lift_system")->Calibrate();
+      CLuaUtility::GetDeviceInstance<CCI_BuilderBotLiftSystemActuator>(pt_lua_state, "lift_system")->Calibrate();
       return 0;
    }
 #endif
