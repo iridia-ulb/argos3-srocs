@@ -86,6 +86,8 @@ namespace argos {
          if(m_psBuffer == nullptr) {
             THROW_ARGOSEXCEPTION("Could not create IIO buffer: " << std::to_string(errno));
          }
+         /* disable blocking mode */
+         ::iio_buffer_set_blocking_mode(m_psBuffer, false);
       }
       catch(CARGoSException& ex) {
          THROW_ARGOSEXCEPTION_NESTED("Initialization error in the BuilderBot differential drive actuator.", ex);
@@ -96,11 +98,14 @@ namespace argos {
    /****************************************/
 
    void CBuilderBotDifferentialDriveDefaultActuator::Update() {
-      SInt16 nLeftVelocity = ConvertToRaw(m_sTargetVelocity.Left);
-      SInt16 nRightVelocity = ConvertToRaw(m_sTargetVelocity.Right);
-      ::iio_channel_write(m_psLeft, m_psBuffer, &nLeftVelocity, 2);
-      ::iio_channel_write(m_psRight, m_psBuffer, &nRightVelocity, 2);
-      ::iio_buffer_push(m_psBuffer);
+      if(m_bUpdateReq) {
+         SInt16 nLeftVelocity = ConvertToRaw(m_sTargetVelocity.Left);
+         SInt16 nRightVelocity = ConvertToRaw(m_sTargetVelocity.Right);
+         ::iio_channel_write(m_psLeft, m_psBuffer, &nLeftVelocity, 2);
+         ::iio_channel_write(m_psRight, m_psBuffer, &nRightVelocity, 2);
+         ::iio_buffer_push(m_psBuffer);
+         m_bUpdateReq = false;
+      }
    }
 
    /****************************************/

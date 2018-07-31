@@ -66,12 +66,12 @@ namespace argos {
             THROW_ARGOSEXCEPTION("Could not find IIO device \"" << strDevice << "\"");
          }
          /* get the channels */
-         m_psLeft = ::iio_device_find_channel(m_psDevice, strLeft.c_str(), true);
+         m_psLeft = ::iio_device_find_channel(m_psDevice, strLeft.c_str(), false);
          if(m_psLeft == nullptr) {
             THROW_ARGOSEXCEPTION("Could not find IIO channel \"" << strLeft <<
                                  "\" for device \"" << strDevice << "\"");
          }
-         m_psRight = ::iio_device_find_channel(m_psDevice, strRight.c_str(), true);
+         m_psRight = ::iio_device_find_channel(m_psDevice, strRight.c_str(), false);
          if(m_psRight == nullptr) {
             THROW_ARGOSEXCEPTION("Could not find IIO channel \"" << strRight <<
                                  "\" for device \"" << strDevice << "\"");

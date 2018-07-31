@@ -25,6 +25,7 @@ namespace argos {
                                      Real f_target_velocity_right) {
          m_sTargetVelocity.Left = f_target_velocity_left;
          m_sTargetVelocity.Right = f_target_velocity_right;
+         m_bUpdateReq = true;
       }
 
 #ifdef ARGOS_WITH_LUA
@@ -37,6 +38,8 @@ namespace argos {
          Real Left = 0.0f;
          Real Right = 0.0f;
       } m_sTargetVelocity;
+
+      bool m_bUpdateReq = false;
 
    };
 
