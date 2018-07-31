@@ -12,6 +12,7 @@
 #include <cerrno>
 
 #include <argos3/core/utility/logging/argos_log.h>
+#include <argos3/plugins/robots/builderbot/hardware/builderbot.h>
 
 namespace argos {
 
@@ -46,7 +47,7 @@ namespace argos {
    
    void CBuilderBotElectromagnetSystemDefaultSensor::Init(TConfigurationNode& t_tree) {
       try {
-         CCI_BuilderBotElectromagnetsystemSensor::Init(t_tree);
+         CCI_BuilderBotElectromagnetSystemSensor::Init(t_tree);
          /* Get context and trigger */
          iio_context* psContext = CBuilderBot::GetInstance().GetContext();
          iio_device* psUpdateTrigger = CBuilderBot::GetInstance().GetSensorUpdateTrigger();

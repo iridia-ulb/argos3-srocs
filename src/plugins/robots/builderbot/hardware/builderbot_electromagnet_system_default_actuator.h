@@ -8,32 +8,34 @@
 #define BUILDERBOT_ELECTROMAGNET_SYSTEM_DEFAULT_ACTUATOR_H
 
 namespace argos {
-   class CBuilderBotElectromagnetDefaultActuator;
+   class CBuilderBotElectromagnetSystemDefaultActuator;
 }
 
 struct iio_device;
 struct iio_buffer;
 struct iio_channel; 
 
-#include <argos3/plugins/robots/builderbot/control_interface/ci_builderbot_electomagnet_system_actuator.h>
+#include <cmath>
+
 #include <argos3/core/hardware/actuator.h>
+#include <argos3/plugins/robots/builderbot/control_interface/ci_builderbot_electromagnet_system_actuator.h>
 
 namespace argos {
 
-   class CBuilderBotElectromagnetDefaultActuator : public CPhysicalActuator,
-                                                   public CCI_BuilderBotElectromagnetActuator {
+   class CBuilderBotElectromagnetSystemDefaultActuator : public CPhysicalActuator,
+                                                         public CCI_BuilderBotElectromagnetSystemActuator {
 
    public:
 
       /**
        * @brief Constructor.
        */
-      CBuilderBotElectromagnetDefaultActuator();
+      CBuilderBotElectromagnetSystemDefaultActuator();
 
       /**
        * @brief Destructor.
        */
-      virtual ~CBuilderBotElectromagnetDefaultActuator();
+      virtual ~CBuilderBotElectromagnetSystemDefaultActuator();
 
       virtual void Init(TConfigurationNode& t_tree);
 

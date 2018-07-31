@@ -12,6 +12,7 @@
 #include <cerrno>
 
 #include <argos3/core/utility/logging/argos_log.h>
+#include <argos3/plugins/robots/builderbot/hardware/builderbot.h>
 
 namespace argos {
 

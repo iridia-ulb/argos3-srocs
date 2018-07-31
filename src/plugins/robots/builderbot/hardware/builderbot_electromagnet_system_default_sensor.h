@@ -15,6 +15,8 @@ struct iio_device;
 struct iio_buffer;
 struct iio_channel; 
 
+#include <cmath>
+
 #include <argos3/core/hardware/sensor.h>
 #include <argos3/plugins/robots/builderbot/control_interface/ci_builderbot_electromagnet_system_sensor.h>
 

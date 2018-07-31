@@ -15,8 +15,10 @@ struct iio_device;
 struct iio_buffer;
 struct iio_channel; 
 
-#include <argos3/plugins/robots/builderbot/control_interface/ci_builderbot_lift_system_actuator.h>
+#include <cmath>
+
 #include <argos3/core/hardware/actuator.h>
+#include <argos3/plugins/robots/builderbot/control_interface/ci_builderbot_lift_system_actuator.h>
 
 namespace argos {
 
@@ -42,6 +44,11 @@ namespace argos {
       virtual void Reset();
 
    private:
+
+      UInt8 ConvertToRaw(Real f_metres) {
+         static const Real fConversionFactor = Real(1000);
+         return std::round(f_metres * fConversionFactor);
+      }
 
       iio_device* m_psDevice;
       iio_buffer* m_psBuffer;

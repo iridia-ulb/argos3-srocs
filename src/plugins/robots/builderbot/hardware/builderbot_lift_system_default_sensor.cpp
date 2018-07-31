@@ -6,7 +6,13 @@
 
 #include "builderbot_lift_system_default_sensor.h"
 
+#include <iio.h>
+
+#include <cmath>
+#include <cerrno>
+
 #include <argos3/core/utility/logging/argos_log.h>
+#include <argos3/plugins/robots/builderbot/hardware/builderbot.h>
 
 namespace argos {
 
@@ -122,7 +128,7 @@ namespace argos {
       ::iio_channel_read(m_psBottomSwitch, m_psBuffer, &m_arrLimitSwitches[1], 1);
       ::iio_channel_read(m_psState, m_psBuffer, &m_unState, 1);
       /* convert the position to metres */
-      m_fPosition = unRawPosition * Real(0.001);
+      m_fPosition = ConvertToMeters(unRawPosition);
    }
 
    /****************************************/

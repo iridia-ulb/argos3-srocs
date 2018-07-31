@@ -12,13 +12,14 @@
 #include <cerrno>
 
 #include <argos3/core/utility/logging/argos_log.h>
+#include <argos3/plugins/robots/builderbot/hardware/builderbot.h>
 
 namespace argos {
 
    /****************************************/
    /****************************************/
 
-   CBuilderBotLiftSystemDefaultActuator::~CBuilderBotLiftSystemDefaultActuator() :
+   CBuilderBotLiftSystemDefaultActuator::CBuilderBotLiftSystemDefaultActuator() :
       m_psDevice(nullptr),
       m_psBuffer(nullptr),
       m_psDistance(nullptr),
@@ -65,7 +66,7 @@ namespace argos {
          /* get the channels */
          m_psDistance = ::iio_device_find_channel(m_psDevice, strDistance.c_str(), true);
          if(m_psDistance == nullptr) {
-            THROW_ARGOSEXCEPTION("Could not find IIO channel \"" << strLeft <<
+            THROW_ARGOSEXCEPTION("Could not find IIO channel \"" << strDistance <<
                                  "\" in device \"" << strDevice << "\"");
          }
          /* enable channels */
@@ -96,7 +97,8 @@ namespace argos {
          ::iio_channel_attr_write_bool(m_psDistance, "calibrate", true);
       }
       else if(m_bSetPositionReq) {
-         ::iio_channel_write(m_psDistance, m_psBuffer, &m_unTargetPosition, 1);
+         UInt8 unTargetPositionRaw = ConvertToRaw(m_fTargetPosition);
+         ::iio_channel_write(m_psDistance, m_psBuffer, &unTargetPositionRaw, 1);
          ::iio_buffer_push(m_psBuffer);
       }
       m_bStopReq = false;
@@ -108,7 +110,7 @@ namespace argos {
    /****************************************/
    
    void CBuilderBotLiftSystemDefaultActuator::Reset() {
-      m_unTargetPosition = 140;
+      m_fTargetPosition = 140;
       m_bCalibrationReq = false;
       m_bStopReq = false;
    }
