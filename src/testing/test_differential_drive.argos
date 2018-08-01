@@ -15,9 +15,6 @@
           device="dds-actr"
           left="anglvel0"
           right="anglvel1" />
-        <builderbot_nfc_interface
-          implementation="default"
-          device="/dev/nfc" /-->
       </actuators>
       <sensors>
         <builderbot_differential_drive
@@ -25,13 +22,6 @@
           device="dds-sens"
           left="anglvel0"
           right="anglvel1" />
-        <!--builderbot_electromagnet_system
-          implementation="default"
-          device="ems-sens"
-          voltage="voltage0" />
-        <builderbot_camera_system
-          implementation="default"
-          device="/dev/video0" /-->
       </sensors>
       <params script="test_differential_drive.lua"/>
     </lua_controller>

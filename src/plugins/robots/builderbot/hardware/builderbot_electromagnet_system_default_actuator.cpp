@@ -56,7 +56,7 @@ namespace argos {
          iio_device* psUpdateTrigger = CBuilderBot::GetInstance().GetActuatorUpdateTrigger();
 
          /* Parse the device name and channel names */
-         std::string strDevice, strDistance;
+         std::string strDevice, strMode;
          GetNodeAttribute(t_tree, "device", strDevice);
          GetNodeAttribute(t_tree, "mode", strMode);
          /* get a pointer to the device */
