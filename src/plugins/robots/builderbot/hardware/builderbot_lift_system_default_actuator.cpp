@@ -22,15 +22,16 @@ namespace argos {
    CBuilderBotLiftSystemDefaultActuator::CBuilderBotLiftSystemDefaultActuator() :
       m_psDevice(nullptr),
       m_psBuffer(nullptr),
-      m_psDistance(nullptr),
-      m_bStopReq(false),
-      m_bCalibrationReq(false),
-      m_bSetPositionReq(false) {}
+      m_psDistance(nullptr) {}
    
    /****************************************/
    /****************************************/
 
    CBuilderBotLiftSystemDefaultActuator::~CBuilderBotLiftSystemDefaultActuator() {
+      /* send emergency stop */
+      if(m_psDevice != nullptr) {
+         ::iio_device_attr_write_bool(m_psDevice, "emergency_stop", true);
+      }
       /* destroy buffer */
       if(m_psBuffer != nullptr) {
          ::iio_buffer_destroy(m_psBuffer);
@@ -91,10 +92,10 @@ namespace argos {
    
    void CBuilderBotLiftSystemDefaultActuator::Update() {
       if(m_bStopReq) {
-         ::iio_channel_attr_write_bool(m_psDistance, "emergency_stop", true);
+         ::iio_device_attr_write_bool(m_psDevice, "emergency_stop", true);
       }
       else if(m_bCalibrationReq) {
-         ::iio_channel_attr_write_bool(m_psDistance, "calibrate", true);
+         ::iio_device_attr_write_bool(m_psDevice, "calibrate", true);
       }
       else if(m_bSetPositionReq) {
          UInt8 unTargetPositionRaw = ConvertToRaw(m_fTargetPosition);

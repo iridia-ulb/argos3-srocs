@@ -15,9 +15,6 @@
           device="dds-actr"
           left="anglvel0"
           right="anglvel1" />
-        <!--builderbot_lift_system
-          implementation="default"
-          device="las-actr" />
         <builderbot_nfc_interface
           implementation="default"
           device="/dev/nfc" /-->
@@ -32,13 +29,6 @@
           implementation="default"
           device="ems-sens"
           voltage="voltage0" />
-        <builderbot_lift_system
-          implementation="default" 
-          device="las-sens"
-          distance="distance0"
-          top_limit_switch="proximity0"
-          bottom_limit_switch="proximity1"
-          state = "index0" />
         <builderbot_camera_system
           implementation="default"
           device="/dev/video0" /-->

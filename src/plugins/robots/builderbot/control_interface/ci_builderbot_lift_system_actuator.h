@@ -20,8 +20,8 @@ namespace argos {
    public:
 
       CCI_BuilderBotLiftSystemActuator() :
-         m_bCalibrationReq(false),
          m_bStopReq(false),
+         m_bCalibrationReq(false),
          m_bSetPositionReq(false),
          m_fTargetPosition(140.0f) {}
 
@@ -45,9 +45,8 @@ namespace argos {
 #endif
 
    protected:
-
-      bool m_bCalibrationReq;
       bool m_bStopReq;
+      bool m_bCalibrationReq;
       bool m_bSetPositionReq;
 
       Real m_fTargetPosition;

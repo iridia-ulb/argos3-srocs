@@ -240,7 +240,10 @@ namespace argos {
             /* start the camera update on a separate thread */
             //std::future<void> cCameraUpdate = 
             //   std::async(std::launch::async, std::bind(&CPhysicalSensor::Update, m_pcCamera));
-            /* meanwhile update the remaining sensors on this thread */
+
+            /* pull in samples from the sensor buffers */
+            ::iio_device_attr_write_bool(m_psSensorUpdateTrigger, "trigger_now", true);
+            /* update the sensors on this thread */
             for(CPhysicalSensor* pc_sensor : m_vecSensors) {
                pc_sensor->Update();
                if(m_bSignalRaised) {
@@ -252,8 +255,6 @@ namespace argos {
             /* forward any exceptions from the update thread to this thread */
             //cCameraUpdate.get();
 
-            /* pull in samples from the sensor buffers */
-            ::iio_device_attr_write_bool(m_psSensorUpdateTrigger, "trigger_now", true);
             /* sleep if required */
             cRate.Sleep();
             /* step the internal state machine */

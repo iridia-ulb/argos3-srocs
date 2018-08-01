@@ -107,9 +107,6 @@ namespace argos {
          if(m_psBuffer == nullptr) {
             THROW_ARGOSEXCEPTION("Could not create IIO buffer: " << std::to_string(errno));
          }
-         else {
-            THROW_ARGOSEXCEPTION("Could not find IIO device \"" << strDevice << "\".");
-         }
       }
       catch(CARGoSException& ex) {
          THROW_ARGOSEXCEPTION_NESTED("Initialization error in the BuilderBot lift system sensor.", ex);

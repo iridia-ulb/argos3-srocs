@@ -53,9 +53,6 @@ namespace argos {
       iio_device* m_psDevice;
       iio_buffer* m_psBuffer;
       iio_channel* m_psDistance;
-      bool m_bStopReq;
-      bool m_bCalibrationReq;
-      bool m_bSetPositionReq;
 
    };
 }
