@@ -19,20 +19,25 @@ namespace argos {
 
    public:
 
-      enum class EDischargeMode {
-         DISABLED,
-         CONSTRUCTIVE,
-         DESTRUCTIVE,
+      enum class EDischargeMode : UInt8 {
+         CONSTRUCTIVE = 0,
+         DESTRUCTIVE = 1,
+         DISABLED = 2,
       };
 
    public:
 
       CCI_BuilderBotElectromagnetSystemActuator() :
-         m_eDischargeMode(EDischargeMode::DISABLED) {}
+         m_eDischargeMode(EDischargeMode::DISABLED),
+         m_bUpdateReq(false) {}
 
       virtual ~CCI_BuilderBotElectromagnetSystemActuator() {}
 
-      virtual void SetDischargeMode(EDischargeMode e_discharge_mode);
+      virtual void SetDischargeMode(EDischargeMode e_discharge_mode) {
+         m_eDischargeMode = e_discharge_mode;
+         m_bUpdateReq = true;
+      }
+
 
 #ifdef ARGOS_WITH_LUA
       virtual void CreateLuaState(lua_State* pt_lua_state);
@@ -40,6 +45,8 @@ namespace argos {
 
    protected:
       EDischargeMode m_eDischargeMode;
+
+      bool m_bUpdateReq;
 
    };
 

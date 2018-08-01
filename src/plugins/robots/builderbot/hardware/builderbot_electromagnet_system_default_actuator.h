@@ -1,5 +1,5 @@
 /**
- * @file <argos3/plugins/robots/builderbot/hardware/builderbot_electromagnet_default_actuator.h>
+ * @file <argos3/plugins/robots/builderbot/hardware/builderbot_electromagnet_system_default_actuator.h>
  *
  * @author Michael Allwright - <allsey87@gmail.com>
  */
@@ -42,6 +42,12 @@ namespace argos {
       virtual void Update();
 
       virtual void Reset();
+
+   private:
+
+      iio_device* m_psDevice;
+      iio_buffer* m_psBuffer;
+      iio_channel* m_psMode;
 
    };
 }

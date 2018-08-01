@@ -48,14 +48,6 @@ namespace argos {
    /****************************************/
    /****************************************/
 
-
-   void CCI_BuilderBotElectromagnetSystemActuator::SetDischargeMode(CCI_BuilderBotElectromagnetSystemActuator::EDischargeMode e_discharge_mode) {
-      m_eDischargeMode = e_discharge_mode;
-   }
-
-   /****************************************/
-   /****************************************/
-
 #ifdef ARGOS_WITH_LUA
    void CCI_BuilderBotElectromagnetSystemActuator::CreateLuaState(lua_State* pt_lua_state) {
       CLuaUtility::OpenRobotStateTable(pt_lua_state, "electromagnet_system");

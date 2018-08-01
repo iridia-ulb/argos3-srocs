@@ -10,10 +10,10 @@
   <controllers>
     <lua_controller id="test_electromagnet_system">
       <actuators>
-        <!--builderbot_lift_system
+        <builderbot_electromagnet_system
           implementation="default"
-          device="las-actr"
-          distance="distance0" /-->
+          device="ems-actr"
+          mode="index0" />
       </actuators>
       <sensors>
         <builderbot_electromagnet_system
