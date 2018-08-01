@@ -61,7 +61,7 @@ namespace argos {
             THROW_ARGOSEXCEPTION("Could not find IIO device \"" << strDevice << "\"");
          }
          /* get the channels */
-         m_psVoltage = ::iio_device_find_channel(m_psDevice, strVoltage.c_str(), true);
+         m_psVoltage = ::iio_device_find_channel(m_psDevice, strVoltage.c_str(), false);
          if(m_psVoltage == nullptr) {
             THROW_ARGOSEXCEPTION("Could not find IIO channel \"" << strVoltage <<
                                  "\" for device \"" << strDevice << "\"");

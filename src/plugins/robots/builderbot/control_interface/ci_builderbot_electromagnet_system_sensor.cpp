@@ -1,5 +1,5 @@
 /**
- * @file <argos3/plugins/robots/builderbot/control_interface/ci_builderbot_ems_sensor.cpp>
+ * @file <argos3/plugins/robots/builderbot/control_interface/ci_builderbot_electromagnet_system_sensor.cpp>
  *
  * @author Michael Allwright <allsey87@gmail.com>
  */
@@ -35,9 +35,9 @@ namespace argos {
 
 #ifdef ARGOS_WITH_LUA
    void CCI_BuilderBotElectromagnetSystemSensor::ReadingsToLuaState(lua_State* pt_lua_state) {
-      CLuaUtility::OpenRobotStateTable(pt_lua_state, "electromagnet_system");
+      lua_getfield(pt_lua_state, -1, "electromagnet_system");
       CLuaUtility::AddToTable(pt_lua_state, "voltage", m_fVoltage);
-      CLuaUtility::CloseRobotStateTable(pt_lua_state);
+      lua_pop(pt_lua_state, 1);
    }
 #endif
 
