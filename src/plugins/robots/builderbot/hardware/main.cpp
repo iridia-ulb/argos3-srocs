@@ -55,7 +55,7 @@ int main(int n_argc, char** ppch_argv) {
                                                      strConfigurationFile);
       cCommandLineArgParser.AddArgument<std::string>('i',
                                                      "controller",
-                                                     "the controller identifier [REQUIRED]",
+                                                     "the controller identifier",
                                                      strControllerId);     
       cCommandLineArgParser.Parse(n_argc, ppch_argv);
       if(bUsageHelp) {
@@ -70,10 +70,6 @@ int main(int n_argc, char** ppch_argv) {
          if (strConfigurationFile.empty()) {
             THROW_ARGOSEXCEPTION("configuration file not provided");
          }
-         if (strControllerId.empty()) {
-            THROW_ARGOSEXCEPTION("controller identifier not provided");
-         }
-
       } /* else all is ok, we can continue */
    } catch (CARGoSException& ex) {
       THROW_ARGOSEXCEPTION_NESTED("Error while parsing arguments", ex);

@@ -142,13 +142,13 @@ namespace argos {
              ++itController) {
             std::string strControllerId;
             GetNodeAttributeOrDefault(*itController, "id", strControllerId, strControllerId);
-            if(strControllerId == str_controller_id) {
+            if(str_controller_id.empty() || strControllerId == str_controller_id) {
                strControllerLabel = itController->Value();
                break;
             }
          }
          if(strControllerLabel.empty()) {
-            THROW_ARGOSEXCEPTION("controller with id = \"" << str_controller_id << "\" not found")
+            THROW_ARGOSEXCEPTION("could not find controller in the experiment configuration file")
          }
          LOG << "[INFO] Creating a " << strControllerLabel << " with id = \"" << str_controller_id << "\"" << std::endl;
          /* Create the controller */
