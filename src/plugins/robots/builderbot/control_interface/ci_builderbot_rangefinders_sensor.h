@@ -1,21 +1,21 @@
 /**
- * @file <argos3/plugins/robots/builderbot/control_interface/ci_builderbot_pai_sensor.h>
+ * @file <argos3/plugins/robots/builderbot/control_interface/ci_builderbot_rangefinders_sensor.h>
  *
  * @author Michael Allwright <allsey87@gmail.com>
  */
 
-#ifndef CCI_BUILDERBOT_PAI_SENSOR_H
-#define CCI_BUILDERBOT_PAI_SENSOR_H
+#ifndef CCI_BUILDERBOT_RANGEFINDERS_SENSOR_H
+#define CCI_BUILDERBOT_RANGEFINDERS_SENSOR_H
 
 namespace argos {
-   class CCI_BuilderBotPAISensor;
+   class CCI_BuilderBotRangefindersSensor;
 }
 
 #include <argos3/core/control_interface/ci_sensor.h>
 
 namespace argos {
 
-   class CCI_BuilderBotPAISensor : public CCI_Sensor {
+   class CCI_BuilderBotRangefindersSensor : public CCI_Sensor {
 
    public:
 
@@ -30,7 +30,7 @@ namespace argos {
          using TVector = std::vector<SInterface*>;
       };
 
-      virtual ~CCI_BuilderBotPAISensor() {}
+      virtual ~CCI_BuilderBotRangefindersSensor() {}
 
       const SInterface::TVector& GetInterfaces() const;
 
@@ -42,7 +42,7 @@ namespace argos {
 
    protected:
 
-      SInterface::TVector m_tInterfaces;
+      SInterface::TVector m_vecInterfaces;
 
    };
 

@@ -9,7 +9,8 @@ set(ARGOS3_HEADERS_PLUGINS_ROBOTS_BUILDERBOT_CONTROLINTERFACE
   control_interface/ci_builderbot_electromagnet_system_actuator.h
   control_interface/ci_builderbot_electromagnet_system_sensor.h
   control_interface/ci_builderbot_lift_system_actuator.h
-  control_interface/ci_builderbot_lift_system_sensor.h)
+  control_interface/ci_builderbot_lift_system_sensor.h
+  control_interface/ci_builderbot_rangefinders_sensor.h)
 if(ARGOS_BUILD_FOR_SIMULATOR)
   # argos3/plugins/robots/builderbot/simulator
   set(ARGOS3_HEADERS_PLUGINS_ROBOTS_BUILDERBOT_SIMULATOR
@@ -30,7 +31,8 @@ else(ARGOS_BUILD_FOR_SIMULATOR)
     hardware/builderbot_electromagnet_system_default_actuator.h
     hardware/builderbot_electromagnet_system_default_sensor.h
     hardware/builderbot_lift_system_default_actuator.h
-    hardware/builderbot_lift_system_default_sensor.h)
+    hardware/builderbot_lift_system_default_sensor.h
+    hardware/builderbot_rangefinders_default_sensor.h)
 endif(ARGOS_BUILD_FOR_SIMULATOR)
 
 #
@@ -45,7 +47,8 @@ set(ARGOS3_SOURCES_PLUGINS_ROBOTS_BUILDERBOT
   control_interface/ci_builderbot_electromagnet_system_actuator.cpp
   control_interface/ci_builderbot_electromagnet_system_sensor.cpp
   control_interface/ci_builderbot_lift_system_actuator.cpp
-  control_interface/ci_builderbot_lift_system_sensor.cpp)
+  control_interface/ci_builderbot_lift_system_sensor.cpp
+  control_interface/ci_builderbot_rangefinders_sensor.cpp)
 if(ARGOS_BUILD_FOR_SIMULATOR)
   # argos3/plugins/robots/builderbot/simulator
   set(ARGOS3_SOURCES_PLUGINS_ROBOTS_BUILDERBOT
@@ -72,6 +75,7 @@ else(ARGOS_BUILD_FOR_SIMULATOR)
     hardware/builderbot_electromagnet_system_default_sensor.cpp
     hardware/builderbot_lift_system_default_actuator.cpp
     hardware/builderbot_lift_system_default_sensor.cpp
+    hardware/builderbot_rangefinders_default_sensor.cpp
     hardware/main.cpp)
 endif(ARGOS_BUILD_FOR_SIMULATOR)
 

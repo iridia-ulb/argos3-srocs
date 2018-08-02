@@ -5,7 +5,7 @@ end
 --[[ This function is executed at each time step
      It must contain the logic of your controller ]]
 function step()
-   for k, v in pairs(robot.pai) do
+   for k, v in pairs(robot.rangefinders) do
       log(k .. " " .. v.proximity .. ", " .. v.illuminance)
    end
 end
