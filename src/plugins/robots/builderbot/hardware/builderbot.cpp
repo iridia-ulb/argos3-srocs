@@ -150,7 +150,6 @@ namespace argos {
          if(strControllerLabel.empty()) {
             THROW_ARGOSEXCEPTION("could not find controller in the experiment configuration file")
          }
-         LOG << "[INFO] Creating a " << strControllerLabel << " with id = \"" << str_controller_id << "\"" << std::endl;
          /* Create the controller */
          CCI_Controller* pcController = CFactory<CCI_Controller>::New(strControllerLabel);
          m_pcController = dynamic_cast<CLuaController*>(pcController);

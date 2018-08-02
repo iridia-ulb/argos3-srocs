@@ -72,8 +72,11 @@ namespace argos {
                   THROW_ARGOSEXCEPTION("Could not create IIO buffer: " << std::to_string(errno));
                }
                m_vecPhysicalInterfaces.emplace_back(pchBuffer, psDevice, psProximity, psIlluminance, psBuffer);
-               m_vecInterfaces.push_back(&m_vecPhysicalInterfaces.back());
             }
+         }
+         /* add pointers to the control interface */
+         for(SPhysicalInterface& s_physical_interface : m_vecPhysicalInterfaces) {
+            m_vecInterfaces.push_back(&s_physical_interface);
          }
       }
       catch(CARGoSException& ex) {
