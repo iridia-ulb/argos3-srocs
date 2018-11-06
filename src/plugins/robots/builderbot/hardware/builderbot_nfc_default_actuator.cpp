@@ -30,6 +30,7 @@ namespace argos {
    void CBuilderBotNFCDefaultActuator::Update() {
       if(m_bWriteReq) {
          std::ofstream(m_strDevicePath.c_str()) << m_strMessage << std::flush;
+         m_bWriteReq = false;
       }
    }
 
