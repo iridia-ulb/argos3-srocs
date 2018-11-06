@@ -3,3 +3,34 @@
  *
  * @author Michael Allwright - <allsey87@gmail.com>
  */
+
+#ifndef DYNAMICS3D_BUILDERBOT_MODEL_H
+#define DYNAMICS3D_BUILDERBOT_MODEL_H
+
+namespace argos {
+   class CDynamics3DSingleBodyObjectModel;
+   class CDynamics3DBuilderBotModel;
+   class CBuilderBotEntity;
+}
+
+#include <argos3/plugins/simulator/physics_engines/dynamics3d/dynamics3d_single_body_object_model.h>
+
+namespace argos {
+
+   class CDynamics3DBuilderBotModel : public CDynamics3DSingleBodyObjectModel {
+
+   public:     
+
+      CDynamics3DBuilderBotModel(CDynamics3DEngine& c_engine,
+                                 CBuilderBotEntity& c_builderbot);
+
+      virtual ~CDynamics3DBuilderBotModel();
+
+   private:
+
+      CBody* m_pcBody;
+
+   };
+}
+
+#endif
