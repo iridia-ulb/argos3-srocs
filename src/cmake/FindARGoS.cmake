@@ -2,7 +2,7 @@
 # - Find the ARGoS Library
 #=============================================================================
 # This module defines
-# 	ARGOS_INCLUDE_DIR, where to find TagDetector.h, etc.
+# 	ARGOS_INCLUDE_DIR, where to find argos3/core/config.h, etc.
 # 	ARGOS_LIB, libraries to link against to use ARGoS.
 # 	ARGOS_FOUND, true if ARGoS was found.
 #
