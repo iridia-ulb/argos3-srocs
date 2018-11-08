@@ -32,7 +32,7 @@ set(CMAKE_CXX_FLAGS_DEBUG          "${CMAKE_CXX_FLAGS_DEBUG} -ggdb3")
 set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} ${CMAKE_CXX_FLAGS_RELEASE} ${CMAKE_CXX_FLAGS_DEBUG}")
 
 # Get rid of annoying warnings
-add_definitions(-Wno-unknown-pragmas)
+add_definitions(-Wno-unknown-pragmas -Wno-psabi)
 
 if(APPLE)
   # MAC OSX

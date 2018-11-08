@@ -95,7 +95,6 @@ if(NOT ARGOS_BUILD_FOR_SIMULATOR)
   if(NOT V4L2SUBDEV_FOUND)
     message(FATAL_ERROR "Required V4L2 Sub-device library not found.")
   endif(NOT V4L2SUBDEV_FOUND)
-  include_directories(${V4L2SUBDEV_INCLUDE_DIR})
 endif(NOT ARGOS_BUILD_FOR_SIMULATOR)
 
 #

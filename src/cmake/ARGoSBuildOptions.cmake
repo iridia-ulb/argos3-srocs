@@ -14,12 +14,8 @@ add_definitions(-DARGOS_${ARGOS_BUILD_FOR}_BUILD)
 # Create a convenience variable for checks in the CMake files
 if(ARGOS_BUILD_FOR STREQUAL "simulator")
   set(ARGOS_BUILD_FOR_SIMULATOR TRUE)
-  set(ARGOS_BUILD_FOR_HARDWARE FALSE)
 else(ARGOS_BUILD_FOR STREQUAL "simulator")
   set(ARGOS_BUILD_FOR_SIMULATOR FALSE)
-  set(ARGOS_BUILD_FOR_HARDWARE TRUE)
-  # override the ARGOS_BUILD_FOR string
-  set(ARGOS_BUILD_FOR "hardware")
 endif(ARGOS_BUILD_FOR STREQUAL "simulator")
 
 #
