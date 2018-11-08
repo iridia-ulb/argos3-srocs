@@ -87,6 +87,31 @@ if(NOT ARGOS_BUILD_FOR_SIMULATOR)
 endif(NOT ARGOS_BUILD_FOR_SIMULATOR)
 
 #
+# Check for V4L2 Sub-device library
+# It is required only when compiling for the hardware
+#
+if(NOT ARGOS_BUILD_FOR_SIMULATOR)
+  find_package(V4L2Subdev)
+  if(NOT V4L2SUBDEV_FOUND)
+    message(FATAL_ERROR "Required V4L2 Sub-device library not found.")
+  endif(NOT V4L2SUBDEV_FOUND)
+  include_directories(${V4L2SUBDEV_INCLUDE_DIR})
+endif(NOT ARGOS_BUILD_FOR_SIMULATOR)
+
+#
+# Check for Mediactl library
+# It is required only when compiling for the hardware
+#
+if(NOT ARGOS_BUILD_FOR_SIMULATOR)
+  find_package(Mediactl)
+  if(NOT MEDIACTL_FOUND)
+    message(FATAL_ERROR "Required library Mediactl not found.")
+  endif(NOT MEDIACTL_FOUND)
+  include_directories(${MEDIACTL_INCLUDE_DIR})
+endif(NOT ARGOS_BUILD_FOR_SIMULATOR)
+
+
+#
 # Check for Doxygen
 #
 set(ARGOS_BUILD_API OFF)

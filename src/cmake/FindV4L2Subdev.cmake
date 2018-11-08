@@ -13,19 +13,19 @@ SET (V4L2SUBDEV_FOUND 0)
 FIND_PATH (V4L2SUBDEV_INCLUDE_DIR
   NAMES v4l2-subdev.h
   PATH_SUFFIXES linux
-  DOC "The V4L2 subdev include directory"
+  DOC "The V4L2 sub-device include directory"
 )
 
 FIND_LIBRARY (V4L2SUBDEV_LIBRARY
   NAMES v4l2subdev
-  DOC "The V4L2subdev shared library"
+  DOC "The V4L2 sub-device shared library"
 )
 
 #=============================================================================
 
 INCLUDE (FindPackageHandleStandardArgs)
 FIND_PACKAGE_HANDLE_STANDARD_ARGS (
-  V4L2subdev
+  V4L2Subdev
   FOUND_VAR V4L2SUBDEV_FOUND
   REQUIRED_VARS V4L2SUBDEV_LIBRARY V4L2SUBDEV_INCLUDE_DIR)
 
