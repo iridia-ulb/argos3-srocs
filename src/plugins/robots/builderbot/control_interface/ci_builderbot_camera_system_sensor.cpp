@@ -23,6 +23,25 @@ namespace argos {
    /****************************************/
 
 #ifdef ARGOS_WITH_LUA
+   int LuaEnableBuilderBotCameraSystemSensor(lua_State* pt_lua_state) {
+      /* Check parameters */
+      if(lua_gettop(pt_lua_state) != 1) {
+         return luaL_error(pt_lua_state, "robot.camera_system.enable() expects a single argument");
+      }
+      luaL_checktype(pt_lua_state, 1, LUA_TBOOLEAN);
+      /* Get the camera sensor */
+      CCI_BuilderBotCameraSystemSensor* pcCameraSensor = 
+         CLuaUtility::GetDeviceInstance<CCI_BuilderBotCameraSystemSensor>(pt_lua_state, "camera_system");
+      /* Set the enable member */
+      pcCameraSensor->m_bEnable = lua_toboolean(pt_lua_state, 1);
+      return 0;
+   }
+#endif
+
+   /****************************************/
+   /****************************************/
+
+#ifdef ARGOS_WITH_LUA
    /*
     * The stack must have four integers in this order:
     * 1. The x offset (a number)
@@ -78,6 +97,9 @@ namespace argos {
       CLuaUtility::AddToTable(pt_lua_state,
                               "get_pixels",
                               &LuaGetBuilderBotCameraSystemSensorPixels);
+      CLuaUtility::AddToTable(pt_lua_state,
+                              "enable",
+                              &LuaEnableBuilderBotCameraSystemSensor);
       CLuaUtility::StartTable(pt_lua_state, "tags");
       for(size_t i = 0; i < m_tTags.size(); ++i) {
          CLuaUtility::StartTable(pt_lua_state, i + 1);

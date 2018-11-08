@@ -50,6 +50,8 @@ namespace argos {
 
       const STag::TVector& GetTags() const;
 
+      bool m_bEnable = true;
+
 #ifdef ARGOS_WITH_LUA
       virtual void CreateLuaState(lua_State* pt_lua_state);
 

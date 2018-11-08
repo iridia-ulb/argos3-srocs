@@ -1,7 +1,8 @@
-/**
+/*
  * @file <argos3/plugins/robots/builderbot/hardware/builderbot_camera_system_default_sensor.h>
  *
  * @author Michael Allwright - <allsey87@gmail.com>
+ * @co-author Weixu Zhu (Harry) - <zhuweixu_harry@126.com>
  */
 
 #ifndef BUILDERBOT_CAMERA_SYSTEM_DEFAULT_SENSOR_H
@@ -14,6 +15,7 @@ namespace argos {
 /* forward declarations for the apriltag library */
 struct apriltag_family;
 struct apriltag_detector;
+struct v4l2_buffer;
 
 #include <memory>
 
@@ -22,6 +24,8 @@ struct apriltag_detector;
 #include <argos3/core/utility/math/rng.h>
 #include <argos3/core/hardware/sensor.h>
 #include <argos3/plugins/robots/builderbot/control_interface/ci_builderbot_camera_system_sensor.h>
+
+#include <linux/videodev2.h>  // for v4l2
 
 namespace argos {
 
@@ -43,30 +47,46 @@ namespace argos {
                              std::vector<SPixel>& vec_pixels);
 
    private:
+      const static UInt32 m_unBytesPerPixel = 2;
+
+      /* */
+      struct SPixelData {
+         unsigned char U0;
+         unsigned char Y0;
+         unsigned char V0;
+         unsigned char Y1;
+      };
+
+
       /* apriltag components */
       apriltag_family* m_psTagFamily;
       apriltag_detector* m_psTagDetector;
 
-      /* buffers for the YUV pixel data */
-      struct SFrame {
-         /* pointers to pixel data */
-         std::unique_ptr<image_u8_t, void (*)(image_u8_t*)> Y, U, V;
-         /* default constructor */
-         SFrame() :
-            Y(image_u8_create(0, 0), image_u8_destroy),
-            U(image_u8_create(0, 0), image_u8_destroy),
-            V(image_u8_create(0, 0), image_u8_destroy) {}
-         /* set size of frame */
-         void SetSize(size_t un_width, size_t un_height) {
-            Y.reset(image_u8_create(un_width, un_height));
-            U.reset(image_u8_create(un_width, un_height));
-            V.reset(image_u8_create(un_width, un_height));
-         }
+      void Write(const image_u8_t* s_image, const std::string& str_file);
+
+      /**************** about camera ***************/
+      void LinkCamera(const char* pch_media_dev);
+      void OpenCamera(const char* pch_dev);
+      void GetFrame(image_u8_t* pt_y_channel);
+      void CloseCamera();
+      UInt32 m_unCameraHandle;
+      UInt32 m_unBytesPerPixel;  // default 2 (UYVY per 2 frames), set in OpenCamera()
+
+      struct SFrameBuffer {
+         unsigned char* Start;
+         unsigned int Length;
+         unsigned int Offset;
       };
 
-      void Write(const SFrame& s_frame, const std::string& str_file);
+      std::array<SFrameBuffer, 1> m_arrBuffers;
 
-      SFrame m_sCurrentFrame;
+      unsigned char* m_pchCurrentBuffer;  // for holding a buffer, in case of getpixel
+      struct v4l2_buffer m_sCaptureBuf;
+      /**************** end of camera ***************/
+
+
+
+      image_u8_t* m_sCurrentFrame;
 
       UInt32 m_unImageHeight;
       UInt32 m_unImageWidth;
