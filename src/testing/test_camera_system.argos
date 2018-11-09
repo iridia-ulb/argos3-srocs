@@ -1,0 +1,20 @@
+<?xml version="1.0" ?>
+<argos-configuration>
+
+  <!-- General configuration -->
+  <framework>
+    <experiment length="0" ticks_per_second="5" random_seed="0"/>
+  </framework>
+
+  <!-- Controller -->
+  <controllers>
+    <lua_controller id="test_camera_system">
+      <actuators/>
+      <sensors>
+        <builderbot_camera_system implementation="default" />
+      </sensors>
+      <params script="test_differential_drive.lua"/>
+    </lua_controller>
+  </controllers>
+
+</argos-configuration>
