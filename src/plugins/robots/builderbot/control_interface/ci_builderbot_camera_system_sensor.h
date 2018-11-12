@@ -11,6 +11,7 @@ namespace argos {
    class CCI_BuilderBotCameraSystemSensor;
 }
 
+#include <chrono>
 #include <string>
 #include <argos3/core/utility/math/vector2.h>
 #include <argos3/core/control_interface/ci_sensor.h>
@@ -48,8 +49,15 @@ namespace argos {
                              const CVector2& c_size,
                              std::vector<SPixel>& vec_pixels) = 0;
 
-      const STag::TVector& GetTags() const;
+      const std::chrono::time_point<std::chrono::steady_clock>& GetTimestamp() const {
+         return m_tpTimestamp;
+      }
 
+      const STag::TVector& GetTags() const {
+         return m_tTags;
+      }
+
+      // TODO replace this with virtual method
       bool m_bEnable = true;
 
 #ifdef ARGOS_WITH_LUA
@@ -60,7 +68,10 @@ namespace argos {
 
    protected:
 
+      /* the detected tags in the current frame */
       STag::TVector m_tTags;
+      /* the timestamp of the current frame */
+      std::chrono::time_point<std::chrono::steady_clock> m_tpTimestamp;
 
    };
 

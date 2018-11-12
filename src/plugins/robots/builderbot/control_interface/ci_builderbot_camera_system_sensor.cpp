@@ -15,13 +15,6 @@ namespace argos {
    /****************************************/
    /****************************************/
 
-   const CCI_BuilderBotCameraSystemSensor::STag::TVector& CCI_BuilderBotCameraSystemSensor::GetTags() const {
-      return m_tTags;
-   }
-
-   /****************************************/
-   /****************************************/
-
 #ifdef ARGOS_WITH_LUA
    int LuaEnableBuilderBotCameraSystemSensor(lua_State* pt_lua_state) {
       /* Check parameters */
@@ -33,6 +26,7 @@ namespace argos {
       CCI_BuilderBotCameraSystemSensor* pcCameraSensor = 
          CLuaUtility::GetDeviceInstance<CCI_BuilderBotCameraSystemSensor>(pt_lua_state, "camera_system");
       /* Set the enable member */
+      // TODO call virtual method instead
       pcCameraSensor->m_bEnable = lua_toboolean(pt_lua_state, 1);
       return 0;
    }
@@ -100,6 +94,7 @@ namespace argos {
       CLuaUtility::AddToTable(pt_lua_state,
                               "enable",
                               &LuaEnableBuilderBotCameraSystemSensor);
+      CLuaUtility::AddToTable(pt_lua_state, "timestamp", 0.0f);
       CLuaUtility::StartTable(pt_lua_state, "tags");
       for(size_t i = 0; i < m_tTags.size(); ++i) {
          CLuaUtility::StartTable(pt_lua_state, i + 1);
@@ -126,6 +121,7 @@ namespace argos {
    void CCI_BuilderBotCameraSystemSensor::ReadingsToLuaState(lua_State* pt_lua_state) {
       CLuaUtility::OpenRobotStateTable(pt_lua_state, "camera_system");
       /* TODO check that this doesn't clobber the "get_pixels" entry */
+      CLuaUtility::AddToTable(pt_lua_state, "timestamp", 0.0f);
       CLuaUtility::StartTable(pt_lua_state, "tags");
       /* get the tag count from last time */
       size_t unLastTagCount = lua_rawlen(pt_lua_state, -1);     
