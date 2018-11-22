@@ -23,7 +23,7 @@
           left="anglvel0"
           right="anglvel1" />
       </sensors>
-      <params script="test_differential_drive.lua"/>
+      <params script="/usr/share/argos3/testing/test_differential_drive.lua"/>
     </lua_controller>
   </controllers>
 

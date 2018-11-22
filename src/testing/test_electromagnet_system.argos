@@ -21,7 +21,7 @@
           device="ems-sens"
           voltage="voltage0" />
       </sensors>
-      <params script="test_electromagnet_system.lua"/>
+      <params script="/usr/share/argos3/testing/test_electromagnet_system.lua"/>
     </lua_controller>
   </controllers>
 

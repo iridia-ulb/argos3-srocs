@@ -9,8 +9,8 @@ function step()
 end
 
 function print_tag_info()
-   log("#robot.camera.tags = ", #robot.camera.tags)
-   for i,tag in ipairs(robot.camera.tags) do
+   log("#robot.camera_system.tags = ", #robot.camera_system.tags)
+   for i,tag in ipairs(robot.camera_system.tags) do
       log("tag ", i, ":")
       for j,corner in ipairs(tag.corners) do
          log("  ", corner.x, ", ", corner.y)

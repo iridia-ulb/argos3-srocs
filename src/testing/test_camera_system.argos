@@ -13,7 +13,7 @@
       <sensors>
         <builderbot_camera_system implementation="default" />
       </sensors>
-      <params script="test_differential_drive.lua"/>
+      <params script="/usr/share/argos3/testing/test_camera_system.lua"/>
     </lua_controller>
   </controllers>
 

@@ -24,7 +24,7 @@
           bottom_limit_switch="proximity1"
           state = "index0" />
       </sensors>
-      <params script="test_lift_system.lua"/>
+      <params script="/usr/share/argos3/testing/test_lift_system.lua"/>
     </lua_controller>
   </controllers>
 

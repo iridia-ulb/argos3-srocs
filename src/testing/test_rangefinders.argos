@@ -15,7 +15,7 @@
           implementation="default"
           device="vcnl4000" />
       </sensors>
-      <params script="test_rangefinders.lua"/>
+      <params script="/usr/share/argos3/testing/test_rangefinders.lua"/>
     </lua_controller>
   </controllers>
 
