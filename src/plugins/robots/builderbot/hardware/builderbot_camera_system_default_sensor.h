@@ -177,7 +177,6 @@ namespace argos {
       private:
          ::apriltag_family* m_psTagFamily;
          ::apriltag_detector* m_psTagDetector;
-         ::image_u8_t* frame;
       };
 
       /****************************************/

@@ -380,8 +380,6 @@ namespace argos {
       m_psTagDetector->refine_edges = 1;
       m_psTagDetector->refine_decode = 0;
       m_psTagDetector->refine_pose = 0;
-
-      frame = image_u8_create_from_pnm("input.pnm");
    }
 
    /****************************************/
@@ -404,7 +402,7 @@ namespace argos {
       std::array<CVector2, 4> arrCornerPixels;
       /* run the apriltags algorithm */
       ::zarray_t* psDetectionArray =
-         ::apriltag_detector_detect(m_psTagDetector, frame);
+         ::apriltag_detector_detect(m_psTagDetector, s_frame.Image);
       /* get the detected tags count */
       size_t unTagCount = static_cast<size_t>(::zarray_size(psDetectionArray));
       /* clear out previous readings */
