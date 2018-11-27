@@ -63,8 +63,11 @@ namespace argos {
    private:
       const UInt32 m_unBufferCount = 2;
       const UInt32 m_unBytesPerPixel = 2;
-      const UInt32 m_unImageHeight = 640;
-      const UInt32 m_unImageWidth = 480;
+      //const UInt32 m_unImageWidth = 640;
+      //const UInt32 m_unImageHeight = 480;
+
+      const UInt32 m_unImageWidth = 320;
+      const UInt32 m_unImageHeight = 240;
 
       const char* m_pchMediaDevice = "/dev/media0";
       const char* m_pchVideoDevice = "/dev/video0";
@@ -174,6 +177,7 @@ namespace argos {
       private:
          ::apriltag_family* m_psTagFamily;
          ::apriltag_detector* m_psTagDetector;
+         ::image_u8_t* frame;
       };
 
       /****************************************/

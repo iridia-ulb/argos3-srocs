@@ -71,13 +71,13 @@ namespace argos {
          std::ostringstream ossMediaConfig;
          ossMediaConfig << "\"" << strCameraName << "\":0 [UYVY ";
          ossMediaConfig << std::to_string(m_unImageWidth) << "x" << std::to_string(m_unImageHeight) << "]";
-         if (v4l2_subdev_parse_setup_formats(m_psMediaDevice, ossMediaConfig.str().c_str()) < 0) { // format?
+         if (v4l2_subdev_parse_setup_formats(m_psMediaDevice, ossMediaConfig.str().c_str()) < 0) {
             THROW_ARGOSEXCEPTION("Could not set the format of the camera entity");
          }
          ossMediaConfig.str("");
          ossMediaConfig << "\"OMAP4 ISS CSI2a\":0 [UYVY ";
          ossMediaConfig << std::to_string(m_unImageWidth) << "x" << std::to_string(m_unImageHeight) << "]";
-         if (v4l2_subdev_parse_setup_formats(m_psMediaDevice, ossMediaConfig.str().c_str()) < 0) { // format?
+         if (v4l2_subdev_parse_setup_formats(m_psMediaDevice, ossMediaConfig.str().c_str()) < 0) {
             THROW_ARGOSEXCEPTION("Could not set the format of the CSI entity");
          }
          /***************************************/
@@ -131,18 +131,10 @@ namespace argos {
                                    ::mmap(nullptr, sBuffer.length, PROT_READ | PROT_WRITE,
                                            MAP_SHARED, m_nCameraHandle, sBuffer.m.offset),
                                    ::image_u8_create_alignment(m_unImageWidth, m_unImageHeight, 96));
-            /* push this buffer to capture queue*/
-            /*
-            if (::ioctl(m_nCameraHandle, ::VIDIOC_QBUF, &sBuf) < 0) {
-               THROW_ARGOSEXCEPTION("Could not enqueue buffer " << un_buffer_idx);
-            }
-            */           
          }
-         m_ptrAsyncCaptureOp->Enqueue(lstFrames);
          /***********************************************/
          /* set up and enable image processing pipeline */
          /***********************************************/
-
          /* detect operation sinks to m_lstPreparedFrames */
          m_ptrAsyncDetectOp = 
             std::make_unique<CAsyncDetectOp>([this] (std::list<SFrame>& lst_frames) {
@@ -161,6 +153,8 @@ namespace argos {
             std::make_unique<CAsyncCaptureOp>([this] (std::list<SFrame>& lst_frames) {
             m_ptrAsyncConvertOp->Enqueue(lst_frames);
          }, m_nCameraHandle);
+         /* add the frames to the capture queue */
+         m_ptrAsyncCaptureOp->Enqueue(lstFrames);
          /* enable operations */
          m_ptrAsyncDetectOp->Enable();
          m_ptrAsyncConvertOp->Enable();
@@ -312,7 +306,6 @@ namespace argos {
       /* call the base class's disable method */
       CAsyncPipelineOp::Disable();
       /* stop stream */
-      //if (::ioctl(m_nCameraHandle, ::VIDIOC_STREAMOFF, &m_sCaptureBuf) < 0) {
       enum v4l2_buf_type eBufferType = V4L2_BUF_TYPE_VIDEO_CAPTURE;
       if (::ioctl(m_nCameraHandle, VIDIOC_STREAMOFF, &eBufferType) < 0) {
          THROW_ARGOSEXCEPTION("Could not stop the stream");
@@ -387,6 +380,8 @@ namespace argos {
       m_psTagDetector->refine_edges = 1;
       m_psTagDetector->refine_decode = 0;
       m_psTagDetector->refine_pose = 0;
+
+      frame = image_u8_create_from_pnm("input.pnm");
    }
 
    /****************************************/
@@ -409,7 +404,7 @@ namespace argos {
       std::array<CVector2, 4> arrCornerPixels;
       /* run the apriltags algorithm */
       ::zarray_t* psDetectionArray =
-         ::apriltag_detector_detect(m_psTagDetector, s_frame.Image);
+         ::apriltag_detector_detect(m_psTagDetector, frame);
       /* get the detected tags count */
       size_t unTagCount = static_cast<size_t>(::zarray_size(psDetectionArray));
       /* clear out previous readings */
