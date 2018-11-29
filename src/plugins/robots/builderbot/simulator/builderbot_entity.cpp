@@ -8,8 +8,10 @@
 
 #include <argos3/core/simulator/entity/controllable_entity.h>
 #include <argos3/core/simulator/entity/embodied_entity.h>
-#include <argos3/plugins/simulator/entities/wheeled_entity.h>
+//#include <argos3/plugins/simulator/entities/wheeled_entity.h>
 #include <argos3/plugins/simulator/entities/radio_entity.h>
+
+#include <argos3/plugins/robots/builderbot/simulator/builderbot_differential_drive_entity.h>
 
 namespace argos {
 
@@ -47,8 +49,8 @@ namespace argos {
          SAnchor& cOriginAnchor = m_pcEmbodiedEntity->GetOriginAnchor();
 
          /* Create and initialize the differential drive entity */
-         //m_pcDifferentialDriveEntity = new CBuilderBotDifferentialDriveEntity(this);
-         //AddComponent(*m_pcDifferentialDriveEntity);
+         m_pcDifferentialDriveEntity = new CBuilderBotDifferentialDriveEntity(this);
+         AddComponent(*m_pcDifferentialDriveEntity);
 
          /* Create and initialize the magnet equipped entity */
          /*

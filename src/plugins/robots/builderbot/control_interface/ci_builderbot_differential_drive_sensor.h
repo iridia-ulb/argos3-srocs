@@ -21,19 +21,15 @@ namespace argos {
 
       virtual ~CCI_BuilderBotDifferentialDriveSensor() {}
 
+      virtual Real GetLeftVelocity() = 0;
+
+      virtual Real GetRightVelocity() = 0;
+
 #ifdef ARGOS_WITH_LUA
       virtual void CreateLuaState(lua_State* pt_lua_state);
 
       virtual void ReadingsToLuaState(lua_State* pt_lua_state);
 #endif
-
-   protected:
-
-      struct {
-         Real Left = 0.0f;
-         Real Right = 0.0f;
-      } m_sVelocity;
-
    };
 
 }

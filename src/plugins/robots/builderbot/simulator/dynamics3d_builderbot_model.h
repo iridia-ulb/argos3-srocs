@@ -11,6 +11,7 @@ namespace argos {
    class CDynamics3DSingleBodyObjectModel;
    class CDynamics3DBuilderBotModel;
    class CBuilderBotEntity;
+   class CBuilderBotDifferentialDriveEntity;
 }
 
 #include <argos3/plugins/simulator/physics_engines/dynamics3d/dynamics3d_single_body_object_model.h>
@@ -26,9 +27,16 @@ namespace argos {
 
       virtual ~CDynamics3DBuilderBotModel();
 
+      virtual void UpdateEntityStatus();
+
+      virtual void UpdateFromEntityStatus();
+
+
    private:
 
       CBody* m_pcBody;
+
+      CBuilderBotDifferentialDriveEntity* m_pcDifferentialDriveEntity;
 
    };
 }

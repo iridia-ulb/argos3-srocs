@@ -21,26 +21,13 @@ namespace argos {
 
       virtual ~CCI_BuilderBotDifferentialDriveActuator() {}
 
-      virtual void SetTargetVelocity(Real f_target_velocity_left,
-                                     Real f_target_velocity_right) {
-         m_sTargetVelocity.Left = f_target_velocity_left;
-         m_sTargetVelocity.Right = f_target_velocity_right;
-         m_bUpdateReq = true;
-      }
+      virtual void SetTargetVelocityLeft(Real f_target_velocity_left) = 0;
+
+      virtual void SetTargetVelocityRight(Real f_target_velocity_left) = 0;
 
 #ifdef ARGOS_WITH_LUA
       virtual void CreateLuaState(lua_State* pt_lua_state);
 #endif
-
-   protected:
-
-      struct {
-         Real Left = 0.0f;
-         Real Right = 0.0f;
-      } m_sTargetVelocity;
-
-      bool m_bUpdateReq = false;
-
    };
 
 }

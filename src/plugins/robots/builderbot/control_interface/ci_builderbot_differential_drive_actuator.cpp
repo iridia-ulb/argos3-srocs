@@ -28,10 +28,12 @@ namespace argos {
       }
       luaL_checktype(pt_lua_state, 1, LUA_TNUMBER);
       luaL_checktype(pt_lua_state, 2, LUA_TNUMBER);
-      /* Perform action */
-      CLuaUtility::GetDeviceInstance<CCI_BuilderBotDifferentialDriveActuator>(pt_lua_state, "differential_drive")->
-         SetTargetVelocity(lua_tonumber(pt_lua_state, 1),
-                           lua_tonumber(pt_lua_state, 2));
+      /* Get actuator instance */
+      CCI_BuilderBotDifferentialDriveActuator* pcDifferentialDriveActuator =
+         CLuaUtility::GetDeviceInstance<CCI_BuilderBotDifferentialDriveActuator>(pt_lua_state, "differential_drive");
+      /* Update actuator */
+      pcDifferentialDriveActuator->SetTargetVelocityLeft(lua_tonumber(pt_lua_state, 1));
+      pcDifferentialDriveActuator->SetTargetVelocityRight(lua_tonumber(pt_lua_state, 2));
       return 0;
    }
 #endif

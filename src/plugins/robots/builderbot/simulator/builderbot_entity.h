@@ -8,7 +8,7 @@
 #define BUILDERBOT_ENTITY_H
 
 namespace argos {
-//   class CBuilderBotDifferentialDriveEntity;
+   class CBuilderBotDifferentialDriveEntity;
    class CControllableEntity;
    class CEmbodiedEntity;
 //   class CRadioEntity;
@@ -35,11 +35,11 @@ namespace argos {
       inline CControllableEntity& GetControllableEntity() {
          return *m_pcControllableEntity;
       }
-/*
+
       inline CBuilderBotDifferentialDriveEntity& GetDifferentialDriveEntity() {
          return *m_pcDifferentialDriveEntity;
       }
-*/
+
       inline CEmbodiedEntity& GetEmbodiedEntity() {
          return *m_pcEmbodiedEntity;
       }
@@ -57,7 +57,7 @@ namespace argos {
 
    private:
 
-//      CBuilderBotDifferentialDriveEntity*    m_pcDifferentialDriveEntity;
+      CBuilderBotDifferentialDriveEntity*    m_pcDifferentialDriveEntity;
       CControllableEntity*                   m_pcControllableEntity;
       CEmbodiedEntity*                       m_pcEmbodiedEntity;
    };

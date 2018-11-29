@@ -11,6 +11,9 @@
 #include <argos3/plugins/simulator/physics_engines/dynamics3d/dynamics3d_single_body_object_model.h>
 #include <argos3/plugins/simulator/physics_engines/dynamics3d/dynamics3d_shape_manager.h>
 
+#include <argos3/plugins/robots/builderbot/simulator/builderbot_differential_drive_entity.h>
+#include <argos3/plugins/robots/builderbot/simulator/builderbot_entity.h>
+
 namespace argos {
 
    /****************************************/
@@ -20,6 +23,10 @@ namespace argos {
                                                           CBuilderBotEntity& c_builderbot) :
       CDynamics3DSingleBodyObjectModel(c_engine, c_builderbot),
       m_pcBody(nullptr) {
+
+      m_pcDifferentialDriveEntity =
+         &(c_builderbot.GetComponent<CBuilderBotDifferentialDriveEntity>("differential_drive"));
+
       /* Fetch a collision shape for this model */
       std::shared_ptr<btCollisionShape> ptrShape = 
          CDynamics3DShapeManager::RequestBox(
@@ -72,7 +79,31 @@ namespace argos {
       /* Delete the body */
       delete m_pcBody;
    }
+
+   /****************************************/
+   /****************************************/
    
+   void CDynamics3DBuilderBotModel::UpdateEntityStatus() {
+      /* */
+      std::cerr << "to space (2.0,2.1)" << std::endl;
+      m_pcDifferentialDriveEntity->SetVelocityLeft(2.0);
+      m_pcDifferentialDriveEntity->SetVelocityRight(2.1);
+
+      CDynamics3DSingleBodyObjectModel::UpdateEntityStatus();
+   }
+
+   /****************************************/
+   /****************************************/
+
+   void CDynamics3DBuilderBotModel::UpdateFromEntityStatus() {
+      CDynamics3DSingleBodyObjectModel::UpdateFromEntityStatus();
+      
+      std::cerr << "from space (" 
+                << m_pcDifferentialDriveEntity->GetTargetVelocityLeft() << ", "
+                << m_pcDifferentialDriveEntity->GetTargetVelocityRight() << ")"
+                << std::endl;
+   }
+
    /****************************************/
    /****************************************/
 

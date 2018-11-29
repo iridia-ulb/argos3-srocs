@@ -19,8 +19,8 @@ namespace argos {
    void CCI_BuilderBotDifferentialDriveSensor::CreateLuaState(lua_State* pt_lua_state) {
       CLuaUtility::OpenRobotStateTable(pt_lua_state, "differential_drive");
       CLuaUtility::StartTable(pt_lua_state, "encoders");
-      CLuaUtility::AddToTable(pt_lua_state, "left", m_sVelocity.Left);
-      CLuaUtility::AddToTable(pt_lua_state, "right", m_sVelocity.Right);
+      CLuaUtility::AddToTable(pt_lua_state, "left", GetLeftVelocity());
+      CLuaUtility::AddToTable(pt_lua_state, "right", GetRightVelocity());
       CLuaUtility::EndTable(pt_lua_state);      
       CLuaUtility::CloseRobotStateTable(pt_lua_state);
    }
@@ -33,8 +33,8 @@ namespace argos {
    void CCI_BuilderBotDifferentialDriveSensor::ReadingsToLuaState(lua_State* pt_lua_state) {
       lua_getfield(pt_lua_state, -1, "differential_drive");
       lua_getfield(pt_lua_state, -1, "encoders");
-      CLuaUtility::AddToTable(pt_lua_state, "left", m_sVelocity.Left);
-      CLuaUtility::AddToTable(pt_lua_state, "right", m_sVelocity.Right);
+      CLuaUtility::AddToTable(pt_lua_state, "left", GetLeftVelocity());
+      CLuaUtility::AddToTable(pt_lua_state, "right", GetRightVelocity());
       lua_pop(pt_lua_state, 1);
       lua_pop(pt_lua_state, 1);
    }
