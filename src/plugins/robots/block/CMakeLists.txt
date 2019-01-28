@@ -7,7 +7,8 @@ set(ARGOS3_HEADERS_PLUGINS_ROBOTS_BLOCK_CONTROLINTERFACE
 if(ARGOS_BUILD_FOR_SIMULATOR)
   # argos3/plugins/robots/block/simulator
   set(ARGOS3_HEADERS_PLUGINS_ROBOTS_BLOCK_SIMULATOR
-    simulator/block_entity.h)
+    simulator/block_entity.h
+    simulator/dynamics3d_block_model.h)
   if(ARGOS_COMPILE_QTOPENGL)
     set(ARGOS3_HEADERS_PLUGINS_ROBOTS_BLOCK_SIMULATOR
       ${ARGOS3_HEADERS_PLUGINS_ROBOTS_BLOCK_SIMULATOR}
@@ -27,7 +28,8 @@ if(ARGOS_BUILD_FOR_SIMULATOR)
   set(ARGOS3_SOURCES_PLUGINS_ROBOTS_BLOCK
     ${ARGOS3_SOURCES_PLUGINS_ROBOTS_BLOCK}
     ${ARGOS3_HEADERS_PLUGINS_ROBOTS_BLOCK_SIMULATOR}
-    simulator/block_entity.cpp)
+    simulator/block_entity.cpp
+    simulator/dynamics3d_block_model.cpp)
   if(ARGOS_COMPILE_QTOPENGL)
     set(ARGOS3_SOURCES_PLUGINS_ROBOTS_BLOCK
       ${ARGOS3_SOURCES_PLUGINS_ROBOTS_BLOCK}

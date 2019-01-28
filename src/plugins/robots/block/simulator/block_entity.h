@@ -9,13 +9,13 @@
 
 namespace argos {
    class CControllableEntity;
-   class CDirectionalLEDEquippedEntity;
    class CEmbodiedEntity;
+   class CDirectionalLEDEquippedEntity;
    class CRadioEquippedEntity;
-   class CMagnetEquippedEntity;
+   class CTagEquippedEntity;
 }
 
-#include <argos3/core/config.h>
+#include <argos3/core/simulator/entity/composable_entity.h>
 
 namespace argos {
 
@@ -23,9 +23,13 @@ namespace argos {
 
    public:
 
+      ENABLE_VTABLE();
+
+   public:
+
       CBlockEntity();
 
-      virtual ~CBuilderBotEntity() {}
+      virtual ~CBlockEntity() {}
 
       virtual void Init(TConfigurationNode& t_tree);
 
@@ -33,29 +37,64 @@ namespace argos {
          return *m_pcControllableEntity;
       }
 
-      inline CDirectionalLEDEquippedEntity& GetDirectionalLEDEquippedEntity() {
-         return *m_pcDirectionalLEDEquippedEntity;
-      }
-
       inline CEmbodiedEntity& GetEmbodiedEntity() {
          return *m_pcEmbodiedEntity;
       }
 
-      inline CMagnetEquippedEntity& GetMagnetEquippedEntity() {
-         return *m_pcMagnetEquippedEntity;
+      inline CDirectionalLEDEquippedEntity& GetDirectionalLEDEquippedEntity() {
+         return *m_pcDirectionalLEDEquippedEntity;
+      }
+
+      inline const CDirectionalLEDEquippedEntity& GetDirectionalLEDEquippedEntity() const {
+         return *m_pcDirectionalLEDEquippedEntity;
+      }
+
+      inline CTagEquippedEntity& GetTagEquippedEntity() {
+         return *m_pcTagEquippedEntity;
+      }
+
+      inline const CTagEquippedEntity& GetTagEquippedEntity() const {
+         return *m_pcTagEquippedEntity;
       }
 
       inline CRadioEquippedEntity& GetRadioEquippedEntity() {
          return *m_pcRadioEquippedEntity;
       }
 
+      virtual void UpdateComponents();
+
    private:
 
       CControllableEntity*              m_pcControllableEntity;
       CDirectionalLEDEquippedEntity*    m_pcDirectionalLEDEquippedEntity;
       CEmbodiedEntity*                  m_pcEmbodiedEntity;
-      CMagnetEquippedEntity*            m_pcMagnetEquippedEntity;
+      CTagEquippedEntity*               m_pcTagEquippedEntity;
       CRadioEquippedEntity*             m_pcRadioEquippedEntity;
+
+      const Real m_fBlockSideLength = Real(0.055);
+
+      const std::array<std::pair<CVector3, CQuaternion>, 6> m_arrFaceOffsets = {
+         std::make_pair(CVector3( 0.5f,  0.0f, 0.5f) * m_fBlockSideLength,
+                        CQuaternion( 0.5f * CRadians::PI, CVector3::Y)),
+         std::make_pair(CVector3( 0.0f, -0.5f, 0.5f) * m_fBlockSideLength,
+                        CQuaternion( 0.5f * CRadians::PI, CVector3::X)),
+         std::make_pair(CVector3(-0.5f,  0.0f, 0.5f) * m_fBlockSideLength,
+                        CQuaternion(-0.5f * CRadians::PI, CVector3::Y)),
+         std::make_pair(CVector3( 0.0f,  0.5f, 0.5f) * m_fBlockSideLength,
+                        CQuaternion(-0.5f * CRadians::PI, CVector3::X)),
+         std::make_pair(CVector3( 0.0f,  0.0f, 1.0f) * m_fBlockSideLength,
+                        CQuaternion( 0.0f * CRadians::PI, CVector3::Z)),
+         std::make_pair(CVector3( 0.0f,  0.0f, 0.0f) * m_fBlockSideLength,
+                        CQuaternion( 1.0f * CRadians::PI, CVector3::X)),
+
+      };
+
+      const std::array<CVector3, 4> m_arrLEDOffsets = {
+         CVector3(0.02f,0.0f,0.0f),
+         CVector3(0.0f,0.02f,0.0f),
+         CVector3(-0.02f,0.0f,0.0f),
+         CVector3(0.0f,-0.02f,0.0f),
+      };
 
    };
 
