@@ -14,16 +14,6 @@ namespace argos {
    /****************************************/
    /****************************************/
 
-   CBuilderBotDifferentialDriveEntity::CBuilderBotDifferentialDriveEntity(CComposableEntity* pc_parent) :
-      CEntity(pc_parent),
-      m_fTargetVelocityLeft(0.0f),
-      m_fTargetVelocityRight(0.0f),
-      m_fVelocityLeft(0.0f),
-      m_fVelocityRight(0.0f) {}
-
-   /****************************************/
-   /****************************************/
-
    CBuilderBotDifferentialDriveEntity::CBuilderBotDifferentialDriveEntity(CComposableEntity* pc_parent,
                                                                           const std::string& str_id) :
       CEntity(pc_parent, str_id),
@@ -34,19 +24,7 @@ namespace argos {
   
    /****************************************/
    /****************************************/
-   
-   void CBuilderBotDifferentialDriveEntity::Init(TConfigurationNode& t_tree) {
-      try {
-         CEntity::Init(t_tree);
-      }
-      catch(CARGoSException& ex) {
-         THROW_ARGOSEXCEPTION_NESTED("Initialization error in the BuilderBot differential drive entity.", ex);
-      }
-   }
-
-   /****************************************/
-   /****************************************/
- 
+    
    void CBuilderBotDifferentialDriveEntity::Reset() {
       m_fTargetVelocityLeft = 0.0f;
       m_fTargetVelocityRight = 0.0f;

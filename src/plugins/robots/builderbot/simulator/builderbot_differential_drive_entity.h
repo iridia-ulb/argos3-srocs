@@ -33,8 +33,6 @@ namespace argos {
        */
       virtual ~CBuilderBotDifferentialDriveEntity() {}
 
-      virtual void Init(TConfigurationNode& t_tree);
-
       virtual void Update() {}
 
       virtual void Reset();

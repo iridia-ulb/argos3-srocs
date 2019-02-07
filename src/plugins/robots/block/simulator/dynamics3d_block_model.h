@@ -43,14 +43,14 @@ namespace argos {
 
    private:
       const std::array<btVector3, 8> m_arrMagnetOffsets {
-         btVector3( 0.0225, -0.0225f, -0.0225),
-         btVector3(-0.0225, -0.0225f, -0.0225),
-         btVector3(-0.0225, -0.0225f,  0.0225),
-         btVector3( 0.0225, -0.0225f,  0.0225),
-         btVector3( 0.0225,  0.0225f, -0.0225),
-         btVector3(-0.0225,  0.0225f, -0.0225),
-         btVector3(-0.0225,  0.0225f,  0.0225),
-         btVector3( 0.0225,  0.0225f,  0.0225),
+         btVector3( 0.023, -0.023f, -0.023),
+         btVector3(-0.023, -0.023f, -0.023),
+         btVector3(-0.023, -0.023f,  0.023),
+         btVector3( 0.023, -0.023f,  0.023),
+         btVector3( 0.023,  0.023f, -0.023),
+         btVector3(-0.023,  0.023f, -0.023),
+         btVector3(-0.023,  0.023f,  0.023),
+         btVector3( 0.023,  0.023f,  0.023),
       };
 
    private:

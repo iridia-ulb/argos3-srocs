@@ -18,6 +18,8 @@ namespace argos {
 #include <GL/gl.h>
 #endif
 
+#include <argos3/plugins/simulator/visualizations/qt-opengl/qtopengl_obj_model.h>
+
 namespace argos {
 
    class CQTOpenGLBuilderBot {
@@ -31,13 +33,11 @@ namespace argos {
       virtual void Draw(const CBuilderBotEntity& c_entity);
 
    private:
-
-      void MakeBody();
-
-   private:
-
-      GLuint m_unBaseList;
-      GLuint m_unBodyList;
+      /* OBJ models */
+      CQTOpenGLObjModel m_cBuilderBotModel;
+      CQTOpenGLObjModel m_cBuilderBotManipulatorModel;
+      /* Pointer to the LED material within the OBJ model */
+      std::array<CQTOpenGLObjModel::SMaterial*, 12> m_arrLEDs;
    };
 
 }

@@ -18,6 +18,12 @@ if(ARGOS_BUILD_FOR_SIMULATOR)
     simulator/builderbot_differential_drive_default_actuator.h
     simulator/builderbot_differential_drive_default_sensor.h
     simulator/builderbot_differential_drive_entity.h
+    simulator/builderbot_electromagnet_system_default_actuator.h
+    simulator/builderbot_electromagnet_system_default_sensor.h
+    simulator/builderbot_electromagnet_system_entity.h
+    simulator/builderbot_lift_system_default_actuator.h
+    simulator/builderbot_lift_system_default_sensor.h
+    simulator/builderbot_lift_system_entity.h
     simulator/dynamics3d_builderbot_model.h)
   if(ARGOS_COMPILE_QTOPENGL)
     set(ARGOS3_HEADERS_PLUGINS_ROBOTS_BUILDERBOT_SIMULATOR
@@ -61,6 +67,12 @@ if(ARGOS_BUILD_FOR_SIMULATOR)
     simulator/builderbot_differential_drive_default_actuator.cpp
     simulator/builderbot_differential_drive_default_sensor.cpp
     simulator/builderbot_differential_drive_entity.cpp
+    simulator/builderbot_electromagnet_system_default_actuator.cpp
+    simulator/builderbot_electromagnet_system_default_sensor.cpp
+    simulator/builderbot_electromagnet_system_entity.cpp
+    simulator/builderbot_lift_system_default_actuator.cpp
+    simulator/builderbot_lift_system_default_sensor.cpp
+    simulator/builderbot_lift_system_entity.cpp
     simulator/dynamics3d_builderbot_model.cpp)
   if(ARGOS_COMPILE_QTOPENGL)
     set(ARGOS3_SOURCES_PLUGINS_ROBOTS_BUILDERBOT

@@ -5,8 +5,10 @@
  */
 
 #include "qtopengl_builderbot.h"
+#include <argos3/core/utility/datatypes/color.h>
 #include <argos3/core/utility/math/vector2.h>
 #include <argos3/plugins/robots/builderbot/simulator/builderbot_entity.h>
+#include <argos3/plugins/simulator/entities/directional_led_equipped_entity.h>
 #include <argos3/plugins/simulator/visualizations/qt-opengl/qtopengl_widget.h>
 
 namespace argos {
@@ -14,105 +16,81 @@ namespace argos {
    /****************************************/
    /****************************************/
 
-   const GLfloat MOVABLE_COLOR[]    = { 1.0f, 0.0f, 0.0f, 1.0f };
-   const GLfloat SPECULAR[]         = { 0.0f, 0.0f, 0.0f, 1.0f };
-   const GLfloat SHININESS[]        = { 0.0f                   };
-   const GLfloat EMISSION[]         = { 0.0f, 0.0f, 0.0f, 1.0f };
+    CQTOpenGLBuilderBot::CQTOpenGLBuilderBot() :
+      /* create the model */
+      m_cBuilderBotModel("builderbot.obj"),
+      m_cBuilderBotManipulatorModel("builderbot-manipulator.obj") //,
+      /* get pointers to the LED materials */
+      /*
+      m_arrLEDs {
+         &m_cBuilderBotModel.GetMaterial("led_0"),
+         &m_cBuilderBotModel.GetMaterial("led_1"),
+         &m_cBuilderBotModel.GetMaterial("led_2"),
+         &m_cBuilderBotModel.GetMaterial("led_3"),
+         &m_cBuilderBotModel.GetMaterial("led_4"),
+         &m_cBuilderBotModel.GetMaterial("led_5"),
+         &m_cBuilderBotModel.GetMaterial("led_6"),
+         &m_cBuilderBotModel.GetMaterial("led_7"),
+         &m_cBuilderBotModel.GetMaterial("led_8"),
+         &m_cBuilderBotModel.GetMaterial("led_9"),
+         &m_cBuilderBotModel.GetMaterial("led_10"),
+         &m_cBuilderBotModel.GetMaterial("led_11"),
+      } */ {}
 
    /****************************************/
    /****************************************/
 
-    CQTOpenGLBuilderBot::CQTOpenGLBuilderBot() {
-       /* Reserve the needed display lists */
-       m_unBaseList = glGenLists(1);
-       m_unBodyList = m_unBaseList;
-
-       /* Make body list */
-       glNewList(m_unBodyList, GL_COMPILE);
-       MakeBody();
-       glEndList();
-    }
-
-   /****************************************/
-   /****************************************/
-
-   CQTOpenGLBuilderBot::~CQTOpenGLBuilderBot() {
-      glDeleteLists(m_unBaseList, 1);
-   }
+   CQTOpenGLBuilderBot::~CQTOpenGLBuilderBot() {}
 
    /****************************************/
    /****************************************/
 
    void CQTOpenGLBuilderBot::Draw(const CBuilderBotEntity& c_entity) {
-      /* Draw the body */
-      glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, MOVABLE_COLOR);
+      /* // Update LED materials
+      const CDirectionalLEDEquippedEntity& c_leds = c_entity.GetDirectionalLEDEquippedEntity();  
+      for(UInt32 un_material_idx = 0;
+          un_material_idx < m_arrLEDs.size();
+          un_material_idx++) {
+         const CColor& cColor = c_leds.GetLED(un_material_idx).GetColor();
+         std::array<GLfloat, 4> arrColor = {
+            cColor.GetRed() / 255.0f,
+            cColor.GetGreen() / 255.0f,
+            cColor.GetBlue() / 255.0f,
+            1.0f
+         };
+         m_arrLEDs[un_material_idx]->Emission = arrColor;
+      }
+      */
+
+      CRadians cZAngle, cYAngle, cXAngle;
+
+      /* Get the position of the robot */
+      const CVector3& cPosition = c_entity.GetEmbodiedEntity().GetOriginAnchor().Position;
+      /* Get the orientation of the robot */
+      const CQuaternion& cOrientation = c_entity.GetEmbodiedEntity().GetOriginAnchor().Orientation;
+      cOrientation.ToEulerAngles(cZAngle, cYAngle, cXAngle);
+      /* translate, rotate, and draw */
       glPushMatrix();
-      glScalef(0.5f, 0.5f, 0.5f);
-      glCallList(m_unBodyList);
+      glTranslatef(cPosition.GetX(), cPosition.GetY(), cPosition.GetZ());
+      glRotatef(ToDegrees(cXAngle).GetValue(), 1.0f, 0.0f, 0.0f);
+      glRotatef(ToDegrees(cYAngle).GetValue(), 0.0f, 1.0f, 0.0f);
+      glRotatef(ToDegrees(cZAngle).GetValue(), 0.0f, 0.0f, 1.0f);
+      m_cBuilderBotModel.Draw();
       glPopMatrix();
-   }
 
-   /****************************************/
-   /****************************************/
-
-   void CQTOpenGLBuilderBot::MakeBody() {
-	     /* Since this shape can be stretched,
-	         make sure the normal vectors are unit-long */
-	      glEnable(GL_NORMALIZE);
-
-	      /* Set the material */
-	      glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, SPECULAR);
-	      glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, SHININESS);
-	      glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, EMISSION);
-
-	      /* Let's start the actual shape */
-
-	      /* This part covers the top and bottom faces (parallel to XY) */
-	      glBegin(GL_QUADS);
-	      /* Bottom face */
-	      glNormal3f(0.0f, 0.0f, -1.0f);
-	      glVertex3f( 0.5f,  0.5f, 0.0f);
-	      glVertex3f( 0.5f, -0.5f, 0.0f);
-	      glVertex3f(-0.5f, -0.5f, 0.0f);
-	      glVertex3f(-0.5f,  0.5f, 0.0f);
-	      /* Top face */
-	      glNormal3f(0.0f, 0.0f, 1.0f);
-	      glVertex3f(-0.5f, -0.5f, 1.0f);
-	      glVertex3f( 0.5f, -0.5f, 1.0f);
-	      glVertex3f( 0.5f,  0.5f, 1.0f);
-	      glVertex3f(-0.5f,  0.5f, 1.0f);
-	      glEnd();
-	      /* This part covers the faces (South, East, North, West) */
-	      glBegin(GL_QUADS);
-	      /* South face */
-        glNormal3f(0.0f, -1.0f, 0.0f);
-        glVertex3f(-0.5f, -0.5f, 1.0f);
-        glVertex3f(-0.5f, -0.5f, 0.0f);
-        glVertex3f( 0.5f, -0.5f, 0.0f);
-        glVertex3f( 0.5f, -0.5f, 1.0f);
-        /* East face */
-        glNormal3f(1.0f, 0.0f, 0.0f);
-        glVertex3f( 0.5f, -0.5f, 1.0f);
-        glVertex3f( 0.5f, -0.5f, 0.0f);
-        glVertex3f( 0.5f,  0.5f, 0.0f);
-        glVertex3f( 0.5f,  0.5f, 1.0f);
-        /* North face */
-        glNormal3f(0.0f, 1.0f, 0.0f);
-        glVertex3f( 0.5f,  0.5f, 1.0f);
-        glVertex3f( 0.5f,  0.5f, 0.0f);
-        glVertex3f(-0.5f,  0.5f, 0.0f);
-        glVertex3f(-0.5f,  0.5f, 1.0f);
-        /* West face */
-        glNormal3f(-1.0f, 0.0f, 0.0f);
-        glVertex3f(-0.5f,  0.5f, 1.0f);
-        glVertex3f(-0.5f,  0.5f, 0.0f);
-        glVertex3f(-0.5f, -0.5f, 0.0f);
-        glVertex3f(-0.5f, -0.5f, 1.0f);
-	      glEnd();
-	      /* The shape definitions is finished */
-
-	      /* We don't need it anymore */
-	      glDisable(GL_NORMALIZE);
+      /* Get the position of the manipulator */
+      const CVector3& cManipulatorPosition = c_entity.GetEmbodiedEntity().GetAnchor("end_effector").Position;
+      /* Get the orientation of the manipulator */
+      const CQuaternion& cManipulatorOrientation = c_entity.GetEmbodiedEntity().GetAnchor("end_effector").Orientation;
+      cManipulatorOrientation.ToEulerAngles(cZAngle, cYAngle, cXAngle);
+      /* translate, rotate, and draw */
+      glPushMatrix();
+      glTranslatef(cManipulatorPosition.GetX(), cManipulatorPosition.GetY(), cManipulatorPosition.GetZ());
+      glRotatef(ToDegrees(cXAngle).GetValue(), 1.0f, 0.0f, 0.0f);
+      glRotatef(ToDegrees(cYAngle).GetValue(), 0.0f, 1.0f, 0.0f);
+      glRotatef(ToDegrees(cZAngle).GetValue(), 0.0f, 0.0f, 1.0f);
+      m_cBuilderBotManipulatorModel.Draw();
+      glPopMatrix();
    }
 
    /****************************************/
@@ -123,7 +101,7 @@ namespace argos {
       void ApplyTo(CQTOpenGLWidget& c_visualization,
                    CBuilderBotEntity& c_entity) {
          static CQTOpenGLBuilderBot m_cModel;
-         c_visualization.DrawEntity(c_entity.GetEmbodiedEntity());
+         //c_visualization.DrawEntity(c_entity.GetEmbodiedEntity());
          m_cModel.Draw(c_entity);
       }
    };

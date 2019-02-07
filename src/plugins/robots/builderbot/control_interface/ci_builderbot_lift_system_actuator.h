@@ -23,7 +23,7 @@ namespace argos {
          m_bStopReq(false),
          m_bCalibrationReq(false),
          m_bSetPositionReq(false),
-         m_fTargetPosition(140.0f) {}
+         m_fTargetPosition(0.0f) {}
 
       virtual ~CCI_BuilderBotLiftSystemActuator() {}
 

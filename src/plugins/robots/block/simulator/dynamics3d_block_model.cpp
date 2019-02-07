@@ -74,7 +74,7 @@ namespace argos {
                                      cInertia,
                                      m_fBlockMass,
                                      fFriction);
-      CBase* pcBase = new CBase(*this, sOriginAnchor, ptrShape, sBodyData);                 
+      CBase* pcBase = new CBase(*this, c_block.GetEmbodiedEntity().AddAnchor("base"), ptrShape, sBodyData);
       m_vecBodies.push_back(pcBase);
       /* get a collision shape for the magnets */
       std::shared_ptr<btCollisionShape> ptrMagnetShape =
@@ -108,6 +108,8 @@ namespace argos {
          CLink* pcMagnetBody = 
                new CLink(*this,
                          unMagnetIndex,
+                         /* note that the relative offsets are zero for this anchor, this is not correct
+                            even though it has no consequences for the moment */
                          c_block.GetEmbodiedEntity().AddAnchor("magnet_" + std::to_string(unMagnetIndex)),
                          ptrMagnetShape,
                          sMagnetData);
@@ -167,8 +169,7 @@ namespace argos {
    /****************************************/
 
    void CDynamics3DBlockModel::UpdateFromEntityStatus() {
-      CDynamics3DMultiBodyObjectModel::UpdateFromEntityStatus();
-      
+      CDynamics3DMultiBodyObjectModel::UpdateFromEntityStatus();    
    }
 
    /****************************************/

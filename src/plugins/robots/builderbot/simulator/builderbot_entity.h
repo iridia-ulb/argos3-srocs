@@ -9,9 +9,10 @@
 
 namespace argos {
    class CBuilderBotDifferentialDriveEntity;
+   class CBuilderBotElectromagnetSystemEntity;
+   class CBuilderBotLiftSystemEntity;
    class CControllableEntity;
    class CEmbodiedEntity;
-//   class CRadioEntity;
 }
 
 #include <argos3/core/simulator/entity/composable_entity.h>
@@ -40,26 +41,43 @@ namespace argos {
          return *m_pcDifferentialDriveEntity;
       }
 
+      inline const CBuilderBotDifferentialDriveEntity& GetDifferentialDriveEntity() const {
+         return *m_pcDifferentialDriveEntity;
+      }
+
+      inline CBuilderBotElectromagnetSystemEntity& GetElectromagnetSystemEntity() {
+         return *m_pcElectromagnetSystemEntity;
+      }
+
+      inline const CBuilderBotElectromagnetSystemEntity& GetElectromagnetSystemEntity() const {
+         return *m_pcElectromagnetSystemEntity;
+      }
+
+      inline CBuilderBotLiftSystemEntity& GetLiftSystemEntity() {
+         return *m_pcLiftSystemEntity;
+      }
+
+      inline const CBuilderBotLiftSystemEntity& GetLiftSystemEntity() const {
+         return *m_pcLiftSystemEntity;
+      }
+
       inline CEmbodiedEntity& GetEmbodiedEntity() {
          return *m_pcEmbodiedEntity;
       }
-/*
-      inline CMagnetEntity& GetMagnetEntity() {
-         return *m_pcMagnetEntity;
+
+      inline const CEmbodiedEntity& GetEmbodiedEntity() const {
+         return *m_pcEmbodiedEntity;
       }
-*/
-/*
-      inline CRadioEntity& GetRadioEntity() {
-         return *m_pcRadioEntity;
-      }
-*/
+
       virtual void UpdateComponents();
 
    private:
 
-      CBuilderBotDifferentialDriveEntity*    m_pcDifferentialDriveEntity;
       CControllableEntity*                   m_pcControllableEntity;
       CEmbodiedEntity*                       m_pcEmbodiedEntity;
+      CBuilderBotDifferentialDriveEntity*    m_pcDifferentialDriveEntity;
+      CBuilderBotElectromagnetSystemEntity*  m_pcElectromagnetSystemEntity;
+      CBuilderBotLiftSystemEntity*           m_pcLiftSystemEntity;
    };
 
 }

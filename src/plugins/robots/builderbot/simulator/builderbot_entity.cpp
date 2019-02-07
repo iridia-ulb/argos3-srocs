@@ -8,10 +8,11 @@
 
 #include <argos3/core/simulator/entity/controllable_entity.h>
 #include <argos3/core/simulator/entity/embodied_entity.h>
-//#include <argos3/plugins/simulator/entities/wheeled_entity.h>
 #include <argos3/plugins/simulator/entities/radio_entity.h>
 
 #include <argos3/plugins/robots/builderbot/simulator/builderbot_differential_drive_entity.h>
+#include <argos3/plugins/robots/builderbot/simulator/builderbot_electromagnet_system_entity.h>
+#include <argos3/plugins/robots/builderbot/simulator/builderbot_lift_system_entity.h>
 
 namespace argos {
 
@@ -28,10 +29,10 @@ namespace argos {
    CBuilderBotEntity::CBuilderBotEntity() :
       CComposableEntity(nullptr),
       m_pcControllableEntity(nullptr),
-//      m_pcDifferentialDriveEntity(nullptr),
-//      m_pcDirectionalLEDEquippedEntity(nullptr),
-      m_pcEmbodiedEntity(nullptr)
-      {}
+      m_pcEmbodiedEntity(nullptr),
+      m_pcDifferentialDriveEntity(nullptr),
+      m_pcElectromagnetSystemEntity(nullptr),
+      m_pcLiftSystemEntity(nullptr) {}
 
    /****************************************/
    /****************************************/
@@ -45,22 +46,24 @@ namespace argos {
          AddComponent(*m_pcEmbodiedEntity);
          m_pcEmbodiedEntity->Init(GetNode(t_tree, "body"));
          /* Create anchors */
-         //SAnchor& cEndEffectorAnchor = m_pcEmbodiedEntity->AddAnchor("end_effector");
-         SAnchor& cOriginAnchor = m_pcEmbodiedEntity->GetOriginAnchor();
+         //SAnchor& cOriginAnchor = m_pcEmbodiedEntity->GetOriginAnchor();
+         SAnchor& cEndEffectorAnchor =
+            m_pcEmbodiedEntity->AddAnchor("end_effector", CVector3(0.0980875, 0, 0.055));
 
          /* Create and initialize the differential drive entity */
-         m_pcDifferentialDriveEntity = new CBuilderBotDifferentialDriveEntity(this);
+         m_pcDifferentialDriveEntity 
+            = new CBuilderBotDifferentialDriveEntity(this, "differential_drive_0");
          AddComponent(*m_pcDifferentialDriveEntity);
 
-         /* Create and initialize the magnet equipped entity */
-         /*
-         m_pcMagnetEquippedEntity = new CMagnetEquippedEntity(this);
-         AddComponent(*m_pcMagnetEquippedEntity);
-         m_pcMagnetEquippedEntity->AddMagnet("magnet_fr", MAGNET_PASSIVE_FIELD_STRENGTH);
-         m_pcMagnetEquippedEntity->AddMagnet("magnet_fl", MAGNET_PASSIVE_FIELD_STRENGTH);
-         m_pcMagnetEquippedEntity->AddMagnet("magnet_br", MAGNET_PASSIVE_FIELD_STRENGTH);
-         m_pcMagnetEquippedEntity->AddMagnet("magnet_bl", MAGNET_PASSIVE_FIELD_STRENGTH);
-         */
+         /* Create and initialize the electromagnet system entity */
+         m_pcElectromagnetSystemEntity = 
+            new CBuilderBotElectromagnetSystemEntity(this, "electromagnet_system_0");
+         AddComponent(*m_pcElectromagnetSystemEntity);
+
+         /* Create and initialize the lift system entity */
+         m_pcLiftSystemEntity = 
+            new CBuilderBotLiftSystemEntity(this, "lift_system_0", cEndEffectorAnchor);
+         AddComponent(*m_pcLiftSystemEntity);
 
          /* Create and initialize the radio equipped entity */
          /*
@@ -116,7 +119,7 @@ namespace argos {
                    "builderbot",
                    "1.0",
                    "Michael Allwright [allsey87@gmail.com]",
-                   "The BuilderBot mobile construction robot",
+                   "The BuilderBot construction robot",
                    "Long description",
                    "Usable"
    );
