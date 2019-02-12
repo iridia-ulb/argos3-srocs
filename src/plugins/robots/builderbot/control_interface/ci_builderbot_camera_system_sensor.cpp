@@ -26,7 +26,6 @@ namespace argos {
       CCI_BuilderBotCameraSystemSensor* pcCameraSensor = 
          CLuaUtility::GetDeviceInstance<CCI_BuilderBotCameraSystemSensor>(pt_lua_state, "camera_system");
       /* Set the enable member */
-      // TODO call virtual method instead
       pcCameraSensor->m_bEnable = lua_toboolean(pt_lua_state, 1);
       return 0;
    }
@@ -43,10 +42,10 @@ namespace argos {
     * 3. The width (a number)
     * 4. The height (a number)
     */
-   int LuaGetBuilderBotCameraSystemSensorPixels(lua_State* pt_lua_state) {
+   int LuaBuilderBotCameraSystemSensorDetectLed(lua_State* pt_lua_state) {
       /* Check parameters */
       if(lua_gettop(pt_lua_state) != 4) {
-         return luaL_error(pt_lua_state, "robot.camera_system.get_pixels() expects 4 arguments");
+         return luaL_error(pt_lua_state, "robot.camera_system.detect_led() expects 4 arguments");
       }
       luaL_checktype(pt_lua_state, 1, LUA_TNUMBER);
       luaL_checktype(pt_lua_state, 2, LUA_TNUMBER);
@@ -57,27 +56,12 @@ namespace argos {
                        lua_tonumber(pt_lua_state, 2));
       CVector2 cSize(lua_tonumber(pt_lua_state, 3),
                      lua_tonumber(pt_lua_state, 4));
-      /* Prepare buffer for holding the pixels */
-      std::vector<CCI_BuilderBotCameraSystemSensor::SPixel> vecPixelBuffer;
-      /* Allocate memory to the buffer */
-      vecPixelBuffer.reserve(static_cast<size_t>(cSize.GetX()) *
-                             static_cast<size_t>(cSize.GetY()));
       /* Get the camera sensor */
       CCI_BuilderBotCameraSystemSensor* pcCameraSensor = 
          CLuaUtility::GetDeviceInstance<CCI_BuilderBotCameraSystemSensor>(pt_lua_state, "camera_system");
-      /* Get the pixels */
-      pcCameraSensor->GetPixels(cOffset, cSize, vecPixelBuffer);
-      /* Create a table for the pixel data */
-      lua_newtable (pt_lua_state);
-      for(size_t i = 0; i < vecPixelBuffer.size(); ++i) {
-         CLuaUtility::StartTable(pt_lua_state, i + 1);
-         CLuaUtility::AddToTable(pt_lua_state, "y", vecPixelBuffer[i].Y);
-         CLuaUtility::AddToTable(pt_lua_state, "u", vecPixelBuffer[i].U);
-         CLuaUtility::AddToTable(pt_lua_state, "v", vecPixelBuffer[i].V);
-         CLuaUtility::EndTable(pt_lua_state);
-      }
-      /* return a single result, the table */
-      return 1;
+      /* Detect an LED */
+      pcCameraSensor->DetectLed(cOffset, cSize);
+      return 0;
    }
 #endif
 
@@ -89,8 +73,8 @@ namespace argos {
       CLuaUtility::OpenRobotStateTable(pt_lua_state, "camera_system");
       CLuaUtility::AddToTable(pt_lua_state, "_instance", this);
       CLuaUtility::AddToTable(pt_lua_state,
-                              "get_pixels",
-                              &LuaGetBuilderBotCameraSystemSensorPixels);
+                              "detect_led",
+                              &LuaBuilderBotCameraSystemSensorDetectLed);
       CLuaUtility::AddToTable(pt_lua_state,
                               "enable",
                               &LuaEnableBuilderBotCameraSystemSensor);

@@ -102,6 +102,7 @@ namespace argos {
                    CBuilderBotEntity& c_entity) {
          static CQTOpenGLBuilderBot m_cModel;
          //c_visualization.DrawEntity(c_entity.GetEmbodiedEntity());
+         c_visualization.DrawRays(c_entity.GetControllableEntity());
          m_cModel.Draw(c_entity);
       }
    };

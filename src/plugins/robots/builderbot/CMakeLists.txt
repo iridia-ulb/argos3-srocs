@@ -14,13 +14,14 @@ set(ARGOS3_HEADERS_PLUGINS_ROBOTS_BUILDERBOT_CONTROLINTERFACE
 if(ARGOS_BUILD_FOR_SIMULATOR)
   # argos3/plugins/robots/builderbot/simulator
   set(ARGOS3_HEADERS_PLUGINS_ROBOTS_BUILDERBOT_SIMULATOR
-    simulator/builderbot_entity.h
+    simulator/builderbot_camera_system_default_sensor.h
     simulator/builderbot_differential_drive_default_actuator.h
     simulator/builderbot_differential_drive_default_sensor.h
     simulator/builderbot_differential_drive_entity.h
     simulator/builderbot_electromagnet_system_default_actuator.h
     simulator/builderbot_electromagnet_system_default_sensor.h
     simulator/builderbot_electromagnet_system_entity.h
+    simulator/builderbot_entity.h
     simulator/builderbot_lift_system_default_actuator.h
     simulator/builderbot_lift_system_default_sensor.h
     simulator/builderbot_lift_system_entity.h
@@ -63,13 +64,14 @@ if(ARGOS_BUILD_FOR_SIMULATOR)
   set(ARGOS3_SOURCES_PLUGINS_ROBOTS_BUILDERBOT
     ${ARGOS3_SOURCES_PLUGINS_ROBOTS_BUILDERBOT}
     ${ARGOS3_HEADERS_PLUGINS_ROBOTS_BUILDERBOT_SIMULATOR}
-    simulator/builderbot_entity.cpp
+    simulator/builderbot_camera_system_default_sensor.cpp
     simulator/builderbot_differential_drive_default_actuator.cpp
     simulator/builderbot_differential_drive_default_sensor.cpp
     simulator/builderbot_differential_drive_entity.cpp
     simulator/builderbot_electromagnet_system_default_actuator.cpp
     simulator/builderbot_electromagnet_system_default_sensor.cpp
     simulator/builderbot_electromagnet_system_entity.cpp
+    simulator/builderbot_entity.cpp
     simulator/builderbot_lift_system_default_actuator.cpp
     simulator/builderbot_lift_system_default_sensor.cpp
     simulator/builderbot_lift_system_entity.cpp

@@ -54,7 +54,7 @@ namespace argos {
             m_pcTagEquippedEntity->AddTag(c_face_offset.first,
                                           c_face_offset.second,
                                           sOriginAnchor,
-                                          CRadians::PI,
+                                          CRadians::PI_OVER_THREE,
                                           Real(0.03), /* side length of the tag */
                                           std::string("0"));
          }
@@ -91,7 +91,7 @@ namespace argos {
                m_pcDirectionalLEDEquippedEntity->AddLED(cLEDPosition,
                                                         c_face_offset.second,
                                                         sOriginAnchor,
-                                                        CRadians::PI,
+                                                        CRadians::PI_OVER_THREE,
                                                         CColor::BLACK);
             }
          }

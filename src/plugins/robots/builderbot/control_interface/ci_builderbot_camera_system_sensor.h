@@ -14,6 +14,7 @@ namespace argos {
 #include <chrono>
 #include <string>
 #include <argos3/core/utility/math/vector2.h>
+#include <argos3/core/utility/datatypes/color.h>
 #include <argos3/core/control_interface/ci_sensor.h>
 
 namespace argos {
@@ -37,17 +38,37 @@ namespace argos {
          using TVector = std::vector<STag>;
       };
 
+      struct SLed {
+         /* constructor */
+         SLed(const CColor& c_color,
+              const CVector2& c_center) :
+            Color(c_color),
+            Center(c_center) {}
+         /* members */
+         CColor Color;
+         CVector2 Center;
+         using TVector = std::vector<SLed>;
+      };
+
       struct SPixel {
+         /* constructor */
          SPixel(UInt8 un_y, UInt8 un_u, UInt8 un_v) :
             Y(un_y), U(un_u), V(un_v) {}
-         UInt8 Y,U,V;
+         /* members */
+         UInt8 Y, U, V;
       };
+
+   public:
+
+      CCI_BuilderBotCameraSystemSensor() :
+         m_bEnable(true) {}
 
       virtual ~CCI_BuilderBotCameraSystemSensor() {}
 
-      virtual void GetPixels(const CVector2& c_center,
-                             const CVector2& c_size,
-                             std::vector<SPixel>& vec_pixels) = 0;
+      virtual bool DetectLed(const CVector2& c_center,
+                             const CVector2& c_size) = 0;
+
+      virtual CVector2 GetResolution() const = 0;
 
       const std::chrono::time_point<std::chrono::steady_clock>& GetTimestamp() const {
          return m_tpTimestamp;
@@ -57,17 +78,20 @@ namespace argos {
          return m_tTags;
       }
 
-      // TODO replace this with virtual method
-      bool m_bEnable = true;
+      const SLed::TVector& GetLeds() const {
+         return m_tLeds;
+      }
+
+      bool m_bEnable;
 
 #ifdef ARGOS_WITH_LUA
       virtual void CreateLuaState(lua_State* pt_lua_state);
 
       virtual void ReadingsToLuaState(lua_State* pt_lua_state);
 #endif
-
    protected:
-
+      /* the detected leds in the current frame */
+      SLed::TVector m_tLeds;
       /* the detected tags in the current frame */
       STag::TVector m_tTags;
       /* the timestamp of the current frame */

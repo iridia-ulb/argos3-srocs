@@ -71,7 +71,7 @@ namespace argos {
       CTagEquippedEntity*               m_pcTagEquippedEntity;
       CRadioEquippedEntity*             m_pcRadioEquippedEntity;
 
-      const Real m_fBlockSideLength = Real(0.055);
+      const Real m_fBlockSideLength = Real(0.0555);
 
       const std::array<std::pair<CVector3, CQuaternion>, 6> m_arrFaceOffsets = {
          std::make_pair(CVector3( 0.5f,  0.0f, 0.5f) * m_fBlockSideLength,
@@ -86,7 +86,6 @@ namespace argos {
                         CQuaternion( 0.0f * CRadians::PI, CVector3::Z)),
          std::make_pair(CVector3( 0.0f,  0.0f, 0.0f) * m_fBlockSideLength,
                         CQuaternion( 1.0f * CRadians::PI, CVector3::X)),
-
       };
 
       const std::array<CVector3, 4> m_arrLEDOffsets = {
