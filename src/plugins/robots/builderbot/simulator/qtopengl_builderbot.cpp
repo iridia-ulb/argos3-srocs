@@ -79,6 +79,7 @@ namespace argos {
       glPopMatrix();
 
       /* Get the position of the manipulator */
+      // TODO don't use string for look up, add get anchor method c_entity.GetLiftActuatorSystem().GetAnchor()
       const CVector3& cManipulatorPosition = c_entity.GetEmbodiedEntity().GetAnchor("end_effector").Position;
       /* Get the orientation of the manipulator */
       const CQuaternion& cManipulatorOrientation = c_entity.GetEmbodiedEntity().GetAnchor("end_effector").Orientation;
