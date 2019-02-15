@@ -45,11 +45,7 @@ namespace argos {
          Real Range;
       };
 
-      CBuilderBotRangefindersDefaultSensor() :
-         m_pcEmbodiedEntity(nullptr),
-         m_pcControllableEntity(nullptr) {
-         m_vecInterfaces.reserve(16);
-      }
+      CBuilderBotRangefindersDefaultSensor();
 
       virtual ~CBuilderBotRangefindersDefaultSensor() {}
 
@@ -73,11 +69,10 @@ namespace argos {
       }
 
    private:
-
-      bool m_bShowRays = true;
-
       CEmbodiedEntity* m_pcEmbodiedEntity;
       CControllableEntity* m_pcControllableEntity;
+
+      bool m_bShowRays;
 
       std::vector<SSimulatedInterface> m_vecSimulatedInterfaces;
 

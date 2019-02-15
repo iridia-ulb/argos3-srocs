@@ -12,6 +12,9 @@ namespace argos {
 }
 
 #include <argos3/core/control_interface/ci_actuator.h>
+#include <argos3/core/utility/datatypes/byte_array.h>
+
+#include <list>
 
 namespace argos {
 
@@ -19,14 +22,12 @@ namespace argos {
 
    public:
 
-      CCI_BuilderBotNFCActuator() :
-         m_bWriteReq(false) {}
+      CCI_BuilderBotNFCActuator() {}
 
       virtual ~CCI_BuilderBotNFCActuator() {}
 
-      virtual void Write(const std::string& str_message) {
-         m_strMessage = str_message;
-         m_bWriteReq = true;
+      virtual void Write(const CByteArray& c_data) {
+         m_lstMessages.emplace_back(c_data);
       }
 
 #ifdef ARGOS_WITH_LUA
@@ -35,8 +36,7 @@ namespace argos {
 
    protected:
 
-      std::string m_strMessage;
-      bool m_bWriteReq;
+      std::list<CByteArray> m_lstMessages;
 
    };
 

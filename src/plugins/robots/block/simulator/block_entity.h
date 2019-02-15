@@ -71,20 +71,24 @@ namespace argos {
       CTagEquippedEntity*               m_pcTagEquippedEntity;
       CRadioEquippedEntity*             m_pcRadioEquippedEntity;
 
-      const Real m_fBlockSideLength = Real(0.0555);
+      const Real m_fBlockSideLength = Real(0.055);
 
+      /* these face offsets are used for calculating the positions of the LEDs
+         radios, and tags. Since the LEDs and the tags need to be seen by
+         cameras, the offset is increased by 1% so that the entity sits just
+         above the surface of the block */
       const std::array<std::pair<CVector3, CQuaternion>, 6> m_arrFaceOffsets = {
-         std::make_pair(CVector3( 0.5f,  0.0f, 0.5f) * m_fBlockSideLength,
+         std::make_pair(CVector3( 0.505f,  0.000f,  0.505f) * m_fBlockSideLength,
                         CQuaternion( 0.5f * CRadians::PI, CVector3::Y)),
-         std::make_pair(CVector3( 0.0f, -0.5f, 0.5f) * m_fBlockSideLength,
+         std::make_pair(CVector3( 0.000f, -0.505f,  0.505f) * m_fBlockSideLength,
                         CQuaternion( 0.5f * CRadians::PI, CVector3::X)),
-         std::make_pair(CVector3(-0.5f,  0.0f, 0.5f) * m_fBlockSideLength,
+         std::make_pair(CVector3(-0.505f,  0.000f,  0.505f) * m_fBlockSideLength,
                         CQuaternion(-0.5f * CRadians::PI, CVector3::Y)),
-         std::make_pair(CVector3( 0.0f,  0.5f, 0.5f) * m_fBlockSideLength,
+         std::make_pair(CVector3( 0.000f,  0.505f,  0.505f) * m_fBlockSideLength,
                         CQuaternion(-0.5f * CRadians::PI, CVector3::X)),
-         std::make_pair(CVector3( 0.0f,  0.0f, 1.0f) * m_fBlockSideLength,
-                        CQuaternion( 0.0f * CRadians::PI, CVector3::Z)),
-         std::make_pair(CVector3( 0.0f,  0.0f, 0.0f) * m_fBlockSideLength,
+         std::make_pair(CVector3( 0.000f,  0.000f,  1.010f) * m_fBlockSideLength,
+                        CQuaternion( 0.0f * CRadians::PI, CVector3::X)),
+         std::make_pair(CVector3( 0.000f,  0.000f, -0.010f) * m_fBlockSideLength,
                         CQuaternion( 1.0f * CRadians::PI, CVector3::X)),
       };
 

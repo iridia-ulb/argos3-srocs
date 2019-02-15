@@ -44,7 +44,7 @@ namespace argos {
 
    CDynamics3DBlockModel::CDynamics3DBlockModel(CDynamics3DEngine& c_engine,
                                                 CBlockEntity& c_block) :
-      CDynamics3DMultiBodyObjectModel(c_engine, c_block, 8, false) {
+      CDynamics3DMultiBodyObjectModel(c_engine, c_block, m_arrMagnetOffsets.size(), false) {
       /* get a collision shape for the block */
       std::shared_ptr<btCollisionShape> ptrShape =
          CDynamics3DShapeManager::RequestBox(btVector3(0.5f, 0.5f, 0.5f) * m_fBlockSideLength);

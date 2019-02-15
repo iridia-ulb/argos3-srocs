@@ -13,6 +13,7 @@ namespace argos {
    class CBuilderBotLiftSystemEntity;
    class CControllableEntity;
    class CEmbodiedEntity;
+   class CRadioEquippedEntity;
 }
 
 #include <argos3/core/simulator/entity/composable_entity.h>
@@ -82,6 +83,8 @@ namespace argos {
       CBuilderBotDifferentialDriveEntity*    m_pcDifferentialDriveEntity;
       CBuilderBotElectromagnetSystemEntity*  m_pcElectromagnetSystemEntity;
       CBuilderBotLiftSystemEntity*           m_pcLiftSystemEntity;
+      CRadioEquippedEntity*                  m_pcNFCRadioEquippedEntity;
+      CRadioEquippedEntity*                  m_pcWifiRadioEquippedEntity;
    };
 
 }

@@ -17,7 +17,8 @@
 #include <argos3/plugins/simulator/media/radio_medium.h>
 #include <argos3/plugins/simulator/media/tag_medium.h>
 
-
+#define TAG_SIDE_LENGTH 0.03f
+#define NFC_TRANSMISSION_RANGE 0.02f
 
 namespace argos {
 
@@ -55,7 +56,7 @@ namespace argos {
                                           c_face_offset.second,
                                           sOriginAnchor,
                                           CRadians::PI_OVER_THREE,
-                                          Real(0.03), /* side length of the tag */
+                                          TAG_SIDE_LENGTH, /* side length of the tag */
                                           std::string("0"));
          }
          CTagMedium& cTagMedium = 
@@ -70,10 +71,10 @@ namespace argos {
             /* add a radio */
             m_pcRadioEquippedEntity->AddRadio(c_face_offset.first,
                                               sOriginAnchor,
-                                              Real(0.02)); /* transmission range of the radio */
+                                              NFC_TRANSMISSION_RANGE); /* transmission range of the radio */
          }
          CRadioMedium& cRadioMedium = 
-            CSimulator::GetInstance().GetMedium<CRadioMedium>("radios");
+            CSimulator::GetInstance().GetMedium<CRadioMedium>("nfc");
          m_pcRadioEquippedEntity->SetMedium(cRadioMedium);
          m_pcRadioEquippedEntity->Enable();
          AddComponent(*m_pcRadioEquippedEntity);

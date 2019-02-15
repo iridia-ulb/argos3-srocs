@@ -6,9 +6,12 @@
 
 #include "builderbot_entity.h"
 
+#include <argos3/core/simulator/simulator.h>
 #include <argos3/core/simulator/entity/controllable_entity.h>
 #include <argos3/core/simulator/entity/embodied_entity.h>
-#include <argos3/plugins/simulator/entities/radio_entity.h>
+#include <argos3/plugins/simulator/entities/radio_equipped_entity.h>
+
+#include <argos3/plugins/simulator/media/radio_medium.h>
 
 #include <argos3/plugins/robots/builderbot/simulator/builderbot_differential_drive_entity.h>
 #include <argos3/plugins/robots/builderbot/simulator/builderbot_electromagnet_system_entity.h>
@@ -19,9 +22,8 @@ namespace argos {
    /****************************************/
    /****************************************/
 
-   // TODO correct these values
-   static const Real RADIO_TRANSMISSION_RANGE         = 0.02f;
-   static const Real MAGNET_PASSIVE_FIELD_STRENGTH    = 1.50f;
+   static const Real WIFI_TRANSMISSION_RANGE = 10.0f;
+   static const Real NFC_TRANSMISSION_RANGE  = 0.02f;
 
    /****************************************/
    /****************************************/
@@ -39,40 +41,47 @@ namespace argos {
 
    void CBuilderBotEntity::Init(TConfigurationNode& t_tree) {
       try {
-         /* Initialize the parent */
+         /* initialize the base class */
          CComposableEntity::Init(t_tree);
-         /* Create and initialize the embodied entity */
+         /* create and initialize the embodied entity */
          m_pcEmbodiedEntity = new CEmbodiedEntity(this);
          AddComponent(*m_pcEmbodiedEntity);
          m_pcEmbodiedEntity->Init(GetNode(t_tree, "body"));
-         /* Create anchors */
-         //SAnchor& cOriginAnchor = m_pcEmbodiedEntity->GetOriginAnchor();
-         SAnchor& cEndEffectorAnchor =
+         /* create anchors */
+         SAnchor& sEndEffectorAnchor =
             m_pcEmbodiedEntity->AddAnchor("end_effector", CVector3(0.0980875, 0, 0.055));
-
-         /* Create and initialize the differential drive entity */
+         SAnchor& sOriginAnchor = m_pcEmbodiedEntity->GetOriginAnchor();
+         /* get mediums */
+         CRadioMedium& cNFCRadioMedium = CSimulator::GetInstance().GetMedium<CRadioMedium>("nfc");
+         CRadioMedium& cWifiRadioMedium = CSimulator::GetInstance().GetMedium<CRadioMedium>("wifi");
+         /* create and initialize the differential drive entity */
          m_pcDifferentialDriveEntity 
             = new CBuilderBotDifferentialDriveEntity(this, "differential_drive_0");
          AddComponent(*m_pcDifferentialDriveEntity);
-
-         /* Create and initialize the electromagnet system entity */
+         m_pcDifferentialDriveEntity->Enable();
+         /* create and initialize the electromagnet system entity */
          m_pcElectromagnetSystemEntity = 
             new CBuilderBotElectromagnetSystemEntity(this, "electromagnet_system_0");
          AddComponent(*m_pcElectromagnetSystemEntity);
-
-         /* Create and initialize the lift system entity */
+         m_pcElectromagnetSystemEntity->Enable();
+         /* create and initialize the lift system entity */
          m_pcLiftSystemEntity = 
-            new CBuilderBotLiftSystemEntity(this, "lift_system_0", cEndEffectorAnchor);
+            new CBuilderBotLiftSystemEntity(this, "lift_system_0", sEndEffectorAnchor);
          AddComponent(*m_pcLiftSystemEntity);
-
-         /* Create and initialize the radio equipped entity */
-         /*
-         m_pcRadioEquippedEntity = new CRadioEquippedEntity(this);
-         AddComponent(*m_pcRadioEquippedEntity);
-         m_pcRadioEquippedEntity->AddRadio("radio_nfc", RADIO_TRANSMISSION_RANGE);
-         */
-
-         /* Create and initialize the directional LED equipped entity */
+         m_pcLiftSystemEntity->Enable();
+         /* create and initialize a radio equipped entity for WiFi */
+         m_pcWifiRadioEquippedEntity = new CRadioEquippedEntity(this, "radios_0");
+         AddComponent(*m_pcWifiRadioEquippedEntity);
+         m_pcWifiRadioEquippedEntity->AddRadio(CVector3(-0.05f, 0.03f, 0.03f), sOriginAnchor, WIFI_TRANSMISSION_RANGE);
+         m_pcWifiRadioEquippedEntity->SetMedium(cWifiRadioMedium);
+         m_pcWifiRadioEquippedEntity->Enable();
+         /* create and initialize a radio equipped entity for NFC */
+         m_pcNFCRadioEquippedEntity = new CRadioEquippedEntity(this, "radios_1");
+         AddComponent(*m_pcNFCRadioEquippedEntity);
+         m_pcNFCRadioEquippedEntity->AddRadio(CVector3(-0.0343f, 0.0f, -0.0275f), sEndEffectorAnchor, NFC_TRANSMISSION_RANGE);
+         m_pcNFCRadioEquippedEntity->SetMedium(cNFCRadioMedium);
+         m_pcNFCRadioEquippedEntity->Enable();
+         /* create and initialize the directional LED equipped entity */
          /*
          m_pcDirectionalLEDEquippedEntity = new CDirectionalLEDEquippedEntity(this);
          AddComponent(*m_pcDirectionalLEDEquippedEntity);

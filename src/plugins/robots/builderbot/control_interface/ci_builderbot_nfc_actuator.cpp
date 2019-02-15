@@ -21,14 +21,33 @@ namespace argos {
     * 1. message to be sent (a string)
     */
    int LuaWriteBuilderBotNFCActuator(lua_State* pt_lua_state) {
-      /* Check parameters */
-      if(lua_gettop(pt_lua_state) != 1) {
-         return luaL_error(pt_lua_state, "robot.nfc.write() expects 1 arguments");
-      }
-      luaL_checktype(pt_lua_state, 1, LUA_TSTRING);
-      /* Perform action */
+      /* build a message from the arguments */
+      CByteArray cBuffer;
+      for(SInt32 nIndex = 1; nIndex <= lua_gettop(pt_lua_state); nIndex++) {
+         switch(lua_type(pt_lua_state, nIndex)) {
+         case LUA_TSTRING:
+            cBuffer << lua_tostring(pt_lua_state, nIndex);
+            break;
+         case LUA_TTABLE:
+            for(UInt32 unTableIndex = 1; unTableIndex <= lua_rawlen(pt_lua_state, nIndex); ++unTableIndex) {
+               lua_pushnumber(pt_lua_state, unTableIndex);
+               lua_gettable(pt_lua_state, nIndex);
+               if(lua_type(pt_lua_state, -1) == LUA_TNUMBER) {
+                  cBuffer << static_cast<UInt8>(lua_tonumber(pt_lua_state, -1));
+                  lua_pop(pt_lua_state, 1);
+               }
+               else {
+                  return luaL_error(pt_lua_state, "element #%d of the table in argument #%dis not a number", unTableIndex, nIndex);
+               }
+            }
+            break;
+         default:
+            luaL_error(pt_lua_state, "argument #%d is not a string nor a table", nIndex);
+            break;
+         }
+      } 
       CLuaUtility::GetDeviceInstance<CCI_BuilderBotNFCActuator>(pt_lua_state, "nfc")->
-         Write(lua_tostring(pt_lua_state, 1));
+            Write(cBuffer);
       return 0;
    }
 #endif

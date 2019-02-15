@@ -187,13 +187,11 @@ void MakeSphere() {
          glCallList(m_unTagList);
          glPopMatrix();
       }
-
       // remove external push
       glPopMatrix();
       /* draw magnets */
       for(const auto& kv : c_entity.GetEmbodiedEntity().GetAnchors()) {
          if(kv.first.find("magnet") != std::string::npos) {
-
             const CVector3& cPosition = kv.second->Position;
             /* Get the orientation of the link */
             const CQuaternion& cOrientation = kv.second->Orientation;
@@ -222,6 +220,7 @@ void MakeSphere() {
       void ApplyTo(CQTOpenGLWidget& c_visualization,
                    CBlockEntity& c_entity) {
          static CQTOpenGLBlock m_cModel;
+         c_visualization.DrawRays(c_entity.GetControllableEntity());
          c_visualization.DrawEntity(c_entity.GetEmbodiedEntity());
          m_cModel.Draw(c_entity);
       }
