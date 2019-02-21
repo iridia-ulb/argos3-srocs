@@ -18,212 +18,6 @@
 
 namespace argos {
 
-/* lower base */
-btVector3 m_cLowerBaseHalfExtents(0.065f, 0.0196783f, 0.07f);
-btScalar m_fLowerBaseMass(0.5f);
-btTransform m_cLowerBaseOffset(btQuaternion(0.0f, 0.0f, 0.0f, 1.0f), btVector3(-0.020f,0.002f,-0.0f));
-btTransform m_cLowerBaseGeometricOffset(btQuaternion(0.0f, 0.0f, 0.0f, 1.0f), btVector3(0.0f, -0.0196783f, 0.0f));
-
-/* wheels */
-btVector3 m_cWheelHalfExtents(0.02f,0.0075f,0.02f);
-btScalar m_fWheelMass(0.1);
-btTransform m_cWheelGeometricOffset(btQuaternion(0.0f, 0.0f, 0.0f, 1.0f), btVector3(0.0f,-0.0075f,0.0f));
-btTransform m_cLeftWheelOffset(btQuaternion(-0.707107f, 0.0f, 0.0f, 0.707107f), btVector3(0.0f, 0.02f, -0.0525f));
-btTransform m_cRightWheelOffset(btQuaternion(0.707107f, 0.0f, 0.0f, 0.707107f), btVector3(0.0f, 0.02f, 0.0525f));
-btVector3 m_cLowerBaseToRightWheelJointOffset(0.02f, -0.0016783f, 0.0525f);
-btVector3 m_cRightWheelToLowerBaseJointOffset(0.0f, 0.0075f, 0.0f);
-btQuaternion m_cLowerBaseToRightWheelJointRotation(-0.707107, 0, 0, 0.707107);
-btVector3 m_cLowerBaseToLeftWheelJointOffset(0.02f, -0.0016783f, -0.0525f);
-btVector3 m_cLeftWheelToLowerBaseJointOffset(0.0f, 0.0075f, -0.0f);
-btQuaternion m_cLowerBaseToLeftWheelJointRotation(0.707107f, 0.0f, 0.0f, 0.707107f);
-btScalar m_fWheelMotorMaxImpulse(0.05f);
-
-/* pivots */
-btScalar m_fPivotRadius(0.02);
-btScalar m_fPivotMass(0.1);
-btTransform m_cPivotGeometricOffset(btQuaternion(0.0f, 0.0f, 0.0f, 1.0f), btVector3(0.0f, -0.02f, 0.0f));
-btTransform m_cFrontPivotOffset(btQuaternion(0.0f, 0.0f, 0.0f, 1.0f), btVector3(0.025f, 0.0f, 0.0f));
-btTransform m_cRearPivotOffset(btQuaternion(0.0f, 0.0f, 0.0f, 1.0f), btVector3(-0.065f, 0.0f, 0.0f));
-btVector3 m_cLowerBaseToFrontPivotJointOffset(0.045f, -0.0016783f, 0.0f);
-btVector3 m_cFrontPivotToLowerBaseJointOffset(0.0f, 0.0f, 0.0f);
-btQuaternion m_cLowerBaseToFrontPivotJointRotation(0.0f, 0.0f, 0.0f, 1.0f);
-btVector3 m_cLowerBaseToRearPivotJointOffset(-0.045f, -0.0016783f, 0.0f);
-btVector3 m_cRearPivotToLowerBaseJointOffset(0.0f, 0.0f, 0.0f);
-btQuaternion m_cLowerBaseToRearPivotJointRotation(0.0f, 0.0f, 0.0f, 1.0f);
-
-/* upper base */
-std::vector<btVector3> m_vecUpperBasePoints = {
-   btVector3( 0.039f, 0.0f, -0.065f),
-   btVector3(-0.039f, 0.0f, -0.065f),
-   btVector3( 0.039f, 0.0f,  0.065f),
-   btVector3(-0.039f, 0.0f,  0.065f),
-   btVector3( 0.065f, 0.0f, -0.039f),
-   btVector3(-0.065f, 0.0f, -0.039f),
-   btVector3( 0.065f, 0.0f,  0.039f),
-   btVector3(-0.065f, 0.0f,  0.039f),
-   btVector3( 0.039f, 0.0569f, -0.065f),
-   btVector3(-0.039f, 0.0569f, -0.065f),
-   btVector3( 0.039f, 0.0569f,  0.065f),
-   btVector3(-0.039f, 0.0569f,  0.065f),
-   btVector3( 0.065f, 0.0569f, -0.039f),
-   btVector3(-0.065f, 0.0569f, -0.039f),
-   btVector3( 0.065f, 0.0569f,  0.039f),
-   btVector3(-0.065f, 0.0569f,  0.039f)
-};
-btScalar m_fUpperBaseMass(0.6f);
-btTransform m_cUpperBaseOffset(btQuaternion(0.0f, 0.0f, 0.0f, 1.0f), btVector3(-0.02f, 0.0413566f, 0.0f));
-btTransform m_cUpperBaseGeometricOffset(btQuaternion(0.0f, 0.0f, 0.0f, 1.0f), btVector3(0.0f, 0.0f, 0.0f));
-btVector3 m_cLowerBaseToUpperBaseJointOffset(0.0f, 0.0196783f, 0.0f);
-btVector3 m_cUpperBaseToLowerBaseJointOffset(0.0f, 0.0f, 0.0f);
-btQuaternion m_cLowerBaseToUpperBaseJointRotation(0.0f, 0.0f, 0.0f, 1.0f);
-
-/* lift column */
-btVector3 m_cLiftColumnHalfExtents(0.02925f, 0.143875f, 0.04725f);
-btScalar m_fLiftColumnMass(0.6f);
-btTransform m_cLiftColumnOffset(btQuaternion(0.0f, 0.0f, 0.0f, 1.0f), btVector3(0.0f, 0.0982566f, 0.0f));
-btTransform m_cLiftColumnGeometricOffset(btQuaternion(0.0f, 0.0f, 0.0f, 1.0f), btVector3(0.0f, -0.143875f, 0.0f));
-btVector3 m_cUpperBaseToLiftColumnJointOffset(0.02f, 0.0569f, 0.0f);
-btVector3 m_cLiftColumnToUpperBaseJointOffset(-0.0f, 0.143875f, -0.0f);
-btQuaternion m_cUpperBaseToLiftColumnJointRotation(0.0f, 0.0f, 0.0f, 1.0f);
-
-/* end effector */
-btVector3 m_cEndEffectorHalfExtents(0.0329375f, 0.005f, 0.036f);
-btScalar m_fEndEffectorMass(0.2f);
-btTransform m_cEndEffectorOffset(btQuaternion(0.0f, 0.0f, 0.0f, 1.0f), btVector3(0.0980875f, 0.055f, -0.0f));
-btTransform m_cEndEffectorGeometricOffset(btQuaternion(0.0f, 0.0f, 0.0f, 1.0f), btVector3(0.0f, -0.005f, 0.0f));
-btVector3 m_cLowerBaseToEndEffectorJointOffset(0.118087f, 0.0333217f, 0.0f);
-btVector3 m_cEndEffectorToLowerBaseJointOffset(-0.0f, 0.005f, -0.0f);
-btQuaternion m_cLowerBaseToEndEffectorJointRotation(0.0f, 0.0f, 0.0f, 1.0f);
-
-/* end effector support */
-btVector3 m_cEndEffectorSupportHalfExtents(0.005125f, 0.078375f, 0.02875f);
-btScalar m_fEndEffectorSupportMass(0.1);
-btTransform m_cEndEffectorSupportOffset(btQuaternion(0.0f, 0.0f, 0.0f, 1.0f), btVector3(0.060025f, 0.00575f, -0.0f));
-btTransform m_cEndEffectorSupportGeometricOffset(btQuaternion(0.0f, 0.0f, 0.0f, 1.0f), btVector3(0, -0.078375, 0));
-btVector3 m_cEndEffectorToEndEffectorSupportJointOffset(-0.0380625f, -0.05425f, 0.0f);
-btVector3 m_cEndEffectorSupportToEndEffectorJointOffset(-0.0f, 0.078375f, -0.0f);
-btQuaternion m_cEndEffectorToEndEffectorSupportJointRotation(0.0f, 0.0f, 0.0f, 1.0f);
-
-/*
-
-
-HE = 0.0329375, 0.005, 0.036
-end_effector
-HE = 0.0329375, 0.005, 0.036
-Prototype: cStartTransform = 0.0980875, 0.055, -0 / 0, 0, 0, 1
-COM = 0, -0.005, 0 / 0, 0, 0, 1
-mass = 0.2
-friction = 2
-cParentOffsetTransform.getOrigin() = 0.118087, 0.0333217, 0
--cChildOffsetTransform.getOrigin() = -0, 0.005, -0
-cParentToChildRotation = 0, 0, 0, 1
-
-HE = 0.005125, 0.078375, 0.02875
-end_effector_link
-HE = 0.005125, 0.078375, 0.02875
-Prototype: cStartTransform = 0.060025, 0.00575, -0 / 0, 0, 0, 1
-COM = 0, -0.078375, 0 / 0, 0, 0, 1
-mass = 0.1
-friction = 2
-cParentOffsetTransform.getOrigin() = -0.0380625, -0.05425, 0
--cChildOffsetTransform.getOrigin() = -0, 0.078375, -0
-cParentToChildRotation = 0, 0, 0, 1
-
-lifter ^^^
-HE = 0.02925, 0.143875, 0.04725
-Prototype: cStartTransform = 0, 0.0982566, -0 / 0, 0, 0, 1
-COM = 0, -0.143875, 0 / 0, 0, 0, 1
-mass = 0.6
-friction = 0.5
-cParentOffsetTransform.getOrigin() = 0.02, 0.0569, 0
--cChildOffsetTransform.getOrigin() = -0, 0.143875, -0
-cParentToChildRotation = 0, 0, 0, 1
-
-
-*/
-
-
-   /*
-wheel_right
-HE = 0.02, 0.0075, 0.02
-Prototype: cStartTransform = 0, 0.02, 0.0525 / 0.707107, 0, 0, 0.707107
-COM = 0, -0.0075, 0 / 0, 0, 0, 1
-mass = 0.1
-friction = 0.5
-cParentOffsetTransform.getOrigin() = 0.02, -0.0016783, 0.0525
--cChildOffsetTransform.getOrigin() = -0, 0.0075, -0
-cParentToChildRotation = -0.707107, 0, 0, 0.707107
-HE = 0.02, 0.0075, 0.02
-
-wheel_left
-HE = 0.02, 0.0075, 0.02
-Prototype: cStartTransform = 0, 0.02, -0.0525 / -0.707107, 0, -0, 0.707107
-COM = 0, -0.0075, 0 / 0, 0, 0, 1
-mass = 0.1
-friction = 0.5
-cParentOffsetTransform.getOrigin() = 0.02, -0.0016783, -0.0525
--cChildOffsetTransform.getOrigin() = -0, 0.0075, -0
-cParentToChildRotation = 0.707107, 0, 0, 0.707107
-HE = 0.02, 0.02, 0.02
-
-
-
-base
-HE = 0.065, 0.0196783, 0.07
-Prototype: cStartTransform = -0.02, 0.002, -0 / 0, 0, 0, 1
-COM = 0, -0.0196783, 0 / 0, 0, 0, 1
-mass = 0.5
-friction = 0.5
-
-
-pivot_front
-HE = 0.02, 0.02, 0.02
-Prototype: cStartTransform = 0.025, 0, -0 / 0, 0, 0, 1
-COM = 0, -0.02, 0 / 0, 0, 0, 1
-mass = 0.1
-friction = 0.5
-cParentOffsetTransform.getOrigin() = btVector3 BaseToFrontPivotJointOffset(0.045f, -0.0016783f, 0.0f);
--cChildOffsetTransform.getOrigin() = btVector3 FrontPivotToLowerBaseJointOffset(-0, -0, -0);
-cParentToChildRotation = btQuaternion BaseToFrontPivotJoint(0, 0, 0, 1);
-
-pivot_back
-HE = 0.02, 0.02, 0.02
-Prototype: cStartTransform = -0.065, 0, -0 / 0, 0, 0, 1
-COM = 0, -0.02, 0 / 0, 0, 0, 1
-mass = 0.1
-friction = 0.5
-cParentOffsetTransform.getOrigin() = -0.045, -0.0016783, 0
--cChildOffsetTransform.getOrigin() = -0, -0, -0
-cParentToChildRotation = 0, 0, 0, 1
-HE = 0, 0, 0
-
-
-
-upper_base
-HE = 0, 0, 0
-Prototype: cStartTransform = -0.02, 0.0413566, -0 / 0, 0, 0, 1
-COM = 0, -0, 0 / 0, 0, 0, 1
-mass = 0.6
-friction = 0.5
-cParentOffsetTransform.getOrigin() = 0, 0.0196783, 0
--cChildOffsetTransform.getOrigin() = -0, -0, -0
-cParentToChildRotation = 0, 0, 0, 1
-HE = 0.02925, 0.143875, 0.04725
-lifter
-HE = 0.02925, 0.143875, 0.04725
-Prototype: cStartTransform = 0, 0.0982566, -0 / 0, 0, 0, 1
-COM = 0, -0.143875, 0 / 0, 0, 0, 1
-mass = 0.6
-friction = 0.5
-cParentOffsetTransform.getOrigin() = 0.02, 0.0569, 0
--cChildOffsetTransform.getOrigin() = -0, 0.143875, -0
-cParentToChildRotation = 0, 0, 0, 1
-
-
-
-*/
-
-
    /****************************************/
    /****************************************/
 
@@ -292,11 +86,11 @@ cParentToChildRotation = 0, 0, 0, 1
       };
 
       /* create a CAbstractBody::SData structure for each body */
-      CAbstractBody::SData sLowerBaseData( cStartTransform * m_cLowerBaseOffset,
-                                           m_cLowerBaseGeometricOffset,
-                                           cLowerBaseInertia,
-                                           m_fLowerBaseMass,
-                                           GetEngine().GetDefaultFriction());
+      CAbstractBody::SData sLowerBaseData(cStartTransform * m_cLowerBaseOffset,
+                                          m_cLowerBaseGeometricOffset,
+                                          cLowerBaseInertia,
+                                          m_fLowerBaseMass,
+                                          GetEngine().GetDefaultFriction());
       CAbstractBody::SData  sLeftWheelData(cStartTransform * m_cLeftWheelOffset,
                                            m_cWheelGeometricOffset,
                                            cWheelInertia,
@@ -312,16 +106,16 @@ cParentToChildRotation = 0, 0, 0, 1
                                            cPivotInertia,
                                            m_fPivotMass,
                                            GetEngine().GetDefaultFriction());
-      CAbstractBody::SData sRearPivotData( cStartTransform * m_cRearPivotOffset,
-                                           m_cPivotGeometricOffset,
-                                           cPivotInertia,
-                                           m_fPivotMass,
-                                           GetEngine().GetDefaultFriction());
-      CAbstractBody::SData sUpperBaseData( cStartTransform * m_cUpperBaseOffset,
-                                           m_cUpperBaseGeometricOffset,
-                                           cUpperBaseInertia,
-                                           m_fUpperBaseMass,
-                                           GetEngine().GetDefaultFriction());
+      CAbstractBody::SData sRearPivotData(cStartTransform * m_cRearPivotOffset,
+                                          m_cPivotGeometricOffset,
+                                          cPivotInertia,
+                                          m_fPivotMass,
+                                          GetEngine().GetDefaultFriction());
+      CAbstractBody::SData sUpperBaseData(cStartTransform * m_cUpperBaseOffset,
+                                          m_cUpperBaseGeometricOffset,
+                                          cUpperBaseInertia,
+                                          m_fUpperBaseMass,
+                                          GetEngine().GetDefaultFriction());
       CAbstractBody::SData sLiftColumnData(cStartTransform * m_cLiftColumnOffset,
                                            m_cLiftColumnGeometricOffset,
                                            cLiftColumnInertia,
@@ -339,35 +133,34 @@ cParentToChildRotation = 0, 0, 0, 1
                                                    m_fEndEffectorSupportMass,
                                                    GetEngine().GetDefaultFriction());
 
-
+      // TODO can the origin anchor be used directly here?
+      bool bDebug = c_builderbot.IsDebug();
+      // TODO anchors require the correct offset if they are going to be used by OpenGL or in other parts of the simulator      
+      SAnchor* psLowerBaseAnchor = &c_builderbot.GetEmbodiedEntity().AddAnchor("base", CVector3(-0.02,0,0.002));
+      SAnchor* psEndEffectorAnchor = &c_builderbot.GetLiftSystemEntity().GetAnchor();
+      SAnchor* psLeftWheelAnchor = bDebug ? &c_builderbot.GetEmbodiedEntity().AddAnchor("left_wheel")  : nullptr;
+      SAnchor* psRightWheelAnchor = bDebug ? &c_builderbot.GetEmbodiedEntity().AddAnchor("right_wheel") : nullptr;
+      SAnchor* psFrontPivotAnchor = bDebug ? &c_builderbot.GetEmbodiedEntity().AddAnchor("front_pivot") : nullptr;
+      SAnchor* psRearPivotAnchor = bDebug ? &c_builderbot.GetEmbodiedEntity().AddAnchor("rear_pivot")  : nullptr;
+      SAnchor* psUpperBaseAnchor = bDebug ? &c_builderbot.GetEmbodiedEntity().AddAnchor("upper_base")  : nullptr;
+      SAnchor* psLiftColumnAnchor = bDebug ? &c_builderbot.GetEmbodiedEntity().AddAnchor("lift_column") : nullptr;    
+      SAnchor* psEndEffectorSupportAnchor = bDebug ? &c_builderbot.GetEmbodiedEntity().AddAnchor("end_effector_support") : nullptr;
       // TODO anchor can be a nullptr? note that the origin anchor is currently updated using the anchor of the first body
       // it would be nice if these were unique_ptr that we could move to the base class and that are auto deallocated instead of using the loop
-      m_ptrLowerBase = std::make_shared<CBase>(*this, c_builderbot.GetEmbodiedEntity().AddAnchor("base", CVector3(-0.02,0,0.002)), ptrLowerBaseShape, sLowerBaseData);
-      m_ptrLeftWheel = std::make_shared<CLink>(*this, 0, c_builderbot.GetEmbodiedEntity().AddAnchor("left_wheel"), ptrWheelShape, sLeftWheelData);
-      m_ptrRightWheel = std::make_shared<CLink>(*this, 1, c_builderbot.GetEmbodiedEntity().AddAnchor("right_wheel"), ptrWheelShape, sRightWheelData);
-      m_ptrFrontPivot = std::make_shared<CLink>(*this, 2, c_builderbot.GetEmbodiedEntity().AddAnchor("front_pivot"), ptrPivotShape, sFrontPivotData);
-      m_ptrRearPivot = std::make_shared<CLink>(*this, 3, c_builderbot.GetEmbodiedEntity().AddAnchor("rear_pivot"), ptrPivotShape, sRearPivotData);
-      m_ptrUpperBase = std::make_shared<CLink>(*this, 4, c_builderbot.GetEmbodiedEntity().AddAnchor("upper_base"), ptrUpperBaseShape, sUpperBaseData);
-      m_ptrLiftColumn = std::make_shared<CLink>(*this, 5, c_builderbot.GetEmbodiedEntity().AddAnchor("lift_column"), ptrLiftColumnShape, sLiftColumnData);
-
-      m_ptrEndEffector = std::make_shared<CLink>(*this, 6, c_builderbot.GetLiftSystemEntity().GetAnchor(), ptrEndEffectorShape, sEndEffectorData);
-
-      m_ptrEndEffectorSupport = std::make_shared<CLink>(*this, 7, c_builderbot.GetEmbodiedEntity().AddAnchor("end_effector_support"), ptrEndEffectorSupportShape, sEndEffectorSupportData);
-
-
-      // 7 8    
-
+      // TODO change the name of the anchor to lower base?
+      m_ptrLowerBase = std::make_shared<CBase>(*this, psLowerBaseAnchor, ptrLowerBaseShape, sLowerBaseData);
+      m_ptrLeftWheel = std::make_shared<CLink>(*this, 0, psLeftWheelAnchor, ptrWheelShape, sLeftWheelData);
+      m_ptrRightWheel = std::make_shared<CLink>(*this, 1, psRightWheelAnchor, ptrWheelShape, sRightWheelData);
+      m_ptrFrontPivot = std::make_shared<CLink>(*this, 2, psFrontPivotAnchor, ptrPivotShape, sFrontPivotData);
+      m_ptrRearPivot = std::make_shared<CLink>(*this, 3, psRearPivotAnchor, ptrPivotShape, sRearPivotData);
+      m_ptrUpperBase = std::make_shared<CLink>(*this, 4, psUpperBaseAnchor, ptrUpperBaseShape, sUpperBaseData);
+      m_ptrLiftColumn = std::make_shared<CLink>(*this, 5, psLiftColumnAnchor, ptrLiftColumnShape, sLiftColumnData);
+      m_ptrEndEffector = std::make_shared<CLink>(*this, 6, psEndEffectorAnchor, ptrEndEffectorShape, sEndEffectorData);
+      m_ptrEndEffectorSupport = std::make_shared<CLink>(*this, 7, psEndEffectorSupportAnchor, ptrEndEffectorSupportShape, sEndEffectorSupportData);
       /* Copy the bodies to the base class */
       m_vecBodies = {
-         std::static_pointer_cast<CLink>(m_ptrLowerBase).get(),
-         m_ptrLeftWheel.get(),
-         m_ptrRightWheel.get(),
-         m_ptrFrontPivot.get(),
-         m_ptrRearPivot.get(),
-         m_ptrUpperBase.get(),
-         m_ptrLiftColumn.get(),
-         m_ptrEndEffector.get(),
-         m_ptrEndEffectorSupport.get()
+         m_ptrLowerBase, m_ptrLeftWheel, m_ptrRightWheel, m_ptrFrontPivot, m_ptrRearPivot,
+         m_ptrUpperBase, m_ptrLiftColumn, m_ptrEndEffector, m_ptrEndEffectorSupport,
       };
       /* Synchronize with the entity in the space */
       Reset();
@@ -472,8 +265,8 @@ cParentToChildRotation = 0, 0, 0, 1
       m_ptrEndEffectorLimit = 
          std::make_shared<btMultiBodyJointLimitConstraint>(&m_cMultiBody,
                                                            m_ptrEndEffector->GetIndex(),
-                                                           0.0000f,
-                                                           0.1375f); 
+                                                           0.0f,
+                                                           m_fEndEffectorTranslationLimit);
       /* Allocate memory and prepare the btMultiBody */
       m_cMultiBody.finalizeMultiDof();
       /* Synchronize with the entity in the space */
@@ -486,13 +279,13 @@ cParentToChildRotation = 0, 0, 0, 1
    void CDynamics3DBuilderBotModel::CalculateBoundingBox() {
       btVector3 cModelAabbMin, cModelAabbMax, cBodyAabbMin, cBodyAabbMax;
       /* Initialize the bounding box with the base's AABB */
-      CAbstractBody* pcBase = m_vecBodies[0];
-      pcBase->GetShape().getAabb(pcBase->GetTransform(), cModelAabbMin, cModelAabbMax);
+      std::shared_ptr<CAbstractBody>& ptrBase = m_vecBodies[0];
+      ptrBase->GetShape().getAabb(ptrBase->GetTransform(), cModelAabbMin, cModelAabbMax);
       /* Extend AABB to include other bodies */
-      CAbstractBody* pc_body = m_ptrLiftColumn.get();
+      //std::shared_ptr<CAbstractBody>& ptr_body = m_ptrLiftColumn;
 //      for(CAbstractBody* pc_body : m_vecBodies) {
          /* Get the axis aligned bounding box for the current body */
-         pc_body->GetShape().getAabb(pc_body->GetTransform(), cBodyAabbMin, cBodyAabbMax);
+         m_ptrLiftColumn->GetShape().getAabb(m_ptrLiftColumn->GetTransform(), cBodyAabbMin, cBodyAabbMax);
          /* Update minimum corner */
          cModelAabbMin.setX(cModelAabbMin.getX() < cBodyAabbMin.getX() ? cModelAabbMin.getX() : cBodyAabbMin.getX());
          cModelAabbMin.setY(cModelAabbMin.getY() < cBodyAabbMin.getY() ? cModelAabbMin.getY() : cBodyAabbMin.getY());
@@ -563,6 +356,71 @@ cParentToChildRotation = 0, 0, 0, 1
    /****************************************/
 
    REGISTER_STANDARD_DYNAMICS3D_OPERATIONS_ON_ENTITY(CBuilderBotEntity, CDynamics3DBuilderBotModel);
+
+   /****************************************/
+   /****************************************/
+
+   const btVector3    CDynamics3DBuilderBotModel::m_cLowerBaseHalfExtents(0.065f, 0.0196783f, 0.07f);
+   const btScalar     CDynamics3DBuilderBotModel::m_fLowerBaseMass(0.5f);
+   const btTransform  CDynamics3DBuilderBotModel::m_cLowerBaseOffset(btQuaternion(0.0f, 0.0f, 0.0f, 1.0f), btVector3(-0.020f,0.002f,-0.0f));
+   const btTransform  CDynamics3DBuilderBotModel::m_cLowerBaseGeometricOffset(btQuaternion(0.0f, 0.0f, 0.0f, 1.0f), btVector3(0.0f, -0.0196783f, 0.0f));
+   const btVector3    CDynamics3DBuilderBotModel::m_cWheelHalfExtents(0.02f,0.0075f,0.02f);
+   const btScalar     CDynamics3DBuilderBotModel::m_fWheelMass(0.1);
+   const btTransform  CDynamics3DBuilderBotModel::m_cWheelGeometricOffset(btQuaternion(0.0f, 0.0f, 0.0f, 1.0f), btVector3(0.0f,-0.0075f,0.0f));
+   const btTransform  CDynamics3DBuilderBotModel::m_cLeftWheelOffset(btQuaternion(-0.707107f, 0.0f, 0.0f, 0.707107f), btVector3(0.0f, 0.02f, -0.0525f));
+   const btTransform  CDynamics3DBuilderBotModel::m_cRightWheelOffset(btQuaternion(0.707107f, 0.0f, 0.0f, 0.707107f), btVector3(0.0f, 0.02f, 0.0525f));
+   const btVector3    CDynamics3DBuilderBotModel::m_cLowerBaseToRightWheelJointOffset(0.02f, -0.0016783f, 0.0525f);
+   const btVector3    CDynamics3DBuilderBotModel::m_cRightWheelToLowerBaseJointOffset(0.0f, 0.0075f, 0.0f);
+   const btQuaternion CDynamics3DBuilderBotModel::m_cLowerBaseToRightWheelJointRotation(-0.707107, 0, 0, 0.707107);
+   const btVector3    CDynamics3DBuilderBotModel::m_cLowerBaseToLeftWheelJointOffset(0.02f, -0.0016783f, -0.0525f);
+   const btVector3    CDynamics3DBuilderBotModel::m_cLeftWheelToLowerBaseJointOffset(0.0f, 0.0075f, -0.0f);
+   const btQuaternion CDynamics3DBuilderBotModel::m_cLowerBaseToLeftWheelJointRotation(0.707107f, 0.0f, 0.0f, 0.707107f);
+   const btScalar     CDynamics3DBuilderBotModel::m_fWheelMotorMaxImpulse(0.05f);
+   const btScalar     CDynamics3DBuilderBotModel::m_fPivotRadius(0.02);
+   const btScalar     CDynamics3DBuilderBotModel::m_fPivotMass(0.1);
+   const btTransform  CDynamics3DBuilderBotModel::m_cPivotGeometricOffset(btQuaternion(0.0f, 0.0f, 0.0f, 1.0f), btVector3(0.0f, -0.02f, 0.0f));
+   const btTransform  CDynamics3DBuilderBotModel::m_cFrontPivotOffset(btQuaternion(0.0f, 0.0f, 0.0f, 1.0f), btVector3(0.025f, 0.0f, 0.0f));
+   const btTransform  CDynamics3DBuilderBotModel::m_cRearPivotOffset(btQuaternion(0.0f, 0.0f, 0.0f, 1.0f), btVector3(-0.065f, 0.0f, 0.0f));
+   const btVector3    CDynamics3DBuilderBotModel::m_cLowerBaseToFrontPivotJointOffset(0.045f, -0.0016783f, 0.0f);
+   const btVector3    CDynamics3DBuilderBotModel::m_cFrontPivotToLowerBaseJointOffset(0.0f, 0.0f, 0.0f);
+   const btQuaternion CDynamics3DBuilderBotModel::m_cLowerBaseToFrontPivotJointRotation(0.0f, 0.0f, 0.0f, 1.0f);
+   const btVector3    CDynamics3DBuilderBotModel::m_cLowerBaseToRearPivotJointOffset(-0.045f, -0.0016783f, 0.0f);
+   const btVector3    CDynamics3DBuilderBotModel::m_cRearPivotToLowerBaseJointOffset(0.0f, 0.0f, 0.0f);
+   const btQuaternion CDynamics3DBuilderBotModel::m_cLowerBaseToRearPivotJointRotation(0.0f, 0.0f, 0.0f, 1.0f);
+   const std::vector<btVector3> CDynamics3DBuilderBotModel::m_vecUpperBasePoints {
+      btVector3( 0.039f, 0.0f, -0.065f), btVector3(-0.039f, 0.0f, -0.065f), btVector3( 0.039f, 0.0f,  0.065f), btVector3(-0.039f, 0.0f,  0.065f),
+      btVector3( 0.065f, 0.0f, -0.039f), btVector3(-0.065f, 0.0f, -0.039f), btVector3( 0.065f, 0.0f,  0.039f), btVector3(-0.065f, 0.0f,  0.039f),
+      btVector3( 0.039f, 0.0569f, -0.065f), btVector3(-0.039f, 0.0569f, -0.065f), btVector3( 0.039f, 0.0569f,  0.065f), btVector3(-0.039f, 0.0569f,  0.065f),
+      btVector3( 0.065f, 0.0569f, -0.039f), btVector3(-0.065f, 0.0569f, -0.039f), btVector3( 0.065f, 0.0569f,  0.039f), btVector3(-0.065f, 0.0569f,  0.039f),
+   };
+   const btScalar     CDynamics3DBuilderBotModel::m_fUpperBaseMass(0.6f);
+   const btTransform  CDynamics3DBuilderBotModel::m_cUpperBaseOffset(btQuaternion(0.0f, 0.0f, 0.0f, 1.0f), btVector3(-0.02f, 0.0413566f, 0.0f));
+   const btTransform  CDynamics3DBuilderBotModel::m_cUpperBaseGeometricOffset(btQuaternion(0.0f, 0.0f, 0.0f, 1.0f), btVector3(0.0f, 0.0f, 0.0f));
+   const btVector3    CDynamics3DBuilderBotModel::m_cLowerBaseToUpperBaseJointOffset(0.0f, 0.0196783f, 0.0f);
+   const btVector3    CDynamics3DBuilderBotModel::m_cUpperBaseToLowerBaseJointOffset(0.0f, 0.0f, 0.0f);
+   const btQuaternion CDynamics3DBuilderBotModel::m_cLowerBaseToUpperBaseJointRotation(0.0f, 0.0f, 0.0f, 1.0f);
+   const btVector3    CDynamics3DBuilderBotModel::m_cLiftColumnHalfExtents(0.02925f, 0.143875f, 0.04725f);
+   const btScalar     CDynamics3DBuilderBotModel::m_fLiftColumnMass(0.6f);
+   const btTransform  CDynamics3DBuilderBotModel::m_cLiftColumnOffset(btQuaternion(0.0f, 0.0f, 0.0f, 1.0f), btVector3(0.0f, 0.0982566f, 0.0f));
+   const btTransform  CDynamics3DBuilderBotModel::m_cLiftColumnGeometricOffset(btQuaternion(0.0f, 0.0f, 0.0f, 1.0f), btVector3(0.0f, -0.143875f, 0.0f));
+   const btVector3    CDynamics3DBuilderBotModel::m_cUpperBaseToLiftColumnJointOffset(0.02f, 0.0569f, 0.0f);
+   const btVector3    CDynamics3DBuilderBotModel::m_cLiftColumnToUpperBaseJointOffset(-0.0f, 0.143875f, -0.0f);
+   const btQuaternion CDynamics3DBuilderBotModel::m_cUpperBaseToLiftColumnJointRotation(0.0f, 0.0f, 0.0f, 1.0f);
+   const btVector3    CDynamics3DBuilderBotModel::m_cEndEffectorHalfExtents(0.0329375f, 0.005f, 0.036f);
+   const btScalar     CDynamics3DBuilderBotModel::m_fEndEffectorMass(0.2f);
+   const btTransform  CDynamics3DBuilderBotModel::m_cEndEffectorOffset(btQuaternion(0.0f, 0.0f, 0.0f, 1.0f), btVector3(0.0980875f, 0.055f, -0.0f));
+   const btTransform  CDynamics3DBuilderBotModel::m_cEndEffectorGeometricOffset(btQuaternion(0.0f, 0.0f, 0.0f, 1.0f), btVector3(0.0f, -0.005f, 0.0f));
+   const btVector3    CDynamics3DBuilderBotModel::m_cLowerBaseToEndEffectorJointOffset(0.118087f, 0.0333217f, 0.0f);
+   const btVector3    CDynamics3DBuilderBotModel::m_cEndEffectorToLowerBaseJointOffset(-0.0f, 0.005f, -0.0f);
+   const btQuaternion CDynamics3DBuilderBotModel::m_cLowerBaseToEndEffectorJointRotation(0.0f, 0.0f, 0.0f, 1.0f);
+   const btScalar     CDynamics3DBuilderBotModel::m_fEndEffectorTranslationLimit = 0.1375f;
+   const btVector3    CDynamics3DBuilderBotModel::m_cEndEffectorSupportHalfExtents(0.005125f, 0.078375f, 0.02875f);
+   const btScalar     CDynamics3DBuilderBotModel::m_fEndEffectorSupportMass(0.1);
+   const btTransform  CDynamics3DBuilderBotModel::m_cEndEffectorSupportOffset(btQuaternion(0.0f, 0.0f, 0.0f, 1.0f), btVector3(0.060025f, 0.00575f, -0.0f));
+   const btTransform  CDynamics3DBuilderBotModel::m_cEndEffectorSupportGeometricOffset(btQuaternion(0.0f, 0.0f, 0.0f, 1.0f), btVector3(0, -0.078375, 0));
+   const btVector3    CDynamics3DBuilderBotModel::m_cEndEffectorToEndEffectorSupportJointOffset(-0.0380625f, -0.05425f, 0.0f);
+   const btVector3    CDynamics3DBuilderBotModel::m_cEndEffectorSupportToEndEffectorJointOffset(-0.0f, 0.078375f, -0.0f);
+   const btQuaternion CDynamics3DBuilderBotModel::m_cEndEffectorToEndEffectorSupportJointRotation(0.0f, 0.0f, 0.0f, 1.0f);
 
    /****************************************/
    /****************************************/

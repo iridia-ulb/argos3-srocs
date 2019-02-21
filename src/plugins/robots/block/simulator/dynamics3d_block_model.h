@@ -23,7 +23,7 @@ namespace argos {
       CDynamics3DBlockModel(CDynamics3DEngine& c_engine,
                             CBlockEntity& c_block);
 
-      virtual ~CDynamics3DBlockModel();
+      virtual ~CDynamics3DBlockModel() {}
 
       virtual void Reset();
 
@@ -42,27 +42,14 @@ namespace argos {
       };
 
    private:
-      const std::array<btVector3, 8> m_arrMagnetOffsets {
-         btVector3( 0.023, -0.023f, -0.023),
-         btVector3(-0.023, -0.023f, -0.023),
-         btVector3(-0.023, -0.023f,  0.023),
-         btVector3( 0.023, -0.023f,  0.023),
-         btVector3( 0.023,  0.023f, -0.023),
-         btVector3(-0.023,  0.023f, -0.023),
-         btVector3(-0.023,  0.023f,  0.023),
-         btVector3( 0.023,  0.023f,  0.023),
-      };
-
-   private:
 
       std::array<SMagnet, 8> m_arrMagnets;
 
-      const Real m_fBlockSideLength = Real(0.055);
-      const Real m_fBlockMass = Real(0.102);
-
-      const Real m_fMagnetMass = Real(0.001);
-      const Real m_fMagnetRadius = Real(0.003);
-
+      static const Real m_fBlockSideLength;
+      static const Real m_fBlockMass;
+      static const Real m_fMagnetMass;
+      static const Real m_fMagnetRadius;
+      static const std::array<btVector3, 8> m_arrMagnetOffsets;
    };
 }
 

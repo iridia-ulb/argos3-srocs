@@ -22,6 +22,9 @@ namespace argos {
 
 namespace argos {
 
+   /****************************************/
+   /****************************************/
+
    class CQTOpenGLBlock {
 
    public:
@@ -42,6 +45,43 @@ namespace argos {
       /* Precompiled list for drawing tags */
       GLuint m_unTagList;
    };
+
+   /****************************************/
+   /****************************************/
+
+   class CQTOpenGLBlockDebug {
+
+   public:
+
+      CQTOpenGLBlockDebug();
+
+      virtual ~CQTOpenGLBlockDebug();
+
+      virtual void Draw(CBlockEntity& c_entity);
+
+      void MakeBlock();
+
+      void MakeMagnet();
+
+   private:
+      /* Precompiled lists for the block */
+      GLuint m_unBaseList;
+      GLuint m_unBlockList;
+      GLuint m_unMagnetList;
+
+      std::array<GLfloat, 4> m_arrBlockFillColor   {0.0f, 0.0f, 0.0f, 0.5f};
+      std::array<GLfloat, 4> m_arrBlockLineColor   {0.0f, 0.0f, 0.0f, 1.0f};
+      std::array<GLfloat, 4> m_arrMagnetNorthColor {1.0f, 0.0f, 0.0f, 1.0f};
+      std::array<GLfloat, 4> m_arrMagnetSouthColor {0.0f, 0.0f, 1.0f, 1.0f};
+      std::array<GLfloat, 4> m_arrDefaultSpecular  {0.0f, 0.0f, 0.0f, 1.0f};
+      std::array<GLfloat, 4> m_arrDefaultEmission  {0.0f, 0.0f, 0.0f, 1.0f};
+      std::array<GLfloat, 1> m_arrDefaultShininess {0.0f};
+
+      Real m_fMagnetRadius = 0.003f;
+   };
+
+   /****************************************/
+   /****************************************/
 
 }
 

@@ -74,8 +74,9 @@ namespace argos {
                                      cInertia,
                                      m_fBlockMass,
                                      fFriction);
-      CBase* pcBase = new CBase(*this, c_block.GetEmbodiedEntity().AddAnchor("base"), ptrShape, sBodyData);
-      m_vecBodies.push_back(pcBase);
+      std::shared_ptr<CBase> ptrBase = 
+         std::make_shared<CBase>(*this, &c_block.GetEmbodiedEntity().AddAnchor("base"), ptrShape, sBodyData);
+      m_vecBodies.push_back(ptrBase);
       /* get a collision shape for the magnets */
       std::shared_ptr<btCollisionShape> ptrMagnetShape =
          CDynamics3DShapeManager::RequestSphere(m_fMagnetRadius);
@@ -104,16 +105,15 @@ namespace argos {
                                           m_fMagnetMass,
                                           fFriction,
                                           vecDipoles);
+         /* anchors for the block's magnets are only added in debug mode */
+         SAnchor* psAnchor = nullptr;
+         if(c_block.IsDebug()) {
+             psAnchor = &c_block.GetEmbodiedEntity().AddAnchor("magnet_" + std::to_string(unMagnetIndex));
+         }
          /* create a body for the magnet and transfer it to the base class */
-         CLink* pcMagnetBody = 
-               new CLink(*this,
-                         unMagnetIndex,
-                         /* note that the relative offsets are zero for this anchor, this is not correct
-                            even though it has no consequences for the moment */
-                         c_block.GetEmbodiedEntity().AddAnchor("magnet_" + std::to_string(unMagnetIndex)),
-                         ptrMagnetShape,
-                         sMagnetData);
-         m_vecBodies.push_back(pcMagnetBody);
+         std::shared_ptr<CLink> ptrMagnet = 
+            std::make_shared<CLink>(*this, unMagnetIndex, psAnchor, ptrMagnetShape, sMagnetData);
+         m_vecBodies.push_back(ptrMagnet);
          /* add the magnet to our array */
          m_arrMagnets[unMagnetIndex] = {
             unMagnetIndex,
@@ -128,12 +128,6 @@ namespace argos {
       Reset();
    }
    
-   /****************************************/
-   /****************************************/
-   
-   CDynamics3DBlockModel::~CDynamics3DBlockModel() {
-   }
-
    /****************************************/
    /****************************************/
 
@@ -176,6 +170,20 @@ namespace argos {
    /****************************************/
 
    REGISTER_STANDARD_DYNAMICS3D_OPERATIONS_ON_ENTITY(CBlockEntity, CDynamics3DBlockModel);
+
+   /****************************************/
+   /****************************************/
+
+   const Real CDynamics3DBlockModel::m_fBlockSideLength(0.055);
+   const Real CDynamics3DBlockModel::m_fBlockMass(0.102);
+   const Real CDynamics3DBlockModel::m_fMagnetMass(0.001);
+   const Real CDynamics3DBlockModel::m_fMagnetRadius(0.003);
+   const std::array<btVector3, 8> CDynamics3DBlockModel::m_arrMagnetOffsets {
+      btVector3( 0.023, -0.023f, -0.023),  btVector3(-0.023, -0.023f, -0.023),
+      btVector3(-0.023, -0.023f,  0.023),  btVector3( 0.023, -0.023f,  0.023),
+      btVector3( 0.023,  0.023f, -0.023),  btVector3(-0.023,  0.023f, -0.023),
+      btVector3(-0.023,  0.023f,  0.023),  btVector3( 0.023,  0.023f,  0.023),
+   };
 
    /****************************************/
    /****************************************/

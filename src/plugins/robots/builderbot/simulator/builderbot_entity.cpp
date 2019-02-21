@@ -34,7 +34,8 @@ namespace argos {
       m_pcEmbodiedEntity(nullptr),
       m_pcDifferentialDriveEntity(nullptr),
       m_pcElectromagnetSystemEntity(nullptr),
-      m_pcLiftSystemEntity(nullptr) {}
+      m_pcLiftSystemEntity(nullptr),
+      m_bDebug(false) {}
 
    /****************************************/
    /****************************************/
@@ -43,6 +44,8 @@ namespace argos {
       try {
          /* initialize the base class */
          CComposableEntity::Init(t_tree);
+         /* check if we are debugging */
+         GetNodeAttributeOrDefault(t_tree, "debug", m_bDebug, m_bDebug);
          /* create and initialize the embodied entity */
          m_pcEmbodiedEntity = new CEmbodiedEntity(this);
          AddComponent(*m_pcEmbodiedEntity);

@@ -74,6 +74,10 @@ namespace argos {
          return *m_pcEmbodiedEntity;
       }
 
+      inline bool IsDebug() const {
+         return m_bDebug;
+      }
+
       virtual void UpdateComponents();
 
    private:
@@ -85,6 +89,8 @@ namespace argos {
       CBuilderBotLiftSystemEntity*           m_pcLiftSystemEntity;
       CRadioEquippedEntity*                  m_pcNFCRadioEquippedEntity;
       CRadioEquippedEntity*                  m_pcWifiRadioEquippedEntity;
+
+      bool m_bDebug;
    };
 
 }

@@ -12,60 +12,15 @@
 #include <argos3/plugins/simulator/entities/tag_equipped_entity.h>
 #include <argos3/plugins/simulator/visualizations/qt-opengl/qtopengl_widget.h>
 
-#define RGB_WHITE std::array<GLfloat, 3> {1.0f, 1.0f, 1.0f}
-#define RGB_BLACK std::array<GLfloat, 3> {0.0f, 0.0f, 0.0f}
+#define TAG_WHITE std::array<GLfloat, 3> {1.0f, 1.0f, 1.0f}
+#define TAG_BLACK std::array<GLfloat, 3> {0.0f, 0.0f, 0.0f}
 
 namespace argos {
 
    /****************************************/
    /****************************************/
 
-   const GLfloat NORTH_COLOR[]           = { 1.0f, 0.0f, 0.0f, 1.0f };
-   const GLfloat SOUTH_COLOR[]           = { 0.0f, 0.0f, 1.0f, 1.0f };
-
-   const GLfloat SPECULAR[]             = { 0.0f, 0.0f, 0.0f, 1.0f };
-   const GLfloat SHININESS[]            = { 0.0f                   };
-   const GLfloat EMISSION[]             = { 0.0f, 0.0f, 0.0f, 1.0f };
-UInt32 list;
-
-void MakeSphere() {
-      list = glGenLists(1);
-      glNewList(list, GL_COMPILE);
-      glEnable(GL_NORMALIZE);
-      glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, SPECULAR);
-      glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, SHININESS);
-      glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, EMISSION);
-      CVector3 cNormal, cPoint;
-      CRadians cSlice(CRadians::TWO_PI / 20);
-      glBegin(GL_TRIANGLE_STRIP);
-      for(CRadians cInclination; cInclination <= CRadians::PI; cInclination += cSlice) {
-         if(cInclination < CRadians::PI_OVER_TWO) {
-            glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, NORTH_COLOR);
-         }
-         else {
-            glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, SOUTH_COLOR);
-         }
-         for(CRadians cAzimuth; cAzimuth <= CRadians::TWO_PI; cAzimuth += cSlice) {
-            cPoint.FromSphericalCoords(0.5f, cInclination, cAzimuth);
-            glNormal3f(cPoint.GetX(), cPoint.GetY(), cPoint.GetZ() + 0.5f);
-            glVertex3f(cPoint.GetX(), cPoint.GetY(), cPoint.GetZ() + 0.5f);
-            cPoint.FromSphericalCoords(0.5f, cInclination + cSlice, cAzimuth);
-            glNormal3f(cPoint.GetX(), cPoint.GetY(), cPoint.GetZ() + 0.5f);
-            glVertex3f(cPoint.GetX(), cPoint.GetY(), cPoint.GetZ() + 0.5f);
-            cPoint.FromSphericalCoords(0.5f, cInclination, cAzimuth + cSlice);
-            glNormal3f(cPoint.GetX(), cPoint.GetY(), cPoint.GetZ() + 0.5f);
-            glVertex3f(cPoint.GetX(), cPoint.GetY(), cPoint.GetZ() + 0.5f);
-            cPoint.FromSphericalCoords(0.5f, cInclination + cSlice, cAzimuth + cSlice);
-            glNormal3f(cPoint.GetX(), cPoint.GetY(), cPoint.GetZ() + 0.5f);
-            glVertex3f(cPoint.GetX(), cPoint.GetY(), cPoint.GetZ() + 0.5f);
-         }
-      }
-      glEnd();
-      glDisable(GL_NORMALIZE);
-      glEndList();
-   }
-
-    CQTOpenGLBlock::CQTOpenGLBlock() :
+   CQTOpenGLBlock::CQTOpenGLBlock() :
       /* create the model */
       m_cBlockModel("block.obj"),
       /* get pointers to the LED materials */
@@ -97,20 +52,17 @@ void MakeSphere() {
       },
       /* initialize the tag texture */
       m_arrTagTexture {
-         RGB_WHITE, RGB_WHITE, RGB_WHITE, RGB_WHITE, RGB_WHITE, RGB_WHITE, RGB_WHITE, RGB_WHITE, RGB_WHITE, RGB_WHITE,
-         RGB_WHITE, RGB_BLACK, RGB_BLACK, RGB_BLACK, RGB_BLACK, RGB_BLACK, RGB_BLACK, RGB_BLACK, RGB_BLACK, RGB_WHITE,
-         RGB_WHITE, RGB_BLACK, RGB_BLACK, RGB_WHITE, RGB_WHITE, RGB_WHITE, RGB_BLACK, RGB_WHITE, RGB_BLACK, RGB_WHITE,
-         RGB_WHITE, RGB_BLACK, RGB_BLACK, RGB_WHITE, RGB_WHITE, RGB_BLACK, RGB_BLACK, RGB_BLACK, RGB_BLACK, RGB_WHITE,
-         RGB_WHITE, RGB_BLACK, RGB_BLACK, RGB_WHITE, RGB_BLACK, RGB_BLACK, RGB_BLACK, RGB_WHITE, RGB_BLACK, RGB_WHITE,
-         RGB_WHITE, RGB_BLACK, RGB_WHITE, RGB_WHITE, RGB_WHITE, RGB_BLACK, RGB_WHITE, RGB_BLACK, RGB_BLACK, RGB_WHITE,
-         RGB_WHITE, RGB_BLACK, RGB_BLACK, RGB_BLACK, RGB_WHITE, RGB_BLACK, RGB_BLACK, RGB_BLACK, RGB_BLACK, RGB_WHITE,
-         RGB_WHITE, RGB_BLACK, RGB_WHITE, RGB_BLACK, RGB_BLACK, RGB_BLACK, RGB_WHITE, RGB_BLACK, RGB_BLACK, RGB_WHITE,
-         RGB_WHITE, RGB_BLACK, RGB_BLACK, RGB_BLACK, RGB_BLACK, RGB_BLACK, RGB_BLACK, RGB_BLACK, RGB_BLACK, RGB_WHITE,
-         RGB_WHITE, RGB_WHITE, RGB_WHITE, RGB_WHITE, RGB_WHITE, RGB_WHITE, RGB_WHITE, RGB_WHITE, RGB_WHITE, RGB_WHITE,
+         TAG_WHITE, TAG_WHITE, TAG_WHITE, TAG_WHITE, TAG_WHITE, TAG_WHITE, TAG_WHITE, TAG_WHITE, TAG_WHITE, TAG_WHITE,
+         TAG_WHITE, TAG_BLACK, TAG_BLACK, TAG_BLACK, TAG_BLACK, TAG_BLACK, TAG_BLACK, TAG_BLACK, TAG_BLACK, TAG_WHITE,
+         TAG_WHITE, TAG_BLACK, TAG_BLACK, TAG_WHITE, TAG_WHITE, TAG_WHITE, TAG_BLACK, TAG_WHITE, TAG_BLACK, TAG_WHITE,
+         TAG_WHITE, TAG_BLACK, TAG_BLACK, TAG_WHITE, TAG_WHITE, TAG_BLACK, TAG_BLACK, TAG_BLACK, TAG_BLACK, TAG_WHITE,
+         TAG_WHITE, TAG_BLACK, TAG_BLACK, TAG_WHITE, TAG_BLACK, TAG_BLACK, TAG_BLACK, TAG_WHITE, TAG_BLACK, TAG_WHITE,
+         TAG_WHITE, TAG_BLACK, TAG_WHITE, TAG_WHITE, TAG_WHITE, TAG_BLACK, TAG_WHITE, TAG_BLACK, TAG_BLACK, TAG_WHITE,
+         TAG_WHITE, TAG_BLACK, TAG_BLACK, TAG_BLACK, TAG_WHITE, TAG_BLACK, TAG_BLACK, TAG_BLACK, TAG_BLACK, TAG_WHITE,
+         TAG_WHITE, TAG_BLACK, TAG_WHITE, TAG_BLACK, TAG_BLACK, TAG_BLACK, TAG_WHITE, TAG_BLACK, TAG_BLACK, TAG_WHITE,
+         TAG_WHITE, TAG_BLACK, TAG_BLACK, TAG_BLACK, TAG_BLACK, TAG_BLACK, TAG_BLACK, TAG_BLACK, TAG_BLACK, TAG_WHITE,
+         TAG_WHITE, TAG_WHITE, TAG_WHITE, TAG_WHITE, TAG_WHITE, TAG_WHITE, TAG_WHITE, TAG_WHITE, TAG_WHITE, TAG_WHITE,
       } {
-
-      MakeSphere();
-
       /* generate the tag texture */
       GLuint unTagTex;
       glGenTextures(1, &unTagTex);
@@ -126,7 +78,7 @@ void MakeSphere() {
       glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
       glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
       glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-      glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);    
+      glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
       glBegin(GL_QUADS);
       glNormal3f(0.0f, 0.0f, 1.0f);
       glTexCoord2f(1.0f, 1.0f); glVertex2f( 0.5f,  0.5f);
@@ -134,7 +86,7 @@ void MakeSphere() {
       glTexCoord2f(0.0f, 0.0f); glVertex2f(-0.5f, -0.5f);
       glTexCoord2f(1.0f, 0.0f); glVertex2f( 0.5f, -0.5f);
       glEnd();
-      glDisable(GL_TEXTURE_2D);     
+      glDisable(GL_TEXTURE_2D);
       glEnable(GL_LIGHTING);
       glDisable(GL_NORMALIZE);
       glEndList();
@@ -153,7 +105,7 @@ void MakeSphere() {
 
    void CQTOpenGLBlock::Draw(CBlockEntity& c_entity) {
       /* update the LED materials */
-      const CDirectionalLEDEquippedEntity& c_leds = c_entity.GetDirectionalLEDEquippedEntity();  
+      const CDirectionalLEDEquippedEntity& c_leds = c_entity.GetDirectionalLEDEquippedEntity();
       for(UInt32 un_material_idx = 0;
           un_material_idx < m_arrLEDs.size();
           un_material_idx++) {
@@ -174,27 +126,156 @@ void MakeSphere() {
              c_entity.GetTagEquippedEntity().GetInstances()) {
          Real fScaling = s_instance.Tag.GetSideLength();
          const CVector3& cTagPosition = s_instance.PositionOffset;
-         const CQuaternion& cTagOrientation = s_instance.OrientationOffset; 
+         const CQuaternion& cTagOrientation = s_instance.OrientationOffset;
          cTagOrientation.ToEulerAngles(cZ, cY, cX);
          glPushMatrix();
          glTranslatef(cTagPosition.GetX(),
                       cTagPosition.GetY(),
                       cTagPosition.GetZ());
          glRotatef(ToDegrees(cX).GetValue(), 1.0f, 0.0f, 0.0f);
-         glRotatef(ToDegrees(cY).GetValue(), 0.0f, 1.0f, 0.0f); 
+         glRotatef(ToDegrees(cY).GetValue(), 0.0f, 1.0f, 0.0f);
          glRotatef(ToDegrees(cZ).GetValue(), 0.0f, 0.0f, 1.0f);
          glScalef(fScaling, fScaling, 1.0f);
          glCallList(m_unTagList);
          glPopMatrix();
       }
-      // remove external push
-      glPopMatrix();
-      /* draw magnets */
-      for(const auto& kv : c_entity.GetEmbodiedEntity().GetAnchors()) {
-         if(kv.first.find("magnet") != std::string::npos) {
-            const CVector3& cPosition = kv.second->Position;
+   }
+
+   /****************************************/
+   /****************************************/
+
+   CQTOpenGLBlockDebug::CQTOpenGLBlockDebug() {
+      m_unBaseList = glGenLists(2);
+      /* References to the display lists */
+      m_unBlockList      = m_unBaseList;
+      m_unMagnetList     = m_unBaseList + 1;
+      /* Make block list */
+      glNewList(m_unBlockList, GL_COMPILE);
+      MakeBlock();
+      glEndList();
+      /* Make magnet list */
+      glNewList(m_unMagnetList, GL_COMPILE);
+      MakeMagnet();
+      glEndList();
+   }
+
+   /****************************************/
+   /****************************************/
+
+   CQTOpenGLBlockDebug::~CQTOpenGLBlockDebug() {
+      glDeleteLists(m_unBaseList, 2);
+   }
+
+   /****************************************/
+   /****************************************/
+
+   void CQTOpenGLBlockDebug::MakeBlock() {
+      Real fSideLength = 0.055f;
+      Real fHalfSideLength = 0.5f * fSideLength;
+      /* Set the material */
+      glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, m_arrDefaultSpecular.data());
+      glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, m_arrDefaultShininess.data());
+      glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, m_arrDefaultEmission.data());
+      /* set drawing modes */
+      std::array<std::pair<GLenum, std::array<GLfloat, 4> >, 2> arrDrawingModes = {
+         std::make_pair<GLenum, std::array<GLfloat, 4> >(GL_LINE, {0.0f, 0.0f, 0.0f, 1.0f}),
+         std::make_pair<GLenum, std::array<GLfloat, 4> >(GL_FILL, {0.0f, 0.0f, 0.0f, 0.5f}),
+      };
+      /* draw */
+      for(const std::pair<GLenum, std::array<GLfloat, 4> >& c_drawing_mode : arrDrawingModes) {
+         glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, c_drawing_mode.second.data());
+         glPolygonMode(GL_FRONT_AND_BACK, c_drawing_mode.first);
+         glBegin(GL_QUADS);
+         /* Bottom face */
+         glNormal3f( 0.0f,             0.0f,           -fSideLength);
+         glVertex3f( fHalfSideLength,  fHalfSideLength, 0.0f);
+         glVertex3f( fHalfSideLength, -fHalfSideLength, 0.0f);
+         glVertex3f(-fHalfSideLength, -fHalfSideLength, 0.0f);
+         glVertex3f(-fHalfSideLength,  fHalfSideLength, 0.0f);
+         /* Top face */
+         glNormal3f( 0.0f,             0.0f,            fSideLength);
+         glVertex3f(-fHalfSideLength, -fHalfSideLength, fSideLength);
+         glVertex3f( fHalfSideLength, -fHalfSideLength, fSideLength);
+         glVertex3f( fHalfSideLength,  fHalfSideLength, fSideLength);
+         glVertex3f(-fHalfSideLength,  fHalfSideLength, fSideLength);
+         /* South face */
+         glNormal3f(0.0f,             -fSideLength,     0.0f);
+         glVertex3f(-fHalfSideLength, -fHalfSideLength, fSideLength);
+         glVertex3f(-fHalfSideLength, -fHalfSideLength, 0.0f);
+         glVertex3f( fHalfSideLength, -fHalfSideLength, 0.0f);
+         glVertex3f( fHalfSideLength, -fHalfSideLength, fSideLength);
+         /* East face */
+         glNormal3f( fSideLength,      0.0f,            0.0f);
+         glVertex3f( fHalfSideLength, -fHalfSideLength, fSideLength);
+         glVertex3f( fHalfSideLength, -fHalfSideLength, 0.0f);
+         glVertex3f( fHalfSideLength,  fHalfSideLength, 0.0f);
+         glVertex3f( fHalfSideLength,  fHalfSideLength, fSideLength);
+         /* North face */
+         glNormal3f( 0.0f,             fSideLength,     0.0f);
+         glVertex3f( fHalfSideLength,  fHalfSideLength, fSideLength);
+         glVertex3f( fHalfSideLength,  fHalfSideLength, 0.0f);
+         glVertex3f(-fHalfSideLength,  fHalfSideLength, 0.0f);
+         glVertex3f(-fHalfSideLength,  fHalfSideLength, fSideLength);
+         /* West face */
+         glNormal3f(-fSideLength,      0.0f,            0.0f);
+         glVertex3f(-fHalfSideLength,  fHalfSideLength, fSideLength);
+         glVertex3f(-fHalfSideLength,  fHalfSideLength, 0.0f);
+         glVertex3f(-fHalfSideLength, -fHalfSideLength, 0.0f);
+         glVertex3f(-fHalfSideLength, -fHalfSideLength, fSideLength);
+         glEnd();
+      }
+   }
+
+   /****************************************/
+   /****************************************/
+
+   void CQTOpenGLBlockDebug::MakeMagnet() {
+      glEnable(GL_NORMALIZE);
+      glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, m_arrDefaultSpecular.data());
+      glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, m_arrDefaultShininess.data());
+      glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, m_arrDefaultEmission.data());
+      CVector3 cNormal, cPoint;
+      CRadians cSlice(CRadians::TWO_PI / 20);
+      Real fRadius = Real(0.003);
+      glBegin(GL_TRIANGLE_STRIP);
+      for(CRadians cInclination; cInclination <= CRadians::PI; cInclination += cSlice) {
+         if(cInclination < CRadians::PI_OVER_TWO) {
+            glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, m_arrMagnetNorthColor.data());
+         }
+         else {
+            glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, m_arrMagnetSouthColor.data());
+         }
+         for(CRadians cAzimuth; cAzimuth <= CRadians::TWO_PI; cAzimuth += cSlice) {
+            cPoint.FromSphericalCoords(fRadius, cInclination, cAzimuth);
+            glNormal3f(cPoint.GetX(), cPoint.GetY(), cPoint.GetZ() + fRadius);
+            glVertex3f(cPoint.GetX(), cPoint.GetY(), cPoint.GetZ() + fRadius);
+            cPoint.FromSphericalCoords(fRadius, cInclination + cSlice, cAzimuth);
+            glNormal3f(cPoint.GetX(), cPoint.GetY(), cPoint.GetZ() + fRadius);
+            glVertex3f(cPoint.GetX(), cPoint.GetY(), cPoint.GetZ() + fRadius);
+            cPoint.FromSphericalCoords(fRadius, cInclination, cAzimuth + cSlice);
+            glNormal3f(cPoint.GetX(), cPoint.GetY(), cPoint.GetZ() + fRadius);
+            glVertex3f(cPoint.GetX(), cPoint.GetY(), cPoint.GetZ() + fRadius);
+            cPoint.FromSphericalCoords(fRadius, cInclination + cSlice, cAzimuth + cSlice);
+            glNormal3f(cPoint.GetX(), cPoint.GetY(), cPoint.GetZ() + fRadius);
+            glVertex3f(cPoint.GetX(), cPoint.GetY(), cPoint.GetZ() + fRadius);
+         }
+      }
+      glEnd();
+      glDisable(GL_NORMALIZE);
+   }
+
+   /****************************************/
+   /****************************************/
+
+   void CQTOpenGLBlockDebug::Draw(CBlockEntity& c_entity) {
+      for(const std::pair<const std::string, SAnchor*>& c_anchor :
+          c_entity.GetEmbodiedEntity().GetAnchors()) {
+         const std::string& strKey = c_anchor.first;
+         /* draw a magnet at each anchor whose id contains the substring 'magnet' */
+         if(strKey.find("magnet") != std::string::npos) {
+            const CVector3& cPosition = c_anchor.second->Position;
             /* Get the orientation of the link */
-            const CQuaternion& cOrientation = kv.second->Orientation;
+            const CQuaternion& cOrientation = c_anchor.second->Orientation;
             CRadians cZAngle, cYAngle, cXAngle;
             cOrientation.ToEulerAngles(cZAngle, cYAngle, cXAngle);
             glPushMatrix();
@@ -202,14 +283,27 @@ void MakeSphere() {
             glRotatef(ToDegrees(cXAngle).GetValue(), 1.0f, 0.0f, 0.0f);
             glRotatef(ToDegrees(cYAngle).GetValue(), 0.0f, 1.0f, 0.0f);
             glRotatef(ToDegrees(cZAngle).GetValue(), 0.0f, 0.0f, 1.0f);
-            glScalef(0.006,0.006,0.006);
-            glCallList(list);
+            glCallList(m_unMagnetList);
             glPopMatrix();
-
          }
       }
-      // add external push
+      /* Get the position of the block */
+      const CVector3& cPosition = c_entity.GetEmbodiedEntity().GetOriginAnchor().Position;
+      /* Get the orientation of the block */
+      const CQuaternion& cOrientation = c_entity.GetEmbodiedEntity().GetOriginAnchor().Orientation;
+      CRadians cZAngle, cYAngle, cXAngle;
+      cOrientation.ToEulerAngles(cZAngle, cYAngle, cXAngle);
       glPushMatrix();
+      glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+      glEnable(GL_BLEND);
+      glTranslatef(cPosition.GetX(), cPosition.GetY(), cPosition.GetZ());
+      glRotatef(ToDegrees(cXAngle).GetValue(), 1.0f, 0.0f, 0.0f);
+      glRotatef(ToDegrees(cYAngle).GetValue(), 0.0f, 1.0f, 0.0f);
+      glRotatef(ToDegrees(cZAngle).GetValue(), 0.0f, 0.0f, 1.0f);
+      /* display the block */
+      glCallList(m_unBlockList);
+      glDisable(GL_BLEND);
+      glPopMatrix();
    }
 
    /****************************************/
@@ -219,12 +313,21 @@ void MakeSphere() {
    public:
       void ApplyTo(CQTOpenGLWidget& c_visualization,
                    CBlockEntity& c_entity) {
-         static CQTOpenGLBlock m_cModel;
+         if(c_entity.IsDebug()) {
+            static CQTOpenGLBlockDebug m_cDebugModel;
+            m_cDebugModel.Draw(c_entity);
+         }
+         else {
+            static CQTOpenGLBlock m_cModel;
+            c_visualization.DrawEntity(c_entity.GetEmbodiedEntity());
+            m_cModel.Draw(c_entity);
+         }
          c_visualization.DrawRays(c_entity.GetControllableEntity());
-         c_visualization.DrawEntity(c_entity.GetEmbodiedEntity());
-         m_cModel.Draw(c_entity);
       }
    };
+
+   /****************************************/
+   /****************************************/
 
    class CQTOpenGLOperationDrawBlockSelected : public CQTOpenGLOperationDrawSelected {
    public:
@@ -233,6 +336,9 @@ void MakeSphere() {
          c_visualization.DrawBoundingBox(c_entity.GetEmbodiedEntity());
       }
    };
+
+   /****************************************/
+   /****************************************/
 
    REGISTER_QTOPENGL_ENTITY_OPERATION(CQTOpenGLOperationDrawNormal, CQTOpenGLOperationDrawBlockNormal, CBlockEntity);
 

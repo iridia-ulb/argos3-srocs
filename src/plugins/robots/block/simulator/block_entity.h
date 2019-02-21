@@ -61,6 +61,10 @@ namespace argos {
          return *m_pcRadioEquippedEntity;
       }
 
+      inline bool IsDebug() const {
+         return m_bDebug;
+      }
+
       virtual void UpdateComponents();
 
    private:
@@ -71,34 +75,11 @@ namespace argos {
       CTagEquippedEntity*               m_pcTagEquippedEntity;
       CRadioEquippedEntity*             m_pcRadioEquippedEntity;
 
-      const Real m_fBlockSideLength = Real(0.055);
+      bool m_bDebug;
 
-      /* these face offsets are used for calculating the positions of the LEDs
-         radios, and tags. Since the LEDs and the tags need to be seen by
-         cameras, the offset is increased by 1% so that the entity sits just
-         above the surface of the block */
-      const std::array<std::pair<CVector3, CQuaternion>, 6> m_arrFaceOffsets = {
-         std::make_pair(CVector3( 0.505f,  0.000f,  0.505f) * m_fBlockSideLength,
-                        CQuaternion( 0.5f * CRadians::PI, CVector3::Y)),
-         std::make_pair(CVector3( 0.000f, -0.505f,  0.505f) * m_fBlockSideLength,
-                        CQuaternion( 0.5f * CRadians::PI, CVector3::X)),
-         std::make_pair(CVector3(-0.505f,  0.000f,  0.505f) * m_fBlockSideLength,
-                        CQuaternion(-0.5f * CRadians::PI, CVector3::Y)),
-         std::make_pair(CVector3( 0.000f,  0.505f,  0.505f) * m_fBlockSideLength,
-                        CQuaternion(-0.5f * CRadians::PI, CVector3::X)),
-         std::make_pair(CVector3( 0.000f,  0.000f,  1.010f) * m_fBlockSideLength,
-                        CQuaternion( 0.0f * CRadians::PI, CVector3::X)),
-         std::make_pair(CVector3( 0.000f,  0.000f, -0.010f) * m_fBlockSideLength,
-                        CQuaternion( 1.0f * CRadians::PI, CVector3::X)),
-      };
-
-      const std::array<CVector3, 4> m_arrLEDOffsets = {
-         CVector3(0.02f,0.0f,0.0f),
-         CVector3(0.0f,0.02f,0.0f),
-         CVector3(-0.02f,0.0f,0.0f),
-         CVector3(0.0f,-0.02f,0.0f),
-      };
-
+      static const Real m_fBlockSideLength;
+      static const std::array<std::pair<CVector3, CQuaternion>, 6> m_arrFaceOffsets;
+      static const std::array<CVector3, 4> m_arrLEDOffsets;
    };
 
 }
