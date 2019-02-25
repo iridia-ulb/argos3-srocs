@@ -51,9 +51,20 @@ namespace argos {
          AddComponent(*m_pcEmbodiedEntity);
          m_pcEmbodiedEntity->Init(GetNode(t_tree, "body"));
          /* create anchors */
+         SAnchor& sLowerBaseAnchor =
+            m_pcEmbodiedEntity->AddAnchor("lower_base", {-0.02f, 0.0f, 0.002f});
          SAnchor& sEndEffectorAnchor =
-            m_pcEmbodiedEntity->AddAnchor("end_effector", CVector3(0.0980875, 0, 0.055));
-         SAnchor& sOriginAnchor = m_pcEmbodiedEntity->GetOriginAnchor();
+            m_pcEmbodiedEntity->AddAnchor("end_effector", {0.0980875, 0, 0.055});
+         if(m_bDebug) {
+            /* create additional anchors for drawing the links from the dynamics 3D engine */
+            m_pcEmbodiedEntity->AddAnchor("left_wheel");
+            m_pcEmbodiedEntity->AddAnchor("right_wheel");
+            m_pcEmbodiedEntity->AddAnchor("front_pivot");
+            m_pcEmbodiedEntity->AddAnchor("rear_pivot");
+            m_pcEmbodiedEntity->AddAnchor("upper_base");
+            m_pcEmbodiedEntity->AddAnchor("lift_column");
+            m_pcEmbodiedEntity->AddAnchor("end_effector_support");
+         }
          /* get mediums */
          CRadioMedium& cNFCRadioMedium = CSimulator::GetInstance().GetMedium<CRadioMedium>("nfc");
          CRadioMedium& cWifiRadioMedium = CSimulator::GetInstance().GetMedium<CRadioMedium>("wifi");
@@ -75,7 +86,7 @@ namespace argos {
          /* create and initialize a radio equipped entity for WiFi */
          m_pcWifiRadioEquippedEntity = new CRadioEquippedEntity(this, "radios_0");
          AddComponent(*m_pcWifiRadioEquippedEntity);
-         m_pcWifiRadioEquippedEntity->AddRadio(CVector3(-0.05f, 0.03f, 0.03f), sOriginAnchor, WIFI_TRANSMISSION_RANGE);
+         m_pcWifiRadioEquippedEntity->AddRadio(CVector3(-0.05f, 0.03f, 0.03f), sLowerBaseAnchor, WIFI_TRANSMISSION_RANGE);
          m_pcWifiRadioEquippedEntity->SetMedium(cWifiRadioMedium);
          m_pcWifiRadioEquippedEntity->Enable();
          /* create and initialize a radio equipped entity for NFC */

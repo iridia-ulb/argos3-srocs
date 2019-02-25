@@ -16,6 +16,8 @@
 #include <argos3/plugins/robots/builderbot/simulator/builderbot_lift_system_entity.h>
 #include <argos3/plugins/robots/builderbot/simulator/builderbot_entity.h>
 
+#include <functional>
+
 namespace argos {
 
    /****************************************/
@@ -27,7 +29,6 @@ namespace argos {
       m_cDifferentialDriveEntity(c_builderbot.GetDifferentialDriveEntity()),
       m_cElectromagnetSystemEntity(c_builderbot.GetElectromagnetSystemEntity()),
       m_cLiftSystemEntity(c_builderbot.GetLiftSystemEntity()) {
-
       /* get the required collision shapes */
       std::shared_ptr<btCollisionShape> ptrLowerBaseShape =
          CDynamics3DShapeManager::RequestBox(m_cLowerBaseHalfExtents);
@@ -43,7 +44,6 @@ namespace argos {
          CDynamics3DShapeManager::RequestBox(m_cEndEffectorHalfExtents);
       std::shared_ptr<btCollisionShape> ptrEndEffectorSupportShape =
          CDynamics3DShapeManager::RequestBox(m_cEndEffectorSupportHalfExtents);
-
       /* calculate the inertia of the collision objects */
       btVector3 cLowerBaseInertia;
       btVector3 cWheelInertia;
@@ -59,7 +59,6 @@ namespace argos {
       ptrLiftColumnShape->calculateLocalInertia(m_fLiftColumnMass, cLiftColumnInertia);
       ptrEndEffectorShape->calculateLocalInertia(m_fEndEffectorMass, cEndEffectorInertia);
       ptrEndEffectorSupportShape->calculateLocalInertia(m_fEndEffectorSupportMass, cEndEffectorSupportInertia);
-
       /* calculate a btTransform that moves us from the global coordinate system to the
          local coordinate system */
       const SAnchor& sOriginAnchor = c_builderbot.GetEmbodiedEntity().GetOriginAnchor();
@@ -73,7 +72,6 @@ namespace argos {
          btVector3(cPosition.GetX(),
                    cPosition.GetZ(),
                   -cPosition.GetY()));
-
       /* create dipoles for the end effector magnets */
       std::function<btVector3()> fnUpdateField = [this] () {
          return btVector3(0.0f, m_cElectromagnetSystemEntity.GetField(), 0.0f);
@@ -84,7 +82,6 @@ namespace argos {
          CAbstractBody::SData::SDipole(fnUpdateField, btTransform(btQuaternion(0.0f, 0.0f, 0.0f, 1.0f), btVector3( 0.0199375f, -0.004f, -0.023f))),
          CAbstractBody::SData::SDipole(fnUpdateField, btTransform(btQuaternion(0.0f, 0.0f, 0.0f, 1.0f), btVector3(-0.0260625f, -0.004f, -0.023f))),
       };
-
       /* create a CAbstractBody::SData structure for each body */
       CAbstractBody::SData sLowerBaseData(cStartTransform * m_cLowerBaseOffset,
                                           m_cLowerBaseGeometricOffset,
@@ -132,23 +129,36 @@ namespace argos {
                                                    cEndEffectorSupportInertia,
                                                    m_fEndEffectorSupportMass,
                                                    GetEngine().GetDefaultFriction());
-
-      // TODO can the origin anchor be used directly here? No, the origin anchors offset must be 0,0,0 from the origin, this is not the case for any of the bodies in our model.
-      // TODO could the COM offset be used?
-      bool bDebug = c_builderbot.IsDebug();
-      // TODO anchors require the correct offset if they are going to be used by OpenGL or in other parts of the simulator      
-      SAnchor* psLowerBaseAnchor = &c_builderbot.GetEmbodiedEntity().AddAnchor("lower_base", CVector3(-0.02,0,0.002));
-      SAnchor* psEndEffectorAnchor = &c_builderbot.GetLiftSystemEntity().GetAnchor();
-      SAnchor* psLeftWheelAnchor = bDebug ? &c_builderbot.GetEmbodiedEntity().AddAnchor("left_wheel")  : nullptr;
-      SAnchor* psRightWheelAnchor = bDebug ? &c_builderbot.GetEmbodiedEntity().AddAnchor("right_wheel") : nullptr;
-      SAnchor* psFrontPivotAnchor = bDebug ? &c_builderbot.GetEmbodiedEntity().AddAnchor("front_pivot", {0.025f, 0.0f, 0.0f}) : nullptr;
-      SAnchor* psRearPivotAnchor = bDebug ? &c_builderbot.GetEmbodiedEntity().AddAnchor("rear_pivot", {-0.065f, 0.0f, 0.0f})  : nullptr;
-      SAnchor* psUpperBaseAnchor = bDebug ? &c_builderbot.GetEmbodiedEntity().AddAnchor("upper_base")  : nullptr;
-      SAnchor* psLiftColumnAnchor = bDebug ? &c_builderbot.GetEmbodiedEntity().AddAnchor("lift_column") : nullptr;    
-      SAnchor* psEndEffectorSupportAnchor = bDebug ? &c_builderbot.GetEmbodiedEntity().AddAnchor("end_effector_support") : nullptr;
-      // TODO anchor can be a nullptr? note that the origin anchor is currently updated using the anchor of the first body
-      // it would be nice if these were unique_ptr that we could move to the base class and that are auto deallocated instead of using the loop
-      // TODO change the name of the anchor to lower base?
+      /*
+       *   Can the lower base or another body be used directly with the origin anchor?
+       *
+       *   No, the origin anchor is designed to represent the origin and should have 
+       *   SAnchor::OffsetPosition and SAnchor::OffsetOrientation set to zero. Even
+       *   if this could be hacked to work now, it may break things in the future. It
+       *   is also not possible to use the geometric offset to place a body at the
+       *   origin, since this would change the location of that body inside of ARGoS
+       *   and mess with sensing, actuating, and drawing. It's just a bad idea.
+       */
+      SAnchor* psLowerBaseAnchor = &c_builderbot.GetEmbodiedEntity().GetAnchor("lower_base");
+      SAnchor* psEndEffectorAnchor = &c_builderbot.GetEmbodiedEntity().GetAnchor("end_effector");
+      SAnchor* psLeftWheelAnchor = nullptr;
+      SAnchor* psRightWheelAnchor = nullptr;
+      SAnchor* psFrontPivotAnchor = nullptr;
+      SAnchor* psRearPivotAnchor = nullptr;
+      SAnchor* psUpperBaseAnchor = nullptr;
+      SAnchor* psLiftColumnAnchor = nullptr;
+      SAnchor* psEndEffectorSupportAnchor = nullptr;
+      /* if debugging is enabled, associate the remaining anchors */
+      if(c_builderbot.IsDebug()) {
+         psLeftWheelAnchor = &c_builderbot.GetEmbodiedEntity().GetAnchor("left_wheel");
+         psRightWheelAnchor = &c_builderbot.GetEmbodiedEntity().GetAnchor("right_wheel");
+         psFrontPivotAnchor = &c_builderbot.GetEmbodiedEntity().GetAnchor("front_pivot");
+         psRearPivotAnchor = &c_builderbot.GetEmbodiedEntity().GetAnchor("rear_pivot");
+         psUpperBaseAnchor = &c_builderbot.GetEmbodiedEntity().GetAnchor("upper_base");
+         psLiftColumnAnchor = &c_builderbot.GetEmbodiedEntity().GetAnchor("lift_column");
+         psEndEffectorSupportAnchor = &c_builderbot.GetEmbodiedEntity().GetAnchor("end_effector_support");
+      }
+      /* create the bodies */
       m_ptrLowerBase = std::make_shared<CBase>(*this, psLowerBaseAnchor, ptrLowerBaseShape, sLowerBaseData);
       m_ptrLeftWheel = std::make_shared<CLink>(*this, 0, psLeftWheelAnchor, ptrWheelShape, sLeftWheelData);
       m_ptrRightWheel = std::make_shared<CLink>(*this, 1, psRightWheelAnchor, ptrWheelShape, sRightWheelData);
@@ -158,12 +168,12 @@ namespace argos {
       m_ptrLiftColumn = std::make_shared<CLink>(*this, 5, psLiftColumnAnchor, ptrLiftColumnShape, sLiftColumnData);
       m_ptrEndEffector = std::make_shared<CLink>(*this, 6, psEndEffectorAnchor, ptrEndEffectorShape, sEndEffectorData);
       m_ptrEndEffectorSupport = std::make_shared<CLink>(*this, 7, psEndEffectorSupportAnchor, ptrEndEffectorSupportShape, sEndEffectorSupportData);
-      /* Copy the bodies to the base class */
+      /* copy the bodies to the base class */
       m_vecBodies = {
          m_ptrLowerBase, m_ptrLeftWheel, m_ptrRightWheel, m_ptrFrontPivot, m_ptrRearPivot,
          m_ptrUpperBase, m_ptrLiftColumn, m_ptrEndEffector, m_ptrEndEffectorSupport,
       };
-      /* Synchronize with the entity in the space */
+      /* synchronize with the entity with the space */
       Reset();
    }
    
@@ -246,25 +256,24 @@ namespace argos {
                               m_cEndEffectorToEndEffectorSupportJointOffset,
                               m_cEndEffectorSupportToEndEffectorJointOffset,
                               true);
-
       /* set up motors for the wheels */
       m_ptrLeftMotor = 
-         std::make_shared<btMultiBodyJointMotor>(&m_cMultiBody,
+         std::make_unique<btMultiBodyJointMotor>(&m_cMultiBody,
                                                  m_ptrLeftWheel->GetIndex(),
                                                  0.0f,
                                                  m_fWheelMotorMaxImpulse);
       m_ptrRightMotor = 
-         std::make_shared<btMultiBodyJointMotor>(&m_cMultiBody,
+         std::make_unique<btMultiBodyJointMotor>(&m_cMultiBody,
                                                  m_ptrRightWheel->GetIndex(),
                                                  0.0f,
                                                  m_fWheelMotorMaxImpulse);
       m_ptrEndEffectorMotor = 
-         std::make_shared<btMultiBodyJointMotor>(&m_cMultiBody,
+         std::make_unique<btMultiBodyJointMotor>(&m_cMultiBody,
                                                  m_ptrEndEffector->GetIndex(),
                                                  0.0f,
                                                  m_fWheelMotorMaxImpulse);
       m_ptrEndEffectorLimit = 
-         std::make_shared<btMultiBodyJointLimitConstraint>(&m_cMultiBody,
+         std::make_unique<btMultiBodyJointLimitConstraint>(&m_cMultiBody,
                                                            m_ptrEndEffector->GetIndex(),
                                                            0.0f,
                                                            m_fEndEffectorTranslationLimit);
@@ -278,30 +287,25 @@ namespace argos {
    /****************************************/
 
    void CDynamics3DBuilderBotModel::CalculateBoundingBox() {
-      btVector3 cModelAabbMin, cModelAabbMax, cBodyAabbMin, cBodyAabbMax;
+      btVector3 cModelAabbMin, cModelAabbMax, cLinkAabbMin, cLinkAabbMax;
       /* Initialize the bounding box with the base's AABB */
-      std::shared_ptr<CAbstractBody>& ptrBase = m_vecBodies[0];
-      ptrBase->GetShape().getAabb(ptrBase->GetTransform(), cModelAabbMin, cModelAabbMax);
+      m_ptrLowerBase->GetShape().getAabb(m_ptrLowerBase->GetTransform(), cModelAabbMin, cModelAabbMax);
       /* Extend AABB to include other bodies */
-      //std::shared_ptr<CAbstractBody>& ptr_body = m_ptrLiftColumn;
-//      for(CAbstractBody* pc_body : m_vecBodies) {
+      for(const std::shared_ptr<CLink>& ptr_link : {std::cref(m_ptrLiftColumn), std::cref(m_ptrEndEffector)}) {
          /* Get the axis aligned bounding box for the current body */
-         m_ptrLiftColumn->GetShape().getAabb(m_ptrLiftColumn->GetTransform(), cBodyAabbMin, cBodyAabbMax);
+         ptr_link->GetShape().getAabb(ptr_link->GetTransform(), cLinkAabbMin, cLinkAabbMax);
          /* Update minimum corner */
-         cModelAabbMin.setX(cModelAabbMin.getX() < cBodyAabbMin.getX() ? cModelAabbMin.getX() : cBodyAabbMin.getX());
-         cModelAabbMin.setY(cModelAabbMin.getY() < cBodyAabbMin.getY() ? cModelAabbMin.getY() : cBodyAabbMin.getY());
-         cModelAabbMin.setZ(cModelAabbMin.getZ() < cBodyAabbMin.getZ() ? cModelAabbMin.getZ() : cBodyAabbMin.getZ());
+         cModelAabbMin.setX(cModelAabbMin.getX() < cLinkAabbMin.getX() ? cModelAabbMin.getX() : cLinkAabbMin.getX());
+         cModelAabbMin.setY(cModelAabbMin.getY() < cLinkAabbMin.getY() ? cModelAabbMin.getY() : cLinkAabbMin.getY());
+         cModelAabbMin.setZ(cModelAabbMin.getZ() < cLinkAabbMin.getZ() ? cModelAabbMin.getZ() : cLinkAabbMin.getZ());
          /* Update maximum corner */
-         cModelAabbMax.setX(cModelAabbMax.getX() > cBodyAabbMax.getX() ? cModelAabbMax.getX() : cBodyAabbMax.getX());
-         cModelAabbMax.setY(cModelAabbMax.getY() > cBodyAabbMax.getY() ? cModelAabbMax.getY() : cBodyAabbMax.getY());
-         cModelAabbMax.setZ(cModelAabbMax.getZ() > cBodyAabbMax.getZ() ? cModelAabbMax.getZ() : cBodyAabbMax.getZ());
-//      }
+         cModelAabbMax.setX(cModelAabbMax.getX() > cLinkAabbMax.getX() ? cModelAabbMax.getX() : cLinkAabbMax.getX());
+         cModelAabbMax.setY(cModelAabbMax.getY() > cLinkAabbMax.getY() ? cModelAabbMax.getY() : cLinkAabbMax.getY());
+         cModelAabbMax.setZ(cModelAabbMax.getZ() > cLinkAabbMax.getZ() ? cModelAabbMax.getZ() : cLinkAabbMax.getZ());
+      }
       /* Write back the bounding box swapping the coordinate systems and the Y component */
       GetBoundingBox().MinCorner.Set(cModelAabbMin.getX(), -cModelAabbMax.getZ(), cModelAabbMin.getY());
       GetBoundingBox().MaxCorner.Set(cModelAabbMax.getX(), -cModelAabbMin.getZ(), cModelAabbMax.getY());
-
-      //TODO redo above method, override for now using default base class method.
-      CDynamics3DMultiBodyObjectModel::CalculateBoundingBox();
    }
 
    /****************************************/

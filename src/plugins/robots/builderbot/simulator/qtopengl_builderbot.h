@@ -61,25 +61,29 @@ namespace argos {
 
       void MakeUpperBase();
 
-      /* Precompiled lists for the BuilderBot */
+      /* Display lists for the BuilderBot */
       GLuint m_unDisplayList;
       GLuint m_unBoxList;
       GLuint m_unCylinderList;
       GLuint m_unSphereList;
       GLuint m_unUpperBaseList;
 
-      GLuint m_unVertices = 20;
-      GLfloat m_fWheelDiameter = 0.04f;
-      GLfloat m_fPivotDiameter = 0.04f;
-      GLfloat m_fWheelThickness = 0.015f;
-
-      std::array<GLfloat, 4> m_arrDefaultColor     {0.5f, 0.5f, 0.5f, 1.0f};
-      std::array<GLfloat, 4> m_arrDefaultSpecular  {0.0f, 0.0f, 0.0f, 1.0f};
-      std::array<GLfloat, 4> m_arrDefaultEmission  {0.0f, 0.0f, 0.0f, 1.0f};
-      std::array<GLfloat, 1> m_arrDefaultShininess {0.0f};
-
       std::array<std::tuple<std::string, GLuint, CVector3>, 9> m_arrItemsToDraw;
 
+      const static GLuint m_unVertices = 20;
+      
+      const static CVector3 m_cLowerBaseScaling;
+      const static CVector3 m_cWheelScaling;
+      const static CVector3 m_cPivotScaling;
+      const static CVector3 m_cUpperBaseScaling;
+      const static CVector3 m_cLiftColumnScaling;
+      const static CVector3 m_cEndEffectorScaling;
+      const static CVector3 m_cEndEffectorSupportScaling;
+      
+      const static std::array<GLfloat, 4> m_arrDefaultColor;
+      const static std::array<GLfloat, 4> m_arrDefaultSpecular;
+      const static std::array<GLfloat, 4> m_arrDefaultEmission;
+      const static std::array<GLfloat, 1> m_arrDefaultShininess;
    };
 
 }

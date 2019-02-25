@@ -117,17 +117,17 @@ namespace argos {
       glNewList(m_unUpperBaseList, GL_COMPILE);
       MakeUpperBase();
       glEndList();
-      /* generate the items to draw list */  
+      /* generate the items to draw list */
       m_arrItemsToDraw = {
-         std::make_tuple("lower_base", m_unBoxList, CVector3(0.13f, 0.14f, 0.0393566f)),
-         std::make_tuple("left_wheel", m_unCylinderList,  CVector3(m_fWheelDiameter, m_fWheelDiameter, m_fWheelThickness)),
-         std::make_tuple("right_wheel", m_unCylinderList, CVector3(m_fWheelDiameter, m_fWheelDiameter, m_fWheelThickness)),
-         std::make_tuple("front_pivot", m_unSphereList, CVector3(m_fPivotDiameter, m_fPivotDiameter, m_fPivotDiameter)),
-         std::make_tuple("rear_pivot", m_unSphereList,  CVector3(m_fPivotDiameter, m_fPivotDiameter, m_fPivotDiameter)),
-         std::make_tuple("upper_base", m_unUpperBaseList, CVector3(1.0f, 1.0f, 1.0f)),
-         std::make_tuple("lift_column", m_unBoxList, CVector3(0.0585f, 0.0945f, 0.28775f)),
-         std::make_tuple("end_effector", m_unBoxList, CVector3(0.065875f, 0.072f, 0.01f)),
-         std::make_tuple("end_effector_support", m_unBoxList, CVector3(0.01025f, 0.0575f, 0.15675f)),
+         std::make_tuple("lower_base", m_unBoxList, m_cLowerBaseScaling),
+         std::make_tuple("left_wheel", m_unCylinderList, m_cWheelScaling),
+         std::make_tuple("right_wheel", m_unCylinderList, m_cWheelScaling),
+         std::make_tuple("front_pivot", m_unSphereList, m_cPivotScaling),
+         std::make_tuple("rear_pivot", m_unSphereList, m_cPivotScaling),
+         std::make_tuple("upper_base", m_unUpperBaseList, m_cUpperBaseScaling),
+         std::make_tuple("lift_column", m_unBoxList, m_cLiftColumnScaling),
+         std::make_tuple("end_effector", m_unBoxList, m_cEndEffectorScaling),
+         std::make_tuple("end_effector_support", m_unBoxList, m_cEndEffectorSupportScaling),
       };
    }
 
@@ -357,6 +357,21 @@ namespace argos {
    REGISTER_QTOPENGL_ENTITY_OPERATION(CQTOpenGLOperationDrawNormal, CQTOpenGLOperationDrawBuilderBotNormal, CBuilderBotEntity);
 
    REGISTER_QTOPENGL_ENTITY_OPERATION(CQTOpenGLOperationDrawSelected, CQTOpenGLOperationDrawBuilderBotSelected, CBuilderBotEntity);
+
+   /****************************************/
+   /****************************************/
+
+   const CVector3 CQTOpenGLBuilderBotDebug::m_cLowerBaseScaling                  {0.13f, 0.14f, 0.0393566f};
+   const CVector3 CQTOpenGLBuilderBotDebug::m_cWheelScaling                      {0.04f, 0.04f, 0.015f};
+   const CVector3 CQTOpenGLBuilderBotDebug::m_cPivotScaling                      {0.04f, 0.04f, 0.04f};
+   const CVector3 CQTOpenGLBuilderBotDebug::m_cUpperBaseScaling                  {1.0f, 1.0f, 1.0f};
+   const CVector3 CQTOpenGLBuilderBotDebug::m_cLiftColumnScaling                 {0.0585f, 0.0945f, 0.28775f};
+   const CVector3 CQTOpenGLBuilderBotDebug::m_cEndEffectorScaling                {0.065875f, 0.072f, 0.01f};
+   const CVector3 CQTOpenGLBuilderBotDebug::m_cEndEffectorSupportScaling         {0.01025f, 0.0575f, 0.15675f};  
+   const std::array<GLfloat, 4> CQTOpenGLBuilderBotDebug::m_arrDefaultColor      {0.5f, 0.5f, 0.5f, 1.0f};
+   const std::array<GLfloat, 4> CQTOpenGLBuilderBotDebug::m_arrDefaultSpecular   {0.0f, 0.0f, 0.0f, 1.0f};
+   const std::array<GLfloat, 4> CQTOpenGLBuilderBotDebug::m_arrDefaultEmission   {0.0f, 0.0f, 0.0f, 1.0f};
+   const std::array<GLfloat, 1> CQTOpenGLBuilderBotDebug::m_arrDefaultShininess  {0.0f};
 
    /****************************************/
    /****************************************/

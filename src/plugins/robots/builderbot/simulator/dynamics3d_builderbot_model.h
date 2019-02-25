@@ -44,10 +44,10 @@ namespace argos {
 
    private:
       /* joint constraints */
-      std::shared_ptr<btMultiBodyJointMotor> m_ptrLeftMotor;
-      std::shared_ptr<btMultiBodyJointMotor> m_ptrRightMotor;
-      std::shared_ptr<btMultiBodyJointMotor> m_ptrEndEffectorMotor;
-      std::shared_ptr<btMultiBodyJointLimitConstraint> m_ptrEndEffectorLimit;
+      std::unique_ptr<btMultiBodyJointMotor> m_ptrLeftMotor;
+      std::unique_ptr<btMultiBodyJointMotor> m_ptrRightMotor;
+      std::unique_ptr<btMultiBodyJointMotor> m_ptrEndEffectorMotor;
+      std::unique_ptr<btMultiBodyJointLimitConstraint> m_ptrEndEffectorLimit;
 
       /* links */
       std::shared_ptr<CBase> m_ptrLowerBase;
