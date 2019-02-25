@@ -59,13 +59,14 @@ namespace argos {
 
       virtual void Draw(CBlockEntity& c_entity);
 
+   private:
+
       void MakeBlock();
 
       void MakeMagnet();
 
-   private:
-      /* Precompiled lists for the block */
-      GLuint m_unBaseList;
+      /* Precompiled lists for the Block */
+      GLuint m_unDisplayList;
       GLuint m_unBlockList;
       GLuint m_unMagnetList;
 

@@ -51,6 +51,10 @@ namespace argos {
          return *m_psAnchor;
       }
 
+      const SAnchor& GetAnchor() const {
+         return *m_psAnchor;
+      }
+
       virtual std::string GetTypeDescription() const {
          return "lift_system";
       }

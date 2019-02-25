@@ -145,10 +145,10 @@ namespace argos {
    /****************************************/
 
    CQTOpenGLBlockDebug::CQTOpenGLBlockDebug() {
-      m_unBaseList = glGenLists(2);
+      m_unDisplayList = glGenLists(2);
       /* References to the display lists */
-      m_unBlockList      = m_unBaseList;
-      m_unMagnetList     = m_unBaseList + 1;
+      m_unBlockList      = m_unDisplayList;
+      m_unMagnetList     = m_unDisplayList + 1;
       /* Make block list */
       glNewList(m_unBlockList, GL_COMPILE);
       MakeBlock();
@@ -163,7 +163,7 @@ namespace argos {
    /****************************************/
 
    CQTOpenGLBlockDebug::~CQTOpenGLBlockDebug() {
-      glDeleteLists(m_unBaseList, 2);
+      glDeleteLists(m_unDisplayList, 2);
    }
 
    /****************************************/
@@ -176,54 +176,32 @@ namespace argos {
       glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, m_arrDefaultSpecular.data());
       glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, m_arrDefaultShininess.data());
       glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, m_arrDefaultEmission.data());
-      /* set drawing modes */
-      std::array<std::pair<GLenum, std::array<GLfloat, 4> >, 2> arrDrawingModes = {
-         std::make_pair<GLenum, std::array<GLfloat, 4> >(GL_LINE, {0.0f, 0.0f, 0.0f, 1.0f}),
-         std::make_pair<GLenum, std::array<GLfloat, 4> >(GL_FILL, {0.0f, 0.0f, 0.0f, 0.5f}),
-      };
-      /* draw */
-      for(const std::pair<GLenum, std::array<GLfloat, 4> >& c_drawing_mode : arrDrawingModes) {
-         glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, c_drawing_mode.second.data());
-         glPolygonMode(GL_FRONT_AND_BACK, c_drawing_mode.first);
-         glBegin(GL_QUADS);
-         /* Bottom face */
-         glNormal3f( 0.0f,             0.0f,           -fSideLength);
-         glVertex3f( fHalfSideLength,  fHalfSideLength, 0.0f);
-         glVertex3f( fHalfSideLength, -fHalfSideLength, 0.0f);
-         glVertex3f(-fHalfSideLength, -fHalfSideLength, 0.0f);
-         glVertex3f(-fHalfSideLength,  fHalfSideLength, 0.0f);
-         /* Top face */
-         glNormal3f( 0.0f,             0.0f,            fSideLength);
-         glVertex3f(-fHalfSideLength, -fHalfSideLength, fSideLength);
-         glVertex3f( fHalfSideLength, -fHalfSideLength, fSideLength);
-         glVertex3f( fHalfSideLength,  fHalfSideLength, fSideLength);
-         glVertex3f(-fHalfSideLength,  fHalfSideLength, fSideLength);
-         /* South face */
-         glNormal3f(0.0f,             -fSideLength,     0.0f);
-         glVertex3f(-fHalfSideLength, -fHalfSideLength, fSideLength);
-         glVertex3f(-fHalfSideLength, -fHalfSideLength, 0.0f);
-         glVertex3f( fHalfSideLength, -fHalfSideLength, 0.0f);
-         glVertex3f( fHalfSideLength, -fHalfSideLength, fSideLength);
-         /* East face */
-         glNormal3f( fSideLength,      0.0f,            0.0f);
-         glVertex3f( fHalfSideLength, -fHalfSideLength, fSideLength);
-         glVertex3f( fHalfSideLength, -fHalfSideLength, 0.0f);
-         glVertex3f( fHalfSideLength,  fHalfSideLength, 0.0f);
-         glVertex3f( fHalfSideLength,  fHalfSideLength, fSideLength);
-         /* North face */
-         glNormal3f( 0.0f,             fSideLength,     0.0f);
-         glVertex3f( fHalfSideLength,  fHalfSideLength, fSideLength);
-         glVertex3f( fHalfSideLength,  fHalfSideLength, 0.0f);
-         glVertex3f(-fHalfSideLength,  fHalfSideLength, 0.0f);
-         glVertex3f(-fHalfSideLength,  fHalfSideLength, fSideLength);
-         /* West face */
-         glNormal3f(-fSideLength,      0.0f,            0.0f);
-         glVertex3f(-fHalfSideLength,  fHalfSideLength, fSideLength);
-         glVertex3f(-fHalfSideLength,  fHalfSideLength, 0.0f);
-         glVertex3f(-fHalfSideLength, -fHalfSideLength, 0.0f);
-         glVertex3f(-fHalfSideLength, -fHalfSideLength, fSideLength);
-         glEnd();
-      }
+      glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, m_arrBlockLineColor.data());
+      /* Bottom face */
+      glBegin(GL_LINE_LOOP);
+      glVertex3f( fHalfSideLength,  fHalfSideLength, 0.0f);
+      glVertex3f( fHalfSideLength, -fHalfSideLength, 0.0f);
+      glVertex3f(-fHalfSideLength, -fHalfSideLength, 0.0f);
+      glVertex3f(-fHalfSideLength,  fHalfSideLength, 0.0f);
+      glEnd();
+      /* Top face */
+      glBegin(GL_LINE_LOOP);
+      glVertex3f( fHalfSideLength,  fHalfSideLength, fSideLength);
+      glVertex3f( fHalfSideLength, -fHalfSideLength, fSideLength);
+      glVertex3f(-fHalfSideLength, -fHalfSideLength, fSideLength);
+      glVertex3f(-fHalfSideLength,  fHalfSideLength, fSideLength);
+      glEnd();
+      /* Sides */
+      glBegin(GL_LINES);
+      glVertex3f( fHalfSideLength,  fHalfSideLength, 0.0f);
+      glVertex3f( fHalfSideLength,  fHalfSideLength, fSideLength);
+      glVertex3f( fHalfSideLength, -fHalfSideLength, 0.0f);
+      glVertex3f( fHalfSideLength, -fHalfSideLength, fSideLength);
+      glVertex3f(-fHalfSideLength, -fHalfSideLength, 0.0f);
+      glVertex3f(-fHalfSideLength, -fHalfSideLength, fSideLength);
+      glVertex3f(-fHalfSideLength,  fHalfSideLength, 0.0f);
+      glVertex3f(-fHalfSideLength,  fHalfSideLength, fSideLength);
+      glEnd();
    }
 
    /****************************************/
@@ -294,15 +272,12 @@ namespace argos {
       CRadians cZAngle, cYAngle, cXAngle;
       cOrientation.ToEulerAngles(cZAngle, cYAngle, cXAngle);
       glPushMatrix();
-      glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-      glEnable(GL_BLEND);
       glTranslatef(cPosition.GetX(), cPosition.GetY(), cPosition.GetZ());
       glRotatef(ToDegrees(cXAngle).GetValue(), 1.0f, 0.0f, 0.0f);
       glRotatef(ToDegrees(cYAngle).GetValue(), 0.0f, 1.0f, 0.0f);
       glRotatef(ToDegrees(cZAngle).GetValue(), 0.0f, 0.0f, 1.0f);
       /* display the block */
       glCallList(m_unBlockList);
-      glDisable(GL_BLEND);
       glPopMatrix();
    }
 

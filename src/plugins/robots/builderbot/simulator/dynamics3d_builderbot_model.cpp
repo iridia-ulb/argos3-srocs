@@ -133,15 +133,16 @@ namespace argos {
                                                    m_fEndEffectorSupportMass,
                                                    GetEngine().GetDefaultFriction());
 
-      // TODO can the origin anchor be used directly here?
+      // TODO can the origin anchor be used directly here? No, the origin anchors offset must be 0,0,0 from the origin, this is not the case for any of the bodies in our model.
+      // TODO could the COM offset be used?
       bool bDebug = c_builderbot.IsDebug();
       // TODO anchors require the correct offset if they are going to be used by OpenGL or in other parts of the simulator      
-      SAnchor* psLowerBaseAnchor = &c_builderbot.GetEmbodiedEntity().AddAnchor("base", CVector3(-0.02,0,0.002));
+      SAnchor* psLowerBaseAnchor = &c_builderbot.GetEmbodiedEntity().AddAnchor("lower_base", CVector3(-0.02,0,0.002));
       SAnchor* psEndEffectorAnchor = &c_builderbot.GetLiftSystemEntity().GetAnchor();
       SAnchor* psLeftWheelAnchor = bDebug ? &c_builderbot.GetEmbodiedEntity().AddAnchor("left_wheel")  : nullptr;
       SAnchor* psRightWheelAnchor = bDebug ? &c_builderbot.GetEmbodiedEntity().AddAnchor("right_wheel") : nullptr;
-      SAnchor* psFrontPivotAnchor = bDebug ? &c_builderbot.GetEmbodiedEntity().AddAnchor("front_pivot") : nullptr;
-      SAnchor* psRearPivotAnchor = bDebug ? &c_builderbot.GetEmbodiedEntity().AddAnchor("rear_pivot")  : nullptr;
+      SAnchor* psFrontPivotAnchor = bDebug ? &c_builderbot.GetEmbodiedEntity().AddAnchor("front_pivot", {0.025f, 0.0f, 0.0f}) : nullptr;
+      SAnchor* psRearPivotAnchor = bDebug ? &c_builderbot.GetEmbodiedEntity().AddAnchor("rear_pivot", {-0.065f, 0.0f, 0.0f})  : nullptr;
       SAnchor* psUpperBaseAnchor = bDebug ? &c_builderbot.GetEmbodiedEntity().AddAnchor("upper_base")  : nullptr;
       SAnchor* psLiftColumnAnchor = bDebug ? &c_builderbot.GetEmbodiedEntity().AddAnchor("lift_column") : nullptr;    
       SAnchor* psEndEffectorSupportAnchor = bDebug ? &c_builderbot.GetEmbodiedEntity().AddAnchor("end_effector_support") : nullptr;
