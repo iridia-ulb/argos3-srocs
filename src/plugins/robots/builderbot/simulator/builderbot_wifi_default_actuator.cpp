@@ -1,10 +1,10 @@
 /**
- * @file <argos3/plugins/robots/builderbot/simulator/builderbot_nfc_default_actuator.cpp>
+ * @file <argos3/plugins/robots/builderbot/simulator/builderbot_wifi_default_actuator.cpp>
  *
  * @author Michael Allwright - <allsey87@gmail.com>
  */
 
-#include "builderbot_nfc_default_actuator.h"
+#include "builderbot_wifi_default_actuator.h"
 
 #include <argos3/core/simulator/entity/composable_entity.h>
 
@@ -16,17 +16,17 @@ namespace argos {
    /****************************************/
    /****************************************/
 
-   CBuilderBotNFCDefaultActuator::CBuilderBotNFCDefaultActuator() :
+   CBuilderBotWifiDefaultActuator::CBuilderBotWifiDefaultActuator() :
       m_pcRadioEntity(nullptr) {
    }
 
    /****************************************/
    /****************************************/
 
-   void CBuilderBotNFCDefaultActuator::SetRobot(CComposableEntity& c_entity) {
+   void CBuilderBotWifiDefaultActuator::SetRobot(CComposableEntity& c_entity) {
       try {
          /* Get and enable omndirectional radio equipped entity */
-         m_pcRadioEntity = &(c_entity.GetComponent<CRadioEntity>("radios[radios_1].radio"));
+         m_pcRadioEntity = &(c_entity.GetComponent<CRadioEntity>("radios[radios_0].radio"));
       }
       catch(CARGoSException& ex) {
          THROW_ARGOSEXCEPTION_NESTED("Can't set robot for the radios default actuator", ex);
@@ -36,13 +36,13 @@ namespace argos {
    /****************************************/
    /****************************************/
 
-   void CBuilderBotNFCDefaultActuator::Init(TConfigurationNode& t_tree) {
+   void CBuilderBotWifiDefaultActuator::Init(TConfigurationNode& t_tree) {
       try {
          /* Parent class init */
-         CCI_BuilderBotNFCActuator::Init(t_tree);
+         CCI_BuilderBotWifiActuator::Init(t_tree);
       }
       catch(CARGoSException& ex) {
-         THROW_ARGOSEXCEPTION_NESTED("Error initializing the BuilderBot NFC default actuator", ex);
+         THROW_ARGOSEXCEPTION_NESTED("Error initializing the BuilderBot WiFi default actuator", ex);
       }
    }
 
@@ -50,7 +50,7 @@ namespace argos {
    /****************************************/
    /****************************************/
 
-   void CBuilderBotNFCDefaultActuator::Update() {
+   void CBuilderBotWifiDefaultActuator::Update() {
       if(!m_lstMessages.empty()) {
          /* Create operation instance */
          CTxOperation cTxOperation(*m_pcRadioEntity, m_lstMessages);
@@ -70,14 +70,14 @@ namespace argos {
    /****************************************/
    /****************************************/
 
-   void CBuilderBotNFCDefaultActuator::Reset() {
+   void CBuilderBotWifiDefaultActuator::Reset() {
       m_lstMessages.clear();
    }
 
    /****************************************/
    /****************************************/
 
-   CBuilderBotNFCDefaultActuator::CTxOperation::CTxOperation(const CRadioEntity& c_tx_radio,
+   CBuilderBotWifiDefaultActuator::CTxOperation::CTxOperation(const CRadioEntity& c_tx_radio,
                                                              const std::list<CByteArray>& lst_tx_data) :
       m_cTxRadio(c_tx_radio),
       m_lstTxData(lst_tx_data) {}
@@ -85,7 +85,7 @@ namespace argos {
    /****************************************/
    /****************************************/
 
-   bool CBuilderBotNFCDefaultActuator::CTxOperation::operator()(CRadioEntity& c_rx_radio) {
+   bool CBuilderBotWifiDefaultActuator::CTxOperation::operator()(CRadioEntity& c_rx_radio) {
       if(&c_rx_radio != &m_cTxRadio) {
          const CVector3& cRxRadioPosition = c_rx_radio.GetPosition();
          const CVector3& cTxRadioPosition = m_cTxRadio.GetPosition();
@@ -102,11 +102,11 @@ namespace argos {
    /****************************************/
    /****************************************/
 
-   REGISTER_ACTUATOR(CBuilderBotNFCDefaultActuator,
-                  "builderbot_nfc", "default",
+   REGISTER_ACTUATOR(CBuilderBotWifiDefaultActuator,
+                  "builderbot_wifi", "default",
                   "Michael Allwright [allsey87@gmail.com]",
                   "1.0",
-                  "The builderbot NFC actuator.",
+                  "The BuilderBot WiFi actuator.",
                   "This actuator sends messages over the near-field communication"
                   "interface of the builderbot.",
                   "Usable"

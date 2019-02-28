@@ -1,30 +1,30 @@
 /**
- * @file <argos3/plugins/robots/builderbot/simulator/builderbot_nfc_default_actuator.h>
+ * @file <argos3/plugins/robots/builderbot/simulator/builderbot_wifi_default_actuator.h>
  *
  * @author Michael Allwright - <allsey87@gmail.com>
  */
 
-#ifndef BUILDERBOT_NFC_DEFAULT_ACTUATOR_H
-#define BUILDERBOT_NFC_DEFAULT_ACTUATOR_H
+#ifndef BUILDERBOT_WIFI_DEFAULT_ACTUATOR_H
+#define BUILDERBOT_WIFI_DEFAULT_ACTUATOR_H
 
 namespace argos {
-   class CBuilderBotNFCDefaultActuator;
+   class CBuilderBotWifiDefaultActuator;
    class CRadioEntity;
 }
 
 #include <argos3/core/simulator/actuator.h>
-#include <argos3/plugins/robots/builderbot/control_interface/ci_builderbot_nfc_actuator.h>
+#include <argos3/plugins/robots/builderbot/control_interface/ci_builderbot_wifi_actuator.h>
 #include <argos3/plugins/simulator/media/radio_medium.h>
 
 namespace argos {
 
-   class CBuilderBotNFCDefaultActuator : public CSimulatedActuator,
-                                         public CCI_BuilderBotNFCActuator {
+   class CBuilderBotWifiDefaultActuator : public CSimulatedActuator,
+                                         public CCI_BuilderBotWifiActuator {
    public:
 
-      CBuilderBotNFCDefaultActuator();
+      CBuilderBotWifiDefaultActuator();
 
-      virtual ~CBuilderBotNFCDefaultActuator() {}
+      virtual ~CBuilderBotWifiDefaultActuator() {}
 
       virtual void SetRobot(CComposableEntity& c_entity);
 

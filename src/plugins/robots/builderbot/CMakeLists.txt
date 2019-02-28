@@ -11,7 +11,9 @@ set(ARGOS3_HEADERS_PLUGINS_ROBOTS_BUILDERBOT_CONTROLINTERFACE
   control_interface/ci_builderbot_lift_system_actuator.h
   control_interface/ci_builderbot_lift_system_sensor.h
   control_interface/ci_builderbot_nfc_actuator.h
-#  control_interface/ci_builderbot_nfc_sensor.h
+  control_interface/ci_builderbot_nfc_sensor.h
+  control_interface/ci_builderbot_wifi_actuator.h
+  control_interface/ci_builderbot_wifi_sensor.h
   control_interface/ci_builderbot_rangefinders_sensor.h)
 if(ARGOS_BUILD_FOR_SIMULATOR)
   # argos3/plugins/robots/builderbot/simulator
@@ -28,7 +30,9 @@ if(ARGOS_BUILD_FOR_SIMULATOR)
     simulator/builderbot_lift_system_default_sensor.h
     simulator/builderbot_lift_system_entity.h
     simulator/builderbot_nfc_default_actuator.h
-#    simulator/builderbot_nfc_default_sensor.h
+    simulator/builderbot_nfc_default_sensor.h
+    simulator/builderbot_wifi_default_actuator.h
+    simulator/builderbot_wifi_default_sensor.h
     simulator/builderbot_rangefinders_default_sensor.h
     simulator/dynamics3d_builderbot_model.h)
   if(ARGOS_COMPILE_QTOPENGL)
@@ -49,6 +53,8 @@ else(ARGOS_BUILD_FOR_SIMULATOR)
     hardware/builderbot_lift_system_default_sensor.h
     hardware/builderbot_nfc_default_actuator.h
 #    hardware/builderbot_nfc_default_sensor.h
+#    hardware/builderbot_wifi_default_actuator.h
+#    hardware/builderbot_wifi_default_sensor.h
     hardware/builderbot_rangefinders_default_sensor.h)
 endif(ARGOS_BUILD_FOR_SIMULATOR)
 
@@ -66,7 +72,9 @@ set(ARGOS3_SOURCES_PLUGINS_ROBOTS_BUILDERBOT
   control_interface/ci_builderbot_lift_system_actuator.cpp
   control_interface/ci_builderbot_lift_system_sensor.cpp
   control_interface/ci_builderbot_nfc_actuator.cpp
-#  control_interface/ci_builderbot_nfc_sensor.cpp
+  control_interface/ci_builderbot_nfc_sensor.cpp
+  control_interface/ci_builderbot_wifi_actuator.cpp
+  control_interface/ci_builderbot_wifi_sensor.cpp
   control_interface/ci_builderbot_rangefinders_sensor.cpp)
 if(ARGOS_BUILD_FOR_SIMULATOR)
   # argos3/plugins/robots/builderbot/simulator
@@ -85,7 +93,9 @@ if(ARGOS_BUILD_FOR_SIMULATOR)
     simulator/builderbot_lift_system_default_sensor.cpp
     simulator/builderbot_lift_system_entity.cpp
     simulator/builderbot_nfc_default_actuator.cpp
-#    simulator/builderbot_nfc_default_sensor.cpp
+    simulator/builderbot_nfc_default_sensor.cpp
+    simulator/builderbot_wifi_default_actuator.cpp
+    simulator/builderbot_wifi_default_sensor.cpp
     simulator/builderbot_rangefinders_default_sensor.cpp
     simulator/dynamics3d_builderbot_model.cpp)
   if(ARGOS_COMPILE_QTOPENGL)
@@ -108,6 +118,8 @@ else(ARGOS_BUILD_FOR_SIMULATOR)
     hardware/builderbot_lift_system_default_sensor.cpp
     hardware/builderbot_nfc_default_actuator.cpp
 #    hardware/builderbot_nfc_default_sensor.cpp
+#    hardware/builderbot_wifi_default_actuator.cpp
+#    hardware/builderbot_wifi_default_sensor.cpp
     hardware/builderbot_rangefinders_default_sensor.cpp
     hardware/main.cpp)
 endif(ARGOS_BUILD_FOR_SIMULATOR)
