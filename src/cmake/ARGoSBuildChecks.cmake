@@ -35,7 +35,12 @@ endif()
 #
 # Check if ARGoS is installed
 #
-find_package(ARGoS)
+if(ARGOS_BUILD_FOR_SIMULATOR)
+   find_package(ARGoS COMPONENTS genericrobot dynamics3d OPTIONAL_COMPONENTS qtopengl)
+else(ARGOS_BUILD_FOR_SIMULATOR)
+   find_package(ARGoS COMPONENTS genericrobot)
+endif(ARGOS_BUILD_FOR_SIMULATOR)
+
 if(NOT ARGOS_FOUND)
   message(FATAL_ERROR "ARGoS was not found.")
 endif(NOT ARGOS_FOUND)
