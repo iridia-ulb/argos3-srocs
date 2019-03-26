@@ -39,6 +39,24 @@ include_directories(BEFORE ${CMAKE_SOURCE_DIR})
 add_subdirectory(plugins)
 
 #
+# Create .gdbinit file for GDB support
+# It is placed in the same directory as the argos3 executable
+#
+configure_file(
+  ${CMAKE_SOURCE_DIR}/scripts/gdbinit.in
+  ${CMAKE_BINARY_DIR}/core/.gdbinit
+  @ONLY)
+
+#
+# Create setup_envsh file for bash support
+# It is placed in the base build directory
+#
+configure_file(
+  ${CMAKE_SOURCE_DIR}/scripts/setup_env.sh.in
+  ${CMAKE_BINARY_DIR}/setup_env.sh
+  @ONLY)
+
+#
 # Install test configurations
 #
 install(DIRECTORY testing DESTINATION share/argos3)
