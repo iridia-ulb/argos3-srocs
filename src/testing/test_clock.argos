@@ -1,0 +1,45 @@
+<?xml version="1.0" ?>
+<argos-configuration>
+
+  <!-- General configuration -->
+  <framework>
+    <experiment length="0" ticks_per_second="5" random_seed="0" real_time="true"/>
+  </framework>
+
+  <!-- Controller -->
+  <controllers>
+    <lua_controller id="test_clock">
+      <actuators />
+      <sensors>
+        <builderbot_clock implementation="default" />
+      </sensors>
+      <params script="src/testing/test_clock.lua"/>
+      <params script="/usr/share/argos3/testing/test_clock.lua"/>
+    </lua_controller>
+  </controllers>
+
+  <arena size="0.5, 0.5, 0.5" center="0, 0, 0.25">
+    <builderbot id="bb01">
+      <body position="0,0,0" orientation="0,0,0" />
+      <controller config="test_clock" />
+    </builderbot>
+  </arena>
+
+  <!-- Physics engines -->
+  <physics_engines>
+    <dynamics3d id="dyn3d" iterations="20">
+      <floor height="0.01"/>
+      <gravity g="9.8" />
+    </dynamics3d>
+  </physics_engines>
+
+  <!-- Media -->
+  <media>
+    <directional_led id="directional_leds" index="grid" grid_size="20,20,20"/>
+    <tag id="tags" index="grid" grid_size="20,20,20" />
+    <radio id="nfc" index="grid" grid_size="20,20,20" />
+    <radio id="wifi" index="grid" grid_size="20,20,20" />
+  </media>
+
+
+</argos-configuration>
