@@ -30,7 +30,7 @@ namespace argos {
    void CBuilderBotNFCDefaultActuator::Update() {
       while(!m_lstMessages.empty()) {
          CByteArray& cMessage = m_lstMessage.front();
-         std::ofstream(m_strDevicePath.c_str()).write(cMessage.ToCArray(), cMessage.size());
+         std::ofstream(m_strDevicePath.c_str()).write(cMessage.ToCArray(), cMessage.Size());
          m_lstMessages.pop_front();
       }
    }
