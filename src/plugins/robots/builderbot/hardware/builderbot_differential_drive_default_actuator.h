@@ -43,6 +43,10 @@ namespace argos {
 
       virtual void Reset();
 
+      virtual void SetTargetVelocityLeft(Real f_target_velocity_left);
+
+      virtual void SetTargetVelocityRight(Real f_target_velocity_right);
+
    private:
 
       SInt16 ConvertToRaw(Real f_metres_per_second) {
@@ -54,6 +58,12 @@ namespace argos {
       iio_buffer* m_psBuffer;
       iio_channel* m_psLeft; 
       iio_channel* m_psRight;
+
+      Real m_fTargetVelocityLeft;
+      Real m_fTargetVelocityRight;
+
+      bool m_bUpdateReq;
+
 
    };
 }

@@ -23,7 +23,10 @@ namespace argos {
       m_psDevice(nullptr),
       m_psBuffer(nullptr),
       m_psLeft(nullptr),
-      m_psRight(nullptr) {}
+      m_psRight(nullptr),
+      m_fTargetVelocityLeft(0.0f),
+      m_fTargetVelocityRight(0.0f),
+      m_bUpdateReq(false) {}
 
    /****************************************/
    /****************************************/
@@ -99,8 +102,8 @@ namespace argos {
 
    void CBuilderBotDifferentialDriveDefaultActuator::Update() {
       if(m_bUpdateReq) {
-         SInt16 nLeftVelocity = ConvertToRaw(m_sTargetVelocity.Left);
-         SInt16 nRightVelocity = ConvertToRaw(m_sTargetVelocity.Right);
+         SInt16 nLeftVelocity = ConvertToRaw(m_fTargetVelocityLeft);
+         SInt16 nRightVelocity = ConvertToRaw(m_fTargetVelocityRight);
          ::iio_channel_write(m_psLeft, m_psBuffer, &nLeftVelocity, 2);
          ::iio_channel_write(m_psRight, m_psBuffer, &nRightVelocity, 2);
          ::iio_buffer_push(m_psBuffer);
@@ -115,7 +118,23 @@ namespace argos {
       m_sTargetVelocity.Left = Real(0);
       m_sTargetVelocity.Right = Real(0);
    }
-   
+
+   /****************************************/
+   /****************************************/
+
+   void CBuilderBotDifferentialDriveDefaultActuator::SetTargetVelocityLeft(Real f_target_velocity_left) {
+      m_fTargetVelocityLeft = f_target_velocity_left;
+      m_bUpdateReq = true;
+   }
+
+   /****************************************/
+   /****************************************/
+
+   void CBuilderBotDifferentialDriveDefaultActuator::SetTargetVelocityRight(Real f_target_velocity_right) {
+      m_fTargetVelocityRight = f_target_velocity_right;
+      m_bUpdateReq = true;
+   }
+
    /****************************************/
    /****************************************/
    
