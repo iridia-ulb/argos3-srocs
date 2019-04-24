@@ -28,9 +28,10 @@ namespace argos {
    /****************************************/
    
    void CBuilderBotNFCDefaultActuator::Update() {
-      if(m_bWriteReq) {
-         std::ofstream(m_strDevicePath.c_str()) << m_strMessage << std::flush;
-         m_bWriteReq = false;
+      while(!m_lstMessages.empty()) {
+         CByteArray& cMessage = m_lstMessage.front();
+         std::ofstream(m_strDevicePath.c_str()).write(cMessage.ToCArray(), cMessage.size());
+         m_lstMessages.pop_front();
       }
    }
 
@@ -38,21 +39,22 @@ namespace argos {
    /****************************************/
    
    void CBuilderBotNFCDefaultActuator::Reset() {
-      m_strMessage.clear();
-      m_bWriteReq = false;
+      m_lstMessages.clear();
    }
    
    /****************************************/
    /****************************************/
+
+   REGISTER_ACTUATOR(CBuilderBotNFCDefaultActuator,
+                     "builderbot_nfc", "default",
+                     "Michael Allwright [allsey87@gmail.com]",
+                     "1.0",
+                     "The builderbot NFC actuator.",
+                     "This actuator controls the near-field communication interface of the builderbot.",
+                     "Usable"
+   );
+
+   /****************************************/
+   /****************************************/
    
 }
-
-REGISTER_ACTUATOR(CBuilderBotNFCDefaultActuator,
-                  "builderbot_nfc", "default",
-                  "Michael Allwright [allsey87@gmail.com]",
-                  "1.0",
-                  "The builderbot NFC actuator.",
-                  "This actuator controls the near-field communication interface of the builderbot.",
-                  "Usable"
-   );
-   
