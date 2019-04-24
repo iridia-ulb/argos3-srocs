@@ -19,7 +19,7 @@ namespace argos {
 
 namespace argos {
 
-   class CBuilderBotClockDefaultSensor : public CSimulatedSensor,
+   class CBuilderBotClockDefaultSensor : public CPhysicalSensor,
                                          public CCI_BuilderBotClockSensor {
 
    public:
@@ -33,8 +33,6 @@ namespace argos {
        * @brief Destructor.
        */
       virtual ~CBuilderBotClockDefaultSensor();
-
-      virtual void SetRobot(CComposableEntity& c_entity);
 
       virtual void Init(TConfigurationNode& t_tree);
 

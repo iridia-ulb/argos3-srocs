@@ -22,11 +22,6 @@ namespace argos {
    
    /****************************************/
    /****************************************/
-
-   void CBuilderBotClockDefaultSensor::SetRobot(CComposableEntity& c_entity) {}
-
-   /****************************************/
-   /****************************************/
    
    void CBuilderBotClockDefaultSensor::Init(TConfigurationNode& t_tree) {
       try {
