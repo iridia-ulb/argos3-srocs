@@ -115,8 +115,8 @@ namespace argos {
    /****************************************/
    
    void CBuilderBotDifferentialDriveDefaultActuator::Reset() {
-      m_sTargetVelocity.Left = Real(0);
-      m_sTargetVelocity.Right = Real(0);
+      m_fTargetVelocityLeft = Real(0);
+      m_fTargetVelocityRight = Real(0);
    }
 
    /****************************************/

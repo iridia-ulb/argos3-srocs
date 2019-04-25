@@ -23,7 +23,9 @@ namespace argos {
       m_psDevice(nullptr),
       m_psBuffer(nullptr),
       m_psLeft(nullptr),
-      m_psRight(nullptr) {}
+      m_psRight(nullptr),
+      m_fVelocityLeft(0.0f),
+      m_fVelocityRight(0.0f) {}
 
    /****************************************/
    /****************************************/
@@ -102,21 +104,34 @@ namespace argos {
       ::iio_channel_read(m_psLeft, m_psBuffer, &nLeftVelocityRaw, 2);
       ::iio_channel_read(m_psRight, m_psBuffer, &nRightVelocityRaw, 2);
       /* convert samples to meters per second */
-      m_sVelocity.Left = ConvertToMetersPerSecond(nLeftVelocityRaw);
-      m_sVelocity.Right = ConvertToMetersPerSecond(nRightVelocityRaw);
+      m_fVelocityLeft = ConvertToMetersPerSecond(nLeftVelocityRaw);
+      m_fVelocityRight = ConvertToMetersPerSecond(nRightVelocityRaw);
    }
 
    /****************************************/
    /****************************************/
    
    void CBuilderBotDifferentialDriveDefaultSensor::Reset() {
-      m_sVelocity.Left = Real(0);
-      m_sVelocity.Right = Real(0);
+      m_fVelocityLeft = Real(0);
+      m_fVelocityRight = Real(0);
    }
    
    /****************************************/
    /****************************************/
    
+   Real CBuilderBotDifferentialDriveDefaultSensor::GetLeftVelocity() {
+      return m_fVelocityLeft;
+   }
+
+   /****************************************/
+   /****************************************/
+
+   Real CBuilderBotDifferentialDriveDefaultSensor::GetRightVelocity() {
+      return m_fVelocityRight;
+   }
+
+   /****************************************/
+   /****************************************/
 }
 
 REGISTER_SENSOR(CBuilderBotDifferentialDriveDefaultSensor,
