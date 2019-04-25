@@ -92,7 +92,7 @@ namespace argos {
                                                         c_face_offset.second,
                                                         sOriginAnchor,
                                                         CRadians::PI_OVER_THREE,
-                                                        CColor::RED);
+                                                        CColor::BLACK);
             }
          }
          CDirectionalLEDMedium& cDirectionalLEDMedium = 
