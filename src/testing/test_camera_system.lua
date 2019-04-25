@@ -1,5 +1,6 @@
 --[[ This function is executed every time you press the 'execute' button ]]
 function init()
+   reset()
 end
 
 --[[ This function is executed at each time step
@@ -13,7 +14,7 @@ function print_tag_info()
    for i,tag in ipairs(robot.camera_system.tags) do
       log("tag ", i, ":")
       for j,corner in ipairs(tag.corners) do
-         log("  ", corner.x, ", ", corner.y)
+         log("  ", string.format("%.2f", corner.x), ", ", string.format("%.2f", corner.y))
       end
    end
 end
@@ -24,7 +25,7 @@ end
      called. The state of sensors and actuators is reset
      automatically by ARGoS. ]]
 function reset()
-   count = 0
+   robot.camera_system.enable()
 end
 
 --[[ This function is executed only once, when the robot is removed

@@ -50,9 +50,10 @@ namespace argos {
 
       virtual void Update();
 
-      virtual void GetPixels(const CVector2& c_center,
-                             const CVector2& c_size,
-                             std::vector<SPixel>& vec_pixels);
+      virtual CColor DetectLed(const CVector2& c_center,
+                               const CVector2& c_size);
+
+      virtual CVector2 GetResolution();
 
    private:
 
@@ -63,9 +64,6 @@ namespace argos {
    private:
       const UInt32 m_unBufferCount = 2;
       const UInt32 m_unBytesPerPixel = 2;
-      //const UInt32 m_unImageWidth = 640;
-      //const UInt32 m_unImageHeight = 480;
-
       const UInt32 m_unImageWidth = 320;
       const UInt32 m_unImageHeight = 240;
 
@@ -82,7 +80,7 @@ namespace argos {
          void* Data;
          image_u8_t* Image;
          STag::TVector Detections;
-         std::chrono::time_point<std::chrono::steady_clock> Timestamp;
+         std::chrono::steady_clock::time_point Timestamp;
       };
 
       std::list<SFrame> m_lstPreparedFrames;
@@ -99,6 +97,8 @@ namespace argos {
       /* camera device handle */
       SInt32 m_nCameraHandle;
 
+      /* time at initialization */
+      std::chrono::steady_clock::time_point m_tpInit;
 
    private:
 

@@ -18,15 +18,14 @@ namespace argos {
 #ifdef ARGOS_WITH_LUA
    int LuaEnableBuilderBotCameraSystemSensor(lua_State* pt_lua_state) {
       /* Check parameters */
-      if(lua_gettop(pt_lua_state) != 1) {
-         return luaL_error(pt_lua_state, "robot.camera_system.enable() expects a single argument");
+      if(lua_gettop(pt_lua_state) != 0) {
+         return luaL_error(pt_lua_state, "robot.camera_system.enable() expects zero arguments");
       }
-      luaL_checktype(pt_lua_state, 1, LUA_TBOOLEAN);
       /* Get the camera sensor */
       CCI_BuilderBotCameraSystemSensor* pcCameraSensor = 
          CLuaUtility::GetDeviceInstance<CCI_BuilderBotCameraSystemSensor>(pt_lua_state, "camera_system");
       /* Set the enable member */
-      pcCameraSensor->m_bEnable = lua_toboolean(pt_lua_state, 1);
+      pcCameraSensor->Enable();
       return 0;
    }
 #endif
@@ -35,12 +34,30 @@ namespace argos {
    /****************************************/
 
 #ifdef ARGOS_WITH_LUA
+   int LuaDisableBuilderBotCameraSystemSensor(lua_State* pt_lua_state) {
+      /* Check parameters */
+      if(lua_gettop(pt_lua_state) != 0) {
+         return luaL_error(pt_lua_state, "robot.camera_system.disable() expects zero arguments");
+      }
+      /* Get the camera sensor */
+      CCI_BuilderBotCameraSystemSensor* pcCameraSensor = 
+         CLuaUtility::GetDeviceInstance<CCI_BuilderBotCameraSystemSensor>(pt_lua_state, "camera_system");
+      /* Set the enable member */
+      pcCameraSensor->Disable();
+      return 0;
+   }
+#endif
+
+   /****************************************/
+   /****************************************/
+   
+#ifdef ARGOS_WITH_LUA
    /*
-    * The stack must have four integers in this order:
-    * 1. The x offset (a number)
-    * 2. The y offset (a number)
-    * 3. The width (a number)
-    * 4. The height (a number)
+    * The stack must have four numbers in this order:
+    * 1. The x offset of the region to check (a number)
+    * 2. The y offset of the region to check (a number)
+    * 3. The width of the region to check (a number)
+    * 4. The height of the region to check (a number)
     */
    int LuaBuilderBotCameraSystemSensorDetectLed(lua_State* pt_lua_state) {
       /* Check parameters */
@@ -59,9 +76,16 @@ namespace argos {
       /* Get the camera sensor */
       CCI_BuilderBotCameraSystemSensor* pcCameraSensor = 
          CLuaUtility::GetDeviceInstance<CCI_BuilderBotCameraSystemSensor>(pt_lua_state, "camera_system");
-      /* Detect an LED */
-      pcCameraSensor->DetectLed(cOffset, cSize);
-      return 0;
+      /* Get the color of the LED (CColor::BLACK if none) */
+      const CColor& cColor = pcCameraSensor->DetectLed(cOffset, cSize);
+      /* Create a table for the pixel data */
+      lua_newtable (pt_lua_state);
+      CLuaUtility::AddToTable(pt_lua_state, "_type", CLuaUtility::TYPE_COLOR);
+      CLuaUtility::AddToTable(pt_lua_state, "red", cColor.GetRed());
+      CLuaUtility::AddToTable(pt_lua_state, "green", cColor.GetGreen());
+      CLuaUtility::AddToTable(pt_lua_state, "blue", cColor.GetBlue());
+      /* return a single result, the table */
+      return 1;
    }
 #endif
 
@@ -78,6 +102,9 @@ namespace argos {
       CLuaUtility::AddToTable(pt_lua_state,
                               "enable",
                               &LuaEnableBuilderBotCameraSystemSensor);
+      CLuaUtility::AddToTable(pt_lua_state,
+                              "disable",
+                              &LuaDisableBuilderBotCameraSystemSensor);
       CLuaUtility::AddToTable(pt_lua_state, "timestamp", 0.0f);
       CLuaUtility::StartTable(pt_lua_state, "tags");
       for(size_t i = 0; i < m_tTags.size(); ++i) {
@@ -104,8 +131,7 @@ namespace argos {
 #ifdef ARGOS_WITH_LUA
    void CCI_BuilderBotCameraSystemSensor::ReadingsToLuaState(lua_State* pt_lua_state) {
       CLuaUtility::OpenRobotStateTable(pt_lua_state, "camera_system");
-      /* TODO check that this doesn't clobber the "get_pixels" entry */
-      CLuaUtility::AddToTable(pt_lua_state, "timestamp", 0.0f);
+      CLuaUtility::AddToTable(pt_lua_state, "timestamp", m_fTimestamp);
       CLuaUtility::StartTable(pt_lua_state, "tags");
       /* get the tag count from last time */
       size_t unLastTagCount = lua_rawlen(pt_lua_state, -1);     
@@ -132,7 +158,6 @@ namespace argos {
       CLuaUtility::CloseRobotStateTable(pt_lua_state);
    }
 #endif
-
 
    /****************************************/
    /****************************************/

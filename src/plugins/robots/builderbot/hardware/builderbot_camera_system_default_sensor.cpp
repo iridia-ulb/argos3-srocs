@@ -155,6 +155,8 @@ namespace argos {
          }, m_nCameraHandle);
          /* add the frames to the capture queue */
          m_ptrAsyncCaptureOp->Enqueue(lstFrames);
+         /* initialize timer */
+         m_tpInit = std::chrono::steady_clock::now();        
          /* enable operations */
          m_ptrAsyncDetectOp->Enable();
          m_ptrAsyncConvertOp->Enable();
@@ -191,7 +193,7 @@ namespace argos {
          /* update the control interface */
          SFrame& sFrame = m_lstCurrentFrame.front();
          m_tTags.swap(sFrame.Detections);
-         m_tpTimestamp = sFrame.Timestamp;
+         m_fTimestamp = duration_cast<duration<Real> >(sFrame.Timestamp - m_tpInit).count();
       }
       catch(CARGoSException& ex) {
          THROW_ARGOSEXCEPTION_NESTED("Error updating the camera sensor", ex);
@@ -206,9 +208,8 @@ namespace argos {
       m_ptrAsyncCaptureOp->Disable();
       m_ptrAsyncConvertOp->Disable();
       m_ptrAsyncDetectOp->Disable();
-
+      /* close the camera */
       ::close(m_nCameraHandle);
-
       /* release the media device */
       ::media_device_unref(m_psMediaDevice);
    }
@@ -216,9 +217,16 @@ namespace argos {
    /****************************************/
    /****************************************/
 
-   void CBuilderBotCameraSystemDefaultSensor::GetPixels(const CVector2& c_offset,
-                                                        const CVector2& c_size,
-                                                        std::vector<SPixel>& vec_pixels) {
+   CColor CBuilderBotCameraSystemDefaultSensor::DetectLed(const CVector2& c_offset,
+                                                          const CVector2& c_size) {
+      return CColor::BLACK;
+   }
+
+   /****************************************/
+   /****************************************/
+   
+   CVector2 CBuilderBotCameraSystemDefaultSensor::GetResolution() {
+      return CVector2(m_unImageWidth, m_unImageHeight);
    }
 
    /****************************************/

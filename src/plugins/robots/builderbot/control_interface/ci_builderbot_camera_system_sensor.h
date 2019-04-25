@@ -11,11 +11,11 @@ namespace argos {
    class CCI_BuilderBotCameraSystemSensor;
 }
 
-#include <chrono>
-#include <string>
 #include <argos3/core/utility/math/vector2.h>
 #include <argos3/core/utility/datatypes/color.h>
 #include <argos3/core/control_interface/ci_sensor.h>
+
+#include <string>
 
 namespace argos {
 
@@ -50,39 +50,44 @@ namespace argos {
          using TVector = std::vector<SLed>;
       };
 
-      struct SPixel {
-         /* constructor */
-         SPixel(UInt8 un_y, UInt8 un_u, UInt8 un_v) :
-            Y(un_y), U(un_u), V(un_v) {}
-         /* members */
-         UInt8 Y, U, V;
-      };
-
    public:
 
       CCI_BuilderBotCameraSystemSensor() :
-         m_bEnable(true) {}
+         m_bEnabled(false) {}
 
       virtual ~CCI_BuilderBotCameraSystemSensor() {}
 
-      virtual bool DetectLed(const CVector2& c_center,
-                             const CVector2& c_size) = 0;
+      virtual void Reset() {
+         /* clear the readings */
+         m_tTags.clear();
+         /* zero the timestamp */
+         m_fTimestamp = 0.0f;
+      }
+
+      virtual CColor DetectLed(const CVector2& c_center,
+                               const CVector2& c_size) = 0;
 
       virtual CVector2 GetResolution() const = 0;
 
-      const std::chrono::time_point<std::chrono::steady_clock>& GetTimestamp() const {
-         return m_tpTimestamp;
+      Real GetTimestamp() const {
+         return m_fTimestamp;
       }
 
       const STag::TVector& GetTags() const {
          return m_tTags;
       }
 
-      const SLed::TVector& GetLeds() const {
-         return m_tLeds;
+      void SetEnabled(bool b_enabled) {
+         m_bEnabled = b_enabled;
       }
 
-      bool m_bEnable;
+      void Enable() {
+         SetEnabled(true);
+      }
+
+      void Disable() {
+         SetEnabled(false);
+      }
 
 #ifdef ARGOS_WITH_LUA
       virtual void CreateLuaState(lua_State* pt_lua_state);
@@ -90,12 +95,12 @@ namespace argos {
       virtual void ReadingsToLuaState(lua_State* pt_lua_state);
 #endif
    protected:
-      /* the detected leds in the current frame */
-      SLed::TVector m_tLeds;
+      /* whether or not the camera sensor is enabled */
+      bool m_bEnabled;    
       /* the detected tags in the current frame */
       STag::TVector m_tTags;
       /* the timestamp of the current frame */
-      std::chrono::time_point<std::chrono::steady_clock> m_tpTimestamp;
+      Real m_fTimestamp;
 
    };
 

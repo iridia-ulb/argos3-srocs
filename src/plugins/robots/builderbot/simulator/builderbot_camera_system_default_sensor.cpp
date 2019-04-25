@@ -14,14 +14,12 @@
 #include <argos3/plugins/simulator/media/directional_led_medium.h>
 #include <argos3/plugins/simulator/media/tag_medium.h>
 
-#include <chrono>
-
-#define CAMERA_RESOLUTION_X 640.0f
-#define CAMERA_RESOLUTION_Y 360.0f
+#define CAMERA_RESOLUTION_X 320.0f
+#define CAMERA_RESOLUTION_Y 240.0f
 #define CAMERA_FOCAL_LENGTH_X 883.961f
 #define CAMERA_FOCAL_LENGTH_Y 883.961f
-#define CAMERA_PRINCIPAL_POINT_X 319.5f
-#define CAMERA_PRINCIPAL_POINT_Y 179.5f
+#define CAMERA_PRINCIPAL_POINT_X 160.0f
+#define CAMERA_PRINCIPAL_POINT_Y 120.0f
 #define CAMERA_RANGE_MIN 0.05f
 #define CAMERA_RANGE_MAX 0.25f
 
@@ -108,121 +106,126 @@ namespace argos {
    /****************************************/
 
    void CBuilderBotCameraSystemDefaultSensor::Update() {
-      using std::chrono::time_point;
-      using std::chrono::duration_cast;
-      using std::chrono::duration;
-      using std::chrono::steady_clock;
-      /* increment the timestamp */
-      Real fExperimentRunTime = CPhysicsEngine::GetSimulationClockTick() *
-         CSimulator::GetInstance().GetSpace().GetSimulationClock();
-      m_tpTimestamp = time_point<steady_clock>() + 
-         duration_cast<steady_clock::duration>(duration<Real>(fExperimentRunTime));
       /* clear out the readings from the last update */
       m_tTags.clear();
-      m_tLeds.clear();
       m_tLedCache.clear();
-      /* get a reference to the checked rays for the controller */
-      std::vector<std::pair<bool, CRay3> >& vecCheckedRays =
-       m_pcControllableEntity->GetCheckedRays();
-      /* sensor parameters */
-      CTransformationMatrix3 cWorldToAnchorTransform;
-      CTransformationMatrix3 cWorldToCameraTransform;
-      CVector3 cLookAt, cUp;
-      CVector3 cX, cY, cZ;
-      CVector3 cNearCenter, cNearTopLeft, cNearTopRight, cNearBottomLeft, cNearBottomRight;
-      CVector3 cFarCenter, cFarTopLeft, cFarTopRight, cFarBottomLeft, cFarBottomRight;
-      CVector3 cBoundingBoxMinCorner, cBoundingBoxMaxCorner;
-      CVector3 cBoundingBoxPosition, cBoundingBoxHalfExtents;
-      /* calculate transform matrices */
-      cWorldToAnchorTransform.SetFromComponents(m_psEndEffectorAnchor->Orientation, m_psEndEffectorAnchor->Position);
-      cWorldToCameraTransform = cWorldToAnchorTransform * m_cOffset;
-      m_cCameraToWorldTransform = cWorldToCameraTransform.GetInverse();
-      /* calculate camera direction vectors */
-      m_cCameraLocation = cWorldToCameraTransform.GetTranslationVector();
-      cLookAt = cWorldToCameraTransform * CVector3::Z;
-      cUp = -CVector3::Y;
-      cUp.Rotate(cWorldToCameraTransform.GetRotationMatrix());
-      /* calculate direction vectors */
-      cZ = m_cCameraLocation - cLookAt;
-      cZ.Normalize();
-      cX = cUp;
-      cX.CrossProduct(cZ);
-      cX.Normalize();
-      cY = cZ;
-      cY.CrossProduct(cX);
-      /* calculate frustum coordinates */
-      cNearCenter = m_cCameraLocation - cZ * CAMERA_RANGE_MIN;
-      cFarCenter = m_cCameraLocation - cZ * CAMERA_RANGE_MAX;
-      cNearTopLeft = cNearCenter + (cY * m_fNearPlaneHeight) - (cX * m_fNearPlaneWidth);
-      cNearTopRight = cNearCenter + (cY * m_fNearPlaneHeight) + (cX * m_fNearPlaneWidth);
-      cNearBottomLeft = cNearCenter - (cY * m_fNearPlaneHeight) - (cX * m_fNearPlaneWidth);
-      cNearBottomRight = cNearCenter - (cY * m_fNearPlaneHeight) + (cX * m_fNearPlaneWidth);
-      cFarTopLeft = cFarCenter + (cY * m_fFarPlaneHeight) - (cX * m_fFarPlaneWidth);
-      cFarTopRight = cFarCenter + (cY * m_fFarPlaneHeight) + (cX * m_fFarPlaneWidth);
-      cFarBottomLeft = cFarCenter - (cY * m_fFarPlaneHeight) - (cX * m_fFarPlaneWidth);
-      cFarBottomRight = cFarCenter - (cY * m_fFarPlaneHeight) + (cX * m_fFarPlaneWidth);
-      /* show frustum if enabled by adding outline to the checked rays vector */
-      if(m_bShowFrustum) {
-         vecCheckedRays.emplace_back(false, CRay3(cNearTopLeft, cNearTopRight));
-         vecCheckedRays.emplace_back(false, CRay3(cNearTopRight, cNearBottomRight));
-         vecCheckedRays.emplace_back(false, CRay3(cNearBottomRight, cNearBottomLeft));
-         vecCheckedRays.emplace_back(false, CRay3(cNearBottomLeft, cNearTopLeft));
-         vecCheckedRays.emplace_back(false, CRay3(cFarTopLeft, cFarTopRight));
-         vecCheckedRays.emplace_back(false, CRay3(cFarTopRight, cFarBottomRight));
-         vecCheckedRays.emplace_back(false, CRay3(cFarBottomRight, cFarBottomLeft));
-         vecCheckedRays.emplace_back(false, CRay3(cFarBottomLeft, cFarTopLeft));
-         vecCheckedRays.emplace_back(false, CRay3(cNearTopLeft, cFarTopLeft));
-         vecCheckedRays.emplace_back(false, CRay3(cNearTopRight, cFarTopRight));
-         vecCheckedRays.emplace_back(false, CRay3(cNearBottomRight, cFarBottomRight));
-         vecCheckedRays.emplace_back(false, CRay3(cNearBottomLeft, cFarBottomLeft));
-      }
-      /* generate a bounding box for the frustum */
-      cBoundingBoxMinCorner = cNearCenter;
-      cBoundingBoxMaxCorner = cNearCenter;
-      for(const CVector3& c_point : {
+      /* increment the timestamp */
+      m_fTimestamp += CPhysicsEngine::GetSimulationClockTick();
+      /* if the sensor is enabled */
+      if(m_bEnabled) {     
+         /* get a reference to the checked rays for the controller */
+         std::vector<std::pair<bool, CRay3> >& vecCheckedRays =
+            m_pcControllableEntity->GetCheckedRays();
+         /* sensor parameters */
+         CTransformationMatrix3 cWorldToAnchorTransform;
+         CTransformationMatrix3 cWorldToCameraTransform;
+         CVector3 cLookAt, cUp;
+         CVector3 cX, cY, cZ;
+         CVector3 cNearCenter, cNearTopLeft, cNearTopRight, cNearBottomLeft, cNearBottomRight;
+         CVector3 cFarCenter, cFarTopLeft, cFarTopRight, cFarBottomLeft, cFarBottomRight;
+         CVector3 cBoundingBoxMinCorner, cBoundingBoxMaxCorner;
+         CVector3 cBoundingBoxPosition, cBoundingBoxHalfExtents;
+         /* calculate transform matrices */
+         cWorldToAnchorTransform.SetFromComponents(m_psEndEffectorAnchor->Orientation, m_psEndEffectorAnchor->Position);
+         cWorldToCameraTransform = cWorldToAnchorTransform * m_cOffset;
+         m_cCameraToWorldTransform = cWorldToCameraTransform.GetInverse();
+         /* calculate camera direction vectors */
+         m_cCameraLocation = cWorldToCameraTransform.GetTranslationVector();
+         cLookAt = cWorldToCameraTransform * CVector3::Z;
+         cUp = -CVector3::Y;
+         cUp.Rotate(cWorldToCameraTransform.GetRotationMatrix());
+         /* calculate direction vectors */
+         cZ = m_cCameraLocation - cLookAt;
+         cZ.Normalize();
+         cX = cUp;
+         cX.CrossProduct(cZ);
+         cX.Normalize();
+         cY = cZ;
+         cY.CrossProduct(cX);
+         /* calculate frustum coordinates */
+         cNearCenter = m_cCameraLocation - cZ * CAMERA_RANGE_MIN;
+         cFarCenter = m_cCameraLocation - cZ * CAMERA_RANGE_MAX;
+         cNearTopLeft = cNearCenter + (cY * m_fNearPlaneHeight) - (cX * m_fNearPlaneWidth);
+         cNearTopRight = cNearCenter + (cY * m_fNearPlaneHeight) + (cX * m_fNearPlaneWidth);
+         cNearBottomLeft = cNearCenter - (cY * m_fNearPlaneHeight) - (cX * m_fNearPlaneWidth);
+         cNearBottomRight = cNearCenter - (cY * m_fNearPlaneHeight) + (cX * m_fNearPlaneWidth);
+         cFarTopLeft = cFarCenter + (cY * m_fFarPlaneHeight) - (cX * m_fFarPlaneWidth);
+         cFarTopRight = cFarCenter + (cY * m_fFarPlaneHeight) + (cX * m_fFarPlaneWidth);
+         cFarBottomLeft = cFarCenter - (cY * m_fFarPlaneHeight) - (cX * m_fFarPlaneWidth);
+         cFarBottomRight = cFarCenter - (cY * m_fFarPlaneHeight) + (cX * m_fFarPlaneWidth);
+         /* show frustum if enabled by adding outline to the checked rays vector */
+         if(m_bShowFrustum) {
+            vecCheckedRays.emplace_back(false, CRay3(cNearTopLeft, cNearTopRight));
+            vecCheckedRays.emplace_back(false, CRay3(cNearTopRight, cNearBottomRight));
+            vecCheckedRays.emplace_back(false, CRay3(cNearBottomRight, cNearBottomLeft));
+            vecCheckedRays.emplace_back(false, CRay3(cNearBottomLeft, cNearTopLeft));
+            vecCheckedRays.emplace_back(false, CRay3(cFarTopLeft, cFarTopRight));
+            vecCheckedRays.emplace_back(false, CRay3(cFarTopRight, cFarBottomRight));
+            vecCheckedRays.emplace_back(false, CRay3(cFarBottomRight, cFarBottomLeft));
+            vecCheckedRays.emplace_back(false, CRay3(cFarBottomLeft, cFarTopLeft));
+            vecCheckedRays.emplace_back(false, CRay3(cNearTopLeft, cFarTopLeft));
+            vecCheckedRays.emplace_back(false, CRay3(cNearTopRight, cFarTopRight));
+            vecCheckedRays.emplace_back(false, CRay3(cNearBottomRight, cFarBottomRight));
+            vecCheckedRays.emplace_back(false, CRay3(cNearBottomLeft, cFarBottomLeft));
+         }
+         /* generate a bounding box for the frustum */
+         cBoundingBoxMinCorner = cNearCenter;
+         cBoundingBoxMaxCorner = cNearCenter;
+         for(const CVector3& c_point : {
             cNearTopLeft, cNearTopRight, cNearBottomLeft, cNearBottomRight, 
             cFarTopLeft, cFarTopRight, cFarBottomLeft, cFarBottomRight
          }) {
-         if(c_point.GetX() > cBoundingBoxMaxCorner.GetX()) {
-            cBoundingBoxMaxCorner.SetX(c_point.GetX());
+            if(c_point.GetX() > cBoundingBoxMaxCorner.GetX()) {
+               cBoundingBoxMaxCorner.SetX(c_point.GetX());
+            }
+            if(c_point.GetX() < cBoundingBoxMinCorner.GetX()) {
+               cBoundingBoxMinCorner.SetX(c_point.GetX());
+            }
+            if(c_point.GetY() > cBoundingBoxMaxCorner.GetY()) {
+               cBoundingBoxMaxCorner.SetY(c_point.GetY());
+            }
+            if(c_point.GetY() < cBoundingBoxMinCorner.GetY()) {
+               cBoundingBoxMinCorner.SetY(c_point.GetY());
+            }
+            if(c_point.GetZ() > cBoundingBoxMaxCorner.GetZ()) {
+               cBoundingBoxMaxCorner.SetZ(c_point.GetZ());
+            }
+            if(c_point.GetZ() < cBoundingBoxMinCorner.GetZ()) {
+               cBoundingBoxMinCorner.SetZ(c_point.GetZ());
+            }
          }
-         if(c_point.GetX() < cBoundingBoxMinCorner.GetX()) {
-            cBoundingBoxMinCorner.SetX(c_point.GetX());
-         }
-         if(c_point.GetY() > cBoundingBoxMaxCorner.GetY()) {
-            cBoundingBoxMaxCorner.SetY(c_point.GetY());
-         }
-         if(c_point.GetY() < cBoundingBoxMinCorner.GetY()) {
-            cBoundingBoxMinCorner.SetY(c_point.GetY());
-         }
-         if(c_point.GetZ() > cBoundingBoxMaxCorner.GetZ()) {
-            cBoundingBoxMaxCorner.SetZ(c_point.GetZ());
-         }
-         if(c_point.GetZ() < cBoundingBoxMinCorner.GetZ()) {
-            cBoundingBoxMinCorner.SetZ(c_point.GetZ());
-         }
+         cBoundingBoxMaxCorner *= 0.5f;
+         cBoundingBoxMinCorner *= 0.5f;
+         cBoundingBoxPosition = (cBoundingBoxMaxCorner + cBoundingBoxMinCorner);
+         cBoundingBoxHalfExtents = (cBoundingBoxMaxCorner - cBoundingBoxMinCorner);
+         /* generate frustum planes */
+         m_arrFrustumPlanes[0].SetFromThreePoints(cNearTopRight, cNearTopLeft, cFarTopLeft);
+         m_arrFrustumPlanes[1].SetFromThreePoints(cNearBottomLeft, cNearBottomRight, cFarBottomRight);
+         m_arrFrustumPlanes[2].SetFromThreePoints(cNearTopLeft, cNearBottomLeft, cFarBottomLeft);
+         m_arrFrustumPlanes[3].SetFromThreePoints(cNearBottomRight, cNearTopRight, cFarBottomRight);
+         m_arrFrustumPlanes[4].SetFromThreePoints(cNearTopLeft, cNearTopRight, cNearBottomRight);
+         m_arrFrustumPlanes[5].SetFromThreePoints(cFarTopRight, cFarTopLeft, cFarBottomLeft);
+         /* set the start of the ray for checking occlusions to the camera's location */
+         m_cOcclusionCheckRay.SetStart(m_cCameraLocation);
+         /* detect tags */
+         m_pcTagIndex->ForEntitiesInBoxRange(cBoundingBoxPosition,
+                                             cBoundingBoxHalfExtents,
+                                             *this);
+         /* detect directional LEDs */
+         m_pcDirectionalLEDIndex->ForEntitiesInBoxRange(cBoundingBoxPosition,
+                                                        cBoundingBoxHalfExtents,
+                                                        *this);
       }
-      cBoundingBoxMaxCorner *= 0.5f;
-      cBoundingBoxMinCorner *= 0.5f;
-      cBoundingBoxPosition = (cBoundingBoxMaxCorner + cBoundingBoxMinCorner);
-      cBoundingBoxHalfExtents = (cBoundingBoxMaxCorner - cBoundingBoxMinCorner);
-      /* generate frustum planes */
-      m_arrFrustumPlanes[0].SetFromThreePoints(cNearTopRight, cNearTopLeft, cFarTopLeft);
-      m_arrFrustumPlanes[1].SetFromThreePoints(cNearBottomLeft, cNearBottomRight, cFarBottomRight);
-      m_arrFrustumPlanes[2].SetFromThreePoints(cNearTopLeft, cNearBottomLeft, cFarBottomLeft);
-      m_arrFrustumPlanes[3].SetFromThreePoints(cNearBottomRight, cNearTopRight, cFarBottomRight);
-      m_arrFrustumPlanes[4].SetFromThreePoints(cNearTopLeft, cNearTopRight, cNearBottomRight);
-      m_arrFrustumPlanes[5].SetFromThreePoints(cFarTopRight, cFarTopLeft, cFarBottomLeft);
-      /* set the start of the ray for checking occlusions to the camera's location */
-      m_cOcclusionCheckRay.SetStart(m_cCameraLocation);
-      /* detect tags */
-      m_pcTagIndex->ForEntitiesInBoxRange(cBoundingBoxPosition,
-                                          cBoundingBoxHalfExtents,
-                                          *this);
-      /* detect directional LEDs */
-      m_pcDirectionalLEDIndex->ForEntitiesInBoxRange(cBoundingBoxPosition,
-                                                     cBoundingBoxHalfExtents,
-                                                     *this);
+   }
+
+   /****************************************/
+   /****************************************/
+
+   void CBuilderBotCameraSystemDefaultSensor::Reset() {
+      /* clear the LED cache */
+      m_tLedCache.clear();
+      /* reset the base class */
+      CCI_BuilderBotCameraSystemSensor::Reset();
    }
 
    /****************************************/
@@ -289,22 +292,21 @@ namespace argos {
          return true;
       }
       m_cOcclusionCheckRay.SetEnd(cLedPosition);
-      if(GetClosestEmbodiedEntityIntersectedByRay(m_sIntersectionItem, m_cOcclusionCheckRay)) {
-         if(m_bShowLEDRays)
-            m_pcControllableEntity->GetCheckedRays().emplace_back(true, m_cOcclusionCheckRay);
-         return true;
-      }
-      if(m_bShowLEDRays)
+      if(!GetClosestEmbodiedEntityIntersectedByRay(m_sIntersectionItem, m_cOcclusionCheckRay)) {
+         m_tLedCache.emplace_back(c_led.GetColor(), ProjectOntoSensor(cLedPosition));
          m_pcControllableEntity->GetCheckedRays().emplace_back(false, m_cOcclusionCheckRay);
-      m_tLedCache.emplace_back(c_led.GetColor(), ProjectOntoSensor(cLedPosition));
+      }
+      else {
+         m_pcControllableEntity->GetCheckedRays().emplace_back(true, m_cOcclusionCheckRay);
+      }
       return true;
    }
 
    /****************************************/
    /****************************************/
 
-   bool CBuilderBotCameraSystemDefaultSensor::DetectLed(const CVector2& c_center,
-                                                        const CVector2& c_size) {
+   CColor CBuilderBotCameraSystemDefaultSensor::DetectLed(const CVector2& c_center,
+                                                          const CVector2& c_size) {
       CVector2 cMinCorner(c_center - 0.5f * c_size);
       CVector2 cMaxCorner(c_center + 0.5f * c_size);
       for(const SLed& s_led : m_tLedCache) {
@@ -312,13 +314,11 @@ namespace argos {
             s_led.Center.GetY() > cMinCorner.GetY() &&
             s_led.Center.GetX() < cMaxCorner.GetX() &&
             s_led.Center.GetY() < cMaxCorner.GetY()) {
-            /* LED detected */
-            m_tLeds.emplace_back(s_led);
-            /* return true to indicate that an LED has been detected */
-            return true;
+            /* return the color of the first LED in the specified region */
+            return s_led.Color;
          }
       }
-      return false;
+      return CColor::BLACK;
    }
 
    /****************************************/

@@ -13,8 +13,6 @@ namespace argos {
    struct SAnchor;
 }
 
-
-
 #include <argos3/core/simulator/physics_engine/physics_engine.h>
 #include <argos3/core/simulator/sensor.h>
 #include <argos3/core/simulator/space/positional_indices/positional_index.h>
@@ -49,12 +47,14 @@ namespace argos {
 
       virtual void Update();
 
+      virtual void Reset();
+
       virtual bool operator()(CTagEntity& c_tag);
 
       virtual bool operator()(CDirectionalLEDEntity& c_led);
 
-      virtual bool DetectLed(const CVector2& c_center,
-                             const CVector2& c_size);
+      virtual CColor DetectLed(const CVector2& c_center,
+                               const CVector2& c_size);
 
       virtual CVector2 GetResolution() const;
 
@@ -69,33 +69,29 @@ namespace argos {
    private:
       CControllableEntity* m_pcControllableEntity;
       CEmbodiedEntity* m_pcEmbodiedEntity;
-
       SAnchor* m_psEndEffectorAnchor;
-
       CPositionalIndex<CDirectionalLEDEntity>* m_pcDirectionalLEDIndex;
       CPositionalIndex<CTagEntity>* m_pcTagIndex;
-
-      bool m_bShowFrustum, m_bShowTagRays, m_bShowLEDRays;
-
-      /* required for operator() updates */
+      /* debugging information */
+      bool m_bShowFrustum;
+      bool m_bShowTagRays;
+      bool m_bShowLEDRays;
+      /* cached data for operator() */
       CTransformationMatrix3 m_cOffset;
       CVector3 m_cCameraLocation;
       CTransformationMatrix3 m_cCameraToWorldTransform;
       CSquareMatrix<3> m_cProjectionMatrix;
       std::array<CPlane, 6> m_arrFrustumPlanes;
-
       /* for generating the fustrum */
       Real m_fNearPlaneWidth;
       Real m_fNearPlaneHeight;
       Real m_fFarPlaneWidth;
-      Real m_fFarPlaneHeight;
-      
-      /* buffers */
+      Real m_fFarPlaneHeight;     
+      /* shared buffers */
       std::array<CVector3, 4> m_arrTagCorners;
       std::array<CVector2, 4> m_arrTagCornerPixels;
       CRay3 m_cOcclusionCheckRay;
-      SEmbodiedEntityIntersectionItem m_sIntersectionItem;
-      
+      SEmbodiedEntityIntersectionItem m_sIntersectionItem;     
       /* AprilTag corner offsets / ordering */
       const std::array<CVector3, 4> m_arrTagCornerOffsets = {{
          {-0.5, -0.5, 0},
@@ -103,11 +99,8 @@ namespace argos {
          { 0.5,  0.5, 0},
          { 0.5, -0.5, 0},
       }};
-
       /* For LEDs found inside the frustum */
       SLed::TVector m_tLedCache;
-
-
    };
 }
 
