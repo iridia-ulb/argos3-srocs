@@ -50,7 +50,6 @@ namespace argos {
          m_pcEmbodiedEntity->Init(GetNode(t_tree, "body"));
          /* Get a reference to the origin anchor */
          SAnchor& sOriginAnchor = m_pcEmbodiedEntity->GetOriginAnchor();
-
          /* Create and initialize the tags */
          m_pcTagEquippedEntity = new CTagEquippedEntity(this, "tags_0");
          for(const std::pair<CVector3, CQuaternion>& c_face_offset : m_arrFaceOffsets) {
@@ -59,7 +58,7 @@ namespace argos {
                                           c_face_offset.second,
                                           sOriginAnchor,
                                           CRadians::PI_OVER_THREE,
-                                          TAG_SIDE_LENGTH, /* side length of the tag */
+                                          TAG_SIDE_LENGTH,
                                           std::string("0"));
          }
          CTagMedium& cTagMedium = 
@@ -67,22 +66,19 @@ namespace argos {
          m_pcTagEquippedEntity->SetMedium(cTagMedium);
          m_pcTagEquippedEntity->Enable();
          AddComponent(*m_pcTagEquippedEntity);
-
          /* Create and initialize the radios */
          m_pcRadioEquippedEntity = new CRadioEquippedEntity(this, "radios_0");
          for(const std::pair<CVector3, CQuaternion>& c_face_offset : m_arrFaceOffsets) {
             /* add a radio */
             m_pcRadioEquippedEntity->AddRadio(c_face_offset.first,
                                               sOriginAnchor,
-                                              NFC_TRANSMISSION_RANGE); /* transmission range of the radio */
+                                              NFC_TRANSMISSION_RANGE);
          }
          CRadioMedium& cRadioMedium = 
             CSimulator::GetInstance().GetMedium<CRadioMedium>("nfc");
          m_pcRadioEquippedEntity->SetMedium(cRadioMedium);
          m_pcRadioEquippedEntity->Enable();
          AddComponent(*m_pcRadioEquippedEntity);
-      
-
          /* Create and initialize the directional LEDs */
          m_pcDirectionalLEDEquippedEntity = new CDirectionalLEDEquippedEntity(this, "directional_leds_0");
          for(const std::pair<CVector3, CQuaternion>& c_face_offset : m_arrFaceOffsets) {
@@ -96,7 +92,7 @@ namespace argos {
                                                         c_face_offset.second,
                                                         sOriginAnchor,
                                                         CRadians::PI_OVER_THREE,
-                                                        CColor::BLACK);
+                                                        CColor::RED);
             }
          }
          CDirectionalLEDMedium& cDirectionalLEDMedium = 
@@ -104,7 +100,6 @@ namespace argos {
          m_pcDirectionalLEDEquippedEntity->SetMedium(cDirectionalLEDMedium);
          m_pcDirectionalLEDEquippedEntity->Enable();
          AddComponent(*m_pcDirectionalLEDEquippedEntity);
-
          /* Create and initialize the controllable entity */
          m_pcControllableEntity = new CControllableEntity(this);
          AddComponent(*m_pcControllableEntity);
