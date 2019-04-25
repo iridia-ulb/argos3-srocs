@@ -193,6 +193,7 @@ namespace argos {
          /* update the control interface */
          SFrame& sFrame = m_lstCurrentFrame.front();
          m_tTags.swap(sFrame.Detections);
+         using namespace std::chrono;
          m_fTimestamp = duration_cast<duration<Real> >(sFrame.Timestamp - m_tpInit).count();
       }
       catch(CARGoSException& ex) {
@@ -225,7 +226,7 @@ namespace argos {
    /****************************************/
    /****************************************/
    
-   CVector2 CBuilderBotCameraSystemDefaultSensor::GetResolution() {
+   CVector2 CBuilderBotCameraSystemDefaultSensor::GetResolution() const {
       return CVector2(m_unImageWidth, m_unImageHeight);
    }
 

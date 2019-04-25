@@ -53,7 +53,7 @@ namespace argos {
       virtual CColor DetectLed(const CVector2& c_center,
                                const CVector2& c_size);
 
-      virtual CVector2 GetResolution();
+      virtual CVector2 GetResolution() const;
 
    private:
 
