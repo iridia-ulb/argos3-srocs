@@ -25,8 +25,8 @@
 #include <functional>
 
 extern "C" {
-#include <mediactl.h>
-#include <v4l2subdev.h>
+   #include <mediactl.h>
+   #include <v4l2subdev.h>
 }
 
 namespace argos {
@@ -191,10 +191,10 @@ namespace argos {
             }
          }
          /* update the control interface */
-         SFrame& sFrame = m_lstCurrentFrame.front();
-         m_tTags.swap(sFrame.Detections);
+         SFrame& sCurrentFrame = m_lstCurrentFrame.front();
+         m_tTags.swap(sCurrentFrame.Detections);
          using namespace std::chrono;
-         m_fTimestamp = duration_cast<duration<Real> >(sFrame.Timestamp - m_tpInit).count();
+         m_fTimestamp = duration_cast<duration<Real> >(sCurrentFrame.Timestamp - m_tpInit).count();
       }
       catch(CARGoSException& ex) {
          THROW_ARGOSEXCEPTION_NESTED("Error updating the camera sensor", ex);
@@ -218,8 +218,51 @@ namespace argos {
    /****************************************/
    /****************************************/
 
-   CColor CBuilderBotCameraSystemDefaultSensor::DetectLed(const CVector2& c_offset,
+   CColor CBuilderBotCameraSystemDefaultSensor::DetectLed(const CVector2& c_center,
                                                           const CVector2& c_size) {
+      /* calculate the corners of the region of interest */
+      CVector2 cMinCorner(c_center - 0.5f * c_size);
+      CVector2 cMaxCorner(c_center + 0.5f * c_size);
+      /* get the start/end indices */
+      UInt32 unColumnStart = static_cast<UInt32>(std::round(cMinCorner.GetX()));
+      UInt32 unColumnEnd = static_cast<UInt32>(std::round(cMaxCorner.GetX()));
+      UInt32 unRowStart = static_cast<UInt32>(std::round(cMinCorner.GetY()));
+      UInt32 unRowEnd = static_cast<UInt32>(std::round(cMaxCorner.GetY()));
+      /* clamp the region of interest to the image size */
+      m_cColumnRange.TrucValue(unColumnStart);
+      m_cColumnRange.TrucValue(unColumnEnd);
+      m_cRowRange.TrucValue(unRowStart);
+      m_cRowRange.TrucValue(unRowEnd);
+      /* column must start and end at an even number due to pixel format */
+      if(unColumnStart % 2) {
+         ++unColumnStart;
+      }
+      if(unColumnEnd % 2) {
+         --unColumnEnd;
+      }
+      /* initialize sums */
+      Real fWeightedSumU = 0.0f;
+      Real fSumY0 = 0.0f;
+      Real fWeightedSumV = 0.0f;
+      Real fSumY1 = 0.0f;
+      /* extract the data */    
+      const SFrame& sCurrentFrame = m_lstCurrentFrame.front();
+      for(UInt32 un_row = unRowStart; un_row < unRowEnd; un_row += 1) {
+         unRowIndex = un_row * m_unImageWidth;
+         for(UInt32 un_column = unColumnStart; un_column < unColumnEnd; un_column += 2) {
+            /* get a pointer to the start of the macro pixel */
+            UInt8* punMacroPixel =
+               static_cast<UInt8*>(sCurrentFrame.Data) + unRowIndex + un_column;
+            /* extract the macro pixel */
+            fWeightedSumU += static_cast<Real>(punMacroPixel[0]) * punMacroPixel[1];
+            fSumY0 += static_cast<Real>(punMacroPixel[1]);
+            fWeightedSumV += static_cast<Real>(punMacroPixel[2]) * punMacroPixel[3];
+            fSumY1 += static_cast<Real>(punMacroPixel[3]);           
+         }
+      }
+      Real fAverageU = (fWeightedSumU / fSumY0);
+      Real fAverageV = (fWeightedSumV / fSumY1);
+
       return CColor::BLACK;
    }
 
