@@ -132,14 +132,18 @@ namespace argos {
 
    /****************************************/
    /****************************************/
-}
 
-REGISTER_SENSOR(CBuilderBotDifferentialDriveDefaultSensor,
-                  "builderbot_differential_drive", "default",
-                  "Michael Allwright [allsey87@gmail.com]",
-                  "1.0",
-                  "The builderbot differential drive sensor.",
-                  "This sensor monitors the differential drive of the builderbot.",
-                  "Usable"
+   REGISTER_SENSOR(CBuilderBotDifferentialDriveDefaultSensor,
+                   "builderbot_differential_drive", "default",
+                   "Michael Allwright [allsey87@gmail.com]",
+                   "1.0",
+                   "The builderbot differential drive sensor.",
+                   "This sensor monitors the differential drive of the builderbot.",
+                   "Usable"
    );
-   
+
+   /****************************************/
+   /****************************************/
+
+}
+ 
