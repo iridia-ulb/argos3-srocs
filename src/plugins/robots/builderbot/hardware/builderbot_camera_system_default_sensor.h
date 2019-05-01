@@ -40,9 +40,9 @@ namespace argos {
 
    public:
 
-      CBuilderBotCameraSystemDefaultSensor() {}
+      CBuilderBotCameraSystemDefaultSensor();
 
-      virtual ~CBuilderBotCameraSystemDefaultSensor() {}
+      virtual ~CBuilderBotCameraSystemDefaultSensor();
 
       virtual void Init(TConfigurationNode& t_tree);
 
@@ -56,12 +56,6 @@ namespace argos {
       virtual CVector2 GetResolution() const;
 
    private:
-
-      class CAsyncCaptureOp;
-      class CAsyncConvertOp;
-      class CAsyncDetectOp;
-
-   private:
       const UInt32 m_unBufferCount = 2;
       const UInt32 m_unBytesPerPixel = 2;
       const UInt32 m_unImageWidth = 320;
@@ -73,27 +67,13 @@ namespace argos {
       const char* m_pchMediaDevice = "/dev/media0";
       const char* m_pchVideoDevice = "/dev/video0";
 
-      struct SFrame {
-         SFrame(UInt32 un_index, void* pv_data, image_u8_t* pt_image) :
-            Index(un_index),
-            Data(pv_data),
-            Image(pt_image) {}
+      void* m_pvData;
+      image_u8_t* m_ptImage;
+      STag::TVector m_tDetections;
 
-         UInt32 Index;
-         void* Data;
-         image_u8_t* Image;
-         STag::TVector Detections;
-         std::chrono::steady_clock::time_point Timestamp;
-      };
-
-      std::list<SFrame> m_lstPreparedFrames;
-      std::list<SFrame> m_lstCurrentFrame;
-      std::mutex m_mtxPreparedFrames;
-
-      std::unique_ptr<CAsyncCaptureOp> m_ptrAsyncCaptureOp;
-      std::unique_ptr<CAsyncConvertOp> m_ptrAsyncConvertOp;
-      std::unique_ptr<CAsyncDetectOp> m_ptrAsyncDetectOp;
-
+      ::apriltag_family* m_psTagFamily;
+      ::apriltag_detector* m_psTagDetector;
+      
       /* media device */
       media_device* m_psMediaDevice;
 
@@ -103,84 +83,6 @@ namespace argos {
       /* time at initialization */
       std::chrono::steady_clock::time_point m_tpInit;
 
-   private:
-
-      class CAsyncPipelineOp {
-      public:
-         CAsyncPipelineOp(std::function<void(std::list<SFrame>&)> fn_sink) :
-            m_fnSink(fn_sink),
-            m_bEnable(false) {}
-
-         virtual ~CAsyncPipelineOp() {}
-         
-         virtual void Execute(SFrame& s_frame) = 0;
-
-         void Enqueue(std::list<SFrame>& lst_frames);
-
-         virtual void Enable();
-
-         virtual void Disable();
-
-      private:
-         void operator()();
-
-      private:
-         std::future<void> cProcess;
-         std::function<void(std::list<SFrame>&)> m_fnSink;
-         std::list<SFrame> m_lstFrames;
-         std::mutex m_mtxFrames;
-         bool m_bEnable;
-      };
-
-      /****************************************/
-      /****************************************/
-
-      class CAsyncCaptureOp : public CAsyncPipelineOp {
-      public:
-         CAsyncCaptureOp(std::function<void(std::list<SFrame>&)> fn_sink,
-                         SInt32 n_camera_handle) :
-            CAsyncPipelineOp(fn_sink),
-            m_nCameraHandle(n_camera_handle) {}
-
-         void Enable() override;
-
-         void Disable() override;
-
-      private:
-         void Execute(SFrame& s_frame) override;
-
-      private:
-         SInt32 m_nCameraHandle;
-      };
-
-      /****************************************/
-      /****************************************/
-
-      class CAsyncConvertOp : public CAsyncPipelineOp {
-      public:
-         CAsyncConvertOp(std::function<void(std::list<SFrame>&)> fn_sink) :
-            CAsyncPipelineOp(fn_sink) {}
-
-      private:
-         void Execute(SFrame& s_frame) override;
-      };
-
-      /****************************************/
-      /****************************************/
-
-      class CAsyncDetectOp : public CAsyncPipelineOp {
-      public:
-         CAsyncDetectOp(std::function<void(std::list<SFrame>&)> fn_sink);
-
-         ~CAsyncDetectOp();
-
-      private:
-         void Execute(SFrame& s_frame) override;
-
-      private:
-         ::apriltag_family* m_psTagFamily;
-         ::apriltag_detector* m_psTagDetector;
-      };
 
       /****************************************/
       /****************************************/

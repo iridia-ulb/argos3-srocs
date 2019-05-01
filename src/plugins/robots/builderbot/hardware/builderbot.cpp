@@ -188,14 +188,9 @@ namespace argos {
                THROW_ARGOSEXCEPTION("BUG: sensor \"" << itSens->Value() << "\" does not inherit from CCI_Sensor");
             }
             pcCISens->Init(*itSens);
-            if(itSens->Value() == "builderbot_cam") {
-               m_pcCamera = pcSens;
-            }
-            else {
-               m_vecSensors.emplace_back(pcSens);
-            }
+            m_vecSensors.emplace_back(pcSens);
             m_pcController->AddSensor(itSens->Value(), pcCISens);
-         }
+         }        
          /* Set the controller id */
          char pchBuffer[32];
          if (::gethostname(pchBuffer, 32) == 0) {
@@ -236,11 +231,7 @@ namespace argos {
       /* start the main control loop */
       try {
          for(;;) {
-            /* start the camera update on a separate thread */
-            //std::future<void> cCameraUpdate = 
-            //   std::async(std::launch::async, std::bind(&CPhysicalSensor::Update, m_pcCamera));
-
-            /* pull in samples from the sensor buffers */
+            /* request samples from the sensors */
             ::iio_device_attr_write_bool(m_psSensorUpdateTrigger, "trigger_now", true);
             /* update the sensors on this thread */
             for(CPhysicalSensor* pc_sensor : m_vecSensors) {
@@ -249,14 +240,9 @@ namespace argos {
                   THROW_ARGOSEXCEPTION("Signal " << m_nSignal << " raised during sensor update");
                }
             }
-            /* wait for the camera update thread to complete */
-            //cCameraUpdate.wait();
-            /* forward any exceptions from the update thread to this thread */
-            //cCameraUpdate.get();
-
             /* sleep if required */
             cRate.Sleep();
-            /* step the internal state machine */
+            /* step the provided controller */
             m_pcController->ControlStep();
             /* check for errors */
             if(!m_pcController->IsOK()) {
@@ -269,7 +255,7 @@ namespace argos {
                   THROW_ARGOSEXCEPTION("Signal " << m_nSignal << " raised during actuator update");
                }
             }
-            /* push actuator buffers to hardware */
+            /* push data to the actuators */
             ::iio_device_attr_write_bool(m_psActuatorUpdateTrigger, "trigger_now", true);
             /* flush the logs */
             LOG.Flush();
