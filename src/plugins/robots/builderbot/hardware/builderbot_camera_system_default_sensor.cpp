@@ -11,8 +11,8 @@
 
 #include <apriltag/apriltag.h>
 #include <apriltag/tag36h11.h>
-#include <apriltag/image_u8.h>
-#include <apriltag/zarray.h>
+#include <apriltag/common/image_u8.h>
+#include <apriltag/common/zarray.h>
 
 #include <fcntl.h>
 #include <sys/ioctl.h>
@@ -419,7 +419,6 @@ namespace argos {
       CAsyncPipelineOp(fn_sink) {
       /* initialize the apriltag components */
       m_psTagFamily = tag36h11_create();
-      m_psTagFamily->black_border = 1;
       /* create the tag detector */
       m_psTagDetector = apriltag_detector_create();
       /* add the tag family to the tag detector */
@@ -427,11 +426,8 @@ namespace argos {
       /* configure the tag detector */
       m_psTagDetector->quad_decimate = 1.0f;
       m_psTagDetector->quad_sigma = 0.0f;
-      m_psTagDetector->nthreads = 1;
-      m_psTagDetector->debug = 0;
       m_psTagDetector->refine_edges = 1;
-      m_psTagDetector->refine_decode = 0;
-      m_psTagDetector->refine_pose = 0;
+      m_psTagDetector->decode_sharpening = 0.25;
    }
 
    /****************************************/
