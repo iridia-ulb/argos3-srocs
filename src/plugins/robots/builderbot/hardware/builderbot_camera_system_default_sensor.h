@@ -12,7 +12,7 @@ namespace argos {
    class CBuilderBotCameraSystemDefaultSensor;
 }
 
-/* forward declarations for the apriltag library */
+/* forward declarations */
 struct apriltag_family;
 struct apriltag_detector;
 struct v4l2_buffer;
@@ -25,7 +25,7 @@ struct media_device;
 #include <future>
 #include <functional>
 
-#include <apriltag/image_u8.h>
+#include <apriltag/common/image_u8.h>
 
 #include <argos3/core/utility/math/rng.h>
 #include <argos3/core/hardware/sensor.h>
