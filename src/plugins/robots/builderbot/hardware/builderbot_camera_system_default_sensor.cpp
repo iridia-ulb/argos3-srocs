@@ -229,10 +229,10 @@ namespace argos {
       UInt32 unRowStart = static_cast<UInt32>(std::round(cMinCorner.GetY()));
       UInt32 unRowEnd = static_cast<UInt32>(std::round(cMaxCorner.GetY()));
       /* clamp the region of interest to the image size */
-      m_cColumnRange.TrucValue(unColumnStart);
-      m_cColumnRange.TrucValue(unColumnEnd);
-      m_cRowRange.TrucValue(unRowStart);
-      m_cRowRange.TrucValue(unRowEnd);
+      m_cColumnRange.TruncValue(unColumnStart);
+      m_cColumnRange.TruncValue(unColumnEnd);
+      m_cRowRange.TruncValue(unRowStart);
+      m_cRowRange.TruncValue(unRowEnd);
       /* column must start and end at an even number due to pixel format */
       if(unColumnStart % 2) {
          ++unColumnStart;
@@ -248,7 +248,7 @@ namespace argos {
       /* extract the data */    
       const SFrame& sCurrentFrame = m_lstCurrentFrame.front();
       for(UInt32 un_row = unRowStart; un_row < unRowEnd; un_row += 1) {
-         unRowIndex = un_row * m_unImageWidth;
+         UInt32 unRowIndex = un_row * m_unImageWidth;
          for(UInt32 un_column = unColumnStart; un_column < unColumnEnd; un_column += 2) {
             /* get a pointer to the start of the macro pixel */
             UInt8* punMacroPixel =

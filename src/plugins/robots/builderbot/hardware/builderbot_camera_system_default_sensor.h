@@ -67,8 +67,8 @@ namespace argos {
       const UInt32 m_unImageWidth = 320;
       const UInt32 m_unImageHeight = 240;
 
-      const CRange<UInt32> m_cColumnRange(0.0f, m_unImageWidth - 1u);
-      const CRange<UInt32> m_cRowRange(0.0f, m_unImageHeight - 1u);
+      const CRange<UInt32> m_cColumnRange = CRange<UInt32>(0u, m_unImageWidth - 1u);
+      const CRange<UInt32> m_cRowRange = CRange<UInt32>(0u, m_unImageHeight - 1u);
 
       const char* m_pchMediaDevice = "/dev/media0";
       const char* m_pchVideoDevice = "/dev/video0";
