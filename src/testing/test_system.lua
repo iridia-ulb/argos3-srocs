@@ -6,8 +6,8 @@ end
 --[[ This function is executed at each time step
      It must contain the logic of your controller ]]
 function step()
-   log("time = " .. string.format("%.1f", robot.clock.time) .. " seconds");
-
+   log("time = " .. string.format("%.1f", robot.system.time) .. " seconds");
+   log("temperature = " .. string.format("%.1f", robot.system.temperature) .. " degrees");
 end
 
 --[[ This function is executed every time you press the 'reset'

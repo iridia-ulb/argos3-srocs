@@ -6,20 +6,20 @@
   </framework>
 
   <controllers>
-    <lua_controller id="test_clock">
+    <lua_controller id="test_system">
       <actuators />
       <sensors>
-        <builderbot_clock implementation="default" />
+        <builderbot_system implementation="default" />
       </sensors>
-      <params script="src/testing/test_clock.lua" />
-      <params script="/usr/share/argos3/testing/test_clock.lua" />
+      <params script="src/testing/test_system.lua" />
+      <params script="/usr/share/argos3/testing/test_system.lua" />
     </lua_controller>
   </controllers>
 
   <arena size="0.5, 0.5, 0.5" center="0, 0, 0.25">
     <builderbot id="builderbot_0">
       <body position="0,0,0" orientation="0,0,0" />
-      <controller config="test_clock" />
+      <controller config="test_system" />
     </builderbot>
   </arena>
 
