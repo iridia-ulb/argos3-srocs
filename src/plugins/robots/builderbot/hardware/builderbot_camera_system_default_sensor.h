@@ -56,7 +56,6 @@ namespace argos {
       virtual CVector2 GetResolution() const;
 
    private:
-      const UInt32 m_unBufferCount = 2;
       const UInt32 m_unBytesPerPixel = 2;
       const UInt32 m_unImageWidth = 320;
       const UInt32 m_unImageHeight = 240;
@@ -67,15 +66,16 @@ namespace argos {
       const char* m_pchMediaDevice = "/dev/media0";
       const char* m_pchVideoDevice = "/dev/video0";
 
-      void* m_pvData;
-      image_u8_t* m_ptImage;
-      STag::TVector m_tDetections;
+      std::array<std::pair<UInt32, void*>, 2> m_arrBuffers;
+      std::array<std::pair<UInt32, void*>, 2>::iterator m_itCurrentBuffer;
+      std::array<std::pair<UInt32, void*>, 2>::iterator m_itNextBuffer;
 
+      ::image_u8_t* m_psImage;
       ::apriltag_family* m_psTagFamily;
       ::apriltag_detector* m_psTagDetector;
       
       /* media device */
-      media_device* m_psMediaDevice;
+      ::media_device* m_psMediaDevice;
 
       /* camera device handle */
       SInt32 m_nCameraHandle;

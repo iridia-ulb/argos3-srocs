@@ -46,12 +46,16 @@ namespace argos {
       m_psTagDetector->quad_sigma = 0.0f;
       m_psTagDetector->refine_edges = 1;
       m_psTagDetector->decode_sharpening = 0.25;
+      /* allocate image memory */
+      m_psImage = ::image_u8_create_alignment(m_unImageWidth, m_unImageHeight, 96);
    }
 
    /****************************************/
    /****************************************/
 
    CBuilderBotCameraSystemDefaultSensor::~CBuilderBotCameraSystemDefaultSensor() {
+      /* deallocate image memory */
+      ::image_u8_destroy(m_psImage);
       /* uninitialize the apriltag components */
       ::apriltag_detector_remove_family(m_psTagDetector, m_psTagFamily);
       /* destroy the tag detector */
@@ -133,32 +137,50 @@ namespace argos {
          /* request camera buffers */
          v4l2_requestbuffers sRequest;
          ::memset(&sRequest, 0, sizeof(sRequest));
-         sRequest.count = m_unBufferCount;
+         sRequest.count = m_arrBuffers.size();
          sRequest.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
          sRequest.memory= V4L2_MEMORY_MMAP;
          if (::ioctl(m_nCameraHandle, VIDIOC_REQBUFS, &sRequest) < 0) {
             THROW_ARGOSEXCEPTION("Could not request buffers");
          }
-         if (sRequest.count < m_unBufferCount) {
+         if (sRequest.count < m_arrBuffers.size()) {
             THROW_ARGOSEXCEPTION("Could not get the requested number of buffers");
          }
          /* remap and enqueue the buffers */
          v4l2_buffer sBuffer;
-         /* zero the buffer */
-         ::memset(&sBuffer, 0, sizeof(v4l2_buffer));
-         sBuffer.type = ::V4L2_BUF_TYPE_VIDEO_CAPTURE;
-         sBuffer.memory = ::V4L2_MEMORY_MMAP;
-         sBuffer.index = 0;
-         if(::ioctl(m_nCameraHandle, VIDIOC_QUERYBUF, &sBuffer) < 0) {
-            THROW_ARGOSEXCEPTION("Could not query buffer");
+         UInt32 unBufferIndex = 0;
+         for(std::pair<UInt32, void*>& t_buffer : m_arrBuffers) {
+            /* zero the buffer */
+            ::memset(&sBuffer, 0, sizeof(v4l2_buffer));
+            sBuffer.type = ::V4L2_BUF_TYPE_VIDEO_CAPTURE;
+            sBuffer.memory = ::V4L2_MEMORY_MMAP;
+            sBuffer.index = unBufferIndex;
+            if(::ioctl(m_nCameraHandle, VIDIOC_QUERYBUF, &sBuffer) < 0) {
+               THROW_ARGOSEXCEPTION("Could not query buffer");
+            }
+            std::get<UInt32>(t_buffer) =
+               unBufferIndex;
+            std::get<void*>(t_buffer) =
+               ::mmap(nullptr, sBuffer.length, PROT_READ | PROT_WRITE, MAP_SHARED,
+                      m_nCameraHandle, sBuffer.m.offset);
+            /* increment the buffer index */
+            unBufferIndex++;
          }
-         m_pvData = ::mmap(nullptr, sBuffer.length, PROT_READ | PROT_WRITE,
-                           MAP_SHARED, m_nCameraHandle, sBuffer.m.offset);
-         m_ptImage = ::image_u8_create_alignment(m_unImageWidth, m_unImageHeight, 96);
+         /* intialize iterators for the buffers */
+         m_itNextBuffer = std::begin(m_arrBuffers);
+         m_itCurrentBuffer = std::end(m_arrBuffers);
          /* start the stream */
          enum v4l2_buf_type eBufferType = ::V4L2_BUF_TYPE_VIDEO_CAPTURE;
          if(::ioctl(m_nCameraHandle, VIDIOC_STREAMON, &eBufferType) < 0) {
             THROW_ARGOSEXCEPTION("Could not start the stream");
+         }
+         /* enqueue the first buffer */
+         ::memset(&sBuffer, 0, sizeof(::v4l2_buffer));
+         sBuffer.type = ::V4L2_BUF_TYPE_VIDEO_CAPTURE;
+         sBuffer.memory = ::V4L2_MEMORY_MMAP;
+         sBuffer.index = m_itNextBuffer->first;
+         if(::ioctl(m_nCameraHandle, VIDIOC_QBUF, &sBuffer) < 0) {
+            THROW_ARGOSEXCEPTION("Could not enqueue used buffer");
          }
       }
       catch(CARGoSException& ex) {
@@ -171,55 +193,55 @@ namespace argos {
 
    void CBuilderBotCameraSystemDefaultSensor::Update() {
       try {
-         ::v4l2_buffer sBuffer;
-         /* enqueue buffer */
-         ::memset(&sBuffer, 0, sizeof(::v4l2_buffer));
-         sBuffer.type = ::V4L2_BUF_TYPE_VIDEO_CAPTURE;
-         sBuffer.memory = ::V4L2_MEMORY_MMAP;
-         sBuffer.index = 0;
-         if(::ioctl(m_nCameraHandle, VIDIOC_QBUF, &sBuffer) < 0) {
-            THROW_ARGOSEXCEPTION("Can not enqueue used buffer");
+         /* update the buffer iterators */
+         m_itCurrentBuffer = m_itNextBuffer;
+         m_itNextBuffer++;
+         if(m_itNextBuffer == std::end(m_arrBuffers)) {
+            m_itNextBuffer = std::begin(m_arrBuffers);
          }
-         /* dequeue buffer */
+         /* dequeue the buffer */
+         ::v4l2_buffer sBuffer;
          memset(&sBuffer, 0, sizeof(v4l2_buffer));
          sBuffer.type = ::V4L2_BUF_TYPE_VIDEO_CAPTURE;
          sBuffer.memory = ::V4L2_MEMORY_MMAP;
-         if(::ioctl(m_nCameraHandle, VIDIOC_DQBUF, &sBuffer) < 0)
+         sBuffer.index = m_itCurrentBuffer->first;
+         if(::ioctl(m_nCameraHandle, VIDIOC_DQBUF, &sBuffer) < 0) {
             THROW_ARGOSEXCEPTION("Could not dequeue buffer");
+         }
          /* store the capture time for the frame */
          std::chrono::steady_clock::time_point tpTimestamp =
             std::chrono::steady_clock::now();
-         /* create the gray scale image for the AprilTag algorithm */
-         UInt32 unSourceIndex = 0,
-            unDestinationIndex = 0,
-            unImageStride = m_ptImage->stride,
-            unImageWidth = m_ptImage->width,
-            unImageHeight = m_ptImage->height;
+         /* get a pointer to the image data */
+         uint8_t* punImageData = static_cast<uint8_t*>(m_itCurrentBuffer->second);
+         /* create the gray scale image based on the luminance data */
+         UInt32 unSourceIndex = 0;
+         UInt32 unDestinationIndex = 0;
+         UInt32 unImageStride = m_psImage->stride;
+         UInt32 unImageWidth = m_psImage->width;
+         UInt32 unImageHeight = m_psImage->height;
          /* extract the luminance from the data */
          for (UInt32 un_height_index = 0; un_height_index < unImageHeight; un_height_index++) {
             for (UInt32 un_width_index = 0; un_width_index < unImageWidth; un_width_index++) {
                /* copy data */
-               m_ptImage->buf[unDestinationIndex++] = 
-                  static_cast<uint8_t*>(m_pvData)[unSourceIndex + 1]; // Y0 and Y1
+               m_psImage->buf[unDestinationIndex++] = punImageData[unSourceIndex + 1];
                /* move to the next pixel */
                unSourceIndex += 2;
             }
             unDestinationIndex += (unImageStride - unImageWidth);
          }
-         
-
+         /* detect the tags */
          CVector2 cCenterPixel;
          std::array<CVector2, 4> arrCornerPixels;
          /* run the apriltags algorithm */
          ::zarray_t* psDetectionArray =
-              ::apriltag_detector_detect(m_psTagDetector, m_ptImage);
+              ::apriltag_detector_detect(m_psTagDetector, m_psImage);
          /* get the detected tags count */
          size_t unTagCount = static_cast<size_t>(::zarray_size(psDetectionArray));
          /* clear out previous readings */
          m_tTags.clear();
          /* reserve space for the tags */
          m_tTags.reserve(unTagCount);
-         /* process detections */
+         /* copy detection data to the control interface */
          for(size_t un_index = 0; un_index < unTagCount; un_index++) {
             ::apriltag_detection_t *psDetection;
             ::zarray_get(psDetectionArray, un_index, &psDetection);
@@ -235,8 +257,16 @@ namespace argos {
          }
          /* destroy the readings array */
          ::apriltag_detections_destroy(psDetectionArray);
-
+         /* copy timestamp to the control interface */
          m_fTimestamp = std::chrono::duration_cast<std::chrono::duration<Real> >(tpTimestamp - m_tpInit).count();
+         /* enqueue the next buffer */
+         ::memset(&sBuffer, 0, sizeof(::v4l2_buffer));
+         sBuffer.type = ::V4L2_BUF_TYPE_VIDEO_CAPTURE;
+         sBuffer.memory = ::V4L2_MEMORY_MMAP;
+         sBuffer.index = m_itNextBuffer->first;
+         if(::ioctl(m_nCameraHandle, VIDIOC_QBUF, &sBuffer) < 0) {
+            THROW_ARGOSEXCEPTION("Can not enqueue used buffer");
+         }
       }
       catch(CARGoSException& ex) {
          THROW_ARGOSEXCEPTION_NESTED("Error updating the camera sensor", ex);
@@ -247,6 +277,15 @@ namespace argos {
    /****************************************/
 
    void CBuilderBotCameraSystemDefaultSensor::Destroy() {
+      /* dequeue the next buffer */
+      ::v4l2_buffer sBuffer;
+      memset(&sBuffer, 0, sizeof(v4l2_buffer));
+      sBuffer.type = ::V4L2_BUF_TYPE_VIDEO_CAPTURE;
+      sBuffer.memory = ::V4L2_MEMORY_MMAP;
+      sBuffer.index = m_itNextBuffer->first;
+      if(::ioctl(m_nCameraHandle, VIDIOC_DQBUF, &sBuffer) < 0) {
+         LOGERR << "[WARNING] Could not dequeue buffer" << std::endl;
+      }
       /* stop stream */
       enum v4l2_buf_type eBufferType = V4L2_BUF_TYPE_VIDEO_CAPTURE;
       if (::ioctl(m_nCameraHandle, VIDIOC_STREAMOFF, &eBufferType) < 0) {
@@ -288,13 +327,17 @@ namespace argos {
       Real fSumY0 = 0.0f;
       Real fWeightedSumV = 0.0f;
       Real fSumY1 = 0.0f;
+      /* get a pointer to the current image data */
+      if(m_itCurrentBuffer == std::end(m_arrBuffers)) {
+         THROW_ARGOSEXCEPTION("Current buffer is not ready");
+      }
+      UInt8* punImageData = static_cast<UInt8*>(m_itCurrentBuffer->second);
       /* extract the data */    
       for(UInt32 un_row = unRowStart; un_row < unRowEnd; un_row += 1) {
          UInt32 unRowIndex = un_row * m_unImageWidth;
          for(UInt32 un_column = unColumnStart; un_column < unColumnEnd; un_column += 2) {
             /* get a pointer to the start of the macro pixel */
-            UInt8* punMacroPixel =
-               static_cast<UInt8*>(m_pvData) + unRowIndex + un_column;
+            UInt8* punMacroPixel = punImageData + (unRowIndex + un_column);
             /* extract the macro pixel */
             fWeightedSumU += static_cast<Real>(punMacroPixel[0]) * punMacroPixel[1];
             fSumY0 += static_cast<Real>(punMacroPixel[1]);
