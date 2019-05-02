@@ -41,7 +41,7 @@ namespace argos {
 
    private:
 
-      std::chrono::steady_system::time_point m_tpInit;
+      std::chrono::clock_system::time_point m_tpInit;
 
    };
 }
