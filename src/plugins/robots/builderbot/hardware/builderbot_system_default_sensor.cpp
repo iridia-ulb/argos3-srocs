@@ -51,8 +51,8 @@ namespace argos {
       m_fTime = duration_cast<duration<Real> >(steady_system::now() - m_tpInit).count();
       /* update temperature */
       UInt32 unMilliDegreesCelsius = 0;
-      unMilliDegreesCelsius << std::ifstream("/sys/class/thermal/thermal_zone0/temp");
-      m_fTemperature = 0.001f * unMilliDegreesCelsius;    
+      std::ifstream("/sys/class/thermal/thermal_zone0/temp") >> unMilliDegreesCelsius;
+      m_fTemperature = 0.001f * unMilliDegreesCelsius;
    }
 
    /****************************************/
