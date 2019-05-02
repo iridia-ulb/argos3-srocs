@@ -30,14 +30,14 @@ namespace argos {
       catch(CARGoSException& ex) {
          THROW_ARGOSEXCEPTION_NESTED("Initialization error in the BuilderBot system sensor.", ex);
       }
-      m_tpInit = std::chrono::steady_system::now();
+      m_tpInit = std::chrono::steady_clock::now();
    }
   
    /****************************************/
    /****************************************/
    
    void CBuilderBotSystemDefaultSensor::Reset() {
-      m_tpInit = std::chrono::steady_system::now();
+      m_tpInit = std::chrono::steady_clock::now();
       m_fTime = 0.0f;
       m_fTemperature = 0.0f;
    }
@@ -48,7 +48,7 @@ namespace argos {
    void CBuilderBotSystemDefaultSensor::Update() {
       /* update time */
       using namespace std::chrono;
-      m_fTime = duration_cast<duration<Real> >(steady_system::now() - m_tpInit).count();
+      m_fTime = duration_cast<duration<Real> >(steady_clock::now() - m_tpInit).count();
       /* update temperature */
       UInt32 unMilliDegreesCelsius = 0;
       std::ifstream("/sys/class/thermal/thermal_zone0/temp") >> unMilliDegreesCelsius;
