@@ -22,12 +22,20 @@
 
 #include <regex>
 #include <chrono>
-#include <functional>
 
 extern "C" {
    #include <mediactl.h>
    #include <v4l2subdev.h>
 }
+
+#define THRESHOLD_Q1_MIN_V 140u
+#define THRESHOLD_Q1_MIN_U 140u
+#define THRESHOLD_Q2_MIN_V 140u
+#define THRESHOLD_Q2_MAX_U 100u
+#define THRESHOLD_Q3_MAX_V 110u
+#define THRESHOLD_Q3_MAX_U 130u
+#define THRESHOLD_Q4_MAX_V 100u
+#define THRESHOLD_Q4_MIN_U 145u
 
 namespace argos {
 
@@ -46,6 +54,7 @@ namespace argos {
       m_psTagDetector->quad_sigma = 0.0f;
       m_psTagDetector->refine_edges = 1;
       m_psTagDetector->decode_sharpening = 0.25;
+      m_psTagDetector->nthreads = 2;
       /* allocate image memory */
       m_psImage = ::image_u8_create_alignment(m_unImageWidth, m_unImageHeight, 96);
    }
@@ -300,21 +309,26 @@ namespace argos {
    /****************************************/
    /****************************************/
 
-   CColor CBuilderBotCameraSystemDefaultSensor::DetectLed(const CVector2& c_center,
-                                                          const CVector2& c_size) {
+   CBuilderBotCameraSystemDefaultSensor::ELedState
+      CBuilderBotCameraSystemDefaultSensor::DetectLed(const CVector2& c_center,
+                                                      const CVector2& c_size) {
       /* calculate the corners of the region of interest */
       CVector2 cMinCorner(c_center - 0.5f * c_size);
       CVector2 cMaxCorner(c_center + 0.5f * c_size);
-      /* get the start/end indices */
-      UInt32 unColumnStart = static_cast<UInt32>(std::round(cMinCorner.GetX()));
-      UInt32 unColumnEnd = static_cast<UInt32>(std::round(cMaxCorner.GetX()));
-      UInt32 unRowStart = static_cast<UInt32>(std::round(cMinCorner.GetY()));
-      UInt32 unRowEnd = static_cast<UInt32>(std::round(cMaxCorner.GetY()));
       /* clamp the region of interest to the image size */
-      m_cColumnRange.TruncValue(unColumnStart);
-      m_cColumnRange.TruncValue(unColumnEnd);
-      m_cRowRange.TruncValue(unRowStart);
-      m_cRowRange.TruncValue(unRowEnd);
+      Real fColumnStart = cMinCorner.GetX();
+      Real fColumnEnd = cMaxCorner.GetX();
+      Real fRowStart = cMinCorner.GetY();
+      Real fRowEnd = cMaxCorner.GetY();
+      m_cColumnRange.TruncValue(fColumnStart);
+      m_cColumnRange.TruncValue(fColumnEnd);
+      m_cRowRange.TruncValue(fRowStart);
+      m_cRowRange.TruncValue(fRowEnd);
+      /* get the start/end indices */
+      UInt32 unColumnStart = static_cast<UInt32>(std::round(fColumnStart));
+      UInt32 unColumnEnd = static_cast<UInt32>(std::round(fColumnEnd));
+      UInt32 unRowStart = static_cast<UInt32>(std::round(fRowStart));
+      UInt32 unRowEnd = static_cast<UInt32>(std::round(fRowEnd));
       /* column must start and end at an even number due to pixel format */
       if(unColumnStart % 2) {
          ++unColumnStart;
@@ -334,10 +348,12 @@ namespace argos {
       UInt8* punImageData = static_cast<UInt8*>(m_itCurrentBuffer->second);
       /* extract the data */    
       for(UInt32 un_row = unRowStart; un_row < unRowEnd; un_row += 1) {
-         UInt32 unRowIndex = un_row * m_unImageWidth;
-         for(UInt32 un_column = unColumnStart; un_column < unColumnEnd; un_column += 2) {
+         UInt32 unRowIndex = un_row * m_unImageWidth * m_unBytesPerPixel;
+         for(UInt32 un_column = unColumnStart * m_unBytesPerPixel;
+             un_column < unColumnEnd * m_unBytesPerPixel;
+             un_column += (2 * m_unBytesPerPixel)) {
             /* get a pointer to the start of the macro pixel */
-            UInt8* punMacroPixel = punImageData + (unRowIndex + un_column);
+            UInt8* punMacroPixel = punImageData + unRowIndex + un_column;
             /* extract the macro pixel */
             fWeightedSumU += static_cast<Real>(punMacroPixel[0]) * punMacroPixel[1];
             fSumY0 += static_cast<Real>(punMacroPixel[1]);
@@ -345,10 +361,31 @@ namespace argos {
             fSumY1 += static_cast<Real>(punMacroPixel[3]);           
          }
       }
-      Real fAverageU = (fWeightedSumU / fSumY0);
-      Real fAverageV = (fWeightedSumV / fSumY1);
-
-      return CColor::BLACK;
+      /* default values if fSumY1,0 are zero */
+      UInt8 unAverageU = 128u;
+      UInt8 unAverageV = 128u;     
+      if(fSumY0 != 0.0f) {
+         unAverageU = static_cast<UInt8>(std::round(fWeightedSumU / fSumY0));
+      }
+      if(fSumY1 != 0.0f) {
+         unAverageV = static_cast<UInt8>(std::round(fWeightedSumV / fSumY1));
+      }
+      /* initialize the LED state to off */
+      ELedState eLedState = ELedState::OFF;    
+      /* deduce the LED state from the UV values */
+      if((unAverageV > THRESHOLD_Q1_MIN_V) && (unAverageU > THRESHOLD_Q1_MIN_U)) {
+         eLedState = ELedState::Q1;
+      }
+      else if((unAverageV > THRESHOLD_Q2_MIN_V) && (unAverageU < THRESHOLD_Q2_MAX_U)) {
+         eLedState = ELedState::Q2;
+      }
+      else if((unAverageV < THRESHOLD_Q3_MAX_V) && (unAverageU < THRESHOLD_Q3_MAX_U)) {
+         eLedState = ELedState::Q3;
+      }
+      else if((unAverageV < THRESHOLD_Q4_MAX_V) && (unAverageU > THRESHOLD_Q4_MIN_U)) {
+         eLedState = ELedState::Q4;
+      }
+      return eLedState;
    }
 
    /****************************************/

@@ -53,8 +53,8 @@ namespace argos {
 
       virtual bool operator()(CDirectionalLEDEntity& c_led);
 
-      virtual CColor DetectLed(const CVector2& c_center,
-                               const CVector2& c_size);
+      virtual ELedState DetectLed(const CVector2& c_center,
+                                  const CVector2& c_size);
 
       virtual CVector2 GetResolution() const;
 
@@ -72,26 +72,31 @@ namespace argos {
       SAnchor* m_psEndEffectorAnchor;
       CPositionalIndex<CDirectionalLEDEntity>* m_pcDirectionalLEDIndex;
       CPositionalIndex<CTagEntity>* m_pcTagIndex;
+
       /* debugging information */
       bool m_bShowFrustum;
       bool m_bShowTagRays;
       bool m_bShowLEDRays;
+
       /* cached data for operator() */
       CTransformationMatrix3 m_cOffset;
       CVector3 m_cCameraLocation;
       CTransformationMatrix3 m_cCameraToWorldTransform;
       CSquareMatrix<3> m_cProjectionMatrix;
       std::array<CPlane, 6> m_arrFrustumPlanes;
+
       /* for generating the fustrum */
       Real m_fNearPlaneWidth;
       Real m_fNearPlaneHeight;
       Real m_fFarPlaneWidth;
       Real m_fFarPlaneHeight;     
+
       /* shared buffers */
       std::array<CVector3, 4> m_arrTagCorners;
       std::array<CVector2, 4> m_arrTagCornerPixels;
       CRay3 m_cOcclusionCheckRay;
-      SEmbodiedEntityIntersectionItem m_sIntersectionItem;     
+      SEmbodiedEntityIntersectionItem m_sIntersectionItem;
+
       /* AprilTag corner offsets / ordering */
       const std::array<CVector3, 4> m_arrTagCornerOffsets = {{
          {-0.5, -0.5, 0},
@@ -99,8 +104,17 @@ namespace argos {
          { 0.5,  0.5, 0},
          { 0.5, -0.5, 0},
       }};
-      /* For LEDs found inside the frustum */
-      SLed::TVector m_tLedCache;
+
+      /* for representing LEDs found inside the frustum */
+      struct SLed {
+         SLed(const CColor& c_color,
+              const CVector2& c_center) :
+            Color(c_color),
+            Center(c_center) {}
+         CColor Color;
+         CVector2 Center;
+      };
+      std::vector<SLed> m_vecLedCache;
    };
 }
 

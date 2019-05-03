@@ -38,16 +38,12 @@ namespace argos {
          using TVector = std::vector<STag>;
       };
 
-      struct SLed {
-         /* constructor */
-         SLed(const CColor& c_color,
-              const CVector2& c_center) :
-            Color(c_color),
-            Center(c_center) {}
-         /* members */
-         CColor Color;
-         CVector2 Center;
-         using TVector = std::vector<SLed>;
+      enum class ELedState : UInt8 {
+         OFF = 0,
+         Q1  = 1,
+         Q2  = 2,
+         Q3  = 3,
+         Q4  = 4
       };
 
    public:
@@ -64,8 +60,8 @@ namespace argos {
          m_fTimestamp = 0.0f;
       }
 
-      virtual CColor DetectLed(const CVector2& c_center,
-                               const CVector2& c_size) = 0;
+      virtual ELedState DetectLed(const CVector2& c_center,
+                                  const CVector2& c_size) = 0;
 
       virtual CVector2 GetResolution() const = 0;
 

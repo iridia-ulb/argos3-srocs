@@ -18,12 +18,8 @@ struct apriltag_detector;
 struct v4l2_buffer;
 struct media_device;
 
-#include <memory>
+#include <array>
 #include <chrono>
-#include <list>
-#include <mutex>
-#include <future>
-#include <functional>
 
 #include <apriltag/common/image_u8.h>
 
@@ -50,8 +46,8 @@ namespace argos {
 
       virtual void Update();
 
-      virtual CColor DetectLed(const CVector2& c_center,
-                               const CVector2& c_size);
+      virtual ELedState DetectLed(const CVector2& c_center,
+                                  const CVector2& c_size);
 
       virtual CVector2 GetResolution() const;
 
@@ -60,8 +56,8 @@ namespace argos {
       const UInt32 m_unImageWidth = 320;
       const UInt32 m_unImageHeight = 240;
 
-      const CRange<UInt32> m_cColumnRange = CRange<UInt32>(0u, m_unImageWidth - 1u);
-      const CRange<UInt32> m_cRowRange = CRange<UInt32>(0u, m_unImageHeight - 1u);
+      const CRange<Real> m_cColumnRange = CRange<Real>(0.0f, m_unImageWidth - 1.0f);
+      const CRange<Real> m_cRowRange = CRange<Real>(0.0f, m_unImageHeight - 1.0f);
 
       const char* m_pchMediaDevice = "/dev/media0";
       const char* m_pchVideoDevice = "/dev/video0";

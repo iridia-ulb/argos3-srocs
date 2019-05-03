@@ -91,7 +91,7 @@ namespace argos {
          GetNodeAttributeOrDefault(t_tree, "show_tag_rays", m_bShowTagRays, m_bShowTagRays);
          GetNodeAttributeOrDefault(t_tree, "show_led_rays", m_bShowLEDRays, m_bShowLEDRays);
          /* get indices */
-         m_pcTagIndex = 
+         m_pcTagIndex =
             &(CSimulator::GetInstance().GetMedium<CTagMedium>("tags").GetIndex());
          m_pcDirectionalLEDIndex =
             &(CSimulator::GetInstance().GetMedium<CDirectionalLEDMedium>("directional_leds").GetIndex());
@@ -108,11 +108,11 @@ namespace argos {
    void CBuilderBotCameraSystemDefaultSensor::Update() {
       /* clear out the readings from the last update */
       m_tTags.clear();
-      m_tLedCache.clear();
+      m_vecLedCache.clear();
       /* increment the timestamp */
       m_fTimestamp += CPhysicsEngine::GetSimulationClockTick();
       /* if the sensor is enabled */
-      if(m_bEnabled) {     
+      if(m_bEnabled) {
          /* get a reference to the checked rays for the controller */
          std::vector<std::pair<bool, CRay3> >& vecCheckedRays =
             m_pcControllableEntity->GetCheckedRays();
@@ -172,7 +172,7 @@ namespace argos {
          cBoundingBoxMinCorner = cNearCenter;
          cBoundingBoxMaxCorner = cNearCenter;
          for(const CVector3& c_point : {
-            cNearTopLeft, cNearTopRight, cNearBottomLeft, cNearBottomRight, 
+            cNearTopLeft, cNearTopRight, cNearBottomLeft, cNearBottomRight,
             cFarTopLeft, cFarTopRight, cFarBottomLeft, cFarBottomRight
          }) {
             if(c_point.GetX() > cBoundingBoxMaxCorner.GetX()) {
@@ -223,7 +223,7 @@ namespace argos {
 
    void CBuilderBotCameraSystemDefaultSensor::Reset() {
       /* clear the LED cache */
-      m_tLedCache.clear();
+      m_vecLedCache.clear();
       /* reset the base class */
       CCI_BuilderBotCameraSystemSensor::Reset();
    }
@@ -293,7 +293,7 @@ namespace argos {
       }
       m_cOcclusionCheckRay.SetEnd(cLedPosition);
       if(!GetClosestEmbodiedEntityIntersectedByRay(m_sIntersectionItem, m_cOcclusionCheckRay)) {
-         m_tLedCache.emplace_back(c_led.GetColor(), ProjectOntoSensor(cLedPosition));
+         m_vecLedCache.emplace_back(c_led.GetColor(), ProjectOntoSensor(cLedPosition));
          m_pcControllableEntity->GetCheckedRays().emplace_back(false, m_cOcclusionCheckRay);
       }
       else {
@@ -305,20 +305,35 @@ namespace argos {
    /****************************************/
    /****************************************/
 
-   CColor CBuilderBotCameraSystemDefaultSensor::DetectLed(const CVector2& c_center,
-                                                          const CVector2& c_size) {
+   CBuilderBotCameraSystemDefaultSensor::ELedState
+      CBuilderBotCameraSystemDefaultSensor::DetectLed(const CVector2& c_center,
+                                                      const CVector2& c_size) {
+      ELedState eLedState = ELedState::OFF;
       CVector2 cMinCorner(c_center - 0.5f * c_size);
       CVector2 cMaxCorner(c_center + 0.5f * c_size);
-      for(const SLed& s_led : m_tLedCache) {
+      for(const SLed& s_led : m_vecLedCache) {
          if(s_led.Center.GetX() > cMinCorner.GetX() &&
             s_led.Center.GetY() > cMinCorner.GetY() &&
             s_led.Center.GetX() < cMaxCorner.GetX() &&
             s_led.Center.GetY() < cMaxCorner.GetY()) {
-            /* return the color of the first LED in the specified region */
-            return s_led.Color;
+            /* in simulation, the state of the LED is mapped from its color */
+            if(s_led.Color == CColor::MAGENTA) {
+               eLedState = ELedState::Q1;
+            }
+            else if(s_led.Color == CColor::ORANGE) {
+               eLedState = ELedState::Q2;
+            }
+            else if(s_led.Color == CColor::GREEN) {
+               eLedState = ELedState::Q3;
+            }
+            else if(s_led.Color == CColor::BLUE) {
+               eLedState = ELedState::Q4;
+            }
+            /* stop at the first LED */
+            break;
          }
       }
-      return CColor::BLACK;
+      return eLedState;
    }
 
    /****************************************/
@@ -346,12 +361,12 @@ namespace argos {
       CVector3 cCameraToEntityTranslation(m_cCameraToWorldTransform * c_point);
       /* this could be avoided if CVector3 inherited from CMatrix<3,1> */
       CMatrix<3,1> cCameraToEntityTranslationMatrix;
-      cCameraToEntityTranslationMatrix(0,0) = 
+      cCameraToEntityTranslationMatrix(0,0) =
          cCameraToEntityTranslation.GetX() / cCameraToEntityTranslation.GetZ();
       cCameraToEntityTranslationMatrix(1,0) =
          cCameraToEntityTranslation.GetY() / cCameraToEntityTranslation.GetZ();
       cCameraToEntityTranslationMatrix(2,0) = 1.0f;
-      /* get image coordinates */              
+      /* get image coordinates */
       CMatrix<3,1> cImageCoordinates(m_cProjectionMatrix * cCameraToEntityTranslationMatrix);
       /* return as vector2 */
       return CVector2(cImageCoordinates(0,0), cImageCoordinates(1,0));

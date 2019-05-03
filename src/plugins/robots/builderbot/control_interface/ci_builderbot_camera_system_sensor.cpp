@@ -77,14 +77,11 @@ namespace argos {
       CCI_BuilderBotCameraSystemSensor* pcCameraSensor = 
          CLuaUtility::GetDeviceInstance<CCI_BuilderBotCameraSystemSensor>(pt_lua_state, "camera_system");
       /* Get the color of the LED (CColor::BLACK if none) */
-      const CColor& cColor = pcCameraSensor->DetectLed(cOffset, cSize);
-      /* Create a table for the pixel data */
-      lua_newtable (pt_lua_state);
-      CLuaUtility::AddToTable(pt_lua_state, "_type", CLuaUtility::TYPE_COLOR);
-      CLuaUtility::AddToTable(pt_lua_state, "red", cColor.GetRed());
-      CLuaUtility::AddToTable(pt_lua_state, "green", cColor.GetGreen());
-      CLuaUtility::AddToTable(pt_lua_state, "blue", cColor.GetBlue());
-      /* return a single result, the table */
+      const CCI_BuilderBotCameraSystemSensor::ELedState& eLedState =
+         pcCameraSensor->DetectLed(cOffset, cSize);
+      /* convert the LED state to an integer and push it onto the stack */
+      lua_pushinteger(pt_lua_state, static_cast<UInt8>(eLedState));
+      /* return a single result, the integer */
       return 1;
    }
 #endif
