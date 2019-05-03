@@ -38,8 +38,8 @@ namespace argos {
    
    void CBuilderBotSystemDefaultSensor::Reset() {
       m_tpInit = std::chrono::steady_clock::now();
-      m_fTime = 0.0f;
-      m_fTemperature = 0.0f;
+      m_fTime = Real(0);
+      m_fTemperature = Real(0);
    }
 
    /****************************************/
@@ -50,9 +50,9 @@ namespace argos {
       using namespace std::chrono;
       m_fTime = duration_cast<duration<Real> >(steady_clock::now() - m_tpInit).count();
       /* update temperature */
-      UInt32 unMilliDegreesCelsius = 0;
+      UInt32 unMilliDegreesCelsius = 0u;
       std::ifstream("/sys/class/thermal/thermal_zone0/temp") >> unMilliDegreesCelsius;
-      m_fTemperature = 0.001f * unMilliDegreesCelsius;
+      m_fTemperature = Real(0.001) * unMilliDegreesCelsius;
    }
 
    /****************************************/
