@@ -17,10 +17,10 @@ namespace argos {
       for(std::pair<const std::string, SOutput*>& s_interface : m_tInterfaces) {
          if(!s_interface.second->Buffer.str().empty()) {
             if(s_interface.second->WriteToStandardOutput) {
-               LOG << s_interface.second->Buffer.str() << std::flush;
+               std::cout << s_interface.second->Buffer.str() << std::flush;
             }
             if(s_interface.second->WriteToStandardError) {
-               LOGERR << s_interface.second->Buffer.str() << std::flush;
+               std::cerr << s_interface.second->Buffer.str() << std::flush;
             }
             if(s_interface.second->WriteToFile.is_open()) {
                s_interface.second->WriteToFile << s_interface.second->Buffer.str() << std::flush;

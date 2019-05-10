@@ -18,13 +18,11 @@ function step()
       end
    end
 
-   robot.camera_system.detect_led(320, 180, 640, 360)
-   --robot.nfc.write({255}, {255, 255}, {255, 255, 255}, {255, 255, 255, 255})
-   --robot.nfc.write({1,2,3})
-   robot.debug.log("test")
-   robot.debug.logerr("test")
-   robot.debug.draw("(bb01)->(bb02)")
-   log("step")
+   if robot.debug ~= nil then
+      robot.debug.log("test1")
+      robot.debug.logerr("test2")
+      --robot.debug.draw("(bb01)->(bb02)")
+   end
 end
 
 --[[ This function is executed every time you press the 'reset'
@@ -36,6 +34,7 @@ function reset()
    robot.electromagnet_system.set_discharge_mode("disabled")
    robot.lift_system.calibrate();
    robot.differential_drive.set_target_velocity(0.5,0.5);
+   robot.camera_system.enable()
 end
 
 
