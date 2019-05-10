@@ -37,6 +37,20 @@ namespace argos {
 
    public:
 
+      /* represents LEDs inside a frustum */
+      struct SLed {
+         SLed(const CColor& c_color,
+              const CVector2& c_center) :
+            Color(c_color),
+            Center(c_center) {}
+         CColor Color;
+         CVector2 Center;
+      };
+
+      const std::vector<SLed>& GetLedCache() const {
+         return m_vecLedCache;
+      }
+
       CBuilderBotCameraSystemDefaultSensor();
 
       virtual ~CBuilderBotCameraSystemDefaultSensor() {}
@@ -105,16 +119,8 @@ namespace argos {
          { 0.5, -0.5, 0},
       }};
 
-      /* for representing LEDs found inside the frustum */
-      struct SLed {
-         SLed(const CColor& c_color,
-              const CVector2& c_center) :
-            Color(c_color),
-            Center(c_center) {}
-         CColor Color;
-         CVector2 Center;
-      };
       std::vector<SLed> m_vecLedCache;
+
    };
 }
 
