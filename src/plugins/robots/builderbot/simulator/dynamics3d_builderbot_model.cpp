@@ -6,9 +6,7 @@
 
 #include "dynamics3d_builderbot_model.h"
 
-#include <argos3/plugins/robots/builderbot/simulator/builderbot_entity.h>
 #include <argos3/plugins/simulator/physics_engines/dynamics3d/dynamics3d_engine.h>
-#include <argos3/plugins/simulator/physics_engines/dynamics3d/dynamics3d_single_body_object_model.h>
 #include <argos3/plugins/simulator/physics_engines/dynamics3d/dynamics3d_shape_manager.h>
 
 #include <argos3/plugins/robots/builderbot/simulator/builderbot_differential_drive_entity.h>
