@@ -12,7 +12,6 @@ function step()
    end  
    robot.directional_leds.set_all_colors("black")
    robot.directional_leds.set_single_color(count, "red")
-   robot.radios.radio_2.tx_data({1})
 end
 
 function reset()
