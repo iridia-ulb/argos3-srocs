@@ -8,11 +8,11 @@
 #ifndef BUILDERBOT_CAMERA_SYSTEM_DEFAULT_SENSOR_H
 #define BUILDERBOT_CAMERA_SYSTEM_DEFAULT_SENSOR_H
 
+/* forward declarations */
 namespace argos {
    class CBuilderBotCameraSystemDefaultSensor;
 }
 
-/* forward declarations */
 struct apriltag_family;
 struct apriltag_detector;
 struct v4l2_buffer;
@@ -23,8 +23,12 @@ struct media_device;
 
 #include <apriltag/common/image_u8.h>
 
-#include <argos3/core/utility/math/rng.h>
 #include <argos3/core/hardware/sensor.h>
+#include <argos3/core/utility/math/quaternion.h>
+#include <argos3/core/utility/math/rng.h>
+#include <argos3/core/utility/math/vector2.h>
+#include <argos3/core/utility/math/vector3.h>
+
 #include <argos3/plugins/robots/builderbot/control_interface/ci_builderbot_camera_system_sensor.h>
 
 #include <linux/videodev2.h>
@@ -52,15 +56,11 @@ namespace argos {
       virtual CVector2 GetResolution() const;
 
    private:
-      const UInt32 m_unBytesPerPixel = 2;
-      const UInt32 m_unImageWidth = 320;
-      const UInt32 m_unImageHeight = 240;
-
-      const CRange<Real> m_cColumnRange = CRange<Real>(0.0f, m_unImageWidth - 1.0f);
-      const CRange<Real> m_cRowRange = CRange<Real>(0.0f, m_unImageHeight - 1.0f);
-
-      const char* m_pchMediaDevice = "/dev/media0";
-      const char* m_pchVideoDevice = "/dev/video0";
+      /* calibration data */
+      CVector2 m_cFocalLength;
+      CVector2 m_cPrincipalPoint;
+      CVector3 m_cPositionOffset;
+      CQuaternion m_cOrientationOffset;
 
       std::array<std::pair<UInt32, void*>, 2> m_arrBuffers;
       std::array<std::pair<UInt32, void*>, 2>::iterator m_itCurrentBuffer;
@@ -78,7 +78,6 @@ namespace argos {
 
       /* time at initialization */
       std::chrono::steady_clock::time_point m_tpInit;
-
 
       /****************************************/
       /****************************************/

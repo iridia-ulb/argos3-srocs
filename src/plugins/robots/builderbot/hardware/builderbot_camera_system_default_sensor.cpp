@@ -8,6 +8,9 @@
 #include "builderbot_camera_system_default_sensor.h"
 
 #include <argos3/core/utility/logging/argos_log.h>
+#include <argos3/core/utility/math/vector2.h>
+#include <argos3/core/utility/math/vector3.h>
+#include <argos3/core/utility/math/quaternion.h>
 
 #include <apriltag/apriltag.h>
 #include <apriltag/tag36h11.h>
@@ -37,12 +40,24 @@ extern "C" {
 #define THRESHOLD_Q4_MAX_V 100u
 #define THRESHOLD_Q4_MIN_U 145u
 
+#define DEFAULT_FOCAL_LENGTH_X 313.9f
+#define DEFAULT_FOCAL_LENGTH_Y 313.9f
+#define DEFAULT_PRINCIPAL_POINT_X 160.0f
+#define DEFAULT_PRINCIPAL_POINT_Y 120.0f
+#define IMAGE_BYTES_PER_PIXEL 2u
+#define IMAGE_WIDTH 320u
+#define IMAGE_HEIGHT 240u
+#define FILE_MEDIA_DEVICE "/dev/media0"
+#define FILE_VIDEO_DEVICE "/dev/video0"
+
 namespace argos {
 
    /****************************************/
    /****************************************/
    
-   CBuilderBotCameraSystemDefaultSensor::CBuilderBotCameraSystemDefaultSensor() {
+   CBuilderBotCameraSystemDefaultSensor::CBuilderBotCameraSystemDefaultSensor() :
+      m_cFocalLength(DEFAULT_FOCAL_LENGTH_X, DEFAULT_FOCAL_LENGTH_Y),
+      m_cPrincipalPoint(DEFAULT_PRINCIPAL_POINT_X, DEFAULT_PRINCIPAL_POINT_Y) {
       /* initialize the apriltag components */
       m_psTagFamily = ::tag36h11_create();
       /* create the tag detector */
@@ -56,7 +71,7 @@ namespace argos {
       m_psTagDetector->decode_sharpening = 0.25;
       m_psTagDetector->nthreads = 2;
       /* allocate image memory */
-      m_psImage = ::image_u8_create_alignment(m_unImageWidth, m_unImageHeight, 96);
+      m_psImage = ::image_u8_create_alignment(IMAGE_WIDTH, IMAGE_HEIGHT, 96);
    }
 
    /****************************************/
@@ -79,15 +94,33 @@ namespace argos {
    void CBuilderBotCameraSystemDefaultSensor::Init(TConfigurationNode& t_tree) {
       try {
          CCI_BuilderBotCameraSystemSensor::Init(t_tree);
+         /********************************/
+         /* retrieve the calibraton data */
+         /********************************/
+         std::string strCalibrationFilePath;
+         GetNodeAttributeOrDefault(t_tree, "calibration", strCalibrationFilePath, strCalibrationFilePath);
+         if(strCalibrationFilePath.empty()) {
+            LOGERR << "[WARNING] No calibration data provided for the builderbot camera system" << std::endl;
+         }
+         else {
+            ticpp::Document tCalibration = ticpp::Document(strCalibrationFilePath);
+            tCalibration.LoadFile();
+            TConfigurationNode& t_calibration = *tCalibration.FirstChildElement();
+            /* read the parameters */
+            GetNodeAttributeOrDefault(t_calibration, "focal_length", m_cFocalLength, m_cFocalLength);
+            GetNodeAttributeOrDefault(t_calibration, "principal_point", m_cPrincipalPoint, m_cPrincipalPoint);
+            GetNodeAttributeOrDefault(t_calibration, "position", m_cPositionOffset, m_cPositionOffset);
+            GetNodeAttributeOrDefault(t_calibration, "orientation", m_cOrientationOffset, m_cOrientationOffset);
+         }
          /***************************************/
          /* open and configure the media device */
          /***************************************/
-         m_psMediaDevice = media_device_new(m_pchMediaDevice);
+         m_psMediaDevice = media_device_new(FILE_MEDIA_DEVICE);
          if (m_psMediaDevice == nullptr)
-            THROW_ARGOSEXCEPTION("Could not open media device " << m_pchMediaDevice);
+            THROW_ARGOSEXCEPTION("Could not open media device " << FILE_MEDIA_DEVICE);
          /* enumerate entities, pads and links */
          if (media_device_enumerate(m_psMediaDevice) < 0)
-            THROW_ARGOSEXCEPTION("Could not enumerate media device" << m_pchMediaDevice);
+            THROW_ARGOSEXCEPTION("Could not enumerate media device" << FILE_MEDIA_DEVICE);
          /* reset links */
          media_reset_links(m_psMediaDevice);
          /* setup links */
@@ -112,33 +145,33 @@ namespace argos {
          /* setup formats */
          std::ostringstream ossMediaConfig;
          ossMediaConfig << "\"" << strCameraName << "\":0 [UYVY ";
-         ossMediaConfig << std::to_string(m_unImageWidth) << "x" << std::to_string(m_unImageHeight) << "]";
+         ossMediaConfig << std::to_string(IMAGE_WIDTH) << "x" << std::to_string(IMAGE_HEIGHT) << "]";
          if (v4l2_subdev_parse_setup_formats(m_psMediaDevice, ossMediaConfig.str().c_str()) < 0) {
             THROW_ARGOSEXCEPTION("Could not set the format of the camera entity");
          }
          ossMediaConfig.str("");
          ossMediaConfig << "\"OMAP4 ISS CSI2a\":0 [UYVY ";
-         ossMediaConfig << std::to_string(m_unImageWidth) << "x" << std::to_string(m_unImageHeight) << "]";
+         ossMediaConfig << std::to_string(IMAGE_WIDTH) << "x" << std::to_string(IMAGE_HEIGHT) << "]";
          if (v4l2_subdev_parse_setup_formats(m_psMediaDevice, ossMediaConfig.str().c_str()) < 0) {
             THROW_ARGOSEXCEPTION("Could not set the format of the CSI entity");
          }
          /***************************************/
          /* open and configure the video device */
          /***************************************/
-         if ((m_nCameraHandle = ::open(m_pchVideoDevice, O_RDWR, 0)) < 0)
-            THROW_ARGOSEXCEPTION("Could not open " << m_pchVideoDevice);
+         if ((m_nCameraHandle = ::open(FILE_VIDEO_DEVICE, O_RDWR, 0)) < 0)
+            THROW_ARGOSEXCEPTION("Could not open " << FILE_VIDEO_DEVICE);
          int nInput = 0;
          if (::ioctl(m_nCameraHandle, VIDIOC_S_INPUT, &nInput) < 0)
-            THROW_ARGOSEXCEPTION("Could not set " << m_pchVideoDevice << " as an input");
+            THROW_ARGOSEXCEPTION("Could not set " << FILE_VIDEO_DEVICE << " as an input");
          /* set camera format*/
          v4l2_format sFormat;
          //if (::ioctl(m_nCameraHandle, VIDIOC_G_FMT, &sFmt) < 0)
          //   THROW_ARGOSEXCEPTION("Could not get the camera format");
          sFormat.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
-         sFormat.fmt.pix.width = m_unImageWidth;
-         sFormat.fmt.pix.height = m_unImageHeight;
-         sFormat.fmt.pix.sizeimage = m_unImageWidth * m_unImageHeight * m_unBytesPerPixel;
-         sFormat.fmt.pix.bytesperline = m_unImageWidth * m_unBytesPerPixel;
+         sFormat.fmt.pix.width = IMAGE_WIDTH;
+         sFormat.fmt.pix.height = IMAGE_HEIGHT;
+         sFormat.fmt.pix.sizeimage = IMAGE_WIDTH * IMAGE_HEIGHT * IMAGE_BYTES_PER_PIXEL;
+         sFormat.fmt.pix.bytesperline = IMAGE_WIDTH * IMAGE_BYTES_PER_PIXEL;
          sFormat.fmt.pix.pixelformat = V4L2_PIX_FMT_UYVY;
          sFormat.fmt.pix.field = V4L2_FIELD_NONE;
          if (::ioctl(m_nCameraHandle, VIDIOC_S_FMT, &sFormat) < 0)
@@ -312,6 +345,9 @@ namespace argos {
    CBuilderBotCameraSystemDefaultSensor::ELedState
       CBuilderBotCameraSystemDefaultSensor::DetectLed(const CVector2& c_center,
                                                       const CVector2& c_size) {
+      /* declare ranges for truncation */
+      static const CRange<Real> m_cColumnRange(0.0f, IMAGE_WIDTH - 1.0f);
+      static const CRange<Real> m_cRowRange(0.0f, IMAGE_HEIGHT - 1.0f);
       /* calculate the corners of the region of interest */
       CVector2 cMinCorner(c_center - 0.5f * c_size);
       CVector2 cMaxCorner(c_center + 0.5f * c_size);
@@ -348,10 +384,10 @@ namespace argos {
       UInt8* punImageData = static_cast<UInt8*>(m_itCurrentBuffer->second);
       /* extract the data */    
       for(UInt32 un_row = unRowStart; un_row < unRowEnd; un_row += 1) {
-         UInt32 unRowIndex = un_row * m_unImageWidth * m_unBytesPerPixel;
-         for(UInt32 un_column = unColumnStart * m_unBytesPerPixel;
-             un_column < unColumnEnd * m_unBytesPerPixel;
-             un_column += (2 * m_unBytesPerPixel)) {
+         UInt32 unRowIndex = un_row * IMAGE_WIDTH * IMAGE_BYTES_PER_PIXEL;
+         for(UInt32 un_column = unColumnStart * IMAGE_BYTES_PER_PIXEL;
+             un_column < unColumnEnd * IMAGE_BYTES_PER_PIXEL;
+             un_column += (2 * IMAGE_BYTES_PER_PIXEL)) {
             /* get a pointer to the start of the macro pixel */
             UInt8* punMacroPixel = punImageData + unRowIndex + un_column;
             /* extract the macro pixel */
@@ -392,7 +428,7 @@ namespace argos {
    /****************************************/
    
    CVector2 CBuilderBotCameraSystemDefaultSensor::GetResolution() const {
-      return CVector2(m_unImageWidth, m_unImageHeight);
+      return CVector2(IMAGE_WIDTH, IMAGE_HEIGHT);
    }
 
    /****************************************/

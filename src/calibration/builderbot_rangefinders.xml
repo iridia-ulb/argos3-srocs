@@ -1,0 +1,18 @@
+<?xml version="1.0" ?>
+<calibration>
+   <builderbot_rangefinders />
+      <sensor index="0" values="0.05,0.5,5,50" />
+      <sensor index="1" values="0.05,0.5,5,50" />
+      <sensor index="2" values="0.05,0.5,5,50" />
+      <sensor index="3" values="0.05,0.5,5,50" />
+      <sensor index="4" values="0.05,0.5,5,50" />
+      <sensor index="5" values="0.05,0.5,5,50" />
+      <sensor index="6" values="0.05,0.5,5,50" />
+      <sensor index="7" values="0.05,0.5,5,50" />
+      <sensor index="8" values="0.05,0.5,5,50" />
+      <sensor index="9" values="0.05,0.5,5,50" />
+      <sensor index="10" values="0.05,0.5,5,50" />
+      <sensor index="11" values="0.05,0.5,5,50" />
+   </builderbot_rangefinders>
+</calibration>
+

@@ -1,0 +1,8 @@
+<?xml version="1.0" ?>
+<calibration>
+   <builderbot_camera_system focal_length="305.4607,305.4607"
+                             principal_point="160.0,120.0"
+                             position="0.007,0.0,0.070"
+                             orientation="90,144,3.6" />
+</calibration>
+

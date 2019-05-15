@@ -16,24 +16,26 @@
     <lua_controller id="builderbot">
       <actuators>
         <builderbot_electromagnet_system implementation="default" />
-        <builderbot_differential_drive implementation="default" />
+        <builderbot_differential_drive implementation="default"
+          calibration="src/calibration/builderbot_differential_drive.xml" />
         <builderbot_lift_system implementation="default" />
         <builderbot_nfc implementation="default" />
         <builderbot_wifi implementation="default" />
         <builderbot_debug implementation="default">
-          <interface id="logerr" output="stderr"/>
-          <interface id="log" output="stdout"/>
+          <interface id="logerr" output="stderr" />
+          <interface id="log" output="stdout" />
           <interface id="draw" />
         </builderbot_debug>
       </actuators>
       <sensors>
         <builderbot_camera_system implementation="default"
-                                  show_frustum="true" 
-                                  show_tag_rays="true"
-                                  show_led_rays="true" />
+          calibration="src/calibration/builderbot_camera_system.xml"
+          show_frustum="true" show_tag_rays="true" show_led_rays="true" />
         <builderbot_rangefinders implementation="default"
-                                 show_rays="true" />
-        <builderbot_differential_drive implementation="default" />
+          calibration="src/calibration/builderbot_rangefinders.xml"
+          show_rays="true" />
+        <builderbot_differential_drive implementation="default"
+          calibration="src/calibration/builderbot_differential_drive.xml" />
         <builderbot_electromagnet_system implementation="default" />
         <builderbot_lift_system implementation="default" />
         <builderbot_nfc implementation="default" show_rays="true" />
