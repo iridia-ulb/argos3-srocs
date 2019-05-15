@@ -41,7 +41,7 @@ namespace argos {
       /* Pointer to the LED material within the OBJ model */
       std::array<CQTOpenGLObjModel::SMaterial*, 24> m_arrLEDs;
       /* The tag texture */
-      const std::array<std::array<GLfloat, 3>, 100> m_arrTagTexture;
+      const std::array<std::array<GLfloat, 3>, 64> m_arrTagTexture;
       /* Precompiled list for drawing tags */
       GLuint m_unTagList;
    };

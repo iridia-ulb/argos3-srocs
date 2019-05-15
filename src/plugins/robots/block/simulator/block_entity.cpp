@@ -17,7 +17,7 @@
 #include <argos3/plugins/simulator/media/radio_medium.h>
 #include <argos3/plugins/simulator/media/tag_medium.h>
 
-#define TAG_SIDE_LENGTH 0.03f
+#define TAG_SIDE_LENGTH 0.0235f
 #define NFC_TRANSMISSION_RANGE 0.02f
 
 namespace argos {
