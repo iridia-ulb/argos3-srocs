@@ -16,12 +16,13 @@
 
 #define CAMERA_RESOLUTION_X 320.0f
 #define CAMERA_RESOLUTION_Y 240.0f
-#define CAMERA_FOCAL_LENGTH_X 883.961f
-#define CAMERA_FOCAL_LENGTH_Y 883.961f
+/* focal length is based on a camera with a diagonal field of view of 65 degrees */
+#define CAMERA_FOCAL_LENGTH_X 313.9f
+#define CAMERA_FOCAL_LENGTH_Y 313.9f
 #define CAMERA_PRINCIPAL_POINT_X 160.0f
 #define CAMERA_PRINCIPAL_POINT_Y 120.0f
-#define CAMERA_RANGE_MIN 0.05f
-#define CAMERA_RANGE_MAX 0.25f
+#define CAMERA_RANGE_MIN 0.025f
+#define CAMERA_RANGE_MAX 0.625f
 
 namespace argos {
 
