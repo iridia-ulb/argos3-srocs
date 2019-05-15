@@ -19,9 +19,9 @@ function step()
    end
 
    if robot.debug ~= nil then
-      robot.debug.log("test1")
-      robot.debug.logerr("test2")
-      --robot.debug.draw("(bb01)->(bb02)")
+      robot.debug.draw("arrow(red)(0.125,0,0.05)(0.25,0,0.05)")
+      robot.debug.draw("arrow(green)(0,0.125,0.05)(0,0.25,0.05)")
+      robot.debug.draw("arrow(blue)(0,0,0.25)(0,0,0.50)")
    end
 end
 

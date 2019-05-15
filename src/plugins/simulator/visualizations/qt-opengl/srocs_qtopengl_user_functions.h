@@ -28,11 +28,10 @@ namespace argos {
 
       virtual void Init(TConfigurationNode& t_tree);
 
-      virtual void DrawInWorld();
+      virtual void DrawInWorld() {}
 
       using CQTOpenGLUserFunctions::Draw;
       void Draw(CBuilderBotEntity& c_builderbot);
-
 
    public slots:
 
@@ -40,6 +39,41 @@ namespace argos {
       void StepDone(int n_step);
 
    private:
+
+      void DrawArrow3(const CColor& c_color, const CVector3& c_from, const CVector3& c_to);
+
+      struct SCachedShapes {
+         SCachedShapes() :
+            Vertices(24) {
+            /* Reserve the needed display lists */
+            BaseList = glGenLists(2);
+            /* References to the display lists */
+            Cylinder = BaseList;
+            Cone     = BaseList + 1;
+            /* Make cylinder list */
+            glNewList(Cylinder, GL_COMPILE);
+            MakeCylinder();
+            glEndList();
+            /* Make cone list */
+            glNewList(Cone, GL_COMPILE);
+            MakeCone();
+            glEndList();
+         }
+
+         ~SCachedShapes() {
+            glDeleteLists(BaseList, 2);
+         }
+
+         void MakeCone();
+         void MakeCylinder();
+
+         GLuint Vertices;
+         GLuint BaseList;
+         GLuint Cylinder;
+         GLuint Cone;
+      };
+
+
 
       CSpace* m_pcSpace;
       CQTOpenGLMainWindow* m_pcMainWindow;

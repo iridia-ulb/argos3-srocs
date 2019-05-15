@@ -3,6 +3,7 @@
 #include <argos3/plugins/simulator/visualizations/qt-opengl/qtopengl_log_stream.h>
 
 #include <argos3/plugins/robots/builderbot/simulator/builderbot_camera_system_default_sensor.h>
+#include <argos3/plugins/robots/builderbot/simulator/builderbot_entity.h>
 
 #include <QVBoxLayout>
 #include <QGraphicsScene>
@@ -16,12 +17,13 @@ namespace argos {
    /********************************************************************************/
 
    CBuilderBotQtOpenGLWidget::CBuilderBotQtOpenGLWidget(QWidget* pc_parent,
-                                                        CCI_Controller* pc_controller) :
+                                                        CBuilderBotEntity& c_robot) :
       QWidget(pc_parent),
-      m_pcController(pc_controller) {
-      /* try and get the camera sensor */     
-      m_pcCameraSystemSensor = 
-         m_pcController->GetSensor<CBuilderBotCameraSystemDefaultSensor>("builderbot_camera_system");
+      m_cRobot(c_robot),
+      m_cController(c_robot.GetControllableEntity().GetController()) {
+      /* try and get the camera sensor */
+      m_pcCameraSystemSensor =
+         m_cController.GetSensor<CBuilderBotCameraSystemDefaultSensor>("builderbot_camera_system");
       if(m_pcCameraSystemSensor == nullptr) {
          THROW_ARGOSEXCEPTION("Can not access the builderbot camera system");
       }
@@ -40,16 +42,9 @@ namespace argos {
       m_pcLogStatesBuffer = new QTextEdit;
       m_pcLogTargetsBuffer->setReadOnly(true);
       m_pcLogStatesBuffer->setReadOnly(true);
-      QString strContents;
-      QTextStream(&strContents) << "<b>" << "Init" << "</b>";
-      m_pcLogTargetsBuffer->append(strContents);
-      m_pcLogStatesBuffer->append(strContents);
       m_pcLayout->addWidget(m_pcViewport);
       m_pcLayout->addWidget(m_pcLogStatesBuffer);
       m_pcLayout->addWidget(m_pcLogTargetsBuffer);
-
-      //m_pcLogStatesStream = new CQTOpenGLLogStream(m_pcController->m_mapLogs["states"], m_pcLogStatesBuffer);
-      //m_pcLogTargetsStream = new CQTOpenGLLogStream(m_pcController->m_mapLogs["targets"], m_pcLogTargetsBuffer);
 
       setLayout(m_pcLayout);
       // Draw sensor readings
@@ -68,15 +63,22 @@ namespace argos {
       delete m_pcScene;
       delete m_pcLogTargetsBuffer;
       delete m_pcLogStatesBuffer;
-//      delete m_pcLogTargetsStream;
-//      delete m_pcLogStatesStream;
-
    }
 
    /********************************************************************************/
    /********************************************************************************/
 
    void CBuilderBotQtOpenGLWidget::Update() {
+/*
+      QString strContents;
+      QTextStream(&strContents) << "<b>" << "Init" << "</b>";
+      m_pcLogTargetsBuffer->append(strContents);
+      m_pcLogStatesBuffer->append(strContents);
+
+*/
+
+
+
       m_pcScene->clear();
       m_pcViewport->setBackgroundBrush(QBrush(Qt::black));
 

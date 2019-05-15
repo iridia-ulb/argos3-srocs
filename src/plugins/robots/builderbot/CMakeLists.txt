@@ -22,6 +22,7 @@ if(ARGOS_BUILD_FOR_SIMULATOR)
   set(ARGOS3_HEADERS_PLUGINS_ROBOTS_BUILDERBOT_SIMULATOR
     simulator/builderbot_camera_system_default_sensor.h
     simulator/builderbot_debug_default_actuator.h
+    simulator/builderbot_debug_entity.h
     simulator/builderbot_differential_drive_default_actuator.h
     simulator/builderbot_differential_drive_default_sensor.h
     simulator/builderbot_differential_drive_entity.h
@@ -57,6 +58,7 @@ else(ARGOS_BUILD_FOR_SIMULATOR)
     hardware/builderbot_lift_system_default_sensor.h
     hardware/builderbot_nfc_default_actuator.h
     hardware/builderbot_system_default_sensor.h
+#    hardware/builderbot_debug_default_actuator.h
 #    hardware/builderbot_nfc_default_sensor.h
 #    hardware/builderbot_wifi_default_actuator.h
 #    hardware/builderbot_wifi_default_sensor.h
@@ -90,6 +92,7 @@ if(ARGOS_BUILD_FOR_SIMULATOR)
     ${ARGOS3_HEADERS_PLUGINS_ROBOTS_BUILDERBOT_SIMULATOR}
     simulator/builderbot_camera_system_default_sensor.cpp
     simulator/builderbot_debug_default_actuator.cpp
+    simulator/builderbot_debug_entity.cpp
     simulator/builderbot_differential_drive_default_actuator.cpp
     simulator/builderbot_differential_drive_default_sensor.cpp
     simulator/builderbot_differential_drive_entity.cpp
@@ -127,6 +130,7 @@ else(ARGOS_BUILD_FOR_SIMULATOR)
     hardware/builderbot_lift_system_default_sensor.cpp
     hardware/builderbot_nfc_default_actuator.cpp
     hardware/builderbot_system_default_sensor.cpp
+#    hardware/builderbot_debug_default_actuator.cpp
 #    hardware/builderbot_nfc_default_sensor.cpp
 #    hardware/builderbot_wifi_default_actuator.cpp
 #    hardware/builderbot_wifi_default_sensor.cpp

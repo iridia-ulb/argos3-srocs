@@ -22,17 +22,16 @@ namespace argos {
     * 2. right wheel speed (a number)
     */
    int LuaBuilderBotDebugActuator(lua_State* pt_lua_state) {
-      using TOutputConfiguration = std::pair<const std::string, CCI_BuilderBotDebugActuator::SOutput*>;
+      using TBuffer = std::pair<const std::string, std::ostringstream>;
       /* get a pointer to the output structure */
-      TOutputConfiguration* ptOutput = 
-         static_cast<TOutputConfiguration*>(lua_touserdata(pt_lua_state, lua_upvalueindex(1)));
+      TBuffer* ptBuffer = static_cast<TBuffer*>(lua_touserdata(pt_lua_state, lua_upvalueindex(1)));
       /* Check parameters */
       if(lua_gettop(pt_lua_state) != 1) {
-         std::string strErrMsg = "robot.debug." + ptOutput->first + "() expects a single argument";
+         std::string strErrMsg = "robot.debug." + ptBuffer->first + "() expects a single argument";
          return luaL_error(pt_lua_state, strErrMsg.c_str());
       }
       luaL_checktype(pt_lua_state, 1, LUA_TSTRING);
-      ptOutput->second->Buffer << lua_tostring(pt_lua_state, 1) << std::endl;
+      ptBuffer->second << lua_tostring(pt_lua_state, 1) << std::endl;
       return 0;
    }
 #endif
@@ -43,9 +42,9 @@ namespace argos {
 #ifdef ARGOS_WITH_LUA
    void CCI_BuilderBotDebugActuator::CreateLuaState(lua_State* pt_lua_state) {
       CLuaUtility::StartTable(pt_lua_state, "debug");
-      for(std::pair<const std::string, SOutput*>& s_interface : m_tInterfaces) {
-         lua_pushstring(pt_lua_state, s_interface.first.c_str());
-         lua_pushlightuserdata(pt_lua_state, &s_interface);
+      for(std::pair<const std::string, std::ostringstream>& c_buffer : m_mapBuffers) {
+         lua_pushstring(pt_lua_state, c_buffer.first.c_str());
+         lua_pushlightuserdata(pt_lua_state, &c_buffer);
          lua_pushcclosure(pt_lua_state, &LuaBuilderBotDebugActuator, 1);
          lua_settable(pt_lua_state, -3);
       }

@@ -8,6 +8,7 @@
 #define BUILDERBOT_ENTITY_H
 
 namespace argos {
+   class CBuilderBotDebugEntity;
    class CBuilderBotDifferentialDriveEntity;
    class CBuilderBotElectromagnetSystemEntity;
    class CBuilderBotLiftSystemEntity;
@@ -50,6 +51,14 @@ namespace argos {
          return *m_pcDifferentialDriveEntity;
       }
 
+      inline CBuilderBotDebugEntity& GetDebugEntity() {
+         return *m_pcDebugEntity;
+      }
+
+      inline const CBuilderBotDebugEntity& GetDebugEntity() const {
+         return *m_pcDebugEntity;
+      }
+
       inline CBuilderBotElectromagnetSystemEntity& GetElectromagnetSystemEntity() {
          return *m_pcElectromagnetSystemEntity;
       }
@@ -85,6 +94,7 @@ namespace argos {
       CControllableEntity*                   m_pcControllableEntity;
       CEmbodiedEntity*                       m_pcEmbodiedEntity;
       CBuilderBotDifferentialDriveEntity*    m_pcDifferentialDriveEntity;
+      CBuilderBotDebugEntity*                m_pcDebugEntity;
       CBuilderBotElectromagnetSystemEntity*  m_pcElectromagnetSystemEntity;
       CBuilderBotLiftSystemEntity*           m_pcLiftSystemEntity;
       CRadioEquippedEntity*                  m_pcNFCRadioEquippedEntity;
