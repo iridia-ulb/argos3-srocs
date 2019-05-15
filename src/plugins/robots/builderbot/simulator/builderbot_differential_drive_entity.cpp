@@ -14,6 +14,12 @@ namespace argos {
    /****************************************/
    /****************************************/
 
+   CBuilderBotDifferentialDriveEntity::CBuilderBotDifferentialDriveEntity(CComposableEntity* pc_parent) :
+      CEntity(pc_parent) {}
+
+   /****************************************/
+   /****************************************/
+
    CBuilderBotDifferentialDriveEntity::CBuilderBotDifferentialDriveEntity(CComposableEntity* pc_parent,
                                                                           const std::string& str_id) :
       CEntity(pc_parent, str_id),
