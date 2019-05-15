@@ -79,19 +79,17 @@ namespace argos {
       /* signal handling variables */
       bool m_bSignalRaised;
       int m_nSignal;
-      /* Pointer to the RNG */
+      /* pointer to the RNG */
       CRandom::CRNG* m_pcRNG;
-      /* Target tick length for the controller */
+      /* target tick length for the controller */
       UInt32 m_unTicksPerSec;
-      /*  Pointer to the controller */
+      /* pointer to the controller */
       CLuaController* m_pcController;
-
-      /* The vector of actuators */
+      /* the vector of actuators */
       std::vector<CPhysicalActuator*> m_vecActuators;
-      /* The vector of sensors */
+      /* the vector of sensors */
       std::vector<CPhysicalSensor*> m_vecSensors;
-
-      /* Triggers for updating the sensors and actuators */
+      /* triggers for updating the sensors and actuators */
       iio_context* m_psContext;
       iio_device* m_psSensorUpdateTrigger;
       iio_device* m_psActuatorUpdateTrigger;
