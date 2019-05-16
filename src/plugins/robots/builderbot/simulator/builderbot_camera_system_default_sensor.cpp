@@ -272,9 +272,22 @@ namespace argos {
          return ProjectOntoSensor(c_tag_corner);
       });
       const CVector2& cCenterPixel = ProjectOntoSensor(c_tag.GetPosition());
-      const std::string& strPayload = c_tag.GetPayload();
+      /* try to convert tag payload to an unsigned integer */
+      UInt32 unId = 0;
+      try {
+         unId = std::stoul(c_tag.GetPayload());
+      }
+      catch(const std::logic_error& err_logic) {
+         THROW_ARGOSEXCEPTION("Tag payload \"" << c_tag.GetPayload() << "\" can not be converted to an unsigned integer");
+      }
+      /* TODO calculate tag pose and get LEDs here! */
+      CVector3 cTagPosition;
+      CQuaternion cTagOrientation;
+      std::array<ELedState, 4> arrLEDs = {
+         ELedState::OFF, ELedState::OFF, ELedState::OFF, ELedState::OFF,
+      };
       /* transfer readings to the control interface */
-      m_tTags.emplace_back(strPayload, cCenterPixel, m_arrTagCornerPixels);
+      m_tTags.emplace_back(unId, cTagPosition, cTagOrientation, cCenterPixel, m_arrTagCornerPixels, arrLEDs);
       return true;
    }
 
@@ -301,40 +314,6 @@ namespace argos {
          m_pcControllableEntity->GetCheckedRays().emplace_back(true, m_cOcclusionCheckRay);
       }
       return true;
-   }
-
-   /****************************************/
-   /****************************************/
-
-   CBuilderBotCameraSystemDefaultSensor::ELedState
-      CBuilderBotCameraSystemDefaultSensor::DetectLed(const CVector2& c_center,
-                                                      const CVector2& c_size) {
-      ELedState eLedState = ELedState::OFF;
-      CVector2 cMinCorner(c_center - 0.5f * c_size);
-      CVector2 cMaxCorner(c_center + 0.5f * c_size);
-      for(const SLed& s_led : m_vecLedCache) {
-         if(s_led.Center.GetX() > cMinCorner.GetX() &&
-            s_led.Center.GetY() > cMinCorner.GetY() &&
-            s_led.Center.GetX() < cMaxCorner.GetX() &&
-            s_led.Center.GetY() < cMaxCorner.GetY()) {
-            /* in simulation, the state of the LED is mapped from its color */
-            if(s_led.Color == CColor::MAGENTA) {
-               eLedState = ELedState::Q1;
-            }
-            else if(s_led.Color == CColor::ORANGE) {
-               eLedState = ELedState::Q2;
-            }
-            else if(s_led.Color == CColor::GREEN) {
-               eLedState = ELedState::Q3;
-            }
-            else if(s_led.Color == CColor::BLUE) {
-               eLedState = ELedState::Q4;
-            }
-            /* stop at the first LED */
-            break;
-         }
-      }
-      return eLedState;
    }
 
    /****************************************/

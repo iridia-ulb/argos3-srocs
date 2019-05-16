@@ -50,12 +50,11 @@ namespace argos {
 
       virtual void Update();
 
-      virtual ELedState DetectLed(const CVector2& c_center,
-                                  const CVector2& c_size);
-
-      virtual CVector2 GetResolution() const;
-
    private:
+
+      ELedState DetectLed(const CVector2& c_center,
+                          const CVector2& c_size);
+
       /* calibration data */
       CVector2 m_cFocalLength;
       CVector2 m_cPrincipalPoint;

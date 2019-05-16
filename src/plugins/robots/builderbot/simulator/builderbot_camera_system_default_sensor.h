@@ -67,10 +67,7 @@ namespace argos {
 
       virtual bool operator()(CDirectionalLEDEntity& c_led);
 
-      virtual ELedState DetectLed(const CVector2& c_center,
-                                  const CVector2& c_size);
-
-      virtual CVector2 GetResolution() const;
+      CVector2 GetResolution() const;
 
    private:
 

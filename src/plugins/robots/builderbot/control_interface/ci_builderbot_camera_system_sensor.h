@@ -11,11 +11,10 @@ namespace argos {
    class CCI_BuilderBotCameraSystemSensor;
 }
 
-#include <argos3/core/utility/math/vector2.h>
-#include <argos3/core/utility/datatypes/color.h>
 #include <argos3/core/control_interface/ci_sensor.h>
-
-#include <string>
+#include <argos3/core/utility/math/vector2.h>
+#include <argos3/core/utility/math/vector3.h>
+#include <argos3/core/utility/math/quaternion.h>
 
 namespace argos {
 
@@ -23,27 +22,39 @@ namespace argos {
 
    public:
 
-      struct STag {
-         /* constructor */
-         STag(const std::string& str_payload,
-              const CVector2& c_center,
-              const std::array<CVector2, 4>& arr_corners) :
-            Payload(str_payload),
-            Center(c_center),
-            Corners(arr_corners) {}
-         /* members */
-         std::string Payload;
-         CVector2 Center;
-         std::array<CVector2, 4> Corners;
-         using TVector = std::vector<STag>;
-      };
-
       enum class ELedState : UInt8 {
          OFF = 0,
          Q1  = 1,
          Q2  = 2,
          Q3  = 3,
          Q4  = 4
+      };
+
+      struct STag {
+         STag(UInt32 un_id,
+              const CVector3& c_position,
+              const CQuaternion& c_orientation,
+              const CVector2& c_center,
+              const std::array<CVector2, 4>& arr_corners,
+              const std::array<ELedState, 4>& arr_leds) :
+            Id(un_id),
+            Position(c_position),
+            Orientation(c_orientation),           
+            Center(c_center),
+            Corners(arr_corners),
+            LEDs(arr_leds) {}
+         /* Tag identifier */
+         UInt32 Id;
+         /* 3D information */
+         CVector3 Position;
+         CQuaternion Orientation;
+         /* 2D information */
+         CVector2 Center;
+         std::array<CVector2, 4> Corners;
+         /* LED data */
+         std::array<ELedState, 4> LEDs;
+         /* Vector of tags */
+         using TVector = std::vector<STag>;
       };
 
    public:
@@ -59,11 +70,6 @@ namespace argos {
          /* zero the timestamp */
          m_fTimestamp = 0.0f;
       }
-
-      virtual ELedState DetectLed(const CVector2& c_center,
-                                  const CVector2& c_size) = 0;
-
-      virtual CVector2 GetResolution() const = 0;
 
       Real GetTimestamp() const {
          return m_fTimestamp;

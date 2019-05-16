@@ -294,8 +294,14 @@ namespace argos {
             arrCornerPixels[3].Set(psDetection->p[3][0], psDetection->p[3][1]);
             /* copy the tag center coordinate */
             cCenterPixel.Set(psDetection->c[0], psDetection->c[1]);
+            /* TODO calculate tag pose and get LEDs here! */
+            CVector3 cTagPosition;
+            CQuaternion cTagOrientation;
+            std::array<ELedState, 4> arrLEDs = {
+               ELedState::OFF, ELedState::OFF, ELedState::OFF, ELedState::OFF,
+            };
             /* copy readings */
-            m_tTags.emplace_back(std::to_string(psDetection->id), cCenterPixel, arrCornerPixels);
+            m_tTags.emplace_back(psDetection->id, cTagPosition, cTagOrientation, cCenterPixel, arrCornerPixels, arrLEDs);
          }
          /* destroy the readings array */
          ::apriltag_detections_destroy(psDetectionArray);
@@ -427,13 +433,6 @@ namespace argos {
    /****************************************/
    /****************************************/
    
-   CVector2 CBuilderBotCameraSystemDefaultSensor::GetResolution() const {
-      return CVector2(IMAGE_WIDTH, IMAGE_HEIGHT);
-   }
-
-   /****************************************/
-   /****************************************/
-
    REGISTER_SENSOR(CBuilderBotCameraSystemDefaultSensor,
                    "builderbot_camera_system", "default",
                    "Michael Allwright [allsey87@gmail.com]",
@@ -441,4 +440,8 @@ namespace argos {
                    "Camera sensor for the BuilderBot Robot",
                    "Camera sensor for the BuilderBot Robot\n",
                    "Under development");
+
+   /****************************************/
+   /****************************************/
+
 }
