@@ -79,16 +79,12 @@ namespace argos {
          return m_tTags;
       }
 
-      void SetEnabled(bool b_enabled) {
-         m_bEnabled = b_enabled;
+      virtual void Enable() {
+         m_bEnabled = true;
       }
 
-      void Enable() {
-         SetEnabled(true);
-      }
-
-      void Disable() {
-         SetEnabled(false);
+      virtual void Disable() {
+         m_bEnabled = false;
       }
 
 #ifdef ARGOS_WITH_LUA

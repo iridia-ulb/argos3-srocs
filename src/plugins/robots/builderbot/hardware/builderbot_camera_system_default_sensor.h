@@ -48,6 +48,10 @@ namespace argos {
 
       virtual void Destroy();
 
+      virtual void Enable();
+
+      virtual void Disable();
+
       virtual void Update();
 
    private:
