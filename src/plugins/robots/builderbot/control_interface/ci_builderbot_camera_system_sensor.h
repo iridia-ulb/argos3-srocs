@@ -41,8 +41,7 @@ namespace argos {
             Position(c_position),
             Orientation(c_orientation),           
             Center(c_center),
-            Corners(arr_corners),
-            LEDs(arr_leds) {}
+            Corners(arr_corners) {}
          /* Tag identifier */
          UInt32 Id;
          /* 3D information */
@@ -51,8 +50,6 @@ namespace argos {
          /* 2D information */
          CVector2 Center;
          std::array<CVector2, 4> Corners;
-         /* LED data */
-         std::array<ELedState, 4> LEDs;
          /* Vector of tags */
          using TVector = std::vector<STag>;
       };
@@ -92,6 +89,15 @@ namespace argos {
 
       virtual void ReadingsToLuaState(lua_State* pt_lua_state);
 #endif
+   protected:
+
+      static void GetTagLedPositions(std::array<CVector2, 4>& arr_led_buffer,
+                                     const CSquareMatrix<3>& c_camera_matrix,
+                                     const CVector3& c_tag_position,
+                                     const CRotationMatrix3& c_tag_orientation);
+
+      static const std::array<CVector3, 4> m_arrLedOffsets;
+
    protected:
       /* whether or not the camera sensor is enabled */
       bool m_bEnabled;    

@@ -13,6 +13,7 @@
 #include <argos3/core/utility/math/quaternion.h>
 
 #include <apriltag/apriltag.h>
+#include <apriltag/apriltag_pose.h>
 #include <apriltag/tag36h11.h>
 #include <apriltag/common/image_u8.h>
 #include <apriltag/common/zarray.h>
@@ -31,6 +32,20 @@ extern "C" {
    #include <v4l2subdev.h>
 }
 
+#define DEFAULT_FOCAL_LENGTH_X 313.9f
+#define DEFAULT_FOCAL_LENGTH_Y 313.9f
+#define DEFAULT_PRINCIPAL_POINT_X 160.0f
+#define DEFAULT_PRINCIPAL_POINT_Y 120.0f
+
+#define FILE_MEDIA_DEVICE "/dev/media0"
+#define FILE_VIDEO_DEVICE "/dev/video0"
+
+#define IMAGE_BYTES_PER_PIXEL 2u
+#define IMAGE_WIDTH 320u
+#define IMAGE_HEIGHT 240u
+
+#define TAG_SIDE_LENGTH 0.0235f
+
 #define THRESHOLD_Q1_MIN_V 140u
 #define THRESHOLD_Q1_MIN_U 140u
 #define THRESHOLD_Q2_MIN_V 140u
@@ -39,16 +54,6 @@ extern "C" {
 #define THRESHOLD_Q3_MAX_U 130u
 #define THRESHOLD_Q4_MAX_V 100u
 #define THRESHOLD_Q4_MIN_U 145u
-
-#define DEFAULT_FOCAL_LENGTH_X 313.9f
-#define DEFAULT_FOCAL_LENGTH_Y 313.9f
-#define DEFAULT_PRINCIPAL_POINT_X 160.0f
-#define DEFAULT_PRINCIPAL_POINT_Y 120.0f
-#define IMAGE_BYTES_PER_PIXEL 2u
-#define IMAGE_WIDTH 320u
-#define IMAGE_HEIGHT 240u
-#define FILE_MEDIA_DEVICE "/dev/media0"
-#define FILE_VIDEO_DEVICE "/dev/video0"
 
 namespace argos {
 
@@ -59,17 +64,17 @@ namespace argos {
       m_cFocalLength(DEFAULT_FOCAL_LENGTH_X, DEFAULT_FOCAL_LENGTH_Y),
       m_cPrincipalPoint(DEFAULT_PRINCIPAL_POINT_X, DEFAULT_PRINCIPAL_POINT_Y) {
       /* initialize the apriltag components */
-      m_psTagFamily = ::tag36h11_create();
+      m_ptTagFamily = ::tag36h11_create();
       /* create the tag detector */
-      m_psTagDetector = ::apriltag_detector_create();
+      m_ptTagDetector = ::apriltag_detector_create();
       /* add the tag family to the tag detector */
-      ::apriltag_detector_add_family(m_psTagDetector, m_psTagFamily);
+      ::apriltag_detector_add_family(m_ptTagDetector, m_ptTagFamily);
       /* configure the tag detector */
-      m_psTagDetector->quad_decimate = 1.0f;
-      m_psTagDetector->quad_sigma = 0.0f;
-      m_psTagDetector->refine_edges = 1;
-      m_psTagDetector->decode_sharpening = 0.25;
-      m_psTagDetector->nthreads = 2;
+      m_ptTagDetector->quad_decimate = 1.0f;
+      m_ptTagDetector->quad_sigma = 0.0f;
+      m_ptTagDetector->refine_edges = 1;
+      m_ptTagDetector->decode_sharpening = 0.25;
+      m_ptTagDetector->nthreads = 2;
       /* allocate image memory */
       m_psImage = ::image_u8_create_alignment(IMAGE_WIDTH, IMAGE_HEIGHT, 96);
    }
@@ -81,11 +86,11 @@ namespace argos {
       /* deallocate image memory */
       ::image_u8_destroy(m_psImage);
       /* uninitialize the apriltag components */
-      ::apriltag_detector_remove_family(m_psTagDetector, m_psTagFamily);
+      ::apriltag_detector_remove_family(m_ptTagDetector, m_ptTagFamily);
       /* destroy the tag detector */
-      ::apriltag_detector_destroy(m_psTagDetector);
+      ::apriltag_detector_destroy(m_ptTagDetector);
       /* destroy the tag family */
-      ::tag36h11_destroy(m_psTagFamily);
+      ::tag36h11_destroy(m_ptTagFamily);
    }
    
    /****************************************/
@@ -112,6 +117,18 @@ namespace argos {
             GetNodeAttributeOrDefault(t_calibration, "position", m_cPositionOffset, m_cPositionOffset);
             GetNodeAttributeOrDefault(t_calibration, "orientation", m_cOrientationOffset, m_cOrientationOffset);
          }
+         /* update the camera matrix */
+         m_cCameraMatrix.SetIdentityMatrix();
+         m_cCameraMatrix(0,0) = m_cFocalLength.GetX();
+         m_cCameraMatrix(1,1) = m_cFocalLength.GetY();
+         m_cCameraMatrix(0,2) = m_cPrincipalPoint.GetX();
+         m_cCameraMatrix(1,2) = m_cPrincipalPoint.GetY();
+         /* update the tag detection info structure */
+         m_tTagDetectionInfo.fx = m_cFocalLength.GetX();
+         m_tTagDetectionInfo.fy = m_cFocalLength.GetY();
+         m_tTagDetectionInfo.cx = m_cPrincipalPoint.GetX();
+         m_tTagDetectionInfo.cy = m_cPrincipalPoint.GetY();
+         m_tTagDetectionInfo.tagsize = TAG_SIDE_LENGTH;
          /***************************************/
          /* open and configure the media device */
          /***************************************/
@@ -312,34 +329,47 @@ namespace argos {
             CVector2 cCenterPixel;
             std::array<CVector2, 4> arrCornerPixels;
             /* run the apriltags algorithm */
-            ::zarray_t* psDetectionArray =
-                 ::apriltag_detector_detect(m_psTagDetector, m_psImage);
+            ::zarray_t* ptDetectionArray =
+                 ::apriltag_detector_detect(m_ptTagDetector, m_psImage);
             /* get the detected tags count */
-            size_t unTagCount = static_cast<size_t>(::zarray_size(psDetectionArray));
+            size_t unTagCount = static_cast<size_t>(::zarray_size(ptDetectionArray));
             /* reserve space for the tags */
             m_tTags.reserve(unTagCount);
             /* copy detection data to the control interface */
             for(size_t un_index = 0; un_index < unTagCount; un_index++) {
-               ::apriltag_detection_t *psDetection;
-               ::zarray_get(psDetectionArray, un_index, &psDetection);
+               ::apriltag_detection_t *ptDetection;
+               ::zarray_get(ptDetectionArray, un_index, &ptDetection);
                /* copy the tag corner coordinates */
-               arrCornerPixels[0].Set(psDetection->p[0][0], psDetection->p[0][1]);
-               arrCornerPixels[1].Set(psDetection->p[1][0], psDetection->p[1][1]);
-               arrCornerPixels[2].Set(psDetection->p[2][0], psDetection->p[2][1]);
-               arrCornerPixels[3].Set(psDetection->p[3][0], psDetection->p[3][1]);
+               arrCornerPixels[0].Set(ptDetection->p[0][0], ptDetection->p[0][1]);
+               arrCornerPixels[1].Set(ptDetection->p[1][0], ptDetection->p[1][1]);
+               arrCornerPixels[2].Set(ptDetection->p[2][0], ptDetection->p[2][1]);
+               arrCornerPixels[3].Set(ptDetection->p[3][0], ptDetection->p[3][1]);
                /* copy the tag center coordinate */
-               cCenterPixel.Set(psDetection->c[0], psDetection->c[1]);
-               /* TODO calculate tag pose and get LEDs here! */
-               CVector3 cTagPosition;
-               CQuaternion cTagOrientation;
-               std::array<ELedState, 4> arrLEDs = {
+               cCenterPixel.Set(ptDetection->c[0], ptDetection->c[1]);
+               /* calculate tag pose */
+               apriltag_pose_t tPose;
+               m_tTagDetectionInfo.det = ptDetection;
+               ::estimate_tag_pose(&m_tTagDetectionInfo, &tPose);
+               CRotationMatrix3 cTagOrientation(pose.R->data);
+               CVector3 cTagPosition(tPose.t->data[0], tPose.t->data[1], tPose.t->data[2]);
+               /* calculate LED positions */
+               std::array<CVector2, 4> arrLedPositionBuffer;
+               GetTagLedPositions(arrLedPositionBuffer, m_cCameraMatrix, cTagPosition, cTagOrientation);
+               /* detect LEDs at each location */
+               std::array<ELedState, 4> arrLedStates = {
                   ELedState::OFF, ELedState::OFF, ELedState::OFF, ELedState::OFF,
                };
-               /* copy readings */
-               m_tTags.emplace_back(psDetection->id, cTagPosition, cTagOrientation, cCenterPixel, arrCornerPixels, arrLEDs);
+               std::transform(std::begin(arrLedPositionBuffer),
+                              std::end(arrLedPositionBuffer),
+                              std::begin(arrLedStates),
+                              [] (const CVector2& c_led_position) {
+                  return DetectLed(c_led_position, CVector2(5.0f,5.0f));
+               });
+                /* copy readings */
+               m_tTags.emplace_back(ptDetection->id, cTagPosition, cTagOrientation, cCenterPixel, arrCornerPixels, arrLedStates);
             }
             /* destroy the readings array */
-            ::apriltag_detections_destroy(psDetectionArray);
+            ::apriltag_detections_destroy(ptDetectionArray);
             /* enqueue the next buffer */
             ::memset(&sBuffer, 0, sizeof(::v4l2_buffer));
             sBuffer.type = ::V4L2_BUF_TYPE_VIDEO_CAPTURE;

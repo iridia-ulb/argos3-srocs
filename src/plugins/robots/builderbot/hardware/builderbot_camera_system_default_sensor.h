@@ -64,14 +64,16 @@ namespace argos {
       CVector2 m_cPrincipalPoint;
       CVector3 m_cPositionOffset;
       CQuaternion m_cOrientationOffset;
+      CSquareMatrix<3> m_cCameraMatrix;
 
       std::array<std::pair<UInt32, void*>, 2> m_arrBuffers;
       std::array<std::pair<UInt32, void*>, 2>::iterator m_itCurrentBuffer;
       std::array<std::pair<UInt32, void*>, 2>::iterator m_itNextBuffer;
 
-      ::image_u8_t* m_psImage;
-      ::apriltag_family* m_psTagFamily;
-      ::apriltag_detector* m_psTagDetector;
+      ::image_u8_t* m_ptImage;
+      ::apriltag_family* m_ptTagFamily;
+      ::apriltag_detector* m_ptTagDetector;
+      ::apriltag_detection_info_t m_tTagDetectionInfo;
       
       /* media device */
       ::media_device* m_psMediaDevice;

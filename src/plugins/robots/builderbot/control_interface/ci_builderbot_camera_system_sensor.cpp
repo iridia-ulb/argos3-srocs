@@ -10,7 +10,41 @@
 #include <argos3/core/wrappers/lua/lua_utility.h>
 #endif
 
+#include <algorithm>
+
+#define LED_OFFSET_FROM_TAG 0.02f
+
 namespace argos {
+
+   /****************************************/
+   /****************************************/
+
+   const std::array<CVector3, 4> CCI_BuilderBotCameraSystemSensor::m_arrLedOffsets = {
+      CVector3(LED_OFFSET_FROM_TAG, 0.0f, 0.0f),
+      CVector3(0.0f, LED_OFFSET_FROM_TAG, 0.0f),
+      CVector3(-LED_OFFSET_FROM_TAG, 0.0f, 0.0f),
+      CVector3(0.0f, -LED_OFFSET_FROM_TAG, 0.0f),
+   };
+
+   /****************************************/
+   /****************************************/
+
+   void CCI_BuilderBotCameraSystemSensor::GetTagLedPositions(std::array<CVector2, 4>& arr_led_buffer,
+                                                             const CSquareMatrix<3>& c_camera_matrix,
+                                                             const CVector3& c_tag_position,
+                                                             const CRotationMatrix3& c_tag_orientation) {
+      std::transform(std::begin(m_arrLedOffsets),
+                     std::end(m_arrLedOffsets),
+                     std::begin(arr_led_buffer),
+                     [c_camera_matrix,
+                      c_tag_orientation,
+                      c_tag_position] (const CVector3& c_led_offset) {
+         const CMatrix<3,1>& cProjection =
+            c_camera_matrix * CMatrix<3,1>((c_tag_orientation * c_led_offset) + c_tag_position);
+         return CVector2(cProjection(0,0) / cProjection(2,0),
+                         cProjection(1,0) / cProjection(2,0));
+      });
+   }
 
    /****************************************/
    /****************************************/
