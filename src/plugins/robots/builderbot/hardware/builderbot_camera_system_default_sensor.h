@@ -56,8 +56,7 @@ namespace argos {
 
    private:
 
-      ELedState DetectLed(const CVector2& c_center,
-                          const CVector2& c_size);
+      ELedState DetectLed(const CVector3& c_position);
 
       /* calibration data */
       CVector2 m_cFocalLength;

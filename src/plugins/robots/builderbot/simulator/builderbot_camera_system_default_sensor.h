@@ -40,11 +40,14 @@ namespace argos {
       /* represents LEDs inside a frustum */
       struct SLed {
          SLed(const CColor& c_color,
+              const CVector3& c_position,
               const CVector2& c_center) :
             Color(c_color),
+            Position(c_position),
             Center(c_center) {}
          CColor Color;
          CVector2 Center;
+         CVector3 Position;
       };
 
       const std::vector<SLed>& GetLedCache() const {
@@ -66,6 +69,8 @@ namespace argos {
       virtual bool operator()(CTagEntity& c_tag);
 
       virtual bool operator()(CDirectionalLEDEntity& c_led);
+
+      virtual ELedState DetectLed(const CVector3& c_position);
 
       CVector2 GetResolution() const;
 
@@ -100,7 +105,7 @@ namespace argos {
       Real m_fNearPlaneWidth;
       Real m_fNearPlaneHeight;
       Real m_fFarPlaneWidth;
-      Real m_fFarPlaneHeight;     
+      Real m_fFarPlaneHeight;
 
       /* shared buffers */
       std::array<CVector3, 4> m_arrTagCorners;

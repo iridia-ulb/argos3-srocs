@@ -10,41 +10,7 @@
 #include <argos3/core/wrappers/lua/lua_utility.h>
 #endif
 
-#include <algorithm>
-
-#define LED_OFFSET_FROM_TAG 0.02f
-
 namespace argos {
-
-   /****************************************/
-   /****************************************/
-
-   const std::array<CVector3, 4> CCI_BuilderBotCameraSystemSensor::m_arrLedOffsets = {
-      CVector3(LED_OFFSET_FROM_TAG, 0.0f, 0.0f),
-      CVector3(0.0f, LED_OFFSET_FROM_TAG, 0.0f),
-      CVector3(-LED_OFFSET_FROM_TAG, 0.0f, 0.0f),
-      CVector3(0.0f, -LED_OFFSET_FROM_TAG, 0.0f),
-   };
-
-   /****************************************/
-   /****************************************/
-
-   void CCI_BuilderBotCameraSystemSensor::GetTagLedPositions(std::array<CVector2, 4>& arr_led_buffer,
-                                                             const CSquareMatrix<3>& c_camera_matrix,
-                                                             const CVector3& c_tag_position,
-                                                             const CRotationMatrix3& c_tag_orientation) {
-      std::transform(std::begin(m_arrLedOffsets),
-                     std::end(m_arrLedOffsets),
-                     std::begin(arr_led_buffer),
-                     [c_camera_matrix,
-                      c_tag_orientation,
-                      c_tag_position] (const CVector3& c_led_offset) {
-         const CMatrix<3,1>& cProjection =
-            c_camera_matrix * CMatrix<3,1>((c_tag_orientation * c_led_offset) + c_tag_position);
-         return CVector2(cProjection(0,0) / cProjection(2,0),
-                         cProjection(1,0) / cProjection(2,0));
-      });
-   }
 
    /****************************************/
    /****************************************/
@@ -86,6 +52,43 @@ namespace argos {
    /****************************************/
 
 #ifdef ARGOS_WITH_LUA
+   /*
+    * the stack must contain a single table with keys named x, y, and z
+    * which represent the X, Y, and Z components of a 3D vector
+    */
+   int LuaBuilderBotCameraSystemSensorDetectLed(lua_State* pt_lua_state) {
+      /* check parameters */
+      if(lua_gettop(pt_lua_state) != 1) {
+         return luaL_error(pt_lua_state, "robot.camera_system.detect_led() expects a single argument");
+      }
+      luaL_checktype(pt_lua_state, 1, LUA_TTABLE);
+      /* push the x,y,z components of the table onto the stack */
+      lua_getfield(pt_lua_state, 1, "x");
+      lua_getfield(pt_lua_state, 1, "y");
+      lua_getfield(pt_lua_state, 1, "z");
+      /* build the vector */
+      CVector3 cPosition(lua_tonumber(pt_lua_state, 2),
+                         lua_tonumber(pt_lua_state, 3)
+                         lua_tonumber(pt_lua_state, 4));
+      /* clean up the stack */
+      lua_pop(pt_lua_state, 3);
+      /* get the camera sensor */
+      CCI_BuilderBotCameraSystemSensor* pcCameraSensor = 
+         CLuaUtility::GetDeviceInstance<CCI_BuilderBotCameraSystemSensor>(pt_lua_state, "camera_system");
+      /* get the LED state */
+      const CCI_BuilderBotCameraSystemSensor::ELedState& eLedState =
+         pcCameraSensor->DetectLed(cPosition);
+      /* convert the LED state to an integer and push it onto the stack */
+      lua_pushinteger(pt_lua_state, static_cast<UInt8>(eLedState));
+      /* return a single result, the integer */
+      return 1;
+   }
+#endif
+
+   /****************************************/
+   /****************************************/
+
+#ifdef ARGOS_WITH_LUA
    void CCI_BuilderBotCameraSystemSensor::CreateLuaState(lua_State* pt_lua_state) {
       CLuaUtility::OpenRobotStateTable(pt_lua_state, "camera_system");
       CLuaUtility::AddToTable(pt_lua_state, "_instance", this);
@@ -95,6 +98,9 @@ namespace argos {
       CLuaUtility::AddToTable(pt_lua_state,
                               "disable",
                               &LuaDisableBuilderBotCameraSystemSensor);
+      CLuaUtility::AddToTable(pt_lua_state,
+                              "detect_led",
+                              &LuaBuilderBotCameraSystemSensorDetectLed);
       CLuaUtility::AddToTable(pt_lua_state, "timestamp", 0.0f);
       CLuaUtility::StartTable(pt_lua_state, "tags");
       for(size_t i = 0; i < m_tTags.size(); ++i) {
@@ -110,13 +116,6 @@ namespace argos {
          }
          CLuaUtility::EndTable(pt_lua_state);
          /* end corners */
-         /* start leds */
-         CLuaUtility::StartTable(pt_lua_state, "leds");
-         for(size_t j = 0; j < m_tTags[i].LEDs.size(); ++j) {           
-            CLuaUtility::AddToTable(pt_lua_state, j + 1, static_cast<UInt8>(m_tTags[i].LEDs[j]));
-         }
-         CLuaUtility::EndTable(pt_lua_state);
-         /* end leds */
          CLuaUtility::EndTable(pt_lua_state);
       }
       CLuaUtility::EndTable(pt_lua_state);
@@ -147,13 +146,6 @@ namespace argos {
          }
          CLuaUtility::EndTable(pt_lua_state);
          /* end corners */
-         /* start leds */
-         CLuaUtility::StartTable(pt_lua_state, "leds");
-         for(size_t j = 0; j < m_tTags[i].LEDs.size(); ++j) {           
-            CLuaUtility::AddToTable(pt_lua_state, j + 1, static_cast<UInt8>(m_tTags[i].LEDs[j]));
-         }
-         CLuaUtility::EndTable(pt_lua_state);
-         /* end leds */
          CLuaUtility::EndTable(pt_lua_state);
       }
       if(m_tTags.size() < unLastTagCount) {

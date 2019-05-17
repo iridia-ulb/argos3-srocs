@@ -35,11 +35,10 @@ namespace argos {
               const CVector3& c_position,
               const CQuaternion& c_orientation,
               const CVector2& c_center,
-              const std::array<CVector2, 4>& arr_corners,
-              const std::array<ELedState, 4>& arr_leds) :
+              const std::array<CVector2, 4>& arr_corners) :
             Id(un_id),
             Position(c_position),
-            Orientation(c_orientation),           
+            Orientation(c_orientation),
             Center(c_center),
             Corners(arr_corners) {}
          /* Tag identifier */
@@ -68,14 +67,6 @@ namespace argos {
          m_fTimestamp = 0.0f;
       }
 
-      Real GetTimestamp() const {
-         return m_fTimestamp;
-      }
-
-      const STag::TVector& GetTags() const {
-         return m_tTags;
-      }
-
       virtual void Enable() {
          m_bEnabled = true;
       }
@@ -84,6 +75,17 @@ namespace argos {
          m_bEnabled = false;
       }
 
+      virtual ELedState DetectLed(const CVector3& c_position) = 0;
+
+      Real GetTimestamp() const {
+         return m_fTimestamp;
+      }
+
+      const STag::TVector& GetTags() const {
+         return m_tTags;
+      }
+
+
 #ifdef ARGOS_WITH_LUA
       virtual void CreateLuaState(lua_State* pt_lua_state);
 
@@ -91,16 +93,8 @@ namespace argos {
 #endif
    protected:
 
-      static void GetTagLedPositions(std::array<CVector2, 4>& arr_led_buffer,
-                                     const CSquareMatrix<3>& c_camera_matrix,
-                                     const CVector3& c_tag_position,
-                                     const CRotationMatrix3& c_tag_orientation);
-
-      static const std::array<CVector3, 4> m_arrLedOffsets;
-
-   protected:
       /* whether or not the camera sensor is enabled */
-      bool m_bEnabled;    
+      bool m_bEnabled;
       /* the detected tags in the current frame */
       STag::TVector m_tTags;
       /* the timestamp of the current frame */

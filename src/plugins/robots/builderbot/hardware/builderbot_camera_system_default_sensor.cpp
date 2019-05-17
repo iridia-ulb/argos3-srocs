@@ -46,14 +46,16 @@ extern "C" {
 
 #define TAG_SIDE_LENGTH 0.0235f
 
-#define THRESHOLD_Q1_MIN_V 140u
-#define THRESHOLD_Q1_MIN_U 140u
-#define THRESHOLD_Q2_MIN_V 140u
-#define THRESHOLD_Q2_MAX_U 100u
-#define THRESHOLD_Q3_MAX_V 110u
-#define THRESHOLD_Q3_MAX_U 130u
-#define THRESHOLD_Q4_MAX_V 100u
-#define THRESHOLD_Q4_MIN_U 145u
+#define DETECT_LED_WIDTH 6u
+#define DETECT_LED_HEIGHT 6u
+#define DETECT_LED_THRES_Q1_MIN_V 140u
+#define DETECT_LED_THRES_Q1_MIN_U 140u
+#define DETECT_LED_THRES_Q2_MIN_V 140u
+#define DETECT_LED_THRES_Q2_MAX_U 100u
+#define DETECT_LED_THRES_Q3_MAX_V 110u
+#define DETECT_LED_THRES_Q3_MAX_U 130u
+#define DETECT_LED_THRES_Q4_MAX_V 100u
+#define DETECT_LED_THRES_Q4_MIN_U 145u
 
 namespace argos {
 
@@ -228,6 +230,11 @@ namespace argos {
          /* intialize iterators for the buffers */
          m_itNextBuffer = std::begin(m_arrBuffers);
          m_itCurrentBuffer = std::end(m_arrBuffers);
+         /* start the stream */
+         enum v4l2_buf_type eBufferType = ::V4L2_BUF_TYPE_VIDEO_CAPTURE;
+         if(::ioctl(m_nCameraHandle, VIDIOC_STREAMON, &eBufferType) < 0) {
+            THROW_ARGOSEXCEPTION("Could not start the stream");
+         }
       }
       catch(CARGoSException& ex) {
          THROW_ARGOSEXCEPTION_NESTED("Error initializing camera sensor", ex);
@@ -239,11 +246,6 @@ namespace argos {
 
    void CBuilderBotCameraSystemDefaultSensor::Enable() {
       if(m_bEnabled == false) {
-         /* start the stream */
-         enum v4l2_buf_type eBufferType = ::V4L2_BUF_TYPE_VIDEO_CAPTURE;
-         if(::ioctl(m_nCameraHandle, VIDIOC_STREAMON, &eBufferType) < 0) {
-            THROW_ARGOSEXCEPTION("Could not start the stream");
-         }
          /* enqueue the first buffer */
          ::v4l2_buffer sBuffer;
          ::memset(&sBuffer, 0, sizeof(::v4l2_buffer));
@@ -270,11 +272,6 @@ namespace argos {
          sBuffer.index = m_itNextBuffer->first;
          if(::ioctl(m_nCameraHandle, VIDIOC_DQBUF, &sBuffer) < 0) {
             LOGERR << "[WARNING] Could not dequeue buffer" << std::endl;
-         }
-         /* stop stream */
-         enum v4l2_buf_type eBufferType = V4L2_BUF_TYPE_VIDEO_CAPTURE;
-         if (::ioctl(m_nCameraHandle, VIDIOC_STREAMOFF, &eBufferType) < 0) {
-            LOGERR << "[WARNING] Could not stop the stream" << std::endl;
          }
          CCI_BuilderBotCameraSystemSensor::Disable();
       }
@@ -352,21 +349,8 @@ namespace argos {
                ::estimate_tag_pose(&m_tTagDetectionInfo, &tPose);
                CRotationMatrix3 cTagOrientation(pose.R->data);
                CVector3 cTagPosition(tPose.t->data[0], tPose.t->data[1], tPose.t->data[2]);
-               /* calculate LED positions */
-               std::array<CVector2, 4> arrLedPositionBuffer;
-               GetTagLedPositions(arrLedPositionBuffer, m_cCameraMatrix, cTagPosition, cTagOrientation);
-               /* detect LEDs at each location */
-               std::array<ELedState, 4> arrLedStates = {
-                  ELedState::OFF, ELedState::OFF, ELedState::OFF, ELedState::OFF,
-               };
-               std::transform(std::begin(arrLedPositionBuffer),
-                              std::end(arrLedPositionBuffer),
-                              std::begin(arrLedStates),
-                              [] (const CVector2& c_led_position) {
-                  return DetectLed(c_led_position, CVector2(5.0f,5.0f));
-               });
                 /* copy readings */
-               m_tTags.emplace_back(ptDetection->id, cTagPosition, cTagOrientation, cCenterPixel, arrCornerPixels, arrLedStates);
+               m_tTags.emplace_back(ptDetection->id, cTagPosition, cTagOrientation, cCenterPixel, arrCornerPixels);
             }
             /* destroy the readings array */
             ::apriltag_detections_destroy(ptDetectionArray);
@@ -391,6 +375,11 @@ namespace argos {
    void CBuilderBotCameraSystemDefaultSensor::Destroy() {
       /* disable the sensor */
       Disable();
+      /* stop the stream */
+      enum v4l2_buf_type eBufferType = V4L2_BUF_TYPE_VIDEO_CAPTURE;
+      if (::ioctl(m_nCameraHandle, VIDIOC_STREAMOFF, &eBufferType) < 0) {
+         LOGERR << "[WARNING] Could not stop the stream" << std::endl;
+      }
       /* close the camera */
       ::close(m_nCameraHandle);
       /* release the media device */
@@ -401,14 +390,19 @@ namespace argos {
    /****************************************/
 
    CBuilderBotCameraSystemDefaultSensor::ELedState
-      CBuilderBotCameraSystemDefaultSensor::DetectLed(const CVector2& c_center,
-                                                      const CVector2& c_size) {
+      CBuilderBotCameraSystemDefaultSensor::DetectLed(const CVector3& c_position) {
+      /* project the LED position onto the sensor array */
+      const CMatrix<3,1> cProjection =
+            m_cCameraMatrix * CMatrix<3,1>(c_position.GetX(), c_position.GetY(), c_position.GetZ());
+      CVector2 cCenter(cProjection(0,0) / cProjection(2,0),
+                       cProjection(1,0) / cProjection(2,0));
+      CVector2 cSize(DETECT_LED_WIDTH, DETECT_LED_HEIGHT);
       /* declare ranges for truncation */
       static const CRange<Real> m_cColumnRange(0.0f, IMAGE_WIDTH - 1.0f);
       static const CRange<Real> m_cRowRange(0.0f, IMAGE_HEIGHT - 1.0f);
       /* calculate the corners of the region of interest */
-      CVector2 cMinCorner(c_center - 0.5f * c_size);
-      CVector2 cMaxCorner(c_center + 0.5f * c_size);
+      CVector2 cMinCorner(cCenter - 0.5f * cSize);
+      CVector2 cMaxCorner(cCenter + 0.5f * cSize);
       /* clamp the region of interest to the image size */
       Real fColumnStart = cMinCorner.GetX();
       Real fColumnEnd = cMaxCorner.GetX();
@@ -467,16 +461,16 @@ namespace argos {
       /* initialize the LED state to off */
       ELedState eLedState = ELedState::OFF;    
       /* deduce the LED state from the UV values */
-      if((unAverageV > THRESHOLD_Q1_MIN_V) && (unAverageU > THRESHOLD_Q1_MIN_U)) {
+      if((unAverageV > DETECT_LED_THRES_Q1_MIN_V) && (unAverageU > DETECT_LED_THRES_Q1_MIN_U)) {
          eLedState = ELedState::Q1;
       }
-      else if((unAverageV > THRESHOLD_Q2_MIN_V) && (unAverageU < THRESHOLD_Q2_MAX_U)) {
+      else if((unAverageV > DETECT_LED_THRES_Q2_MIN_V) && (unAverageU < DETECT_LED_THRES_Q2_MAX_U)) {
          eLedState = ELedState::Q2;
       }
-      else if((unAverageV < THRESHOLD_Q3_MAX_V) && (unAverageU < THRESHOLD_Q3_MAX_U)) {
+      else if((unAverageV < DETECT_LED_THRES_Q3_MAX_V) && (unAverageU < DETECT_LED_THRES_Q3_MAX_U)) {
          eLedState = ELedState::Q3;
       }
-      else if((unAverageV < THRESHOLD_Q4_MAX_V) && (unAverageU > THRESHOLD_Q4_MIN_U)) {
+      else if((unAverageV < DETECT_LED_THRES_Q4_MAX_V) && (unAverageU > DETECT_LED_THRES_Q4_MIN_U)) {
          eLedState = ELedState::Q4;
       }
       return eLedState;

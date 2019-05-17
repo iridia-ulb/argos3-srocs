@@ -23,6 +23,9 @@
 #define CAMERA_PRINCIPAL_POINT_Y 120.0f
 #define CAMERA_RANGE_MIN 0.025f
 #define CAMERA_RANGE_MAX 0.625f
+/* when detecting LEDs, an LED should be within 0.5 cm of the sampled location
+   this prevents the detection of adjacent LEDs on the stigmergic block */
+#define DETECT_LED_DIST_THRES 0.005f
 
 namespace argos {
 
@@ -280,14 +283,11 @@ namespace argos {
       catch(const std::logic_error& err_logic) {
          THROW_ARGOSEXCEPTION("Tag payload \"" << c_tag.GetPayload() << "\" can not be converted to an unsigned integer");
       }
-      /* TODO calculate tag pose and get LEDs here! */
-      CVector3 cTagPosition;
+      /* TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO calculate tag pose! */
+      CVector3 cTagPosition = m_cCameraToWorldTransform * c_tag.GetPosition();
       CQuaternion cTagOrientation;
-      std::array<ELedState, 4> arrLEDs = {
-         ELedState::OFF, ELedState::OFF, ELedState::OFF, ELedState::OFF,
-      };
       /* transfer readings to the control interface */
-      m_tTags.emplace_back(unId, cTagPosition, cTagOrientation, cCenterPixel, m_arrTagCornerPixels, arrLEDs);
+      m_tTags.emplace_back(unId, cTagPosition, cTagOrientation, cCenterPixel, m_arrTagCornerPixels);
       return true;
    }
 
@@ -307,13 +307,51 @@ namespace argos {
       }
       m_cOcclusionCheckRay.SetEnd(cLedPosition);
       if(!GetClosestEmbodiedEntityIntersectedByRay(m_sIntersectionItem, m_cOcclusionCheckRay)) {
-         m_vecLedCache.emplace_back(c_led.GetColor(), ProjectOntoSensor(cLedPosition));
+         m_vecLedCache.emplace_back(c_led.GetColor(), cLedPosition, ProjectOntoSensor(cLedPosition));
          m_pcControllableEntity->GetCheckedRays().emplace_back(false, m_cOcclusionCheckRay);
       }
       else {
          m_pcControllableEntity->GetCheckedRays().emplace_back(true, m_cOcclusionCheckRay);
       }
       return true;
+   }
+
+   /****************************************/
+   /****************************************/
+
+   CBuilderBotCameraSystemDefaultSensor::ELedState
+      CBuilderBotCameraSystemDefaultSensor::DetectLed(const CVector3& c_position) {    
+      /* find the closest LED */
+      std::vector<SLed>::iterator itClosestLed =
+         std::min_element(std::begin(m_vecLedCache),
+                          std::end(m_vecLedCache),
+                          [&c_position] (const SLed& s_lhs_led, const SLed& s_rhs_led) {
+         return (Distance(s_lhs_led.Position, c_position) <
+                 Distance(s_rhs_led.Position, c_position));
+      })
+      /* if no LEDs were found or if the closest LED is more than 0.5 cm away,
+         return ELedState::OFF */
+      if(itClosestLed == std::end(m_vecLedCache) ||
+         Distance(itClosestLed->Position, c_position) > DETECT_LED_DIST_THRES) {
+         return ELedState::OFF;
+      }
+      /* At this point, we have the closest LED, estimate its state (mapped from
+         an exact color in simulation */
+      if(itClosestLed->Color == CColor::MAGENTA) {
+         return ELedState::Q1;
+      }
+      else if(itClosestLed->Color == CColor::ORANGE) {
+         return ELedState::Q2;
+      }
+      else if(itClosestLed->Color == CColor::GREEN) {
+         return ELedState::Q3;
+      }
+      else if(itClosestLed->Color == CColor::BLUE) {
+         return ELedState::Q4;
+      }
+      else {
+         return ELedState::OFF;
+      }
    }
 
    /****************************************/
