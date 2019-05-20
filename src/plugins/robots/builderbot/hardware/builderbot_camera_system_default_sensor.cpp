@@ -112,12 +112,12 @@ namespace argos {
          else {
             ticpp::Document tCalibration = ticpp::Document(strCalibrationFilePath);
             tCalibration.LoadFile();
-            TConfigurationNode& t_calibration = *tCalibration.FirstChildElement();
+            TConfigurationNode& tCalibrationNode = *tCalibration.FirstChildElement();
             /* read the parameters */
-            GetNodeAttributeOrDefault(t_calibration, "focal_length", m_cFocalLength, m_cFocalLength);
-            GetNodeAttributeOrDefault(t_calibration, "principal_point", m_cPrincipalPoint, m_cPrincipalPoint);
-            GetNodeAttributeOrDefault(t_calibration, "position", m_cPositionOffset, m_cPositionOffset);
-            GetNodeAttributeOrDefault(t_calibration, "orientation", m_cOrientationOffset, m_cOrientationOffset);
+            GetNodeAttributeOrDefault(tCalibrationNode, "focal_length", m_cFocalLength, m_cFocalLength);
+            GetNodeAttributeOrDefault(tCalibrationNode, "principal_point", m_cPrincipalPoint, m_cPrincipalPoint);
+            GetNodeAttributeOrDefault(tCalibrationNode, "position", m_cPositionOffset, m_cPositionOffset);
+            GetNodeAttributeOrDefault(tCalibrationNode, "orientation", m_cOrientationOffset, m_cOrientationOffset);
          }
          /* update the camera matrix */
          m_cCameraMatrix.SetIdentityMatrix();
