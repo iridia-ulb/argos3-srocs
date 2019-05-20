@@ -78,7 +78,7 @@ namespace argos {
       m_ptTagDetector->decode_sharpening = 0.25;
       m_ptTagDetector->nthreads = 2;
       /* allocate image memory */
-      m_psImage = ::image_u8_create_alignment(IMAGE_WIDTH, IMAGE_HEIGHT, 96);
+      m_ptImage = ::image_u8_create_alignment(IMAGE_WIDTH, IMAGE_HEIGHT, 96);
    }
 
    /****************************************/
@@ -86,7 +86,7 @@ namespace argos {
 
    CBuilderBotCameraSystemDefaultSensor::~CBuilderBotCameraSystemDefaultSensor() {
       /* deallocate image memory */
-      ::image_u8_destroy(m_psImage);
+      ::image_u8_destroy(m_ptImage);
       /* uninitialize the apriltag components */
       ::apriltag_detector_remove_family(m_ptTagDetector, m_ptTagFamily);
       /* destroy the tag detector */
@@ -309,14 +309,14 @@ namespace argos {
             /* create the gray scale image based on the luminance data */
             UInt32 unSourceIndex = 0;
             UInt32 unDestinationIndex = 0;
-            const UInt32 unImageStride = m_psImage->stride;
-            const UInt32 unImageWidth = m_psImage->width;
-            const UInt32 unImageHeight = m_psImage->height;
+            const UInt32 unImageStride = m_ptImage->stride;
+            const UInt32 unImageWidth = m_ptImage->width;
+            const UInt32 unImageHeight = m_ptImage->height;
             /* extract the luminance from the data */
             for (UInt32 un_height_index = 0; un_height_index < unImageHeight; un_height_index++) {
                for (UInt32 un_width_index = 0; un_width_index < unImageWidth; un_width_index++) {
                   /* copy data */
-                  m_psImage->buf[unDestinationIndex++] = punImageData[unSourceIndex + 1];
+                  m_ptImage->buf[unDestinationIndex++] = punImageData[unSourceIndex + 1];
                   /* move to the next pixel */
                   unSourceIndex += 2;
                }
@@ -327,7 +327,7 @@ namespace argos {
             std::array<CVector2, 4> arrCornerPixels;
             /* run the apriltags algorithm */
             ::zarray_t* ptDetectionArray =
-                 ::apriltag_detector_detect(m_ptTagDetector, m_psImage);
+                 ::apriltag_detector_detect(m_ptTagDetector, m_ptImage);
             /* get the detected tags count */
             size_t unTagCount = static_cast<size_t>(::zarray_size(ptDetectionArray));
             /* reserve space for the tags */
@@ -347,7 +347,7 @@ namespace argos {
                apriltag_pose_t tPose;
                m_tTagDetectionInfo.det = ptDetection;
                ::estimate_tag_pose(&m_tTagDetectionInfo, &tPose);
-               CRotationMatrix3 cTagOrientation(pose.R->data);
+               CRotationMatrix3 cTagOrientation(tPose.R->data);
                CVector3 cTagPosition(tPose.t->data[0], tPose.t->data[1], tPose.t->data[2]);
                 /* copy readings */
                m_tTags.emplace_back(ptDetection->id, cTagPosition, cTagOrientation, cCenterPixel, arrCornerPixels);
@@ -392,8 +392,11 @@ namespace argos {
    CBuilderBotCameraSystemDefaultSensor::ELedState
       CBuilderBotCameraSystemDefaultSensor::DetectLed(const CVector3& c_position) {
       /* project the LED position onto the sensor array */
-      const CMatrix<3,1> cProjection =
-            m_cCameraMatrix * CMatrix<3,1>(c_position.GetX(), c_position.GetY(), c_position.GetZ());
+      CMatrix<3,1> cLedPosition;
+      cLedPosition(0) = c_position.GetX();
+      cLedPosition(1) = c_position.GetY();
+      cLedPosition(2) = c_position.GetZ();
+      const CMatrix<3,1> cProjection = m_cCameraMatrix * cLedPosition;
       CVector2 cCenter(cProjection(0,0) / cProjection(2,0),
                        cProjection(1,0) / cProjection(2,0));
       CVector2 cSize(DETECT_LED_WIDTH, DETECT_LED_HEIGHT);

@@ -21,6 +21,7 @@ struct media_device;
 #include <array>
 #include <chrono>
 
+#include <apriltag/apriltag_pose.h>
 #include <apriltag/common/image_u8.h>
 
 #include <argos3/core/hardware/sensor.h>
