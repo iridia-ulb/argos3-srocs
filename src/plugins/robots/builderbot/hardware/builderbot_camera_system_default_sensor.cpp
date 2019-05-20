@@ -110,14 +110,15 @@ namespace argos {
             LOGERR << "[WARNING] No calibration data provided for the builderbot camera system" << std::endl;
          }
          else {
-            ticpp::Document tCalibration = ticpp::Document(strCalibrationFilePath);
-            tCalibration.LoadFile();
-            TConfigurationNode& tCalibrationNode = *tCalibration.FirstChildElement();
+            ticpp::Document tDocument = ticpp::Document(strCalibrationFilePath);
+            tDocument.LoadFile();
+            TConfigurationNode& tCalibrationNode = *tDocument.FirstChildElement();
+            TConfigurationNode& tSensorNode = GetNode(tCalibrationNode, "builderbot_camera_system");
             /* read the parameters */
-            GetNodeAttributeOrDefault(tCalibrationNode, "focal_length", m_cFocalLength, m_cFocalLength);
-            GetNodeAttributeOrDefault(tCalibrationNode, "principal_point", m_cPrincipalPoint, m_cPrincipalPoint);
-            GetNodeAttributeOrDefault(tCalibrationNode, "position", m_cPositionOffset, m_cPositionOffset);
-            GetNodeAttributeOrDefault(tCalibrationNode, "orientation", m_cOrientationOffset, m_cOrientationOffset);
+            GetNodeAttribute(tSensorNode, "focal_length", m_cFocalLength);
+            GetNodeAttribute(tSensorNode, "principal_point", m_cPrincipalPoint);
+            GetNodeAttribute(tSensorNode, "position", m_cPositionOffset);
+            GetNodeAttribute(tSensorNode, "orientation", m_cOrientationOffset);
          }
          /* update the camera matrix */
          m_cCameraMatrix.SetIdentityMatrix();

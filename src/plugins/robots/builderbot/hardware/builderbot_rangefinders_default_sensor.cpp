@@ -88,12 +88,13 @@ namespace argos {
          }
          else {
             std::string strLabel;
-            ticpp::Document tCalibration = ticpp::Document(strCalibrationFilePath);
-            tCalibration.LoadFile();
-            TConfigurationNode& tCalibrationNode = *tCalibration.FirstChildElement();
+            ticpp::Document tDocument = ticpp::Document(strCalibrationFilePath);
+            tDocument.LoadFile();
+            TConfigurationNode& tCalibrationNode = *tDocument.FirstChildElement();
+            TConfigurationNode& tSensorNode = GetNode(tCalibrationNode, "builderbot_rangefinders");
             /* read the parameters */
             TConfigurationNodeIterator itSensor("sensor");
-            for(itSensor = itSensor.begin(&tCalibrationNode);
+            for(itSensor = itSensor.begin(&tSensorNode);
                 itSensor != itSensor.end();
                 ++itSensor) {
                GetNodeAttribute(*itSensor, "label", strLabel);
