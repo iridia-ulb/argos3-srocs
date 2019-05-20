@@ -6,8 +6,14 @@
 
 #include "builderbot_rangefinders_default_sensor.h"
 
+#include <argos3/core/utility/logging/argos_log.h>
+#include <argos3/core/utility/configuration/argos_configuration.h>
+
+#include <argos3/plugins/robots/builderbot/hardware/builderbot.h>
+
 #include <iio.h>
-#include <sys/stat.h>
+
+#include <algorithm>
 
 namespace argos {
 
@@ -74,6 +80,45 @@ namespace argos {
                m_vecPhysicalInterfaces.emplace_back(pchBuffer, psDevice, psProximity, psIlluminance, psBuffer);
             }
          }
+         /* retrieve the calibraton data */
+         std::string strCalibrationFilePath;
+         GetNodeAttributeOrDefault(t_tree, "calibration", strCalibrationFilePath, strCalibrationFilePath);
+         if(strCalibrationFilePath.empty()) {
+            LOGERR << "[WARNING] No calibration data provided for the builderbot rangefinders" << std::endl;
+         }
+         else {
+            std::string strLabel;
+            ticpp::Document tCalibration = ticpp::Document(strCalibrationFilePath);
+            tCalibration.LoadFile();
+            TConfigurationNode& tCalibrationNode = *tCalibration.FirstChildElement();
+            /* read the parameters */
+            TConfigurationNodeIterator itSensor("sensor");
+            for(itSensor = itSensor.begin(&tCalibrationNode);
+                itSensor != itSensor.end();
+                ++itSensor) {
+               GetNodeAttribute(*itSensor, "label", strLabel);
+               std::vector<SPhysicalInterface>::iterator itInterface =
+                  std::find_if(std::begin(m_vecPhysicalInterfaces),
+                               std::end(m_vecPhysicalInterfaces),
+                               [&strLabel] (const SPhysicalInterface& s_physical_interface) {
+                                  return (s_physical_interface.Label == strLabel);
+                               });
+               if(itInterface == std::end(m_vecPhysicalInterfaces)) {
+                  THROW_ARGOSEXCEPTION("Can not assign calibration data to sensor \"" << strLabel << "\"")
+               }
+               else {
+                  std::array<Real, 2> arrRawParameters = {0.0, 0.0};
+                  std::string strParameters;
+                  GetNodeAttribute(*itSensor, "parameters", strParameters);
+                  ParseValues<Real>(strParameters, 2, arrRawParameters.data(), ',');
+                  /* calculate the actual parameters */
+                  itInterface->Calibration[0] =
+                     std::log(100) / std::log(arrRawParameters[0] / arrRawParameters[1]);
+                  itInterface->Calibration[1] =
+                     arrRawParameters[0] * std::pow(0.001, 1.0 / itInterface->Calibration[0]);
+               }
+            }
+         }
          /* add pointers to the control interface */
          for(SPhysicalInterface& s_physical_interface : m_vecPhysicalInterfaces) {
             m_vecInterfaces.push_back(&s_physical_interface);
@@ -88,7 +133,7 @@ namespace argos {
    /****************************************/
    
    void CBuilderBotRangefindersDefaultSensor::Update() {
-      UInt16 unIlluminanceRaw, unProximityRaw;
+      UInt16 unProximityRaw, unIlluminanceRaw;
       for(SPhysicalInterface& s_physical_interface : m_vecPhysicalInterfaces) {
          ::iio_buffer_refill(s_physical_interface.Buffer);
          ::iio_channel_read(s_physical_interface.ProximityChannel,
@@ -97,13 +142,14 @@ namespace argos {
          ::iio_channel_read(s_physical_interface.IlluminanceChannel,
                             s_physical_interface.Buffer,
                             &unIlluminanceRaw, 2);
-         /* convert samples to metric units */
-         s_physical_interface.Proximity = ConvertToMeters(unProximityRaw);
+         /* calibrate proximity samples and convert to metric units */
+         s_physical_interface.Proximity = 
+            std::pow(s_physical_interface.Calibration[1] / static_cast<Real>(unProximityRaw),
+                     s_physical_interface.Calibration[0]);
+         /* calibrate illuminance samples and convert to metric units */
          s_physical_interface.Illuminance = ConvertToLux(unIlluminanceRaw);
       }
    }
-
-
 
    /****************************************/
    /****************************************/

@@ -8,7 +8,8 @@
 #define BUILDERBOT_RANGEFINDERS_DEFAULT_SENSOR_H
 
 #include <string>
-#include <map>
+#include <vector>
+#include <array>
 
 namespace argos {
    class CBuilderBotRangefindersDefaultSensor;
@@ -17,8 +18,6 @@ namespace argos {
 struct iio_device;
 struct iio_channel;
 struct iio_buffer;
-
-#include <argos3/plugins/robots/builderbot/hardware/builderbot.h>
 
 #include <argos3/core/hardware/sensor.h>
 #include <argos3/plugins/robots/builderbot/control_interface/ci_builderbot_rangefinders_sensor.h>
@@ -40,11 +39,13 @@ namespace argos {
             Device(ps_device),
             ProximityChannel(ps_proximity_channel),
             IlluminanceChannel(ps_illuminance_channel),
-            Buffer(ps_buffer) {}
+            Buffer(ps_buffer),
+            Calibration({0.0, 0.0}) {}
          iio_device* Device;
          iio_channel* ProximityChannel;
          iio_channel* IlluminanceChannel;
          iio_buffer* Buffer;
+         std::array<Real, 2> Calibration;
       };
 
       CBuilderBotRangefindersDefaultSensor();
@@ -58,11 +59,6 @@ namespace argos {
       virtual void Reset();
 
    private:
-
-      Real ConvertToMeters(UInt16 un_raw) {
-         static const Real fConversionFactor = Real(1.0);
-         return (un_raw * fConversionFactor);
-      }
 
       Real ConvertToLux(UInt16 un_raw) {
          static const Real fConversionFactor = Real(1.0);

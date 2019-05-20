@@ -20,11 +20,11 @@ namespace argos {
    public:
 
       struct SInterface {
-         SInterface(const std::string& str_id) :
-            Id(str_id),
+         SInterface(const std::string& str_label) :
+            Label(str_label),
             Proximity(0.0f),
             Illuminance(0.0f) {}
-         std::string Id;
+         std::string Label;
          Real Proximity;
          Real Illuminance;
          using TVector = std::vector<SInterface*>;

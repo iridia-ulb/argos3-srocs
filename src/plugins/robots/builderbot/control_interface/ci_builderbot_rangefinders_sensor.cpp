@@ -26,7 +26,7 @@ namespace argos {
    void CCI_BuilderBotRangefindersSensor::CreateLuaState(lua_State* pt_lua_state) {
       CLuaUtility::OpenRobotStateTable(pt_lua_state, "rangefinders");
       for(SInterface* ps_interface : m_vecInterfaces) {
-         CLuaUtility::StartTable(pt_lua_state, ps_interface->Id);
+         CLuaUtility::StartTable(pt_lua_state, ps_interface->Label);
          CLuaUtility::AddToTable(pt_lua_state, "proximity", ps_interface->Proximity);
          CLuaUtility::AddToTable(pt_lua_state, "illuminance", ps_interface->Illuminance);
          CLuaUtility::EndTable(pt_lua_state);
@@ -42,7 +42,7 @@ namespace argos {
    void CCI_BuilderBotRangefindersSensor::ReadingsToLuaState(lua_State* pt_lua_state) {
       CLuaUtility::OpenRobotStateTable(pt_lua_state, "rangefinders");
       for(SInterface* ps_interface : m_vecInterfaces) {
-         CLuaUtility::StartTable(pt_lua_state, ps_interface->Id);
+         CLuaUtility::StartTable(pt_lua_state, ps_interface->Label);
          CLuaUtility::AddToTable(pt_lua_state, "proximity", ps_interface->Proximity);
          CLuaUtility::AddToTable(pt_lua_state, "illuminance", ps_interface->Illuminance);
          CLuaUtility::EndTable(pt_lua_state);
