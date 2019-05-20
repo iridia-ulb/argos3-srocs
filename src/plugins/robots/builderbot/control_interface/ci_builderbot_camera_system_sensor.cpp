@@ -68,7 +68,7 @@ namespace argos {
       lua_getfield(pt_lua_state, 1, "z");
       /* build the vector */
       CVector3 cPosition(lua_tonumber(pt_lua_state, 2),
-                         lua_tonumber(pt_lua_state, 3)
+                         lua_tonumber(pt_lua_state, 3),
                          lua_tonumber(pt_lua_state, 4));
       /* clean up the stack */
       lua_pop(pt_lua_state, 3);

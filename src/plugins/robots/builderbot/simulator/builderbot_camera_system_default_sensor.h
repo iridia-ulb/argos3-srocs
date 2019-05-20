@@ -46,8 +46,8 @@ namespace argos {
             Position(c_position),
             Center(c_center) {}
          CColor Color;
-         CVector2 Center;
          CVector3 Position;
+         CVector2 Center;
       };
 
       const std::vector<SLed>& GetLedCache() const {

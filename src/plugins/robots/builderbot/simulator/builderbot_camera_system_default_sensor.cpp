@@ -328,7 +328,7 @@ namespace argos {
                           [&c_position] (const SLed& s_lhs_led, const SLed& s_rhs_led) {
          return (Distance(s_lhs_led.Position, c_position) <
                  Distance(s_rhs_led.Position, c_position));
-      })
+      });
       /* if no LEDs were found or if the closest LED is more than 0.5 cm away,
          return ELedState::OFF */
       if(itClosestLed == std::end(m_vecLedCache) ||
