@@ -24,7 +24,7 @@ namespace argos {
 
       CCI_BuilderBotLiftSystemSensor() :
          m_unState(0),
-         m_fPosition(140.0f),
+         m_fPosition(0.0),
          m_arrLimitSwitches({0, 0}) {}
 
       virtual ~CCI_BuilderBotLiftSystemSensor() {}
