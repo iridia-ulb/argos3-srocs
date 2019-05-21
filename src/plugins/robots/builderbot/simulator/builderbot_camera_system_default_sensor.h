@@ -95,8 +95,13 @@ namespace argos {
       bool m_bShowLEDRays;
 
       /* cached data for operator() */
+      /* TODO: remove dependency on m_cOffset */
       CTransformationMatrix3 m_cOffset;
-      CVector3 m_cCameraLocation;
+      CQuaternion m_cOffsetOrientation;
+      CVector3 m_cOffsetPosition;
+
+      CVector3 m_cCameraPosition;
+      CQuaternion m_cCameraOrientation;
       CTransformationMatrix3 m_cCameraToWorldTransform;
       CSquareMatrix<3> m_cProjectionMatrix;
       std::array<CPlane, 6> m_arrFrustumPlanes;
@@ -116,9 +121,9 @@ namespace argos {
       /* AprilTag corner offsets / ordering */
       const std::array<CVector3, 4> m_arrTagCornerOffsets = {{
          {-0.5, -0.5, 0},
-         {-0.5,  0.5, 0},
-         { 0.5,  0.5, 0},
          { 0.5, -0.5, 0},
+         { 0.5,  0.5, 0},
+         {-0.5,  0.5, 0},
       }};
 
       std::vector<SLed> m_vecLedCache;

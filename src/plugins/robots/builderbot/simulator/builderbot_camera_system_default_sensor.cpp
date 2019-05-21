@@ -55,13 +55,12 @@ namespace argos {
       m_fFarPlaneHeight = fHeightToDepthRatio * CAMERA_RANGE_MAX;
       m_fFarPlaneWidth = fWidthToDepthRatio * CAMERA_RANGE_MAX;
       /* offset from end effector anchor */
-      CVector3 cOffsetPosition(0.0f, 0.0f, 0.075f);
-      CQuaternion cOffsetOrientation;
-      cOffsetOrientation.FromEulerAngles(-0.50f * CRadians::PI,
-                                          0.75f * CRadians::PI,
-                                          0.00f * CRadians::PI);
+      m_cOffsetPosition.Set(0.0f, 0.0f, 0.075f);
+      m_cOffsetOrientation.FromEulerAngles(-0.50f * CRadians::PI,
+                                            0.75f * CRadians::PI,
+                                            0.00f * CRadians::PI);
       /* transformation matrix */
-      m_cOffset.SetFromComponents(cOffsetOrientation, cOffsetPosition);
+      m_cOffset.SetFromComponents(m_cOffsetOrientation, m_cOffsetPosition);
    }
 
    /****************************************/
@@ -134,12 +133,14 @@ namespace argos {
          cWorldToCameraTransform = cWorldToAnchorTransform * m_cOffset;
          m_cCameraToWorldTransform = cWorldToCameraTransform.GetInverse();
          /* calculate camera direction vectors */
-         m_cCameraLocation = cWorldToCameraTransform.GetTranslationVector();
+         m_cCameraPosition = cWorldToCameraTransform.GetTranslationVector();
+         m_cCameraOrientation = m_psEndEffectorAnchor->Orientation * m_cOffsetOrientation;
+
          cLookAt = cWorldToCameraTransform * CVector3::Z;
          cUp = -CVector3::Y;
          cUp.Rotate(cWorldToCameraTransform.GetRotationMatrix());
          /* calculate direction vectors */
-         cZ = m_cCameraLocation - cLookAt;
+         cZ = m_cCameraPosition - cLookAt;
          cZ.Normalize();
          cX = cUp;
          cX.CrossProduct(cZ);
@@ -147,8 +148,8 @@ namespace argos {
          cY = cZ;
          cY.CrossProduct(cX);
          /* calculate frustum coordinates */
-         cNearCenter = m_cCameraLocation - cZ * CAMERA_RANGE_MIN;
-         cFarCenter = m_cCameraLocation - cZ * CAMERA_RANGE_MAX;
+         cNearCenter = m_cCameraPosition - cZ * CAMERA_RANGE_MIN;
+         cFarCenter = m_cCameraPosition - cZ * CAMERA_RANGE_MAX;
          cNearTopLeft = cNearCenter + (cY * m_fNearPlaneHeight) - (cX * m_fNearPlaneWidth);
          cNearTopRight = cNearCenter + (cY * m_fNearPlaneHeight) + (cX * m_fNearPlaneWidth);
          cNearBottomLeft = cNearCenter - (cY * m_fNearPlaneHeight) - (cX * m_fNearPlaneWidth);
@@ -210,7 +211,7 @@ namespace argos {
          m_arrFrustumPlanes[4].SetFromThreePoints(cNearTopLeft, cNearTopRight, cNearBottomRight);
          m_arrFrustumPlanes[5].SetFromThreePoints(cFarTopRight, cFarTopLeft, cFarBottomLeft);
          /* set the start of the ray for checking occlusions to the camera's location */
-         m_cOcclusionCheckRay.SetStart(m_cCameraLocation);
+         m_cOcclusionCheckRay.SetStart(m_cCameraPosition);
          /* detect tags */
          m_pcTagIndex->ForEntitiesInBoxRange(cBoundingBoxPosition,
                                              cBoundingBoxHalfExtents,
@@ -283,9 +284,9 @@ namespace argos {
       catch(const std::logic_error& err_logic) {
          THROW_ARGOSEXCEPTION("Tag payload \"" << c_tag.GetPayload() << "\" can not be converted to an unsigned integer");
       }
-      /* TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO calculate tag pose! */
+      /* TODO: Update the position and orientation calculations to avoid the use of matrices */
       CVector3 cTagPosition = m_cCameraToWorldTransform * c_tag.GetPosition();
-      CQuaternion cTagOrientation;
+      CQuaternion cTagOrientation = m_cCameraOrientation.Inverse() * c_tag.GetOrientation();
       /* transfer readings to the control interface */
       m_tTags.emplace_back(unId, cTagPosition, cTagOrientation, cCenterPixel, m_arrTagCornerPixels);
       return true;
@@ -365,7 +366,7 @@ namespace argos {
    /****************************************/
 
    CRadians CBuilderBotCameraSystemDefaultSensor::GetAngleWithCamera(const CPositionalEntity& c_entity) const {
-      CVector3 cEntityToCamera(m_cCameraLocation - c_entity.GetPosition());
+      CVector3 cEntityToCamera(m_cCameraPosition - c_entity.GetPosition());
       CVector3 cEntityDirection(CVector3::Z);
       cEntityDirection.Rotate(c_entity.GetOrientation());
       Real fDotProduct = cEntityDirection.DotProduct(cEntityToCamera);
