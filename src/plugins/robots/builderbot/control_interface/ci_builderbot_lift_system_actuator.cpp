@@ -23,7 +23,7 @@ namespace argos {
    int LuaSetBuilderBotLiftSystemActuatorPosition(lua_State* pt_lua_state) {
       /* Check parameters */
       if(lua_gettop(pt_lua_state) != 1) {
-         return luaL_error(pt_lua_state, "robot.las.set_position() expects 1 argument");
+         return luaL_error(pt_lua_state, "robot.lift_system.set_position() expects 1 argument");
       }
       luaL_checktype(pt_lua_state, 1, LUA_TNUMBER);
       /* Perform action */
