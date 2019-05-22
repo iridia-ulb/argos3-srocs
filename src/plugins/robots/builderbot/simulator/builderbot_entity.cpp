@@ -61,7 +61,6 @@ namespace argos {
             /* create additional anchors for drawing the links from the dynamics 3D engine */
             m_pcEmbodiedEntity->AddAnchor("left_wheel");
             m_pcEmbodiedEntity->AddAnchor("right_wheel");
-            m_pcEmbodiedEntity->AddAnchor("front_pivot");
             m_pcEmbodiedEntity->AddAnchor("rear_pivot");
             m_pcEmbodiedEntity->AddAnchor("upper_base");
             m_pcEmbodiedEntity->AddAnchor("lift_column");
@@ -118,8 +117,6 @@ namespace argos {
          /* create and initialize a debugging entity */
          m_pcDebugEntity = new CBuilderBotDebugEntity(this, "debug_0");
          AddComponent(*m_pcDebugEntity);
-
-
          /* Create and initialize the controllable entity */
          m_pcControllableEntity = new CControllableEntity(this);
          AddComponent(*m_pcControllableEntity);

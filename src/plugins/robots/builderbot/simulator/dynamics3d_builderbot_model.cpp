@@ -23,7 +23,7 @@ namespace argos {
 
    CDynamics3DBuilderBotModel::CDynamics3DBuilderBotModel(CDynamics3DEngine& c_engine,
                                                           CBuilderBotEntity& c_builderbot) :
-      CDynamics3DMultiBodyObjectModel(c_engine, c_builderbot, 8, false),
+      CDynamics3DMultiBodyObjectModel(c_engine, c_builderbot, 7, false),
       m_cDifferentialDriveEntity(c_builderbot.GetDifferentialDriveEntity()),
       m_cElectromagnetSystemEntity(c_builderbot.GetElectromagnetSystemEntity()),
       m_cLiftSystemEntity(c_builderbot.GetLiftSystemEntity()) {
@@ -32,8 +32,8 @@ namespace argos {
          CDynamics3DShapeManager::RequestBox(m_cLowerBaseHalfExtents);
       std::shared_ptr<btCollisionShape> ptrWheelShape =
          CDynamics3DShapeManager::RequestCylinder(m_cWheelHalfExtents);
-      std::shared_ptr<btCollisionShape> ptrPivotShape =
-         CDynamics3DShapeManager::RequestSphere(m_fPivotRadius);
+      std::shared_ptr<btCollisionShape> ptrRearPivotShape =
+         CDynamics3DShapeManager::RequestSphere(m_fRearPivotRadius);
       std::shared_ptr<btCollisionShape> ptrUpperBaseShape =
          CDynamics3DShapeManager::RequestConvexHull(m_vecUpperBasePoints);
       std::shared_ptr<btCollisionShape> ptrLiftColumnShape =
@@ -45,14 +45,14 @@ namespace argos {
       /* calculate the inertia of the collision objects */
       btVector3 cLowerBaseInertia;
       btVector3 cWheelInertia;
-      btVector3 cPivotInertia;
+      btVector3 cRearPivotInertia;
       btVector3 cUpperBaseInertia;
       btVector3 cLiftColumnInertia;
       btVector3 cEndEffectorInertia;
       btVector3 cEndEffectorSupportInertia;
       ptrLowerBaseShape->calculateLocalInertia(m_fLowerBaseMass, cLowerBaseInertia);
       ptrWheelShape->calculateLocalInertia(m_fWheelMass, cWheelInertia);
-      ptrPivotShape->calculateLocalInertia(m_fPivotMass, cPivotInertia);
+      ptrRearPivotShape->calculateLocalInertia(m_fRearPivotMass, cRearPivotInertia);
       ptrUpperBaseShape->calculateLocalInertia(m_fUpperBaseMass, cUpperBaseInertia);
       ptrLiftColumnShape->calculateLocalInertia(m_fLiftColumnMass, cLiftColumnInertia);
       ptrEndEffectorShape->calculateLocalInertia(m_fEndEffectorMass, cEndEffectorInertia);
@@ -96,15 +96,10 @@ namespace argos {
                                            cWheelInertia,
                                            m_fWheelMass,
                                            GetEngine().GetDefaultFriction());
-      CAbstractBody::SData sFrontPivotData(cStartTransform * m_cFrontPivotOffset,
-                                           m_cPivotGeometricOffset,
-                                           cPivotInertia,
-                                           m_fPivotMass,
-                                           GetEngine().GetDefaultFriction());
       CAbstractBody::SData sRearPivotData(cStartTransform * m_cRearPivotOffset,
-                                          m_cPivotGeometricOffset,
-                                          cPivotInertia,
-                                          m_fPivotMass,
+                                          m_cRearPivotGeometricOffset,
+                                          cRearPivotInertia,
+                                          m_fRearPivotMass,
                                           GetEngine().GetDefaultFriction());
       CAbstractBody::SData sUpperBaseData(cStartTransform * m_cUpperBaseOffset,
                                           m_cUpperBaseGeometricOffset,
@@ -141,7 +136,6 @@ namespace argos {
       SAnchor* psEndEffectorAnchor = &c_builderbot.GetEmbodiedEntity().GetAnchor("end_effector");
       SAnchor* psLeftWheelAnchor = nullptr;
       SAnchor* psRightWheelAnchor = nullptr;
-      SAnchor* psFrontPivotAnchor = nullptr;
       SAnchor* psRearPivotAnchor = nullptr;
       SAnchor* psUpperBaseAnchor = nullptr;
       SAnchor* psLiftColumnAnchor = nullptr;
@@ -150,7 +144,6 @@ namespace argos {
       if(c_builderbot.IsDebug()) {
          psLeftWheelAnchor = &c_builderbot.GetEmbodiedEntity().GetAnchor("left_wheel");
          psRightWheelAnchor = &c_builderbot.GetEmbodiedEntity().GetAnchor("right_wheel");
-         psFrontPivotAnchor = &c_builderbot.GetEmbodiedEntity().GetAnchor("front_pivot");
          psRearPivotAnchor = &c_builderbot.GetEmbodiedEntity().GetAnchor("rear_pivot");
          psUpperBaseAnchor = &c_builderbot.GetEmbodiedEntity().GetAnchor("upper_base");
          psLiftColumnAnchor = &c_builderbot.GetEmbodiedEntity().GetAnchor("lift_column");
@@ -160,15 +153,14 @@ namespace argos {
       m_ptrLowerBase = std::make_shared<CBase>(*this, psLowerBaseAnchor, ptrLowerBaseShape, sLowerBaseData);
       m_ptrLeftWheel = std::make_shared<CLink>(*this, 0, psLeftWheelAnchor, ptrWheelShape, sLeftWheelData);
       m_ptrRightWheel = std::make_shared<CLink>(*this, 1, psRightWheelAnchor, ptrWheelShape, sRightWheelData);
-      m_ptrFrontPivot = std::make_shared<CLink>(*this, 2, psFrontPivotAnchor, ptrPivotShape, sFrontPivotData);
-      m_ptrRearPivot = std::make_shared<CLink>(*this, 3, psRearPivotAnchor, ptrPivotShape, sRearPivotData);
-      m_ptrUpperBase = std::make_shared<CLink>(*this, 4, psUpperBaseAnchor, ptrUpperBaseShape, sUpperBaseData);
-      m_ptrLiftColumn = std::make_shared<CLink>(*this, 5, psLiftColumnAnchor, ptrLiftColumnShape, sLiftColumnData);
-      m_ptrEndEffector = std::make_shared<CLink>(*this, 6, psEndEffectorAnchor, ptrEndEffectorShape, sEndEffectorData);
-      m_ptrEndEffectorSupport = std::make_shared<CLink>(*this, 7, psEndEffectorSupportAnchor, ptrEndEffectorSupportShape, sEndEffectorSupportData);
+      m_ptrRearPivot = std::make_shared<CLink>(*this, 2, psRearPivotAnchor, ptrRearPivotShape, sRearPivotData);
+      m_ptrUpperBase = std::make_shared<CLink>(*this, 3, psUpperBaseAnchor, ptrUpperBaseShape, sUpperBaseData);
+      m_ptrLiftColumn = std::make_shared<CLink>(*this, 4, psLiftColumnAnchor, ptrLiftColumnShape, sLiftColumnData);
+      m_ptrEndEffector = std::make_shared<CLink>(*this, 5, psEndEffectorAnchor, ptrEndEffectorShape, sEndEffectorData);
+      m_ptrEndEffectorSupport = std::make_shared<CLink>(*this, 6, psEndEffectorSupportAnchor, ptrEndEffectorSupportShape, sEndEffectorSupportData);
       /* copy the bodies to the base class */
       m_vecBodies = {
-         m_ptrLowerBase, m_ptrLeftWheel, m_ptrRightWheel, m_ptrFrontPivot, m_ptrRearPivot,
+         m_ptrLowerBase, m_ptrLeftWheel, m_ptrRightWheel, m_ptrRearPivot,
          m_ptrUpperBase, m_ptrLiftColumn, m_ptrEndEffector, m_ptrEndEffectorSupport,
       };
       /* synchronize with the entity with the space */
@@ -200,15 +192,7 @@ namespace argos {
                                  m_cLowerBaseToRightWheelJointOffset,
                                  m_cRightWheelToLowerBaseJointOffset,
                                  true);
-      /* set up pivots */
-      m_cMultiBody.setupSpherical(m_ptrFrontPivot->GetIndex(),
-                                  m_ptrFrontPivot->GetData().Mass,
-                                  m_ptrFrontPivot->GetData().Inertia,
-                                  m_ptrLowerBase->GetIndex(),
-                                  m_cLowerBaseToFrontPivotJointRotation,
-                                  m_cLowerBaseToFrontPivotJointOffset,
-                                  m_cFrontPivotToLowerBaseJointOffset,
-                                  true);
+      /* set up rear pivot */
       m_cMultiBody.setupSpherical(m_ptrRearPivot->GetIndex(),
                                   m_ptrRearPivot->GetData().Mass,
                                   m_ptrRearPivot->GetData().Inertia,
@@ -367,6 +351,7 @@ namespace argos {
    const btScalar     CDynamics3DBuilderBotModel::m_fLowerBaseMass(0.5f);
    const btTransform  CDynamics3DBuilderBotModel::m_cLowerBaseOffset(btQuaternion(0.0f, 0.0f, 0.0f, 1.0f), btVector3(-0.020f,0.002f,-0.0f));
    const btTransform  CDynamics3DBuilderBotModel::m_cLowerBaseGeometricOffset(btQuaternion(0.0f, 0.0f, 0.0f, 1.0f), btVector3(0.0f, -0.0196783f, 0.0f));
+
    const btVector3    CDynamics3DBuilderBotModel::m_cWheelHalfExtents(0.02f,0.0075f,0.02f);
    const btScalar     CDynamics3DBuilderBotModel::m_fWheelMass(0.1);
    const btTransform  CDynamics3DBuilderBotModel::m_cWheelGeometricOffset(btQuaternion(0.0f, 0.0f, 0.0f, 1.0f), btVector3(0.0f,-0.0075f,0.0f));
@@ -379,17 +364,15 @@ namespace argos {
    const btVector3    CDynamics3DBuilderBotModel::m_cLeftWheelToLowerBaseJointOffset(0.0f, 0.0075f, -0.0f);
    const btQuaternion CDynamics3DBuilderBotModel::m_cLowerBaseToLeftWheelJointRotation(0.707107f, 0.0f, 0.0f, 0.707107f);
    const btScalar     CDynamics3DBuilderBotModel::m_fWheelMotorMaxImpulse(0.05f);
-   const btScalar     CDynamics3DBuilderBotModel::m_fPivotRadius(0.02);
-   const btScalar     CDynamics3DBuilderBotModel::m_fPivotMass(0.1);
-   const btTransform  CDynamics3DBuilderBotModel::m_cPivotGeometricOffset(btQuaternion(0.0f, 0.0f, 0.0f, 1.0f), btVector3(0.0f, -0.02f, 0.0f));
-   const btTransform  CDynamics3DBuilderBotModel::m_cFrontPivotOffset(btQuaternion(0.0f, 0.0f, 0.0f, 1.0f), btVector3(0.025f, 0.0f, 0.0f));
+
+   const btScalar     CDynamics3DBuilderBotModel::m_fRearPivotRadius(0.02);
+   const btScalar     CDynamics3DBuilderBotModel::m_fRearPivotMass(0.1);
+   const btTransform  CDynamics3DBuilderBotModel::m_cRearPivotGeometricOffset(btQuaternion(0.0f, 0.0f, 0.0f, 1.0f), btVector3(0.0f, -0.02f, 0.0f));
    const btTransform  CDynamics3DBuilderBotModel::m_cRearPivotOffset(btQuaternion(0.0f, 0.0f, 0.0f, 1.0f), btVector3(-0.065f, 0.0f, 0.0f));
-   const btVector3    CDynamics3DBuilderBotModel::m_cLowerBaseToFrontPivotJointOffset(0.045f, -0.0016783f, 0.0f);
-   const btVector3    CDynamics3DBuilderBotModel::m_cFrontPivotToLowerBaseJointOffset(0.0f, 0.0f, 0.0f);
-   const btQuaternion CDynamics3DBuilderBotModel::m_cLowerBaseToFrontPivotJointRotation(0.0f, 0.0f, 0.0f, 1.0f);
    const btVector3    CDynamics3DBuilderBotModel::m_cLowerBaseToRearPivotJointOffset(-0.045f, -0.0016783f, 0.0f);
    const btVector3    CDynamics3DBuilderBotModel::m_cRearPivotToLowerBaseJointOffset(0.0f, 0.0f, 0.0f);
    const btQuaternion CDynamics3DBuilderBotModel::m_cLowerBaseToRearPivotJointRotation(0.0f, 0.0f, 0.0f, 1.0f);
+
    const std::vector<btVector3> CDynamics3DBuilderBotModel::m_vecUpperBasePoints {
       btVector3( 0.039f, 0.0f, -0.065f), btVector3(-0.039f, 0.0f, -0.065f), btVector3( 0.039f, 0.0f,  0.065f), btVector3(-0.039f, 0.0f,  0.065f),
       btVector3( 0.065f, 0.0f, -0.039f), btVector3(-0.065f, 0.0f, -0.039f), btVector3( 0.065f, 0.0f,  0.039f), btVector3(-0.065f, 0.0f,  0.039f),
@@ -402,6 +385,7 @@ namespace argos {
    const btVector3    CDynamics3DBuilderBotModel::m_cLowerBaseToUpperBaseJointOffset(0.0f, 0.0196783f, 0.0f);
    const btVector3    CDynamics3DBuilderBotModel::m_cUpperBaseToLowerBaseJointOffset(0.0f, 0.0f, 0.0f);
    const btQuaternion CDynamics3DBuilderBotModel::m_cLowerBaseToUpperBaseJointRotation(0.0f, 0.0f, 0.0f, 1.0f);
+
    const btVector3    CDynamics3DBuilderBotModel::m_cLiftColumnHalfExtents(0.02925f, 0.143875f, 0.04725f);
    const btScalar     CDynamics3DBuilderBotModel::m_fLiftColumnMass(0.6f);
    const btTransform  CDynamics3DBuilderBotModel::m_cLiftColumnOffset(btQuaternion(0.0f, 0.0f, 0.0f, 1.0f), btVector3(0.0f, 0.0982566f, 0.0f));
@@ -409,6 +393,7 @@ namespace argos {
    const btVector3    CDynamics3DBuilderBotModel::m_cUpperBaseToLiftColumnJointOffset(0.02f, 0.0569f, 0.0f);
    const btVector3    CDynamics3DBuilderBotModel::m_cLiftColumnToUpperBaseJointOffset(-0.0f, 0.143875f, -0.0f);
    const btQuaternion CDynamics3DBuilderBotModel::m_cUpperBaseToLiftColumnJointRotation(0.0f, 0.0f, 0.0f, 1.0f);
+
    const btVector3    CDynamics3DBuilderBotModel::m_cEndEffectorHalfExtents(0.0329375f, 0.005f, 0.036f);
    const btScalar     CDynamics3DBuilderBotModel::m_fEndEffectorMass(0.2f);
    const btTransform  CDynamics3DBuilderBotModel::m_cEndEffectorOffset(btQuaternion(0.0f, 0.0f, 0.0f, 1.0f), btVector3(0.0980875f, 0.055f, -0.0f));
@@ -417,6 +402,7 @@ namespace argos {
    const btVector3    CDynamics3DBuilderBotModel::m_cEndEffectorToLowerBaseJointOffset(-0.0f, 0.005f, -0.0f);
    const btQuaternion CDynamics3DBuilderBotModel::m_cLowerBaseToEndEffectorJointRotation(0.0f, 0.0f, 0.0f, 1.0f);
    const btScalar     CDynamics3DBuilderBotModel::m_fEndEffectorTranslationLimit = 0.1375f;
+
    const btVector3    CDynamics3DBuilderBotModel::m_cEndEffectorSupportHalfExtents(0.005125f, 0.078375f, 0.02875f);
    const btScalar     CDynamics3DBuilderBotModel::m_fEndEffectorSupportMass(0.1);
    const btTransform  CDynamics3DBuilderBotModel::m_cEndEffectorSupportOffset(btQuaternion(0.0f, 0.0f, 0.0f, 1.0f), btVector3(0.060025f, 0.00575f, -0.0f));

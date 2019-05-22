@@ -13,6 +13,8 @@
 #include <argos3/plugins/simulator/entities/directional_led_equipped_entity.h>
 #include <argos3/plugins/simulator/visualizations/qt-opengl/qtopengl_widget.h>
 
+#include <argos3/plugins/robots/builderbot/simulator/builderbot_debug_entity.h>
+
 namespace argos {
 
    /****************************************/
@@ -122,7 +124,6 @@ namespace argos {
          std::make_tuple("lower_base", m_unBoxList, m_cLowerBaseScaling),
          std::make_tuple("left_wheel", m_unCylinderList, m_cWheelScaling),
          std::make_tuple("right_wheel", m_unCylinderList, m_cWheelScaling),
-         std::make_tuple("front_pivot", m_unSphereList, m_cPivotScaling),
          std::make_tuple("rear_pivot", m_unSphereList, m_cPivotScaling),
          std::make_tuple("upper_base", m_unUpperBaseList, m_cUpperBaseScaling),
          std::make_tuple("lift_column", m_unBoxList, m_cLiftColumnScaling),

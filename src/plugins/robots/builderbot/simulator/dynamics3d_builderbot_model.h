@@ -53,7 +53,6 @@ namespace argos {
       std::shared_ptr<CBase> m_ptrLowerBase;
       std::shared_ptr<CLink> m_ptrLeftWheel;
       std::shared_ptr<CLink> m_ptrRightWheel;
-      std::shared_ptr<CLink> m_ptrFrontPivot;
       std::shared_ptr<CLink> m_ptrRearPivot;
       std::shared_ptr<CLink> m_ptrUpperBase;
       std::shared_ptr<CLink> m_ptrLiftColumn;
@@ -83,15 +82,11 @@ namespace argos {
       static const btVector3 m_cLeftWheelToLowerBaseJointOffset;
       static const btQuaternion m_cLowerBaseToLeftWheelJointRotation;
       static const btScalar m_fWheelMotorMaxImpulse;
-      /* pivot data */
-      static const btScalar m_fPivotRadius;
-      static const btScalar m_fPivotMass;
-      static const btTransform m_cPivotGeometricOffset;
-      static const btTransform m_cFrontPivotOffset;
+      /* rear pivot data */
+      static const btScalar m_fRearPivotRadius;
+      static const btScalar m_fRearPivotMass;
+      static const btTransform m_cRearPivotGeometricOffset;
       static const btTransform m_cRearPivotOffset;
-      static const btVector3 m_cLowerBaseToFrontPivotJointOffset;
-      static const btVector3 m_cFrontPivotToLowerBaseJointOffset;
-      static const btQuaternion m_cLowerBaseToFrontPivotJointRotation;
       static const btVector3 m_cLowerBaseToRearPivotJointOffset;
       static const btVector3 m_cRearPivotToLowerBaseJointOffset;
       static const btQuaternion m_cLowerBaseToRearPivotJointRotation;
