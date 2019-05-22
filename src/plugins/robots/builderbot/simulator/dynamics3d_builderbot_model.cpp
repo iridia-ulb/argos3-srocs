@@ -74,13 +74,13 @@ namespace argos {
                   -cPosition.GetY()));
       /* create dipoles for the end effector magnets */
       std::function<btVector3()> fnUpdateField = [this] () {
-         return btVector3(0.0f, m_cElectromagnetSystemEntity.GetField(), 0.0f);
+         return btVector3(0.0, m_cElectromagnetSystemEntity.GetField(), 0.0);
       };
       std::vector<CAbstractBody::SData::SDipole> vecEndEffectorDipoles = {
-         CAbstractBody::SData::SDipole(fnUpdateField, btTransform(btQuaternion(0.0f, 0.0f, 0.0f, 1.0f), btVector3( 0.0199375f, -0.004f,  0.023f))),
-         CAbstractBody::SData::SDipole(fnUpdateField, btTransform(btQuaternion(0.0f, 0.0f, 0.0f, 1.0f), btVector3(-0.0260625f, -0.004f,  0.023f))),
-         CAbstractBody::SData::SDipole(fnUpdateField, btTransform(btQuaternion(0.0f, 0.0f, 0.0f, 1.0f), btVector3( 0.0199375f, -0.004f, -0.023f))),
-         CAbstractBody::SData::SDipole(fnUpdateField, btTransform(btQuaternion(0.0f, 0.0f, 0.0f, 1.0f), btVector3(-0.0260625f, -0.004f, -0.023f))),
+         CAbstractBody::SData::SDipole(fnUpdateField, btTransform(btQuaternion(0.0, 0.0, 0.0, 1.0), btVector3( 0.0199375, -0.004,  0.023))),
+         CAbstractBody::SData::SDipole(fnUpdateField, btTransform(btQuaternion(0.0, 0.0, 0.0, 1.0), btVector3(-0.0260625, -0.004,  0.023))),
+         CAbstractBody::SData::SDipole(fnUpdateField, btTransform(btQuaternion(0.0, 0.0, 0.0, 1.0), btVector3( 0.0199375, -0.004, -0.023))),
+         CAbstractBody::SData::SDipole(fnUpdateField, btTransform(btQuaternion(0.0, 0.0, 0.0, 1.0), btVector3(-0.0260625, -0.004, -0.023))),
       };
       /* create a CAbstractBody::SData structure for each body */
       CAbstractBody::SData sLowerBaseData(cStartTransform * m_cLowerBaseOffset,
@@ -181,7 +181,7 @@ namespace argos {
                                  m_ptrLeftWheel->GetData().Inertia,
                                  m_ptrLowerBase->GetIndex(),
                                  m_cLowerBaseToLeftWheelJointRotation,
-                                 btVector3(0.0f, 1.0f, 0.0f),
+                                 btVector3(0.0, 1.0, 0.0),
                                  m_cLowerBaseToLeftWheelJointOffset,
                                  m_cLeftWheelToLowerBaseJointOffset,
                                  true);
@@ -190,7 +190,7 @@ namespace argos {
                                  m_ptrRightWheel->GetData().Inertia,
                                  m_ptrLowerBase->GetIndex(),
                                  m_cLowerBaseToRightWheelJointRotation,
-                                 btVector3(0.0f, 1.0f, 0.0f),
+                                 btVector3(0.0, 1.0, 0.0),
                                  m_cLowerBaseToRightWheelJointOffset,
                                  m_cRightWheelToLowerBaseJointOffset,
                                  true);
@@ -227,7 +227,7 @@ namespace argos {
                                   m_ptrEndEffector->GetData().Inertia,
                                   m_ptrLowerBase->GetIndex(),
                                   m_cLowerBaseToEndEffectorJointRotation,
-                                  btVector3(0.0f, 1.0f, 0.0f),
+                                  btVector3(0.0, 1.0, 0.0),
                                   m_cLowerBaseToEndEffectorJointOffset,
                                   m_cEndEffectorToLowerBaseJointOffset,
                                   true);
@@ -244,22 +244,22 @@ namespace argos {
       m_ptrLeftMotor = 
          std::make_unique<btMultiBodyJointMotor>(&m_cMultiBody,
                                                  m_ptrLeftWheel->GetIndex(),
-                                                 0.0f,
+                                                 0.0,
                                                  m_fWheelMotorMaxImpulse);
       m_ptrRightMotor = 
          std::make_unique<btMultiBodyJointMotor>(&m_cMultiBody,
                                                  m_ptrRightWheel->GetIndex(),
-                                                 0.0f,
+                                                 0.0,
                                                  m_fWheelMotorMaxImpulse);
       m_ptrEndEffectorMotor = 
          std::make_unique<btMultiBodyJointMotor>(&m_cMultiBody,
                                                  m_ptrEndEffector->GetIndex(),
-                                                 0.0f,
+                                                 0.0,
                                                  m_fWheelMotorMaxImpulse);
       m_ptrEndEffectorLimit = 
          std::make_unique<btMultiBodyJointLimitConstraint>(&m_cMultiBody,
                                                            m_ptrEndEffector->GetIndex(),
-                                                           0.0f,
+                                                           0.0,
                                                            m_fEndEffectorTranslationLimit);
       /* Allocate memory and prepare the btMultiBody */
       m_cMultiBody.finalizeMultiDof();
@@ -349,69 +349,69 @@ namespace argos {
    /****************************************/
    /****************************************/
 
-   const btVector3    CDynamics3DBuilderBotModel::m_cLowerBaseHalfExtents(0.065f, 0.0196783f, 0.07f);
-   const btScalar     CDynamics3DBuilderBotModel::m_fLowerBaseMass(0.282f);
-   const btTransform  CDynamics3DBuilderBotModel::m_cLowerBaseOffset(btQuaternion(0.0f, 0.0f, 0.0f, 1.0f), btVector3(-0.020f,0.002f,-0.0f));
-   const btTransform  CDynamics3DBuilderBotModel::m_cLowerBaseGeometricOffset(btQuaternion(0.0f, 0.0f, 0.0f, 1.0f), btVector3(0.0f, -0.0196783f, 0.0f));
+   const btVector3    CDynamics3DBuilderBotModel::m_cLowerBaseHalfExtents(0.065, 0.0196783, 0.07);
+   const btScalar     CDynamics3DBuilderBotModel::m_fLowerBaseMass(0.282);
+   const btTransform  CDynamics3DBuilderBotModel::m_cLowerBaseOffset(btQuaternion(0.0, 0.0, 0.0, 1.0), btVector3(-0.020,0.002,-0.0));
+   const btTransform  CDynamics3DBuilderBotModel::m_cLowerBaseGeometricOffset(btQuaternion(0.0, 0.0, 0.0, 1.0), btVector3(0.0, -0.0196783, 0.0));
 
-   const btVector3    CDynamics3DBuilderBotModel::m_cWheelHalfExtents(0.02f,0.0075f,0.02f);
-   const btScalar     CDynamics3DBuilderBotModel::m_fWheelMass(0.2f);
-   const btTransform  CDynamics3DBuilderBotModel::m_cWheelGeometricOffset(btQuaternion(0.0f, 0.0f, 0.0f, 1.0f), btVector3(0.0f,-0.0075f,0.0f));
-   const btTransform  CDynamics3DBuilderBotModel::m_cLeftWheelOffset(btQuaternion(-0.707107f, 0.0f, 0.0f, 0.707107f), btVector3(0.0f, 0.02f, -0.0525f));
-   const btTransform  CDynamics3DBuilderBotModel::m_cRightWheelOffset(btQuaternion(0.707107f, 0.0f, 0.0f, 0.707107f), btVector3(0.0f, 0.02f, 0.0525f));
-   const btVector3    CDynamics3DBuilderBotModel::m_cLowerBaseToRightWheelJointOffset(0.02f, -0.0016783f, 0.0525f);
-   const btVector3    CDynamics3DBuilderBotModel::m_cRightWheelToLowerBaseJointOffset(0.0f, 0.0075f, 0.0f);
-   const btQuaternion CDynamics3DBuilderBotModel::m_cLowerBaseToRightWheelJointRotation(-0.707107, 0, 0, 0.707107);
-   const btVector3    CDynamics3DBuilderBotModel::m_cLowerBaseToLeftWheelJointOffset(0.02f, -0.0016783f, -0.0525f);
-   const btVector3    CDynamics3DBuilderBotModel::m_cLeftWheelToLowerBaseJointOffset(0.0f, 0.0075f, -0.0f);
-   const btQuaternion CDynamics3DBuilderBotModel::m_cLowerBaseToLeftWheelJointRotation(0.707107f, 0.0f, 0.0f, 0.707107f);
-   const btScalar     CDynamics3DBuilderBotModel::m_fWheelMotorMaxImpulse(0.15f);
+   const btVector3    CDynamics3DBuilderBotModel::m_cWheelHalfExtents(0.02,0.0075,0.02);
+   const btScalar     CDynamics3DBuilderBotModel::m_fWheelMass(0.2);
+   const btTransform  CDynamics3DBuilderBotModel::m_cWheelGeometricOffset(btQuaternion(0.0, 0.0, 0.0, 1.0), btVector3(0.0,-0.0075,0.0));
+   const btTransform  CDynamics3DBuilderBotModel::m_cLeftWheelOffset(btQuaternion(btVector3(-1,0,0), SIMD_HALF_PI), btVector3(0.0, 0.02, -0.0525));
+   const btTransform  CDynamics3DBuilderBotModel::m_cRightWheelOffset(btQuaternion(btVector3(1,0,0), SIMD_HALF_PI), btVector3(0.0, 0.02, 0.0525));
+   const btVector3    CDynamics3DBuilderBotModel::m_cLowerBaseToRightWheelJointOffset(0.02, -0.0016783, 0.0525);
+   const btVector3    CDynamics3DBuilderBotModel::m_cRightWheelToLowerBaseJointOffset(0.0, 0.0075, 0.0);
+   const btQuaternion CDynamics3DBuilderBotModel::m_cLowerBaseToRightWheelJointRotation(btVector3(-1,0,0), SIMD_HALF_PI);
+   const btVector3    CDynamics3DBuilderBotModel::m_cLowerBaseToLeftWheelJointOffset(0.02, -0.0016783, -0.0525);
+   const btVector3    CDynamics3DBuilderBotModel::m_cLeftWheelToLowerBaseJointOffset(0.0, 0.0075, -0.0);
+   const btQuaternion CDynamics3DBuilderBotModel::m_cLowerBaseToLeftWheelJointRotation(btVector3(1,0,0), SIMD_HALF_PI);
+   const btScalar     CDynamics3DBuilderBotModel::m_fWheelMotorMaxImpulse(0.15);
 
    const btScalar     CDynamics3DBuilderBotModel::m_fRearPivotRadius(0.02);
    const btScalar     CDynamics3DBuilderBotModel::m_fRearPivotMass(0.2);
-   const btTransform  CDynamics3DBuilderBotModel::m_cRearPivotGeometricOffset(btQuaternion(0.0f, 0.0f, 0.0f, 1.0f), btVector3(0.0f, -0.02f, 0.0f));
-   const btTransform  CDynamics3DBuilderBotModel::m_cRearPivotOffset(btQuaternion(0.0f, 0.0f, 0.0f, 1.0f), btVector3(-0.065f, 0.0f, 0.0f));
-   const btVector3    CDynamics3DBuilderBotModel::m_cLowerBaseToRearPivotJointOffset(-0.045f, -0.0016783f, 0.0f);
-   const btVector3    CDynamics3DBuilderBotModel::m_cRearPivotToLowerBaseJointOffset(0.0f, 0.0f, 0.0f);
-   const btQuaternion CDynamics3DBuilderBotModel::m_cLowerBaseToRearPivotJointRotation(0.0f, 0.0f, 0.0f, 1.0f);
+   const btTransform  CDynamics3DBuilderBotModel::m_cRearPivotGeometricOffset(btQuaternion(0.0, 0.0, 0.0, 1.0), btVector3(0.0, -0.02, 0.0));
+   const btTransform  CDynamics3DBuilderBotModel::m_cRearPivotOffset(btQuaternion(0.0, 0.0, 0.0, 1.0), btVector3(-0.065, 0.0, 0.0));
+   const btVector3    CDynamics3DBuilderBotModel::m_cLowerBaseToRearPivotJointOffset(-0.045, -0.0016783, 0.0);
+   const btVector3    CDynamics3DBuilderBotModel::m_cRearPivotToLowerBaseJointOffset(0.0, 0.0, 0.0);
+   const btQuaternion CDynamics3DBuilderBotModel::m_cLowerBaseToRearPivotJointRotation(0.0, 0.0, 0.0, 1.0);
 
    const std::vector<btVector3> CDynamics3DBuilderBotModel::m_vecUpperBasePoints {
-      btVector3( 0.039f, 0.0f, -0.065f), btVector3(-0.039f, 0.0f, -0.065f), btVector3( 0.039f, 0.0f,  0.065f), btVector3(-0.039f, 0.0f,  0.065f),
-      btVector3( 0.065f, 0.0f, -0.039f), btVector3(-0.065f, 0.0f, -0.039f), btVector3( 0.065f, 0.0f,  0.039f), btVector3(-0.065f, 0.0f,  0.039f),
-      btVector3( 0.039f, 0.0569f, -0.065f), btVector3(-0.039f, 0.0569f, -0.065f), btVector3( 0.039f, 0.0569f,  0.065f), btVector3(-0.039f, 0.0569f,  0.065f),
-      btVector3( 0.065f, 0.0569f, -0.039f), btVector3(-0.065f, 0.0569f, -0.039f), btVector3( 0.065f, 0.0569f,  0.039f), btVector3(-0.065f, 0.0569f,  0.039f),
+      btVector3( 0.039, 0.0, -0.065), btVector3(-0.039, 0.0, -0.065), btVector3( 0.039, 0.0,  0.065), btVector3(-0.039, 0.0,  0.065),
+      btVector3( 0.065, 0.0, -0.039), btVector3(-0.065, 0.0, -0.039), btVector3( 0.065, 0.0,  0.039), btVector3(-0.065, 0.0,  0.039),
+      btVector3( 0.039, 0.0569, -0.065), btVector3(-0.039, 0.0569, -0.065), btVector3( 0.039, 0.0569,  0.065), btVector3(-0.039, 0.0569,  0.065),
+      btVector3( 0.065, 0.0569, -0.039), btVector3(-0.065, 0.0569, -0.039), btVector3( 0.065, 0.0569,  0.039), btVector3(-0.065, 0.0569,  0.039),
    };
-   const btScalar     CDynamics3DBuilderBotModel::m_fUpperBaseMass(0.232f);
-   const btTransform  CDynamics3DBuilderBotModel::m_cUpperBaseOffset(btQuaternion(0.0f, 0.0f, 0.0f, 1.0f), btVector3(-0.02f, 0.0413566f, 0.0f));
-   const btTransform  CDynamics3DBuilderBotModel::m_cUpperBaseGeometricOffset(btQuaternion(0.0f, 0.0f, 0.0f, 1.0f), btVector3(0.0f, 0.0f, 0.0f));
-   const btVector3    CDynamics3DBuilderBotModel::m_cLowerBaseToUpperBaseJointOffset(0.0f, 0.0196783f, 0.0f);
-   const btVector3    CDynamics3DBuilderBotModel::m_cUpperBaseToLowerBaseJointOffset(0.0f, 0.0f, 0.0f);
-   const btQuaternion CDynamics3DBuilderBotModel::m_cLowerBaseToUpperBaseJointRotation(0.0f, 0.0f, 0.0f, 1.0f);
+   const btScalar     CDynamics3DBuilderBotModel::m_fUpperBaseMass(0.232);
+   const btTransform  CDynamics3DBuilderBotModel::m_cUpperBaseOffset(btQuaternion(0.0, 0.0, 0.0, 1.0), btVector3(-0.02, 0.0413566, 0.0));
+   const btTransform  CDynamics3DBuilderBotModel::m_cUpperBaseGeometricOffset(btQuaternion(0.0, 0.0, 0.0, 1.0), btVector3(0.0, 0.0, 0.0));
+   const btVector3    CDynamics3DBuilderBotModel::m_cLowerBaseToUpperBaseJointOffset(0.0, 0.0196783, 0.0);
+   const btVector3    CDynamics3DBuilderBotModel::m_cUpperBaseToLowerBaseJointOffset(0.0, 0.0, 0.0);
+   const btQuaternion CDynamics3DBuilderBotModel::m_cLowerBaseToUpperBaseJointRotation(0.0, 0.0, 0.0, 1.0);
 
-   const btVector3    CDynamics3DBuilderBotModel::m_cLiftColumnHalfExtents(0.02925f, 0.143875f, 0.04725f);
-   const btScalar     CDynamics3DBuilderBotModel::m_fLiftColumnMass(0.891f);
-   const btTransform  CDynamics3DBuilderBotModel::m_cLiftColumnOffset(btQuaternion(0.0f, 0.0f, 0.0f, 1.0f), btVector3(0.0f, 0.0982566f, 0.0f));
-   const btTransform  CDynamics3DBuilderBotModel::m_cLiftColumnGeometricOffset(btQuaternion(0.0f, 0.0f, 0.0f, 1.0f), btVector3(0.0f, -0.143875f, 0.0f));
-   const btVector3    CDynamics3DBuilderBotModel::m_cUpperBaseToLiftColumnJointOffset(0.02f, 0.0569f, 0.0f);
-   const btVector3    CDynamics3DBuilderBotModel::m_cLiftColumnToUpperBaseJointOffset(-0.0f, 0.143875f, -0.0f);
-   const btQuaternion CDynamics3DBuilderBotModel::m_cUpperBaseToLiftColumnJointRotation(0.0f, 0.0f, 0.0f, 1.0f);
+   const btVector3    CDynamics3DBuilderBotModel::m_cLiftColumnHalfExtents(0.02925, 0.143875, 0.04725);
+   const btScalar     CDynamics3DBuilderBotModel::m_fLiftColumnMass(0.891);
+   const btTransform  CDynamics3DBuilderBotModel::m_cLiftColumnOffset(btQuaternion(0.0, 0.0, 0.0, 1.0), btVector3(0.0, 0.0982566, 0.0));
+   const btTransform  CDynamics3DBuilderBotModel::m_cLiftColumnGeometricOffset(btQuaternion(0.0, 0.0, 0.0, 1.0), btVector3(0.0, -0.143875, 0.0));
+   const btVector3    CDynamics3DBuilderBotModel::m_cUpperBaseToLiftColumnJointOffset(0.02, 0.0569, 0.0);
+   const btVector3    CDynamics3DBuilderBotModel::m_cLiftColumnToUpperBaseJointOffset(-0.0, 0.143875, -0.0);
+   const btQuaternion CDynamics3DBuilderBotModel::m_cUpperBaseToLiftColumnJointRotation(0.0, 0.0, 0.0, 1.0);
 
-   const btVector3    CDynamics3DBuilderBotModel::m_cEndEffectorHalfExtents(0.0329375f, 0.005f, 0.036f);
-   const btScalar     CDynamics3DBuilderBotModel::m_fEndEffectorMass(0.059f);
-   const btTransform  CDynamics3DBuilderBotModel::m_cEndEffectorOffset(btQuaternion(0.0f, 0.0f, 0.0f, 1.0f), btVector3(0.0980875f, 0.055f, -0.0f));
-   const btTransform  CDynamics3DBuilderBotModel::m_cEndEffectorGeometricOffset(btQuaternion(0.0f, 0.0f, 0.0f, 1.0f), btVector3(0.0f, -0.005f, 0.0f));
-   const btVector3    CDynamics3DBuilderBotModel::m_cLowerBaseToEndEffectorJointOffset(0.118087f, 0.0333217f, 0.0f);
-   const btVector3    CDynamics3DBuilderBotModel::m_cEndEffectorToLowerBaseJointOffset(-0.0f, 0.005f, -0.0f);
-   const btQuaternion CDynamics3DBuilderBotModel::m_cLowerBaseToEndEffectorJointRotation(0.0f, 0.0f, 0.0f, 1.0f);
+   const btVector3    CDynamics3DBuilderBotModel::m_cEndEffectorHalfExtents(0.0329375, 0.005, 0.036);
+   const btScalar     CDynamics3DBuilderBotModel::m_fEndEffectorMass(0.059);
+   const btTransform  CDynamics3DBuilderBotModel::m_cEndEffectorOffset(btQuaternion(0.0, 0.0, 0.0, 1.0), btVector3(0.0980875, 0.055, -0.0));
+   const btTransform  CDynamics3DBuilderBotModel::m_cEndEffectorGeometricOffset(btQuaternion(0.0, 0.0, 0.0, 1.0), btVector3(0.0, -0.005, 0.0));
+   const btVector3    CDynamics3DBuilderBotModel::m_cLowerBaseToEndEffectorJointOffset(0.118087, 0.0333217, 0.0);
+   const btVector3    CDynamics3DBuilderBotModel::m_cEndEffectorToLowerBaseJointOffset(-0.0, 0.005, -0.0);
+   const btQuaternion CDynamics3DBuilderBotModel::m_cLowerBaseToEndEffectorJointRotation(0.0, 0.0, 0.0, 1.0);
    const btScalar     CDynamics3DBuilderBotModel::m_fEndEffectorTranslationLimit = 0.1375f;
 
-   const btVector3    CDynamics3DBuilderBotModel::m_cEndEffectorSupportHalfExtents(0.005125f, 0.078375f, 0.02875f);
-   const btScalar     CDynamics3DBuilderBotModel::m_fEndEffectorSupportMass(0.175f);
-   const btTransform  CDynamics3DBuilderBotModel::m_cEndEffectorSupportOffset(btQuaternion(0.0f, 0.0f, 0.0f, 1.0f), btVector3(0.060025f, 0.00575f, -0.0f));
-   const btTransform  CDynamics3DBuilderBotModel::m_cEndEffectorSupportGeometricOffset(btQuaternion(0.0f, 0.0f, 0.0f, 1.0f), btVector3(0, -0.078375, 0));
-   const btVector3    CDynamics3DBuilderBotModel::m_cEndEffectorToEndEffectorSupportJointOffset(-0.0380625f, -0.05425f, 0.0f);
-   const btVector3    CDynamics3DBuilderBotModel::m_cEndEffectorSupportToEndEffectorJointOffset(-0.0f, 0.078375f, -0.0f);
-   const btQuaternion CDynamics3DBuilderBotModel::m_cEndEffectorToEndEffectorSupportJointRotation(0.0f, 0.0f, 0.0f, 1.0f);
+   const btVector3    CDynamics3DBuilderBotModel::m_cEndEffectorSupportHalfExtents(0.005125, 0.078375, 0.02875);
+   const btScalar     CDynamics3DBuilderBotModel::m_fEndEffectorSupportMass(0.175);
+   const btTransform  CDynamics3DBuilderBotModel::m_cEndEffectorSupportOffset(btQuaternion(0.0, 0.0, 0.0, 1.0), btVector3(0.060025, 0.00575, -0.0));
+   const btTransform  CDynamics3DBuilderBotModel::m_cEndEffectorSupportGeometricOffset(btQuaternion(0.0, 0.0, 0.0, 1.0), btVector3(0, -0.078375, 0));
+   const btVector3    CDynamics3DBuilderBotModel::m_cEndEffectorToEndEffectorSupportJointOffset(-0.0380625, -0.05425, 0.0);
+   const btVector3    CDynamics3DBuilderBotModel::m_cEndEffectorSupportToEndEffectorJointOffset(-0.0, 0.078375, -0.0);
+   const btQuaternion CDynamics3DBuilderBotModel::m_cEndEffectorToEndEffectorSupportJointRotation(0.0, 0.0, 0.0, 1.0);
 
    /****************************************/
    /****************************************/
