@@ -6,7 +6,7 @@
   <!-- ************************* -->
   <framework>
     <system threads="0" />
-    <experiment length="0" ticks_per_second="10" random_seed="12345" />
+    <experiment length="0" ticks_per_second="5" random_seed="12345" />
   </framework>
   
   <!-- *************** -->
@@ -80,8 +80,8 @@
       <controller config="block"/>
     </block>
 
-    <builderbot id="builderbot" debug="false">
-      <body position="0,0,0" orientation="0,0,0"/>
+    <builderbot id="builderbot" debug="true">
+      <body position="-0.25,-0.25,0" orientation="0,0,0"/>
       <controller config="builderbot"/>
     </builderbot>
    
@@ -97,9 +97,9 @@
   <!-- ******************* -->
   <physics_engines>
     <pointmass3d id="pm3d" />
-    <dynamics3d id="dyn3d" iterations="25">
+    <dynamics3d id="dyn3d" iterations="25" default_friction="10">
       <gravity g="9.8" />
-      <floor height="0.01"/>
+      <floor friction="10" />
       <virtual_magnetism />
     </dynamics3d>
   </physics_engines>
@@ -119,7 +119,7 @@
   <!-- ****************** -->
 
   <visualization>
-    <qt-opengl lua_editor="false">
+    <qt-opengl lua_editor="true">
       <user_functions label="srocs_qtopengl_user_functions" />
       <camera>
         <placement idx="0" position=" 0,  -2.5,1" look_at="0,0,0.05" lens_focal_length="78" />
