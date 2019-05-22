@@ -68,7 +68,7 @@ namespace argos {
       GLuint m_unSphereList;
       GLuint m_unUpperBaseList;
 
-      std::array<std::tuple<std::string, GLuint, CVector3>, 9> m_arrItemsToDraw;
+      std::array<std::tuple<std::string, GLuint, CVector3>, 8> m_arrItemsToDraw;
 
       const static GLuint m_unVertices = 20;
       
