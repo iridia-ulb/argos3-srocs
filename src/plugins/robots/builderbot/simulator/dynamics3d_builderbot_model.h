@@ -42,6 +42,10 @@ namespace argos {
 
       virtual void RemoveFromWorld(btMultiBodyDynamicsWorld& c_world);
 
+      const std::shared_ptr<CLink>& GetEndEffectorLink() {
+         return m_ptrEndEffector;
+      }
+
    private:
       /* joint constraints */
       std::unique_ptr<btMultiBodyJointMotor> m_ptrLeftMotor;
