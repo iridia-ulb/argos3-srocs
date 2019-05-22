@@ -59,8 +59,17 @@ namespace argos {
    /****************************************/
 
    Real CBuilderBotElectromagnetSystemEntity::GetField() const {
-      Real fField = ELECTROMAGNET_PASSIVE_FIELD +
-         (ELECTROMAGNET_ACTIVE_FIELD * m_fAccumulatedVoltage);
+      Real fField = ELECTROMAGNET_PASSIVE_FIELD;
+      switch(m_eDischargeMode) {
+      case EDischargeMode::DISABLED:
+         break;
+      case EDischargeMode::CONSTRUCTIVE:
+         fField += (ELECTROMAGNET_ACTIVE_FIELD * m_fAccumulatedVoltage); 
+         break;
+      case EDischargeMode::DESTRUCTIVE:
+         fField -= (ELECTROMAGNET_ACTIVE_FIELD * m_fAccumulatedVoltage); 
+         break;
+      }
       return fField;
    }
 
