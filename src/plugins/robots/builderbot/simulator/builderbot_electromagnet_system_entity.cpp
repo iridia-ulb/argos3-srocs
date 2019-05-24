@@ -10,12 +10,12 @@
 #include <argos3/core/simulator/physics_engine/physics_engine.h>
 #include <argos3/core/simulator/space/space.h>
 
-#define CAPACITOR_DISCHARGE_RATE 4.0f
-#define CAPACITOR_RECHARGE_RATE 2.0f
-#define CAPACITOR_MAX_VOLTAGE 25.0f
-#define CAPACITOR_MIN_VOLTAGE 0.1f
+#define CAPACITOR_DISCHARGE_RATE 1.3f
+#define CAPACITOR_RECHARGE_RATE 0.38f
+#define CAPACITOR_MAX_VOLTAGE 22.9f
+#define CAPACITOR_MIN_VOLTAGE 6.5f
 #define ELECTROMAGNET_PASSIVE_FIELD 1.0f
-#define ELECTROMAGNET_ACTIVE_FIELD 1.0f
+#define ELECTROMAGNET_ACTIVE_FIELD 0.1f
 
 namespace argos {
 

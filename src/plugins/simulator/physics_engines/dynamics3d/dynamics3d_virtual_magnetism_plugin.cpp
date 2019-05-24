@@ -1,167 +1,193 @@
 /**
  * @file <argos3/plugins/simulator/physics_engines/dynamics3d/dynamics3d_virtual_magnetism_plugin.cpp>
  *
+ * @author Weixu Zhu - <zhuweixu_harry@126.com>
  * @author Michael Allwright - <allsey87@gmail.com>
  */
 
 #include "dynamics3d_virtual_magnetism_plugin.h"
 
-#include <argos3/plugins/simulator/physics_engines/dynamics3d/dynamics3d_model.h>
-//#include <argos3/plugins/simulator/entities/box_entity.h>
-#include <argos3/plugins/robots/block/simulator/block_entity.h>
-#include <argos3/plugins/robots/builderbot/simulator/builderbot_entity.h>
+#include <argos3/plugins/robots/block/simulator/dynamics3d_block_model.h>
 #include <argos3/plugins/robots/builderbot/simulator/dynamics3d_builderbot_model.h>
 #include <algorithm>
 #include <vector>
 
-namespace argos {
-   
-   /****************************************/
-   /****************************************/
-   
-   void CDynamics3DVirtualMagnetismPlugin::Init(TConfigurationNode& t_tree) {
-      //GetNodeAttributeOrDefault(t_tree, "g", m_fAcceleration, m_fAcceleration);
-   } 
+#define ELECTROMAGNET_FORCE_COEFFICIENT 2.5
+#define ELECTROMAGNET_RANGE_COEFFICIENT 0.01
+#define ELECTROMAGNET_RANGE_MAX 0.015
 
+#define MAGNET_FORCE_COEFFICIENT 5.0
+#define MAGNET_DISTANCE_CONTACT 0.01
+#define MAGNET_DISTANCE_MAX 0.03
+
+namespace argos {
+ 
    /****************************************/
    /****************************************/
 
    void CDynamics3DVirtualMagnetismPlugin::RegisterModel(CDynamics3DModel& c_model) {
-      /* filt out a box model and push its body into m_vecTargets */
-      CBlockEntity* pcBlockEntity = dynamic_cast<CBlockEntity*>(&c_model.GetComposableEntity());
-      if(pcBlockEntity != nullptr) {
-         std::vector<std::shared_ptr<CDynamics3DModel::CAbstractBody> >& vecBodies = c_model.GetBodies();
-         m_vecTargets.insert(std::end(m_vecTargets),
-                             std::begin(vecBodies),
-                             std::end(vecBodies));
+      /* If the model is a block, then add its body to m_vecBlocks */
+      CDynamics3DBlockModel* pcBlockModel = dynamic_cast<CDynamics3DBlockModel*>(&c_model);
+      if(pcBlockModel != nullptr) {
+         m_vecBlocks.emplace_back(pcBlockModel->GetBody());
       }
-
-      /*
-      CBuilderBotEntity* pcBuilderBotEntity = dynamic_cast<CBuilderBotEntity*>(&c_model.GetComposableEntity());
-      if(pcBuilderBotEntity != nullptr) {
-         std::shared_ptr<CDynamics3DModel::CAbstractBody> m_pEndEffectorBody = 
-            dynamic_cast<CDynamics3DBuilderBotModel*>(&c_model)->GetEndEffector();
+      /* If the model is a BuilderBot, then add its end effector to m_vecEndEffectors */
+      CDynamics3DBuilderBotModel* pcBuilderBotModel = dynamic_cast<CDynamics3DBuilderBotModel*>(&c_model);
+      if(pcBuilderBotModel != nullptr) {
+         m_vecEndEffectors.emplace_back(pcBuilderBotModel->GetEndEffectorLink());
       }
-      */
    }
 
    /****************************************/
    /****************************************/
 
    void CDynamics3DVirtualMagnetismPlugin::UnregisterModel(CDynamics3DModel& c_model) {
-      std::vector<std::shared_ptr<CDynamics3DModel::CAbstractBody> >::iterator itRemove =
-         std::remove_if(std::begin(m_vecTargets),
-                        std::end(m_vecTargets),
-                        [&c_model] (const std::shared_ptr<CDynamics3DModel::CAbstractBody>& ptr_body) {
-                           return (&ptr_body->GetModel() == &c_model);
-                        });
-      m_vecTargets.erase(itRemove, std::end(m_vecTargets));
+      /* If the model is a block, then remove its body from m_vecBlocks */
+      CDynamics3DBlockModel* pcBlockModel = dynamic_cast<CDynamics3DBlockModel*>(&c_model);
+      if(pcBlockModel != nullptr) {
+         std::vector<SBlock>::iterator itBlockToErase =
+            std::find_if(std::begin(m_vecBlocks),
+                         std::end(m_vecBlocks),
+                         [pcBlockModel] (const SBlock& s_block) {
+                            return (pcBlockModel->GetBody() == s_block.Body);
+                         });
+         if(itBlockToErase != std::end(m_vecBlocks)) {
+            m_vecBlocks.erase(itBlockToErase);
+         }
+      }
+      /* If the model is a BuilderBot, then remove its end effector from m_vecEndEffectors */
+      CDynamics3DBuilderBotModel* pcBuilderBotModel = dynamic_cast<CDynamics3DBuilderBotModel*>(&c_model);
+      if(pcBuilderBotModel != nullptr) {
+         std::vector<SEndEffector>::iterator itEndEffectorToErase =
+            std::find_if(std::begin(m_vecEndEffectors),
+                         std::end(m_vecEndEffectors),
+                         [pcBuilderBotModel] (const SEndEffector& s_end_effector) {
+                            return (pcBuilderBotModel->GetEndEffectorLink() == s_end_effector.Body);
+                         });
+         if(itEndEffectorToErase != std::end(m_vecEndEffectors)) {
+            m_vecEndEffectors.erase(itEndEffectorToErase);
+         }
+      }
    }
    
    /****************************************/
    /****************************************/
 
    void CDynamics3DVirtualMagnetismPlugin::Update() {
-      if(m_vecTargets.size() < 2) {
-         /* Nothing to do */
+      /* calculate the magnet offsets and positions for each block */
+      for(SBlock& s_block : m_vecBlocks) {
+         /* for each of the eight magnets, calculate rotated offsets and positions */
+         for(UInt32 un_index = 0; un_index < 8; un_index++) {
+            s_block.Magnets[un_index].RotatedOffset = 
+               quatRotate(s_block.Body->GetTransform().getRotation(), m_arrMagnetOffsets[un_index]);
+            s_block.Magnets[un_index].Position = 
+               s_block.Magnets[un_index].RotatedOffset + s_block.Body->GetTransform().getOrigin();
+         }
+      }
+      /* calculate the electromagnet offsets for each end effector */
+      for(SEndEffector& s_end_effector : m_vecEndEffectors) {
+         /* for each of the four electromagnets */
+         for(UInt32 un_index = 0; un_index < 4; un_index++) {
+            s_end_effector.Electromagnets[un_index].Position = 
+               s_end_effector.Body->GetTransform().getOrigin();
+            s_end_effector.Electromagnets[un_index].Position +=
+               quatRotate(s_end_effector.Body->GetTransform().getRotation(), m_arrElectromagnetOffsets[un_index]);
+         }
+      }
+      /* force between end effectors and blocks */
+      for(SBlock& s_block : m_vecBlocks) {
+         for(SEndEffector& s_end_effector : m_vecEndEffectors) {
+            /* get the field */
+            Real fElectromagnetField = s_end_effector.Body->GetData().Dipoles[0].GetField().getY();
+            /* calculate the force */
+            btScalar fForce = ELECTROMAGNET_FORCE_COEFFICIENT * s_block.Body->GetData().Mass;
+            /* calculate the range */
+            Real fRange = fElectromagnetField * ELECTROMAGNET_RANGE_COEFFICIENT;
+            if(fRange > ELECTROMAGNET_RANGE_MAX)
+               fRange = ELECTROMAGNET_RANGE_MAX;
+            /* apply force only if there are four pairs of magnets in range of each other */
+            UInt32 unInRangeCount = 0;
+            for(const SBlock::SMagnet& s_magnet : s_block.Magnets) {
+               for(const SEndEffector::SElectromagnet& s_electromagnet : s_end_effector.Electromagnets) {
+                  if(s_magnet.Position.distance(s_electromagnet.Position) < fRange) {
+                     unInRangeCount++;
+                  }
+               }
+            }
+            if(unInRangeCount < 4) {
+               /* not enough points in range */
+               continue;
+            }
+            else {
+               /* apply force on the block */
+               for(const SBlock::SMagnet& s_magnet : s_block.Magnets) {
+                  for(const SEndEffector::SElectromagnet& s_electromagnet : s_end_effector.Electromagnets) {
+                     btScalar fDistance = s_magnet.Position.distance(s_electromagnet.Position);
+                     btVector3 cDirectionVector = (s_electromagnet.Position - s_magnet.Position).normalize();
+                     if(fDistance < fRange) {
+                        /* force and torque for box */
+                        s_block.Body->ApplyForce(cDirectionVector * fForce,
+                                                 s_magnet.RotatedOffset);
+                     }
+                  }
+               }
+            }
+         }
+      }
+      /* force between blocks */
+      if(m_vecBlocks.size() < 2) {
+         /* Nothing to do for blocks */
          return;
       }
-      /* for each pair of bodies among targets */
-      for(std::vector< std::shared_ptr<CDynamics3DModel::CAbstractBody> >::iterator 
-          itBody0 = std::begin(m_vecTargets);
-          itBody0 != std::end(m_vecTargets) - 1;
-          ++itBody0) {
-
-         for(std::vector< std::shared_ptr<CDynamics3DModel::CAbstractBody> >::iterator 
-             itBody1 = std::next(itBody0, 1);
-             itBody1 != std::end(m_vecTargets);
-             ++itBody1) {
-            /* get body pointer */
-            std::shared_ptr<CDynamics3DModel::CAbstractBody>& ptr_body0 = *itBody0;
-            std::shared_ptr<CDynamics3DModel::CAbstractBody>& ptr_body1 = *itBody1;
-            /* get box distance */
-            btScalar fBoxDistance = ptr_body0->GetTransform().getOrigin().distance(
-                                    ptr_body1->GetTransform().getOrigin());
-            /* calculate rotated offset and new location of each magnet*/
-            std::array<btVector3, 8> arrBody0MagnetRotatedOffsets;
-            std::array<btVector3, 8> arrBody1MagnetRotatedOffsets;
-            std::array<btVector3, 8> arrBody0MagnetLocations;
-            std::array<btVector3, 8> arrBody1MagnetLocations;
-            for (UInt32 unMagnetIndex = 0; unMagnetIndex < 8; unMagnetIndex++) {
-               btTransform cMagnetRotatedOffset0(ptr_body0->GetTransform().getRotation(),
-                                                 btVector3(0, 0, 0));
-               btTransform cMagnetRotatedOffset1(ptr_body1->GetTransform().getRotation(),
-                                                 btVector3(0, 0, 0));
-               btTransform cOffset(btQuaternion(0.0f, 0.0f, 0.0f, 1.0f), 
-                                   m_arrMagnetOffsets[unMagnetIndex]);
-               cMagnetRotatedOffset0 *= cOffset;
-               cMagnetRotatedOffset1 *= cOffset;
-               arrBody0MagnetRotatedOffsets[unMagnetIndex] = cMagnetRotatedOffset0.getOrigin();
-               arrBody1MagnetRotatedOffsets[unMagnetIndex] = cMagnetRotatedOffset1.getOrigin();
-               arrBody0MagnetLocations[unMagnetIndex] = ptr_body0->GetTransform().getOrigin() + 
-                                                        arrBody0MagnetRotatedOffsets[unMagnetIndex];
-               arrBody1MagnetLocations[unMagnetIndex] = ptr_body1->GetTransform().getOrigin() + 
-                                                        arrBody1MagnetRotatedOffsets[unMagnetIndex];
-            }
-
-            /* calculate rotated Axis */
-            std::array<btVector3, 3> arrBody0RotatedAxis;
-            std::array<btVector3, 3> arrBody1RotatedAxis;
-            for (UInt32 unAxisIndex = 0; unAxisIndex < 3; unAxisIndex++) {
-               btTransform cRotatedAxis0(ptr_body0->GetTransform().getRotation(),
-                                         btVector3(0, 0, 0));
-               btTransform cRotatedAxis1(ptr_body1->GetTransform().getRotation(),
-                                         btVector3(0, 0, 0));
-               btTransform cAxis(btQuaternion(0.0f, 0.0f, 0.0f, 1.0f), m_arrAxis[unAxisIndex]);
-               cRotatedAxis0 *= cAxis;
-               cRotatedAxis1 *= cAxis;
-               arrBody0RotatedAxis[unAxisIndex] = cRotatedAxis0.getOrigin();
-               arrBody1RotatedAxis[unAxisIndex] = cRotatedAxis1.getOrigin();
-            }
-
-            /* if a box is not movable, its mass is zero */
-            btScalar fForce;
-            if (ptr_body0->GetData().Mass != 0)
-               fForce = m_fAcceleration * ptr_body0->GetData().Mass;
-            else
-               fForce = m_fAcceleration * ptr_body1->GetData().Mass;
-
-            /* if a box is already in a structure, make the force stronger */
-            if (fBoxDistance < 0.06) fForce *= 3;
-
-            /* apply force */
-            UInt32 unMagnetIndex0 = 0;
-            for (const btVector3& btMagnet0 : arrBody0MagnetLocations) {
-               UInt32 unMagnetIndex1 = 0;
-               for (const btVector3& btMagnet1: arrBody1MagnetLocations) {
-                  /* distance and relative vector */
-                  btScalar fDistance = btMagnet0.distance(btMagnet1);
-                  btVector3 btDirMag0ToMag1 = (btMagnet1 - btMagnet0).normalize();
-                  btVector3 btDirMag1ToMag0 = -btDirMag0ToMag1;
-
-                  if (fDistance < 0.035)
-                  {
-                     /* axis scale, makes the force larger when normal to a face*/
-                     btScalar fAxisScale = 0;
-                     for (btVector3& axis : arrBody1RotatedAxis)
-                        if (abs(btDirMag1ToMag0.dot(axis)) > fAxisScale)
-                           fAxisScale = abs(btDirMag1ToMag0.dot(axis));
-                     for (btVector3& axis : arrBody0RotatedAxis)
-                        if (abs(btDirMag0ToMag1.dot(axis)) > fAxisScale)
-                           fAxisScale = abs(btDirMag0ToMag1.dot(axis));
-                     fAxisScale = (fAxisScale - 0.70) * 2;
-                     if (fAxisScale < 0) fAxisScale = 0;
-
-                     /* force and torque for body0*/
-                     ptr_body0->ApplyForce(btDirMag0ToMag1 * fForce * fAxisScale,
-                                           arrBody0MagnetRotatedOffsets[unMagnetIndex0]);
-                     /* force and torque for body1*/
-                     ptr_body1->ApplyForce(btDirMag1ToMag0 * fForce * fAxisScale,
-                                           arrBody1MagnetRotatedOffsets[unMagnetIndex1]);
+      /* for each pair of blocks */
+      for(std::vector<SBlock>::iterator itBlock0 = std::begin(m_vecBlocks);
+          itBlock0 != (std::end(m_vecBlocks) - 1);
+          ++itBlock0) {
+         for(std::vector<SBlock>::iterator itBlock1 = std::next(itBlock0, 1);
+             itBlock1 != std::end(m_vecBlocks);
+             ++itBlock1) {
+            /* if a box is not movable, its mass is zero by default, 
+             * so if one is zero, use the mass of the other one */
+            btScalar fForce = MAGNET_FORCE_COEFFICIENT * itBlock0->Body->GetData().Mass;
+            if(fForce == 0)
+               fForce = MAGNET_FORCE_COEFFICIENT * itBlock1->Body->GetData().Mass;
+            /* apply force only if there are four pairs in range */
+            UInt32 unInRangeCount = 0;
+            for(const SBlock::SMagnet& s_magnet : itBlock0->Magnets) {
+               const btVector3& cMagnetPosition0 = s_magnet.Position;
+               for(const SBlock::SMagnet& s_magnet : itBlock1->Magnets) {
+                  const btVector3& cMagnetPosition1 = s_magnet.Position;
+                  if(cMagnetPosition0.distance(cMagnetPosition1) < MAGNET_DISTANCE_MAX) {
+                     unInRangeCount++;
                   }
-                  unMagnetIndex1++;
                }
-               unMagnetIndex0++;
+            }
+            if(unInRangeCount < 4) {
+               continue;
+            }
+            /* apply force on both blocks */
+            for(const SBlock::SMagnet& s_magnet_0 : itBlock0->Magnets) {
+               const btVector3& cMagnetPosition0 = s_magnet_0.Position;
+               for(const SBlock::SMagnet& s_magnet_1 : itBlock1->Magnets) {
+                  const btVector3& cMagnetPosition1 = s_magnet_1.Position;
+                  /* distance and relative vector */
+                  btScalar fDistance = cMagnetPosition0.distance(cMagnetPosition1);
+                  btVector3 cDirectionVector01 = (cMagnetPosition1 - cMagnetPosition0).normalize();
+                  btVector3 cDirectionVector10 = -cDirectionVector01;
+                  /* apply force with respect to distance */
+                  if(fDistance < MAGNET_DISTANCE_MAX) {
+                     if(fDistance > MAGNET_DISTANCE_CONTACT) {
+                        fForce *= (MAGNET_DISTANCE_MAX - fDistance) /
+                                  (MAGNET_DISTANCE_MAX - MAGNET_DISTANCE_CONTACT);
+                     }
+                     /* force and torque for magnet 0 */
+                     itBlock0->Body->ApplyForce(cDirectionVector01 * fForce,
+                                                s_magnet_0.RotatedOffset);
+                     /* force and torque for magnet 1 */
+                     itBlock1->Body->ApplyForce(cDirectionVector10 * fForce,
+                                                s_magnet_1.RotatedOffset);
+                  }
+               }
             }
          }
       }
@@ -170,25 +196,29 @@ namespace argos {
    /****************************************/
    /****************************************/
 
-   /****************************************/
-   /****************************************/
-
    const std::array<btVector3, 8> CDynamics3DVirtualMagnetismPlugin::m_arrMagnetOffsets {
-      btVector3( 0.023, -0.023f, -0.023),  btVector3(-0.023, -0.023f, -0.023),
-      btVector3(-0.023, -0.023f,  0.023),  btVector3( 0.023, -0.023f,  0.023),
-      btVector3( 0.023,  0.023f, -0.023),  btVector3(-0.023,  0.023f, -0.023),
-      btVector3(-0.023,  0.023f,  0.023),  btVector3( 0.023,  0.023f,  0.023),
+      btVector3( 0.023, -0.023, -0.023),  btVector3(-0.023, -0.023, -0.023),
+      btVector3(-0.023, -0.023,  0.023),  btVector3( 0.023, -0.023,  0.023),
+      btVector3( 0.023,  0.023, -0.023),  btVector3(-0.023,  0.023, -0.023),
+      btVector3(-0.023,  0.023,  0.023),  btVector3( 0.023,  0.023,  0.023),
    };
 
-   const std::array<btVector3, 3> CDynamics3DVirtualMagnetismPlugin::m_arrAxis {
-      btVector3( 1.000, 0.000f, 0.000),
-      btVector3( 0.000, 1.000f, 0.000),
-      btVector3( 0.000, 0.000f, 1.000),
+   /****************************************/
+   /****************************************/
+
+   const std::array<btVector3, 4> CDynamics3DVirtualMagnetismPlugin::m_arrElectromagnetOffsets {
+      btVector3( 0.0199375, -0.004,  0.023),
+      btVector3(-0.0260625, -0.004,  0.023),
+      btVector3( 0.0199375, -0.004, -0.023),
+      btVector3(-0.0260625, -0.004, -0.023)
    };
-   
+
+   /****************************************/
+   /****************************************/
+
    REGISTER_DYNAMICS3D_PLUGIN(CDynamics3DVirtualMagnetismPlugin,
                               "virtual_magnetism",
-                              "Michael Allwright [allsey87@gmail.com]",
+                              "Weixu Zhu [zhuweixu_harry@126.com]",
                               "1.0",
                               "Applies a gravity force to all bodies in the simulation",
                               "For a description on how to use this plugin, please consult the documentation\n"

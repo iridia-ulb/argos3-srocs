@@ -2,6 +2,7 @@
  * @file <argos3/plugins/simulator/physics_engines/dynamics3d/dynamics3d_virtual_magnetism_plugin.h>
  *
  * @author Michael Allwright - <allsey87@gmail.com>
+ * @author Weixu Zhu - <zhuweixu_harry@126.com>
  */
 
 #ifndef DYNAMICS3D_VIRTUAL_MAGNETISM_PLUGIN_H
@@ -12,8 +13,8 @@ namespace argos {
 }
 
 #include <argos3/plugins/simulator/physics_engines/dynamics3d/dynamics3d_plugin.h>
-#include <argos3/plugins/simulator/physics_engines/dynamics3d/dynamics3d_model.h>
-#include <argos3/core/utility/datatypes/datatypes.h>
+#include <argos3/plugins/simulator/physics_engines/dynamics3d/dynamics3d_single_body_object_model.h>
+#include <argos3/plugins/simulator/physics_engines/dynamics3d/dynamics3d_multi_body_object_model.h>
 
 namespace argos {
    
@@ -22,12 +23,11 @@ namespace argos {
    
    class CDynamics3DVirtualMagnetismPlugin : public CDynamics3DPlugin {
    public:
-      CDynamics3DVirtualMagnetismPlugin() :
-         m_fAcceleration(5.0) {}
+      CDynamics3DVirtualMagnetismPlugin() {}
       
       ~CDynamics3DVirtualMagnetismPlugin() {}
       
-      virtual void Init(TConfigurationNode& t_tree);
+      virtual void Init(TConfigurationNode& t_tree) {}
       
       virtual void Reset() {}
       
@@ -40,13 +40,36 @@ namespace argos {
       virtual void Update();
 
    private:
+      struct SBlock {
+         struct SMagnet {
+            btVector3 RotatedOffset;
+            btVector3 Position;
+         };
 
-      btScalar m_fAcceleration;
-      std::vector<std::shared_ptr<CDynamics3DModel::CAbstractBody> > m_vecTargets;
-      std::shared_ptr<CDynamics3DModel::CAbstractBody> m_pEndEffectorBody;
+         SBlock(std::shared_ptr<CDynamics3DSingleBodyObjectModel::CBody>& s_body) :
+            Body(s_body) {}
+
+         std::shared_ptr<CDynamics3DSingleBodyObjectModel::CBody> Body;
+         std::array<SMagnet, 8> Magnets;
+      };
+
+      struct SEndEffector {
+         struct SElectromagnet {
+            btVector3 Position;
+         };
+   
+         SEndEffector(std::shared_ptr<CDynamics3DMultiBodyObjectModel::CLink>& s_body) :
+            Body(s_body) {}
+
+         std::shared_ptr<CDynamics3DMultiBodyObjectModel::CLink> Body;
+         std::array<SElectromagnet, 4> Electromagnets;
+      };
+
+      std::vector<SBlock> m_vecBlocks;
+      std::vector<SEndEffector> m_vecEndEffectors;
 
       static const std::array<btVector3, 8> m_arrMagnetOffsets;
-      static const std::array<btVector3, 3> m_arrAxis;
+      static const std::array<btVector3, 4> m_arrElectromagnetOffsets;
    };
    
    /****************************************/

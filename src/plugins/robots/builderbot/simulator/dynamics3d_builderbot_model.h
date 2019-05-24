@@ -42,7 +42,7 @@ namespace argos {
 
       virtual void RemoveFromWorld(btMultiBodyDynamicsWorld& c_world);
 
-      const std::shared_ptr<CLink>& GetEndEffectorLink() {
+      std::shared_ptr<CLink>& GetEndEffectorLink() {
          return m_ptrEndEffector;
       }
 

@@ -297,8 +297,8 @@ namespace argos {
    
    void CDynamics3DBuilderBotModel::UpdateEntityStatus() {
       /* write current wheel speeds back to the simulation */
-      m_cDifferentialDriveEntity.SetVelocityLeft(m_cMultiBody.getJointVel(m_ptrLeftWheel->GetIndex()));
-      m_cDifferentialDriveEntity.SetVelocityRight(m_cMultiBody.getJointVel(m_ptrRightWheel->GetIndex()));
+      m_cDifferentialDriveEntity.SetVelocityLeft(m_cMultiBody.getJointVel(m_ptrLeftWheel->GetIndex() * m_cWheelHalfExtents.getX()));
+      m_cDifferentialDriveEntity.SetVelocityRight(m_cMultiBody.getJointVel(m_ptrRightWheel->GetIndex() * m_cWheelHalfExtents.getX()));
       /* run the base class's implementation of this method */
       CDynamics3DMultiBodyObjectModel::UpdateEntityStatus();
    }
@@ -310,8 +310,8 @@ namespace argos {
       /* run the base class's implementation of this method */
       CDynamics3DMultiBodyObjectModel::UpdateFromEntityStatus();
       /* update joint velocities */
-      m_ptrLeftMotor->setVelocityTarget(m_cDifferentialDriveEntity.GetTargetVelocityLeft());
-      m_ptrRightMotor->setVelocityTarget(m_cDifferentialDriveEntity.GetTargetVelocityRight());
+      m_ptrLeftMotor->setVelocityTarget(m_cDifferentialDriveEntity.GetTargetVelocityLeft() / m_cWheelHalfExtents.getX());
+      m_ptrRightMotor->setVelocityTarget(m_cDifferentialDriveEntity.GetTargetVelocityRight() / m_cWheelHalfExtents.getX());
       m_ptrEndEffectorMotor->setVelocityTarget(m_cLiftSystemEntity.GetTargetVelocity());
    }
 

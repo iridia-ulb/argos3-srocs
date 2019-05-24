@@ -25,6 +25,10 @@ namespace argos {
 
       virtual ~CDynamics3DBlockModel() {}
 
+      std::shared_ptr<CBody>& GetBody() {
+         return m_ptrBody;
+      }
+
    private:
       std::shared_ptr<CBody> m_ptrBody;
 
