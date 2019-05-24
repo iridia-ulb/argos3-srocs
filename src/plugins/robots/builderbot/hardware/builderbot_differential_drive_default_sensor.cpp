@@ -127,7 +127,7 @@ namespace argos {
    /****************************************/
 
    Real CBuilderBotDifferentialDriveDefaultSensor::GetRightVelocity() {
-      return m_fVelocityRight;
+      return -m_fVelocityRight;
    }
 
    /****************************************/
