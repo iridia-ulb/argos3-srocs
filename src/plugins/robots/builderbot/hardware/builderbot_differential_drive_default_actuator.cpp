@@ -131,7 +131,7 @@ namespace argos {
    /****************************************/
 
    void CBuilderBotDifferentialDriveDefaultActuator::SetTargetVelocityRight(Real f_target_velocity_right) {
-      m_fTargetVelocityRight = f_target_velocity_right;
+      m_fTargetVelocityRight = -f_target_velocity_right;
       m_bUpdateReq = true;
    }
 
