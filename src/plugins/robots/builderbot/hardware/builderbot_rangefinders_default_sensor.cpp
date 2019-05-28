@@ -114,7 +114,7 @@ namespace argos {
                   ParseValues<Real>(strParameters, 2, arrRawParameters.data(), ',');
                   /* calculate the actual parameters */
                   itInterface->Calibration[0] =
-                     std::log(100) / std::log(arrRawParameters[1] / arrRawParameters[0]);
+                     std::log(50) / std::log(arrRawParameters[1] / arrRawParameters[0]);
                   itInterface->Calibration[1] =
                      arrRawParameters[1] * std::pow(0.001, 1.0 / itInterface->Calibration[0]);
                }

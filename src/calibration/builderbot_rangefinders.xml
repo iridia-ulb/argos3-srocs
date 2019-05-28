@@ -13,6 +13,10 @@
       <sensor label="10" parameters="3631.95,13001.78" />
       <sensor label="11" parameters="3625.44,19947.51" />
       <sensor label="12" parameters="3472.52,11644.99" />
+      <sensor label="left" parameters="2224.88,11715.22" />
+      <sensor label="right" parameters="2176.71,10807.64" />
+      <sensor label="front" parameters="2375.08,16300.54" />
+      <sensor label="underneath" parameters="2361.22,5363.05" />
    </builderbot_rangefinders>
 </calibration>
 

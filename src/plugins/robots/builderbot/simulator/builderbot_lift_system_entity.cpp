@@ -10,12 +10,12 @@
 #include <argos3/core/simulator/physics_engine/physics_engine.h>
 #include <argos3/core/simulator/space/space.h>
 
-#define LOWER_LIMIT_SWITCH_THRESHOLD 0.0025f
-#define UPPER_LIMIT_SWITCH_THRESHOLD 0.1350f
+#define LOWER_LIMIT_SWITCH_THRESHOLD 0.0010f
+#define UPPER_LIMIT_SWITCH_THRESHOLD 0.1400f
 #define LIFT_ALLOWABLE_ERROR 0.001f
-#define LIFT_MIN_VELOCITY 0.005f
-#define LIFT_MAX_VELOCITY 0.015f
-#define LIFT_GAIN 0.10f
+#define LIFT_MIN_VELOCITY 0.010f
+#define LIFT_MAX_VELOCITY 0.018f
+#define LIFT_GAIN 0.50f
 
 namespace argos {
 
