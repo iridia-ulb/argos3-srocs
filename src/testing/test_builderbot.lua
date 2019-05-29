@@ -10,6 +10,7 @@ function step()
       robot.debug.draw("arrow(red)(0.125,0,0.05)(0.25,0,0.05)")
       robot.debug.draw("arrow(green)(0,0.125,0.05)(0,0.25,0.05)")
       robot.debug.draw("arrow(blue)(0,0,0.25)(0,0,0.50)")
+      robot.debug.draw("ring(yellow)(0.5,0,0)(0.25)")
    end
    if robot.lift_system.state == "inactive" then
       robot.lift_system.set_position(0.07);

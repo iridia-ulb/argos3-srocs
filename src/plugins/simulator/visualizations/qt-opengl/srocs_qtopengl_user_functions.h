@@ -40,40 +40,64 @@ namespace argos {
 
    private:
 
-      void DrawArrow3(const CColor& c_color, const CVector3& c_from, const CVector3& c_to);
+      void DrawArrow3(const CVector3& c_from, const CVector3& c_to);
 
-      struct SCachedShapes {
-         SCachedShapes() :
-            Vertices(24) {
+      void DrawRing3(const CVector3& c_center, Real f_radius);
+
+      struct CCachedShapes {
+      public:
+         static CCachedShapes& GetCachedShapes() {
+            static CCachedShapes cInstance;
+            return cInstance;
+         }
+
+         GLuint GetCylinder() const {
+            return m_unCylinder;
+         }
+
+         GLuint GetCone() const {
+            return m_unCone;
+         }
+
+         GLuint GetRing() const {
+            return m_unRing;
+         }
+
+      private:
+         CCachedShapes() {
             /* Reserve the needed display lists */
-            BaseList = glGenLists(2);
+            m_unBaseList = glGenLists(3);
             /* References to the display lists */
-            Cylinder = BaseList;
-            Cone     = BaseList + 1;
+            m_unCylinder = m_unBaseList;
+            m_unCone     = m_unBaseList + 1;
+            m_unRing     = m_unBaseList + 2;
             /* Make cylinder list */
-            glNewList(Cylinder, GL_COMPILE);
+            glNewList(m_unCylinder, GL_COMPILE);
             MakeCylinder();
             glEndList();
             /* Make cone list */
-            glNewList(Cone, GL_COMPILE);
+            glNewList(m_unCone, GL_COMPILE);
             MakeCone();
+            glEndList();
+            /* Make ring list */
+            glNewList(m_unRing, GL_COMPILE);
+            MakeRing();
             glEndList();
          }
 
-         ~SCachedShapes() {
-            glDeleteLists(BaseList, 2);
+         ~CCachedShapes() {
+            glDeleteLists(m_unBaseList, 3);
          }
 
          void MakeCone();
          void MakeCylinder();
-
-         GLuint Vertices;
-         GLuint BaseList;
-         GLuint Cylinder;
-         GLuint Cone;
+         void MakeRing();
+   
+         GLuint m_unBaseList;
+         GLuint m_unCylinder;
+         GLuint m_unCone;
+         GLuint m_unRing;
       };
-
-
 
       CSpace* m_pcSpace;
       CQTOpenGLMainWindow* m_pcMainWindow;
