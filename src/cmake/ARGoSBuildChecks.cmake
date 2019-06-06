@@ -38,7 +38,7 @@ endif()
 if(ARGOS_BUILD_FOR_SIMULATOR)
    find_package(ARGoS COMPONENTS genericrobot dynamics3d OPTIONAL_COMPONENTS qtopengl)
 else(ARGOS_BUILD_FOR_SIMULATOR)
-   find_package(ARGoS COMPONENTS genericrobot)
+   find_package(ARGoS COMPONENTS genericrobot entities)
 endif(ARGOS_BUILD_FOR_SIMULATOR)
 
 if(NOT ARGOS_FOUND)

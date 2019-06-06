@@ -13,8 +13,6 @@
 #include <argos3/plugins/simulator/entities/directional_led_equipped_entity.h>
 #include <argos3/plugins/simulator/visualizations/qt-opengl/qtopengl_widget.h>
 
-#include <argos3/plugins/robots/builderbot/simulator/builderbot_debug_entity.h>
-
 namespace argos {
 
    /****************************************/

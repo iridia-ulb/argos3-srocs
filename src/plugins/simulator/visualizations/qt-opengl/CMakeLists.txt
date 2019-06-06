@@ -1,32 +1,32 @@
 #
 # Header files
 #
-set(ARGOS3_HEADERS_PLUGINS_SIMULATOR_VISUALIZATIONS_QTOPENGL_SROCS_USER_FUNCTIONS
-  srocs_qtopengl_user_functions.h
-  builderbot_qtopengl_widget.h)
+set(ARGOS3_HEADERS_PLUGINS_SIMULATOR_VISUALIZATIONS_QTOPENGL 
+  qtopengl_block.h)
   
 #
 # Source files
 #
-set(ARGOS3_SOURCES_PLUGINS_SIMULATOR_VISUALIZATIONS_QTOPENGL_SROCS_USER_FUNCTIONS
-  ${ARGOS3_HEADERS_PLUGINS_SIMULATOR_VISUALIZATIONS_QTOPENGL_SROCS_USER_FUNCTIONS}
-  srocs_qtopengl_user_functions.cpp
-  builderbot_qtopengl_widget.cpp)
+set(ARGOS3_SOURCES_PLUGINS_SIMULATOR_VISUALIZATIONS_QTOPENGL
+  ${ARGOS3_HEADERS_PLUGINS_SIMULATOR_VISUALIZATIONS_QTOPENGL}
+  qtopengl_block.cpp)
 
 #
-# Create the SRoCS user functions library
+# Create the library
 #
-add_library(argos3plugin_${ARGOS_BUILD_FOR}_qtopengl_srocs_user_functions MODULE
-  ${ARGOS3_SOURCES_PLUGINS_SIMULATOR_VISUALIZATIONS_QTOPENGL_SROCS_USER_FUNCTIONS})
+add_library(argos3srocs_${ARGOS_BUILD_FOR}_qtopengl MODULE
+  ${ARGOS3_SOURCES_PLUGINS_SIMULATOR_VISUALIZATIONS_QTOPENGL})
 
-target_link_libraries(argos3plugin_${ARGOS_BUILD_FOR}_qtopengl_srocs_user_functions
+target_link_libraries(argos3srocs_${ARGOS_BUILD_FOR}_qtopengl
+  argos3srocs_${ARGOS_BUILD_FOR}_entities
+  ${ARGOS_CORE_LIBRARY}
   ${ARGOS_QTOPENGL_LIBRARY})
 
 install(FILES
-  ${ARGOS3_HEADERS_PLUGINS_SIMULATOR_VISUALIZATIONS_QTOPENGL_SROCS_USER_FUNCTIONS}
+  ${ARGOS3_HEADERS_PLUGINS_SIMULATOR_VISUALIZATIONS_QTOPENGL}
   DESTINATION
   include/argos3/plugins/simulator/visualizations/qt-opengl)
-install(TARGETS argos3plugin_${ARGOS_BUILD_FOR}_qtopengl_srocs_user_functions
+install(TARGETS argos3srocs_${ARGOS_BUILD_FOR}_qtopengl
   RUNTIME DESTINATION bin
   LIBRARY DESTINATION lib/argos3
   ARCHIVE DESTINATION lib/argos3)

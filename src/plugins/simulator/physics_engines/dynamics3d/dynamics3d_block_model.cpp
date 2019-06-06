@@ -6,11 +6,11 @@
 
 #include "dynamics3d_block_model.h"
 
-#include <argos3/plugins/robots/block/simulator/block_entity.h>
+#include <argos3/plugins/simulator/entities/block_entity.h>
 #include <argos3/plugins/simulator/physics_engines/dynamics3d/dynamics3d_engine.h>
 #include <argos3/plugins/simulator/physics_engines/dynamics3d/dynamics3d_shape_manager.h>
 
-#include <argos3/plugins/robots/block/simulator/block_entity.h>
+#include <argos3/plugins/simulator/entities/block_entity.h>
 
 namespace argos {
 

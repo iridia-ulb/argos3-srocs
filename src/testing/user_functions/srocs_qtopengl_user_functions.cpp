@@ -5,7 +5,7 @@
 #include <argos3/plugins/simulator/visualizations/qt-opengl/qtopengl_render.h>
 #include <argos3/plugins/simulator/visualizations/qt-opengl/qtopengl_main_window.h>
 #include <argos3/plugins/robots/builderbot/simulator/builderbot_entity.h>
-#include <argos3/plugins/robots/builderbot/simulator/builderbot_debug_entity.h>
+#include <argos3/plugins/simulator/entities/debug_entity.h>
 
 #include <QDockWidget>
 #include <QTextEdit>

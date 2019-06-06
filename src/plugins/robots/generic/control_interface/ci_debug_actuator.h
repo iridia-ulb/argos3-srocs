@@ -1,14 +1,14 @@
 /**
- * @file <argos3/plugins/robots/builderbot/control_interface/ci_builderbot_debug_actuator.h>
+ * @file <argos3/plugins/robots/generic/control_interface/ci_debug_actuator.h>
  *
  * @author Michael Allwright - <allsey87@gmail.com>
  */
 
-#ifndef CCI_BUILDERBOT_DEBUG_ACTUATOR_H
-#define CCI_BUILDERBOT_DEBUG_ACTUATOR_H
+#ifndef CCI_DEBUG_ACTUATOR_H
+#define CCI_DEBUG_ACTUATOR_H
 
 namespace argos {
-   class CCI_BuilderBotDebugActuator;
+   class CCI_DebugActuator;
 }
 
 #include <argos3/core/control_interface/ci_actuator.h>
@@ -18,11 +18,11 @@ namespace argos {
 
 namespace argos {
 
-   class CCI_BuilderBotDebugActuator : public CCI_Actuator {
+   class CCI_DebugActuator : public CCI_Actuator {
 
    public:
 
-      virtual ~CCI_BuilderBotDebugActuator() {}
+      virtual ~CCI_DebugActuator() {}
 
       virtual void Write(const std::string& str_buffer,
                          const std::string& str_contents);

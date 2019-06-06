@@ -10,10 +10,9 @@
 #include <argos3/core/simulator/entity/controllable_entity.h>
 #include <argos3/core/simulator/entity/embodied_entity.h>
 #include <argos3/plugins/simulator/entities/radio_equipped_entity.h>
+#include <argos3/plugins/simulator/entities/debug_entity.h>
 
 #include <argos3/plugins/simulator/media/radio_medium.h>
-
-#include <argos3/plugins/robots/builderbot/simulator/builderbot_debug_entity.h>
 #include <argos3/plugins/robots/builderbot/simulator/builderbot_differential_drive_entity.h>
 #include <argos3/plugins/robots/builderbot/simulator/builderbot_electromagnet_system_entity.h>
 #include <argos3/plugins/robots/builderbot/simulator/builderbot_lift_system_entity.h>
@@ -32,9 +31,9 @@ namespace argos {
    CBuilderBotEntity::CBuilderBotEntity() :
       CComposableEntity(nullptr),
       m_pcControllableEntity(nullptr),
+      m_pcDebugEntity(nullptr),
       m_pcEmbodiedEntity(nullptr),
       m_pcDifferentialDriveEntity(nullptr),
-      m_pcDebugEntity(nullptr),
       m_pcElectromagnetSystemEntity(nullptr),
       m_pcLiftSystemEntity(nullptr),
       m_bDebug(false) {}
@@ -115,7 +114,7 @@ namespace argos {
          */
 
          /* create and initialize a debugging entity */
-         m_pcDebugEntity = new CBuilderBotDebugEntity(this, "debug_0");
+         m_pcDebugEntity = new CDebugEntity(this, "debug_0");
          AddComponent(*m_pcDebugEntity);
          /* Create and initialize the controllable entity */
          m_pcControllableEntity = new CControllableEntity(this);

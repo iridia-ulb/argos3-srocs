@@ -8,11 +8,11 @@
 #define BUILDERBOT_ENTITY_H
 
 namespace argos {
-   class CBuilderBotDebugEntity;
    class CBuilderBotDifferentialDriveEntity;
    class CBuilderBotElectromagnetSystemEntity;
    class CBuilderBotLiftSystemEntity;
    class CControllableEntity;
+   class CDebugEntity;
    class CEmbodiedEntity;
    class CRadioEquippedEntity;
 }
@@ -43,20 +43,20 @@ namespace argos {
          return *m_pcControllableEntity;
       }
 
+      inline CDebugEntity& GetDebugEntity() {
+         return *m_pcDebugEntity;
+      }
+
+      inline const CDebugEntity& GetDebugEntity() const {
+         return *m_pcDebugEntity;
+      }
+
       inline CBuilderBotDifferentialDriveEntity& GetDifferentialDriveEntity() {
          return *m_pcDifferentialDriveEntity;
       }
 
       inline const CBuilderBotDifferentialDriveEntity& GetDifferentialDriveEntity() const {
          return *m_pcDifferentialDriveEntity;
-      }
-
-      inline CBuilderBotDebugEntity& GetDebugEntity() {
-         return *m_pcDebugEntity;
-      }
-
-      inline const CBuilderBotDebugEntity& GetDebugEntity() const {
-         return *m_pcDebugEntity;
       }
 
       inline CBuilderBotElectromagnetSystemEntity& GetElectromagnetSystemEntity() {
@@ -92,9 +92,10 @@ namespace argos {
    private:
 
       CControllableEntity*                   m_pcControllableEntity;
+      CDebugEntity*                          m_pcDebugEntity;
       CEmbodiedEntity*                       m_pcEmbodiedEntity;
+
       CBuilderBotDifferentialDriveEntity*    m_pcDifferentialDriveEntity;
-      CBuilderBotDebugEntity*                m_pcDebugEntity;
       CBuilderBotElectromagnetSystemEntity*  m_pcElectromagnetSystemEntity;
       CBuilderBotLiftSystemEntity*           m_pcLiftSystemEntity;
       CRadioEquippedEntity*                  m_pcNFCRadioEquippedEntity;

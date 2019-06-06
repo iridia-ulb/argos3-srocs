@@ -1,21 +1,21 @@
 /**
- * @file <argos3/plugins/robots/builderbot/simulator/builderbot_debug_entity.h>
+ * @file <argos3/plugins/simulator/entities/debug_entity.h>
  *
  * @author Michael Allwright - <allsey87@gmail.com>
  */
 
-#ifndef BUILDERBOT_DEBUG_ENTITY_H
-#define BUILDERBOT_DEBUG_ENTITY_H
+#ifndef DEBUG_ENTITY_H
+#define DEBUG_ENTITY_H
 
 namespace argos {
-   class CBuilderBotDebugEntity;
+   class CDebugEntity;
 }
 
 #include <argos3/core/simulator/entity/entity.h>
 
 namespace argos {
 
-   class CBuilderBotDebugEntity : public CEntity {
+   class CDebugEntity : public CEntity {
 
    public:
 
@@ -23,15 +23,15 @@ namespace argos {
 
    public:
 
-      CBuilderBotDebugEntity(CComposableEntity* pc_parent);
+      CDebugEntity(CComposableEntity* pc_parent);
 
-      CBuilderBotDebugEntity(CComposableEntity* pc_parent,
-                             const std::string& str_id);
+      CDebugEntity(CComposableEntity* pc_parent,
+                   const std::string& str_id);
 
       /**
        * @brief Destructor.
        */
-      virtual ~CBuilderBotDebugEntity() {}
+      virtual ~CDebugEntity() {}
 
       virtual void Reset();
 

@@ -7,7 +7,7 @@
 
 #include "dynamics3d_virtual_magnetism_plugin.h"
 
-#include <argos3/plugins/robots/block/simulator/dynamics3d_block_model.h>
+#include <argos3/plugins/simulator/physics_engines/dynamics3d/dynamics3d_block_model.h>
 #include <argos3/plugins/robots/builderbot/simulator/dynamics3d_builderbot_model.h>
 #include <algorithm>
 #include <vector>

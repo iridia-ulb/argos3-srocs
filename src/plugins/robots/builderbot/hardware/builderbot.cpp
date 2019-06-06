@@ -249,6 +249,7 @@ namespace argos {
                THROW_ARGOSEXCEPTION("Controller: " << m_pcController->GetErrorMessage());
             }
             /* actuator update */
+            /* TODO: assuming this doesn't break anything, the act phase should be called before the step phase */
             for(CPhysicalActuator* pc_actuator : m_vecActuators) {
                pc_actuator->Update();
                if(m_bSignalRaised) {

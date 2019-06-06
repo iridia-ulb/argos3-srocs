@@ -1,10 +1,10 @@
 /**
- * @file <argos3/plugins/robots/builderbot/control_interface/ci_builderbot_debug_actuator.h>
+ * @file <argos3/plugins/robots/generic/control_interface/ci_debug_actuator.h>
  *
  * @author Michael Allwright - <allsey87@gmail.com>
  */
 
-#include "ci_builderbot_debug_actuator.h"
+#include "ci_debug_actuator.h"
 
 #ifdef ARGOS_WITH_LUA
 #include <argos3/core/wrappers/lua/lua_utility.h>
@@ -17,7 +17,7 @@ namespace argos {
    /****************************************/
    /****************************************/
 
-   void CCI_BuilderBotDebugActuator::Write(const std::string& str_buffer,
+   void CCI_DebugActuator::Write(const std::string& str_buffer,
                                            const std::string& str_contents) {
       std::vector<SInterface>::iterator itInterface =
          std::find_if(std::begin(m_vecInterfaces),
@@ -47,10 +47,10 @@ namespace argos {
     * 1. left wheel speed (a number)
     * 2. right wheel speed (a number)
     */
-   int LuaBuilderBotDebugActuator(lua_State* pt_lua_state) {
+   int LuaDebugActuator(lua_State* pt_lua_state) {
       /* get a pointer to the output structure */
-      CCI_BuilderBotDebugActuator::SInterface* psInterface = 
-         static_cast<CCI_BuilderBotDebugActuator::SInterface*>(
+      CCI_DebugActuator::SInterface* psInterface = 
+         static_cast<CCI_DebugActuator::SInterface*>(
             lua_touserdata(pt_lua_state, lua_upvalueindex(1)));
       /* check parameters */
       if(lua_gettop(pt_lua_state) != 1) {
@@ -59,8 +59,8 @@ namespace argos {
       }
       luaL_checktype(pt_lua_state, 1, LUA_TSTRING);
       /* get the actuator */
-      CCI_BuilderBotDebugActuator* pcDebugActuator = 
-         CLuaUtility::GetDeviceInstance<CCI_BuilderBotDebugActuator>(pt_lua_state, "debug");
+      CCI_DebugActuator* pcDebugActuator = 
+         CLuaUtility::GetDeviceInstance<CCI_DebugActuator>(pt_lua_state, "debug");
       /* write the string */
       std::string strContent(lua_tostring(pt_lua_state, 1));
       strContent += '\n';
@@ -73,13 +73,13 @@ namespace argos {
    /****************************************/
 
 #ifdef ARGOS_WITH_LUA
-   void CCI_BuilderBotDebugActuator::CreateLuaState(lua_State* pt_lua_state) {
+   void CCI_DebugActuator::CreateLuaState(lua_State* pt_lua_state) {
       CLuaUtility::OpenRobotStateTable(pt_lua_state, "debug");
       CLuaUtility::AddToTable(pt_lua_state, "_instance", this);
       for(SInterface& s_interface : m_vecInterfaces) {
          lua_pushstring(pt_lua_state, s_interface.Id.c_str());
          lua_pushlightuserdata(pt_lua_state, &s_interface);
-         lua_pushcclosure(pt_lua_state, &LuaBuilderBotDebugActuator, 1);
+         lua_pushcclosure(pt_lua_state, &LuaDebugActuator, 1);
          lua_settable(pt_lua_state, -3);
       }
       CLuaUtility::CloseRobotStateTable(pt_lua_state);

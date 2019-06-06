@@ -1,13 +1,13 @@
 /**
- * @file <argos3/plugins/robots/builderbot/hardware/builderbot_debug_default_actuator.cpp>
+ * @file <argos3/plugins/robots/generic/simulator/debug_default_actuator.cpp>
  *
  * @author Michael Allwright - <allsey87@gmail.com>
  */
 
-#include "builderbot_debug_default_actuator.h"
+#include "debug_default_actuator.h"
 
 #include <argos3/core/utility/logging/argos_log.h>
-#include <argos3/plugins/robots/builderbot/simulator/builderbot_debug_entity.h>
+#include <argos3/plugins/simulator/entities/debug_entity.h>
 #include <argos3/core/simulator/entity/composable_entity.h>
 
 namespace argos {
@@ -15,17 +15,17 @@ namespace argos {
    /****************************************/
    /****************************************/
 
-   CBuilderBotDebugDefaultActuator::CBuilderBotDebugDefaultActuator() :
+   CDebugDefaultActuator::CDebugDefaultActuator() :
       m_pcDebugEntity(nullptr) {}
 
    /****************************************/
    /****************************************/
 
-   void CBuilderBotDebugDefaultActuator::Write(const std::string& str_buffer,
-                                               const std::string& str_contents) {
+   void CDebugDefaultActuator::Write(const std::string& str_buffer,
+                                     const std::string& str_contents) {
 
       /* call the method in the control interface */
-      CCI_BuilderBotDebugActuator::Write(str_buffer, str_contents);
+      CCI_DebugActuator::Write(str_buffer, str_contents);
       /* copy the contents into the entity */
       m_pcDebugEntity->AppendToBuffer(str_buffer, str_contents);
    }
@@ -33,7 +33,7 @@ namespace argos {
    /****************************************/
    /****************************************/
 
-   void CBuilderBotDebugDefaultActuator::Update() {
+   void CDebugDefaultActuator::Update() {
       for(SInterface& s_interface : m_vecInterfaces) {
          m_pcDebugEntity->ClearBuffer(s_interface.Id);
       }
@@ -42,7 +42,7 @@ namespace argos {
    /****************************************/
    /****************************************/
    
-   void CBuilderBotDebugDefaultActuator::Reset() {
+   void CDebugDefaultActuator::Reset() {
       for(SInterface& s_interface : m_vecInterfaces) {
          /* recreate file if in use */
          if(s_interface.WriteToFile.is_open()) {
@@ -61,15 +61,15 @@ namespace argos {
    /****************************************/
    /****************************************/
 
-   void CBuilderBotDebugDefaultActuator::SetRobot(CComposableEntity& c_entity) {
+   void CDebugDefaultActuator::SetRobot(CComposableEntity& c_entity) {
       m_pcDebugEntity = 
-         &(c_entity.GetComponent<CBuilderBotDebugEntity>("debug"));
+         &(c_entity.GetComponent<CDebugEntity>("debug"));
    }
    
    /****************************************/
    /****************************************/
 
-   void CBuilderBotDebugDefaultActuator::Init(TConfigurationNode& t_tree) {
+   void CDebugDefaultActuator::Init(TConfigurationNode& t_tree) {
       try {
          TConfigurationNodeIterator itInterface("interface");
          for(itInterface = itInterface.begin(&t_tree);
@@ -94,19 +94,19 @@ namespace argos {
          }
       }
       catch(CARGoSException& ex) {
-         THROW_ARGOSEXCEPTION_NESTED("Error during intialization of the BuilderBot debug actuator", ex)
+         THROW_ARGOSEXCEPTION_NESTED("Error during intialization of the debug actuator", ex)
       }
    }
 
    /****************************************/
    /****************************************/
 
-   REGISTER_ACTUATOR(CBuilderBotDebugDefaultActuator,
-                     "builderbot_debug", "default",
+   REGISTER_ACTUATOR(CDebugDefaultActuator,
+                     "debug", "default",
                      "Michael Allwright [allsey87@gmail.com]",
                      "1.0",
-                     "The builderbot debug actuator.",
-                     "This actuator enables debug interfaces for the BuilderBot.",
+                     "The debug actuator.",
+                     "This actuator enables debugging interfaces for a robot",
                      "Usable"
                      );
 

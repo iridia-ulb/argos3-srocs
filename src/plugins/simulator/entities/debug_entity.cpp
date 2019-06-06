@@ -1,10 +1,10 @@
 /**
- * @file <argos3/plugins/robots/builderbot/simulator/builderbot_debug_entity.cpp>
+ * @file <argos3/plugins/simulator/entities/debug_entity.cpp>
  *
  * @author Michael Allwright - <allsey87@gmail.com>
  */
 
-#include "builderbot_debug_entity.h"
+#include "debug_entity.h"
 
 #include <argos3/core/utility/logging/argos_log.h>
 #include <argos3/core/simulator/space/space.h>
@@ -14,27 +14,27 @@ namespace argos {
    /****************************************/
    /****************************************/
 
-   CBuilderBotDebugEntity::CBuilderBotDebugEntity(CComposableEntity* pc_parent) :
+   CDebugEntity::CDebugEntity(CComposableEntity* pc_parent) :
       CEntity(pc_parent) {}
 
    /****************************************/
    /****************************************/
 
-   CBuilderBotDebugEntity::CBuilderBotDebugEntity(CComposableEntity* pc_parent,
-                                                  const std::string& str_id) :
+   CDebugEntity::CDebugEntity(CComposableEntity* pc_parent,
+                              const std::string& str_id) :
       CEntity(pc_parent, str_id) {}
   
    /****************************************/
    /****************************************/
     
-   void CBuilderBotDebugEntity::Reset() {
+   void CDebugEntity::Reset() {
       m_mapBuffers.clear();
    }
 
    /****************************************/
    /****************************************/
 
-   void CBuilderBotDebugEntity::AppendToBuffer(const std::string& str_buffer_id,
+   void CDebugEntity::AppendToBuffer(const std::string& str_buffer_id,
                                                const std::string& str_contents) {
       m_mapBuffers[str_buffer_id] += str_contents;
    }
@@ -42,14 +42,14 @@ namespace argos {
    /****************************************/
    /****************************************/
 
-   void CBuilderBotDebugEntity::ClearBuffer(const std::string& str_buffer_id) {
+   void CDebugEntity::ClearBuffer(const std::string& str_buffer_id) {
       m_mapBuffers[str_buffer_id].clear();
    }
 
    /****************************************/
    /****************************************/
 
-   const std::string& CBuilderBotDebugEntity::GetBuffer(const std::string& str_buffer_id) const {
+   const std::string& CDebugEntity::GetBuffer(const std::string& str_buffer_id) const {
       std::map<std::string, std::string>::const_iterator itBuffer =
          m_mapBuffers.find(str_buffer_id);
       if(itBuffer == std::end(m_mapBuffers)) {
@@ -64,7 +64,7 @@ namespace argos {
    /****************************************/
    /****************************************/
    
-   REGISTER_STANDARD_SPACE_OPERATIONS_ON_ENTITY(CBuilderBotDebugEntity);
+   REGISTER_STANDARD_SPACE_OPERATIONS_ON_ENTITY(CDebugEntity);
 
    /****************************************/
    /****************************************/

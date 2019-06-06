@@ -129,7 +129,7 @@ namespace argos {
                    "block",
                    "1.0",
                    "Michael Allwright [allsey87@gmail.com]",
-                   "The BuilderBot construction robot",
+                   "Model of the stigmergic block",
                    "Long description",
                    "Usable"
    );

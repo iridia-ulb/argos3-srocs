@@ -34,9 +34,10 @@ include(${CMAKE_SOURCE_DIR}/cmake/ARGoSBuildChecks.cmake)
 include_directories(BEFORE ${CMAKE_SOURCE_DIR})
 
 #
-# Compile stuff
+# Compile code
 #
 add_subdirectory(plugins)
+add_subdirectory(testing)
 
 #
 # Create .gdbinit file for GDB support

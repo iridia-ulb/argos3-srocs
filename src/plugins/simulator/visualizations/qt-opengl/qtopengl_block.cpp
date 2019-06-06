@@ -7,7 +7,7 @@
 #include "qtopengl_block.h"
 #include <argos3/core/utility/datatypes/color.h>
 #include <argos3/core/utility/math/vector2.h>
-#include <argos3/plugins/robots/block/simulator/block_entity.h>
+#include <argos3/plugins/simulator/entities/block_entity.h>
 #include <argos3/plugins/simulator/entities/directional_led_equipped_entity.h>
 #include <argos3/plugins/simulator/entities/tag_equipped_entity.h>
 #include <argos3/plugins/simulator/visualizations/qt-opengl/qtopengl_widget.h>

@@ -1,5 +1,5 @@
 add_subdirectory(builderbot)
-add_subdirectory(block)
+add_subdirectory(generic)
 
 
 
