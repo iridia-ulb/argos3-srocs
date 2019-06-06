@@ -14,7 +14,6 @@ namespace argos {
 #include <argos3/core/control_interface/ci_actuator.h>
 #include <argos3/core/utility/string_utilities.h>
 
-#include <sstream>
 #include <fstream>
 
 namespace argos {
@@ -25,13 +24,30 @@ namespace argos {
 
       virtual ~CCI_BuilderBotDebugActuator() {}
 
+      virtual void Write(const std::string& str_buffer,
+                         const std::string& str_contents);
+
 #ifdef ARGOS_WITH_LUA
       virtual void CreateLuaState(lua_State* pt_lua_state);
 #endif
+
+   public:
+
+      struct SInterface {
+         /* constructor */
+         SInterface(const std::string str_id) :
+            Id(str_id) {}
+         /* data */
+         std::string Id;
+         std::ofstream WriteToFile;
+         bool WriteToStandardOutput = false;
+         bool WriteToStandardError = false;
+      };
+
    protected:
 
-      std::map<std::string, std::ostringstream> m_mapBuffers;
-      
+      std::vector<SInterface> m_vecInterfaces;
+
    };
 }
 

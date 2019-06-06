@@ -40,23 +40,10 @@ namespace argos {
 
       virtual void Reset();
 
+      virtual void Write(const std::string& str_buffer,
+                         const std::string& str_contents);
+
    private:
-
-      struct SInterface {
-         /* constructor */
-         SInterface(const std::string str_id,
-                    std::ostringstream& oss_buffer) :
-            Id(str_id),
-            Buffer(oss_buffer) {}
-         /* data */
-         std::string Id;
-         std::ostringstream& Buffer;
-         std::ofstream WriteToFile;
-         bool WriteToStandardOutput = false;
-         bool WriteToStandardError = false;
-      };
-
-      std::vector<SInterface> m_vecInterfaces;
 
       CBuilderBotDebugEntity* m_pcDebugEntity;
 

@@ -33,31 +33,18 @@ namespace argos {
        */
       virtual ~CBuilderBotDebugEntity() {}
 
-//      virtual void Update() {}
-
       virtual void Reset();
 
       virtual std::string GetTypeDescription() const {
          return "debug";
       }
 
-      const std::string& GetBuffer(const std::string& str_id) const {
-         std::map<std::string, std::string>::const_iterator itBuffer =
-            m_mapBuffers.find(str_id);
-         if(itBuffer == std::end(m_mapBuffers)) {
-            static std::string strEmpty;
-            return strEmpty;
-         }
-         else {
-            return itBuffer->second;
-         }
-      }
+      void AppendToBuffer(const std::string& str_buffer_id,
+                          const std::string& str_contents);
 
-      void SetBuffer(const std::string& str_id,
-                     const std::string& str_contents) {
-         m_mapBuffers[str_id] = str_contents;        
-      }
+      void ClearBuffer(const std::string& str_buffer_id);
 
+      const std::string& GetBuffer(const std::string& str_buffer_id) const;
 
    private:
 

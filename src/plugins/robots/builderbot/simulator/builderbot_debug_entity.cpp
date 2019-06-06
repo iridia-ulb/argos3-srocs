@@ -33,6 +33,36 @@ namespace argos {
 
    /****************************************/
    /****************************************/
+
+   void CBuilderBotDebugEntity::AppendToBuffer(const std::string& str_buffer_id,
+                                               const std::string& str_contents) {
+      m_mapBuffers[str_buffer_id] += str_contents;
+   }
+
+   /****************************************/
+   /****************************************/
+
+   void CBuilderBotDebugEntity::ClearBuffer(const std::string& str_buffer_id) {
+      m_mapBuffers[str_buffer_id].clear();
+   }
+
+   /****************************************/
+   /****************************************/
+
+   const std::string& CBuilderBotDebugEntity::GetBuffer(const std::string& str_buffer_id) const {
+      std::map<std::string, std::string>::const_iterator itBuffer =
+         m_mapBuffers.find(str_buffer_id);
+      if(itBuffer == std::end(m_mapBuffers)) {
+         static std::string strEmpty;
+         return strEmpty;
+      }
+      else {
+         return itBuffer->second;
+      }
+   }
+
+   /****************************************/
+   /****************************************/
    
    REGISTER_STANDARD_SPACE_OPERATIONS_ON_ENTITY(CBuilderBotDebugEntity);
 

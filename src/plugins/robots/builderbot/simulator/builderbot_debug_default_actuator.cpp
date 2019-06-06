@@ -21,28 +21,21 @@ namespace argos {
    /****************************************/
    /****************************************/
 
+   void CBuilderBotDebugDefaultActuator::Write(const std::string& str_buffer,
+                                               const std::string& str_contents) {
+
+      /* call the method in the control interface */
+      CCI_BuilderBotDebugActuator::Write(str_buffer, str_contents);
+      /* copy the contents into the entity */
+      m_pcDebugEntity->AppendToBuffer(str_buffer, str_contents);
+   }
+
+   /****************************************/
+   /****************************************/
+
    void CBuilderBotDebugDefaultActuator::Update() {
       for(SInterface& s_interface : m_vecInterfaces) {
-         /* get the contents of the buffer */
-         const std::string& strContents = s_interface.Buffer.str();
-         /* write to output streams */
-         if(!strContents.empty()) {
-            if(s_interface.WriteToStandardOutput) {
-               std::cout << strContents << std::flush;
-            }
-            if(s_interface.WriteToStandardError) {
-               std::cerr << strContents << std::flush;
-            }
-            if(s_interface.WriteToFile.is_open()) {
-               s_interface.WriteToFile << strContents << std::flush;
-            }
-         }
-         if(m_pcDebugEntity != nullptr) {
-            m_pcDebugEntity->SetBuffer(s_interface.Id, strContents);
-         }
-         /* clear buffer */
-         std::ostringstream ossBuffer;
-         s_interface.Buffer.swap(ossBuffer);
+         m_pcDebugEntity->ClearBuffer(s_interface.Id);
       }
    }
 
@@ -51,9 +44,6 @@ namespace argos {
    
    void CBuilderBotDebugDefaultActuator::Reset() {
       for(SInterface& s_interface : m_vecInterfaces) {
-         /* clear buffer */
-         std::ostringstream ossBuffer;
-         s_interface.Buffer.swap(ossBuffer);
          /* recreate file if in use */
          if(s_interface.WriteToFile.is_open()) {
             /* close old file */
@@ -87,10 +77,8 @@ namespace argos {
              ++itInterface) {
             std::string strInterfaceId, strInterfaceOutput;
             GetNodeAttribute(*itInterface, "id", strInterfaceId);
-            /* create a buffer in the control interface */
-            std::ostringstream& ossBuffer = m_mapBuffers[strInterfaceId];
             /* create an instance of SInterface to manage the interface */
-            m_vecInterfaces.emplace_back(strInterfaceId, ossBuffer);
+            m_vecInterfaces.emplace_back(strInterfaceId);
             SInterface& sInterface = m_vecInterfaces.back();
             /* configure the outputs of SInterface */
             GetNodeAttributeOrDefault(*itInterface, "output", strInterfaceOutput, strInterfaceOutput);

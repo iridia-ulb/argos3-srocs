@@ -10,7 +10,33 @@
 #include <argos3/core/wrappers/lua/lua_utility.h>
 #endif
 
+#include <algorithm>
+
 namespace argos {
+
+   /****************************************/
+   /****************************************/
+
+   void CCI_BuilderBotDebugActuator::Write(const std::string& str_buffer,
+                                           const std::string& str_contents) {
+      std::vector<SInterface>::iterator itInterface =
+         std::find_if(std::begin(m_vecInterfaces),
+                      std::end(m_vecInterfaces),
+                      [&str_buffer] (const SInterface& s_interface) {
+                         return (s_interface.Id == str_buffer);
+                      });
+      if(itInterface != std::end(m_vecInterfaces)) {
+         if(itInterface->WriteToStandardOutput) {
+            std::cout << str_contents << std::flush;
+         }
+         if(itInterface->WriteToStandardError) {
+            std::cerr << str_contents << std::flush;
+         }
+         if(itInterface->WriteToFile) {
+            itInterface->WriteToFile << str_contents << std::flush;
+         }
+      }
+   }
 
    /****************************************/
    /****************************************/
@@ -22,16 +48,23 @@ namespace argos {
     * 2. right wheel speed (a number)
     */
    int LuaBuilderBotDebugActuator(lua_State* pt_lua_state) {
-      using TBuffer = std::pair<const std::string, std::ostringstream>;
       /* get a pointer to the output structure */
-      TBuffer* ptBuffer = static_cast<TBuffer*>(lua_touserdata(pt_lua_state, lua_upvalueindex(1)));
-      /* Check parameters */
+      CCI_BuilderBotDebugActuator::SInterface* psInterface = 
+         static_cast<CCI_BuilderBotDebugActuator::SInterface*>(
+            lua_touserdata(pt_lua_state, lua_upvalueindex(1)));
+      /* check parameters */
       if(lua_gettop(pt_lua_state) != 1) {
-         std::string strErrMsg = "robot.debug." + ptBuffer->first + "() expects a single argument";
+         std::string strErrMsg = "robot.debug." + psInterface->Id + "() expects a single argument";
          return luaL_error(pt_lua_state, strErrMsg.c_str());
       }
       luaL_checktype(pt_lua_state, 1, LUA_TSTRING);
-      ptBuffer->second << lua_tostring(pt_lua_state, 1) << std::endl;
+      /* get the actuator */
+      CCI_BuilderBotDebugActuator* pcDebugActuator = 
+         CLuaUtility::GetDeviceInstance<CCI_BuilderBotDebugActuator>(pt_lua_state, "debug");
+      /* write the string */
+      std::string strContent(lua_tostring(pt_lua_state, 1));
+      strContent += '\n';
+      pcDebugActuator->Write(psInterface->Id, strContent);
       return 0;
    }
 #endif
@@ -41,14 +74,15 @@ namespace argos {
 
 #ifdef ARGOS_WITH_LUA
    void CCI_BuilderBotDebugActuator::CreateLuaState(lua_State* pt_lua_state) {
-      CLuaUtility::StartTable(pt_lua_state, "debug");
-      for(std::pair<const std::string, std::ostringstream>& c_buffer : m_mapBuffers) {
-         lua_pushstring(pt_lua_state, c_buffer.first.c_str());
-         lua_pushlightuserdata(pt_lua_state, &c_buffer);
+      CLuaUtility::OpenRobotStateTable(pt_lua_state, "debug");
+      CLuaUtility::AddToTable(pt_lua_state, "_instance", this);
+      for(SInterface& s_interface : m_vecInterfaces) {
+         lua_pushstring(pt_lua_state, s_interface.Id.c_str());
+         lua_pushlightuserdata(pt_lua_state, &s_interface);
          lua_pushcclosure(pt_lua_state, &LuaBuilderBotDebugActuator, 1);
          lua_settable(pt_lua_state, -3);
       }
-      CLuaUtility::EndTable(pt_lua_state);
+      CLuaUtility::CloseRobotStateTable(pt_lua_state);
    }
 #endif
 
