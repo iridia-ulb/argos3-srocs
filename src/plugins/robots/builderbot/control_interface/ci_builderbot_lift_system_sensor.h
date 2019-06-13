@@ -53,10 +53,10 @@ namespace argos {
       Real m_fPosition;
       std::array<UInt8, 2> m_arrLimitSwitches;
 
-      std::array<std::string, 5> m_arrStateStrings = {
+      std::array<std::string, 5> m_arrStateStrings = {{
          "inactive", "position_control", "speed_control",
          "calibration_search_top", "calibration_search_bottom" 
-      };
+      }};
 
    };
 
