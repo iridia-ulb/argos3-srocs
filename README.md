@@ -1,2 +1,2 @@
-# argos3-builderbot
-ARGoS3 Plug-in for the BuilderBot Robot
+# argos3-srocs
+ARGoS3 Plug-in for the Swarm Robotics Construction System
