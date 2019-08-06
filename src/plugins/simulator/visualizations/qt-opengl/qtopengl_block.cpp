@@ -102,6 +102,8 @@ namespace argos {
    /****************************************/
 
    void CQTOpenGLBlock::Draw(CBlockEntity& c_entity) {
+      /* buffers for converting angles */
+      CRadians cZAngle, cYAngle, cXAngle;
       /* update the LED materials */
       const CDirectionalLEDEquippedEntity& c_leds = c_entity.GetDirectionalLEDEquippedEntity();
       for(UInt32 un_material_idx = 0;
@@ -116,6 +118,15 @@ namespace argos {
          };
          m_arrLEDs[un_material_idx]->Emission = arrColor;
       }
+      /* move to the coordinate system of the block */
+      const CVector3& cPosition = c_entity.GetEmbodiedEntity().GetOriginAnchor().Position;
+      const CQuaternion& cOrientation = c_entity.GetEmbodiedEntity().GetOriginAnchor().Orientation;
+      cOrientation.ToEulerAngles(cZAngle, cYAngle, cXAngle);
+      glPushMatrix();
+      glTranslatef(cPosition.GetX(), cPosition.GetY(), cPosition.GetZ());
+      glRotatef(ToDegrees(cXAngle).GetValue(), 1.0f, 0.0f, 0.0f);
+      glRotatef(ToDegrees(cYAngle).GetValue(), 0.0f, 1.0f, 0.0f);
+      glRotatef(ToDegrees(cZAngle).GetValue(), 0.0f, 0.0f, 1.0f);
       /* draw the body */
       m_cBlockModel.Draw();
       /* draw tags */
@@ -125,18 +136,19 @@ namespace argos {
          Real fScaling = s_instance.Tag.GetSideLength();
          const CVector3& cTagPosition = s_instance.PositionOffset;
          const CQuaternion& cTagOrientation = s_instance.OrientationOffset;
-         cTagOrientation.ToEulerAngles(cZ, cY, cX);
+         cTagOrientation.ToEulerAngles(cZAngle, cYAngle, cXAngle);
          glPushMatrix();
          glTranslatef(cTagPosition.GetX(),
                       cTagPosition.GetY(),
                       cTagPosition.GetZ());
-         glRotatef(ToDegrees(cX).GetValue(), 1.0f, 0.0f, 0.0f);
-         glRotatef(ToDegrees(cY).GetValue(), 0.0f, 1.0f, 0.0f);
-         glRotatef(ToDegrees(cZ).GetValue(), 0.0f, 0.0f, 1.0f);
+         glRotatef(ToDegrees(cXAngle).GetValue(), 1.0f, 0.0f, 0.0f);
+         glRotatef(ToDegrees(cYAngle).GetValue(), 0.0f, 1.0f, 0.0f);
+         glRotatef(ToDegrees(cZAngle).GetValue(), 0.0f, 0.0f, 1.0f);
          glScalef(fScaling, fScaling, 1.0f);
          glCallList(m_unTagList);
          glPopMatrix();
       }
+      glPopMatrix();
    }
 
    /****************************************/
@@ -147,7 +159,7 @@ namespace argos {
       void ApplyTo(CQTOpenGLWidget& c_visualization,
                    CBlockEntity& c_entity) {
          static CQTOpenGLBlock m_cModel;
-         c_visualization.DrawEntity(c_entity.GetEmbodiedEntity());
+         //c_visualization.DrawEntity(c_entity.GetEmbodiedEntity());
          m_cModel.Draw(c_entity);
          c_visualization.DrawRays(c_entity.GetControllableEntity());
       }
