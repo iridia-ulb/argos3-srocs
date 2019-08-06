@@ -158,7 +158,6 @@ namespace argos {
       void ApplyTo(CQTOpenGLWidget& c_visualization,
                    CBlockEntity& c_entity) {
          static CQTOpenGLBlock m_cModel;
-         //c_visualization.DrawEntity(c_entity.GetEmbodiedEntity());
          m_cModel.Draw(c_entity);
          c_visualization.DrawRays(c_entity.GetControllableEntity());
       }
