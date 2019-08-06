@@ -130,7 +130,6 @@ namespace argos {
       /* draw the body */
       m_cBlockModel.Draw();
       /* draw tags */
-      CRadians cZ, cY, cX;
       for(const CTagEquippedEntity::SInstance& s_instance :
              c_entity.GetTagEquippedEntity().GetInstances()) {
          Real fScaling = s_instance.Tag.GetSideLength();
