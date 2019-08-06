@@ -3,6 +3,8 @@
 #
 cmake_minimum_required(VERSION 3.1)
 
+project(argos3-srocs)
+
 #
 # Set the path additional cmake files must be searched for
 #
