@@ -20,6 +20,7 @@ add_library(argos3srocs_${ARGOS_BUILD_FOR}_qtopengl_user_functions MODULE
   ${ARGOS3_SOURCES_PLUGINS_SIMULATOR_VISUALIZATIONS_QTOPENGL_SROCS_USER_FUNCTIONS})
 
 target_link_libraries(argos3srocs_${ARGOS_BUILD_FOR}_qtopengl_user_functions
+  argos3srocs_${ARGOS_BUILD_FOR}_builderbot
   ${ARGOS_QTOPENGL_LIBRARY})
 
 install(FILES
