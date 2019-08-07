@@ -22,6 +22,10 @@ target_link_libraries(argos3srocs_${ARGOS_BUILD_FOR}_qtopengl
   ${ARGOS_CORE_LIBRARY}
   ${ARGOS_QTOPENGL_LIBRARY})
 
+install(DIRECTORY
+   models
+   DESTINATION
+   include/argos3/plugins/simulator/visualizations/qt-opengl)
 install(FILES
   ${ARGOS3_HEADERS_PLUGINS_SIMULATOR_VISUALIZATIONS_QTOPENGL}
   DESTINATION
@@ -30,4 +34,3 @@ install(TARGETS argos3srocs_${ARGOS_BUILD_FOR}_qtopengl
   RUNTIME DESTINATION bin
   LIBRARY DESTINATION lib/argos3
   ARCHIVE DESTINATION lib/argos3)
-
