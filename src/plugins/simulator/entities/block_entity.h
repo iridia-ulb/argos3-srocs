@@ -78,8 +78,8 @@ namespace argos {
       bool m_bDebug;
 
       static const Real m_fBlockSideLength;
-      static const std::array<std::pair<CVector3, CQuaternion>, 6> m_arrFaceOffsets;
-      static const std::array<CVector3, 4> m_arrLEDOffsets;
+      static const std::array<std::tuple<std::string, CVector3, CQuaternion>, 6> m_arrFaces;
+      static const std::array<CVector3, 4> m_arrLEDs;
    };
 
 }

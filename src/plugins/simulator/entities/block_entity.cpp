@@ -52,10 +52,11 @@ namespace argos {
          SAnchor& sOriginAnchor = m_pcEmbodiedEntity->GetOriginAnchor();
          /* Create and initialize the tags */
          m_pcTagEquippedEntity = new CTagEquippedEntity(this, "tags_0");
-         for(const std::pair<CVector3, CQuaternion>& c_face_offset : m_arrFaceOffsets) {
+         for(const std::tuple<std::string, CVector3, CQuaternion>& c_face : m_arrFaces) {
             /* add a tag */
-            m_pcTagEquippedEntity->AddTag(c_face_offset.first,
-                                          c_face_offset.second,
+            m_pcTagEquippedEntity->AddTag(std::get<std::string>(c_face),
+                                          std::get<CVector3>(c_face),
+                                          std::get<CQuaternion>(c_face),
                                           sOriginAnchor,
                                           CRadians::PI_OVER_THREE,
                                           TAG_SIDE_LENGTH,
@@ -68,9 +69,10 @@ namespace argos {
          AddComponent(*m_pcTagEquippedEntity);
          /* Create and initialize the radios */
          m_pcRadioEquippedEntity = new CRadioEquippedEntity(this, "radios_0");
-         for(const std::pair<CVector3, CQuaternion>& c_face_offset : m_arrFaceOffsets) {
+         for(const std::tuple<std::string, CVector3, CQuaternion>& c_face : m_arrFaces) {
             /* add a radio */
-            m_pcRadioEquippedEntity->AddRadio(c_face_offset.first,
+            m_pcRadioEquippedEntity->AddRadio(std::get<std::string>(c_face),
+                                              std::get<CVector3>(c_face),
                                               sOriginAnchor,
                                               NFC_TRANSMISSION_RANGE);
          }
@@ -81,15 +83,19 @@ namespace argos {
          AddComponent(*m_pcRadioEquippedEntity);
          /* Create and initialize the directional LEDs */
          m_pcDirectionalLEDEquippedEntity = new CDirectionalLEDEquippedEntity(this, "directional_leds_0");
-         for(const std::pair<CVector3, CQuaternion>& c_face_offset : m_arrFaceOffsets) {
-            for(const CVector3& c_led_offset : m_arrLEDOffsets) {
+         for(const std::tuple<std::string, CVector3, CQuaternion>& c_face : m_arrFaces) {
+            for(UInt32 un_index = 0; un_index < m_arrLEDs.size(); un_index++) {
                /* calculate the LED offset from the origin anchor */
-               CVector3 cLEDPosition(c_led_offset);
-               cLEDPosition.Rotate(c_face_offset.second);
-               cLEDPosition += c_face_offset.first;
+               CVector3 cPosition(m_arrLEDs[un_index]);
+               cPosition.Rotate(std::get<CQuaternion>(c_face));
+               cPosition += std::get<CVector3>(c_face);
+               /* create an id for the LED */
+               std::string strId(std::get<std::string>(c_face));
+               strId += ("_" + std::to_string(un_index));
                /* add the LED */
-               m_pcDirectionalLEDEquippedEntity->AddLED(cLEDPosition,
-                                                        c_face_offset.second,
+               m_pcDirectionalLEDEquippedEntity->AddLED(strId,
+                                                        cPosition,
+                                                        std::get<CQuaternion>(c_face),
                                                         sOriginAnchor,
                                                         CRadians::PI_OVER_THREE,
                                                         CColor::BLACK);
@@ -148,22 +154,28 @@ namespace argos {
       radios, and tags. Since the LEDs and the tags need to be seen by
       cameras, the offset is increased by 1% so that the entity sits just
       above the surface of the block */
-   const std::array<std::pair<CVector3, CQuaternion>, 6> CBlockEntity::m_arrFaceOffsets = {
-      std::make_pair(CVector3( 0.505f,  0.000f,  0.505f) * m_fBlockSideLength,
-                     CQuaternion( 0.5f * CRadians::PI, CVector3::Y)),
-      std::make_pair(CVector3( 0.000f, -0.505f,  0.505f) * m_fBlockSideLength,
-                     CQuaternion( 0.5f * CRadians::PI, CVector3::X)),
-      std::make_pair(CVector3(-0.505f,  0.000f,  0.505f) * m_fBlockSideLength,
-                     CQuaternion(-0.5f * CRadians::PI, CVector3::Y)),
-      std::make_pair(CVector3( 0.000f,  0.505f,  0.505f) * m_fBlockSideLength,
-                     CQuaternion(-0.5f * CRadians::PI, CVector3::X)),
-      std::make_pair(CVector3( 0.000f,  0.000f,  1.010f) * m_fBlockSideLength,
-                     CQuaternion( 0.0f * CRadians::PI, CVector3::X)),
-      std::make_pair(CVector3( 0.000f,  0.000f, -0.010f) * m_fBlockSideLength,
-                     CQuaternion( 1.0f * CRadians::PI, CVector3::X)),
+   const std::array<std::tuple<std::string, CVector3, CQuaternion>, 6> CBlockEntity::m_arrFaces = {
+      std::make_tuple("north",
+                      CVector3( 0.505f,  0.000f,  0.505f) * m_fBlockSideLength,
+                      CQuaternion( 0.5f * CRadians::PI, CVector3::Y)),
+      std::make_tuple("east",
+                      CVector3( 0.000f, -0.505f,  0.505f) * m_fBlockSideLength,
+                      CQuaternion( 0.5f * CRadians::PI, CVector3::X)),
+      std::make_tuple("south",
+                      CVector3(-0.505f,  0.000f,  0.505f) * m_fBlockSideLength,
+                      CQuaternion(-0.5f * CRadians::PI, CVector3::Y)),
+      std::make_tuple("west",
+                      CVector3( 0.000f,  0.505f,  0.505f) * m_fBlockSideLength,
+                      CQuaternion(-0.5f * CRadians::PI, CVector3::X)),
+      std::make_tuple("top",
+                      CVector3( 0.000f,  0.000f,  1.010f) * m_fBlockSideLength,
+                      CQuaternion( 0.0f * CRadians::PI, CVector3::X)),
+      std::make_tuple("bottom",
+                      CVector3( 0.000f,  0.000f, -0.010f) * m_fBlockSideLength,
+                      CQuaternion( 1.0f * CRadians::PI, CVector3::X)),
    };
 
-   const std::array<CVector3, 4> CBlockEntity::m_arrLEDOffsets = {
+   const std::array<CVector3, 4> CBlockEntity::m_arrLEDs = {
       CVector3(0.02f,0.0f,0.0f),
       CVector3(0.0f,0.02f,0.0f),
       CVector3(-0.02f,0.0f,0.0f),
