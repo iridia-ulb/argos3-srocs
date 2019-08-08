@@ -86,13 +86,13 @@ namespace argos {
          /* create and initialize a radio equipped entity for WiFi */
          m_pcWifiRadioEquippedEntity = new CRadioEquippedEntity(this, "radios_0");
          AddComponent(*m_pcWifiRadioEquippedEntity);
-         m_pcWifiRadioEquippedEntity->AddRadio(CVector3(-0.030f, 0.045f, 0.11f), sLowerBaseAnchor, WIFI_TRANSMISSION_RANGE);
+         m_pcWifiRadioEquippedEntity->AddRadio("wifi", CVector3(-0.030f, 0.045f, 0.11f), sLowerBaseAnchor, WIFI_TRANSMISSION_RANGE);
          m_pcWifiRadioEquippedEntity->SetMedium(cWifiRadioMedium);
          m_pcWifiRadioEquippedEntity->Enable();
          /* create and initialize a radio equipped entity for NFC */
          m_pcNFCRadioEquippedEntity = new CRadioEquippedEntity(this, "radios_1");
          AddComponent(*m_pcNFCRadioEquippedEntity);
-         m_pcNFCRadioEquippedEntity->AddRadio(CVector3(-0.0343f, 0.0f, -0.0275f), sEndEffectorAnchor, NFC_TRANSMISSION_RANGE);
+         m_pcNFCRadioEquippedEntity->AddRadio("nfc", CVector3(-0.0343f, 0.0f, -0.0275f), sEndEffectorAnchor, NFC_TRANSMISSION_RANGE);
          m_pcNFCRadioEquippedEntity->SetMedium(cNFCRadioMedium);
          m_pcNFCRadioEquippedEntity->Enable();
          /* create and initialize the directional LED equipped entity */
