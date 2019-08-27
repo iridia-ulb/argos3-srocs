@@ -173,7 +173,7 @@ namespace argos {
       const Real fArrowThickness = 0.015625f;
       const Real fArrowHead =      0.031250f;
       CVector3 cArrow(c_to - c_from);
-      CQuaternion cRotation(CVector3::Z, cArrow);
+      CQuaternion cRotation(CVector3::Z, cArrow / cArrow.Length());
       CRadians cZAngle, cYAngle, cXAngle;
       cRotation.ToEulerAngles(cZAngle, cYAngle, cXAngle);
       /* draw arrow body */

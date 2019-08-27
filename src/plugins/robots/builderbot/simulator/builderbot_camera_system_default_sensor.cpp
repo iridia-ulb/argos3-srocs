@@ -258,15 +258,17 @@ namespace argos {
          m_cOcclusionCheckRay.SetEnd(c_corner);
          if(GetClosestEmbodiedEntityIntersectedByRay(m_sIntersectionItem, m_cOcclusionCheckRay)) {
             /* corner is occluded */
-            if(m_bShowTagRays)
+            if(m_bShowTagRays) {
                m_pcControllableEntity->GetCheckedRays().emplace_back(true, m_cOcclusionCheckRay);
+            }
             /* no more checks necessary, move on to the next tag */
             return true;
          }
          else {
             /* corner not occluded */
-            if(m_bShowTagRays)
+            if(m_bShowTagRays) {
                m_pcControllableEntity->GetCheckedRays().emplace_back(false, m_cOcclusionCheckRay);
+            }
          }
       }
       std::transform(std::begin(m_arrTagCorners),
@@ -309,10 +311,14 @@ namespace argos {
       m_cOcclusionCheckRay.SetEnd(cLedPosition);
       if(!GetClosestEmbodiedEntityIntersectedByRay(m_sIntersectionItem, m_cOcclusionCheckRay)) {
          m_vecLedCache.emplace_back(c_led.GetColor(), cLedPosition, ProjectOntoSensor(cLedPosition));
-         m_pcControllableEntity->GetCheckedRays().emplace_back(false, m_cOcclusionCheckRay);
+         if(m_bShowLEDRays) {
+            m_pcControllableEntity->GetCheckedRays().emplace_back(false, m_cOcclusionCheckRay);
+         }
       }
       else {
-         m_pcControllableEntity->GetCheckedRays().emplace_back(true, m_cOcclusionCheckRay);
+         if(m_bShowLEDRays) {
+            m_pcControllableEntity->GetCheckedRays().emplace_back(true, m_cOcclusionCheckRay);
+         }
       }
       return true;
    }
@@ -322,18 +328,23 @@ namespace argos {
 
    CBuilderBotCameraSystemDefaultSensor::ELedState
       CBuilderBotCameraSystemDefaultSensor::DetectLed(const CVector3& c_position) {    
+      /* c_position is the led in camera's coordinate system, 
+         transfer it to global coordinate system */
+      CVector3 cLedPosition(c_position);
+      cLedPosition.Rotate(m_cCameraOrientation);
+      cLedPosition += m_cCameraPosition;
       /* find the closest LED */
       std::vector<SLed>::iterator itClosestLed =
          std::min_element(std::begin(m_vecLedCache),
                           std::end(m_vecLedCache),
-                          [&c_position] (const SLed& s_lhs_led, const SLed& s_rhs_led) {
-         return (Distance(s_lhs_led.Position, c_position) <
-                 Distance(s_rhs_led.Position, c_position));
+                          [&cLedPosition] (const SLed& s_lhs_led, const SLed& s_rhs_led) {
+         return (Distance(s_lhs_led.Position, cLedPosition) <
+                 Distance(s_rhs_led.Position, cLedPosition));
       });
       /* if no LEDs were found or if the closest LED is more than 0.5 cm away,
          return ELedState::OFF */
       if(itClosestLed == std::end(m_vecLedCache) ||
-         Distance(itClosestLed->Position, c_position) > DETECT_LED_DIST_THRES) {
+         Distance(itClosestLed->Position, cLedPosition) > DETECT_LED_DIST_THRES) {
          return ELedState::OFF;
       }
       /* At this point, we have the closest LED, estimate its state (mapped from
