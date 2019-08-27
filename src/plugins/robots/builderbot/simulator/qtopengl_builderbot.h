@@ -37,7 +37,7 @@ namespace argos {
       CQTOpenGLObjModel m_cBuilderBotModel;
       CQTOpenGLObjModel m_cBuilderBotManipulatorModel;
       /* Pointer to the LED material within the OBJ model */
-      std::array<CQTOpenGLObjModel::SMaterial*, 12> m_arrLEDs;
+      //std::array<CQTOpenGLObjModel::SMaterial*, 12> m_arrLEDs;
    };
 
 

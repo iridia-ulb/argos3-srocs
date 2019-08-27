@@ -32,7 +32,7 @@ set(CMAKE_CXX_FLAGS_DEBUG          "${CMAKE_CXX_FLAGS_DEBUG} -ggdb3")
 set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} ${CMAKE_CXX_FLAGS_RELEASE} ${CMAKE_CXX_FLAGS_DEBUG}")
 
 # Get rid of annoying warnings
-add_definitions(-Wno-unknown-pragmas -Wno-psabi)
+add_definitions(-Wno-unknown-pragmas)
 
 if(APPLE)
   # MAC OSX
@@ -61,6 +61,8 @@ else(APPLE)
   # Also: required by the PhysX engine
   #set(ARGOS_PC_CFLAGS -malign-double)
   add_definitions(${ARGOS_PC_CFLAGS})
+  # Get rid of annoying warnings
+  add_definitions(-Wno-psabi)
   # Avoid discarding unused symbols to allow plugins to work
   set(CMAKE_SHARED_LINKER_FLAGS "-Wl,--no-as-needed")
   set(ARGOS_SHARED_LIBRARY_EXTENSION "so")

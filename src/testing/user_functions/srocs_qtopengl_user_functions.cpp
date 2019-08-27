@@ -263,18 +263,18 @@ namespace argos {
       connect(&GetQTOpenGLWidget(),
               &CQTOpenGLWidget::EntitySelected,
               this,
-              &CSRoCSQTOpenGLUserFunctions::EntitySelected);
+              &CSRoCSQTOpenGLUserFunctions::ProcessEntitySelected);
       connect(&GetQTOpenGLWidget(),
               &CQTOpenGLWidget::StepDone,
               this,
-              &CSRoCSQTOpenGLUserFunctions::StepDone);
-      StepDone(0);
+              &CSRoCSQTOpenGLUserFunctions::ProcessStepDone);
+      ProcessStepDone(0);
    }
 
    /********************************************************************************/
    /********************************************************************************/
 
-   void CSRoCSQTOpenGLUserFunctions::EntitySelected(CEntity* pc_entity) {
+   void CSRoCSQTOpenGLUserFunctions::ProcessEntitySelected(CEntity* pc_entity) {
       std::cerr << "Selected entity \"" << pc_entity->GetId() << "\"" << std::endl;
       /*
       std::string strSelectedEntityId = m_pcSpace->GetRootEntityVector()[un_index]->GetId();
@@ -292,7 +292,7 @@ namespace argos {
    /********************************************************************************/
    /********************************************************************************/
 
-   void CSRoCSQTOpenGLUserFunctions::StepDone(int n_step) {
+   void CSRoCSQTOpenGLUserFunctions::ProcessStepDone(int n_step) {
       // create a local cache of interfaces
       std::list<std::pair<std::string, SUserInterface> > lstRobotUserInterfaces;
       lstRobotUserInterfaces.swap(m_lstRobotUserInterfaces);

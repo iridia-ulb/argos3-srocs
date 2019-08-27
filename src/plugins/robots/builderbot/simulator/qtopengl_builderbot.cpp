@@ -5,6 +5,7 @@
  */
 
 #include "qtopengl_builderbot.h"
+
 #include <argos3/core/utility/datatypes/color.h>
 #include <argos3/core/utility/math/convex_hull.h>
 #include <argos3/core/utility/math/vector2.h>
@@ -12,6 +13,8 @@
 #include <argos3/plugins/robots/builderbot/simulator/builderbot_lift_system_entity.h>
 #include <argos3/plugins/simulator/entities/directional_led_equipped_entity.h>
 #include <argos3/plugins/simulator/visualizations/qt-opengl/qtopengl_widget.h>
+
+#include <array>
 
 namespace argos {
 

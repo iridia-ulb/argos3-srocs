@@ -14,6 +14,8 @@ namespace argos {
 
 #include <argos3/core/simulator/entity/entity.h>
 
+#include <array>
+
 namespace argos {
 
    class CBuilderBotLiftSystemEntity : public CEntity {

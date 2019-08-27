@@ -31,12 +31,12 @@ namespace argos {
       virtual void DrawInWorld() {}
 
       using CQTOpenGLUserFunctions::Draw;
-      void Draw(CBuilderBotEntity& c_builderbot);
+      virtual void Draw(CBuilderBotEntity& c_builderbot);
 
    public slots:
 
-      void EntitySelected(CEntity* pc_entity);
-      void StepDone(int n_step);
+      void ProcessEntitySelected(CEntity* c_entity);
+      void ProcessStepDone(int n_step);
 
    private:
 

@@ -40,7 +40,7 @@
         <builderbot_lift_system implementation="default" />
         <builderbot_nfc implementation="default" show_rays="true" />
       </sensors>
-      <params script="src/testing/test_builderbot.lua" />
+      <params script="test_builderbot.lua" />
     </lua_controller>
 
     <lua_controller id="block">
@@ -51,19 +51,8 @@
       <sensors>
         <radios implementation="default" show_rays="true"/>
       </sensors>
-      <params script="src/testing/test_block.lua" />
+      <params script="test_block.lua" />
     </lua_controller>
-
-    <lua_controller id="spiri">
-      <actuators>
-        <quadrotor_position implementation="default" />
-      </actuators>
-      <sensors>
-      <!-- camera info: https://www.pleiadesrobotics.com/spiri-mu-specifications -->
-      </sensors>
-      <params script="src/testing/experiment/test_spiri_camera.lua" />
-    </lua_controller>
-
   </controllers>
 
   <!-- *********************** -->
@@ -80,16 +69,11 @@
       <controller config="block"/>
     </block>
 
-    <builderbot id="builderbot" debug="true">
+    <builderbot id="builderbot">
       <body position="-0.25,-0.25,0" orientation="0,0,0"/>
       <controller config="builderbot"/>
     </builderbot>
    
-    <!--spiri id="spiri0">
-      <body position="0.1,0.1,0.5" orientation="0,0,90" />
-      <controller config="spiri" />
-    </spiri-->
-
   </arena>
 
   <!-- ******************* -->
