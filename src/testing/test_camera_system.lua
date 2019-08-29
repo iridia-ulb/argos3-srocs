@@ -7,7 +7,7 @@ end
      It must contain the logic of your controller ]]
 function step()
    print_tag_info()
-   log("led 1: " .. robot.camera_system.detect_led(320, 180, 640, 360))
+   log("led 1: " .. robot.camera_system.detect_led(vector3(0,0,0)))
 end
 
 function print_tag_info()

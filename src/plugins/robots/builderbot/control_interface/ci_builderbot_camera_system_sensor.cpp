@@ -8,6 +8,7 @@
 
 #ifdef ARGOS_WITH_LUA
 #include <argos3/core/wrappers/lua/lua_utility.h>
+#include <argos3/core/wrappers/lua/lua_vector3.h>
 #endif
 
 namespace argos {
@@ -61,17 +62,7 @@ namespace argos {
       if(lua_gettop(pt_lua_state) != 1) {
          return luaL_error(pt_lua_state, "robot.camera_system.detect_led() expects a single argument");
       }
-      luaL_checktype(pt_lua_state, 1, LUA_TTABLE);
-      /* push the x,y,z components of the table onto the stack */
-      lua_getfield(pt_lua_state, 1, "x");
-      lua_getfield(pt_lua_state, 1, "y");
-      lua_getfield(pt_lua_state, 1, "z");
-      /* build the vector */
-      CVector3 cPosition(lua_tonumber(pt_lua_state, 2),
-                         lua_tonumber(pt_lua_state, 3),
-                         lua_tonumber(pt_lua_state, 4));
-      /* clean up the stack */
-      lua_pop(pt_lua_state, 3);
+      const CVector3& cPosition = CLuaVector3::ToVector3(pt_lua_state, 1);
       /* get the camera sensor */
       CCI_BuilderBotCameraSystemSensor* pcCameraSensor = 
          CLuaUtility::GetDeviceInstance<CCI_BuilderBotCameraSystemSensor>(pt_lua_state, "camera_system");
