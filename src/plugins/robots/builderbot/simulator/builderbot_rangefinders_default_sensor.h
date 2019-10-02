@@ -32,16 +32,9 @@ namespace argos {
                              const SAnchor& s_anchor,
                              const CVector3& c_position_offset,
                              const CQuaternion& c_orientation_offset,
-                             Real f_range) :
-            SInterface(str_label),
-            Anchor(s_anchor),
-            PositionOffset(c_position_offset),
-            OrientationOffset(c_orientation_offset),
-            Range(f_range) {}
+                             Real f_range);
          /* members */
          const SAnchor& Anchor;
-         CVector3 PositionOffset;
-         CQuaternion OrientationOffset;
          Real Range;
       };
 

@@ -29,6 +29,11 @@ namespace argos {
          CLuaUtility::StartTable(pt_lua_state, ps_interface->Label);
          CLuaUtility::AddToTable(pt_lua_state, "proximity", ps_interface->Proximity);
          CLuaUtility::AddToTable(pt_lua_state, "illuminance", ps_interface->Illuminance);
+         CLuaUtility::StartTable(pt_lua_state, "transform");
+         CLuaUtility::AddToTable(pt_lua_state, "position", ps_interface->PositionOffset);
+         CLuaUtility::AddToTable(pt_lua_state, "orientation", ps_interface->OrientationOffset);
+         CLuaUtility::AddToTable(pt_lua_state, "anchor", ps_interface->Anchor);
+         CLuaUtility::EndTable(pt_lua_state);
          CLuaUtility::EndTable(pt_lua_state);
       }
       CLuaUtility::CloseRobotStateTable(pt_lua_state);
@@ -40,14 +45,14 @@ namespace argos {
 
 #ifdef ARGOS_WITH_LUA
    void CCI_BuilderBotRangefindersSensor::ReadingsToLuaState(lua_State* pt_lua_state) {
-      CLuaUtility::OpenRobotStateTable(pt_lua_state, "rangefinders");
+      lua_getfield(pt_lua_state, -1, "rangefinders");
       for(SInterface* ps_interface : m_vecInterfaces) {
-         CLuaUtility::StartTable(pt_lua_state, ps_interface->Label);
+         lua_getfield(pt_lua_state, -1, ps_interface->Label.c_str());
          CLuaUtility::AddToTable(pt_lua_state, "proximity", ps_interface->Proximity);
          CLuaUtility::AddToTable(pt_lua_state, "illuminance", ps_interface->Illuminance);
-         CLuaUtility::EndTable(pt_lua_state);
+         lua_pop(pt_lua_state, 1);
       }
-      CLuaUtility::CloseRobotStateTable(pt_lua_state);
+      lua_pop(pt_lua_state, 1);
    }
 #endif
 

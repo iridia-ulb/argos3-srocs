@@ -10,8 +10,24 @@
 #include <argos3/core/simulator/entity/composable_entity.h>
 #include <argos3/core/simulator/entity/controllable_entity.h>
 #include <argos3/core/simulator/entity/embodied_entity.h>
+#include <argos3/core/simulator/physics_engine/physics_model.h>
 
 namespace argos {
+
+   /****************************************/
+   /****************************************/
+
+   CBuilderBotRangefindersDefaultSensor::SSimulatedInterface::SSimulatedInterface(const std::string& str_label,
+                                                                                  const SAnchor& s_anchor,
+                                                                                  const CVector3& c_position_offset,
+                                                                                  const CQuaternion& c_orientation_offset,
+                                                                                  Real f_range) :
+      SInterface(str_label,
+                 s_anchor.Id,
+                 c_position_offset,
+                 c_orientation_offset),
+      Anchor(s_anchor),
+      Range(f_range) {}
 
    /****************************************/
    /****************************************/
@@ -32,67 +48,67 @@ namespace argos {
       m_pcEmbodiedEntity = &(c_entity.GetComponent<CEmbodiedEntity>("body"));
       m_pcControllableEntity = &(c_entity.GetComponent<CControllableEntity>("controller"));
       /* get anchors */
-      SAnchor& sLowerBaseAnchor = m_pcEmbodiedEntity->GetAnchor("lower_base");
+      SAnchor& sOriginAnchor = m_pcEmbodiedEntity->GetOriginAnchor();
       SAnchor& sEndEffectorAnchor = m_pcEmbodiedEntity->GetAnchor("end_effector");
       /* instantiate sensors */
       m_vecSimulatedInterfaces.emplace_back("1",
-                                            sLowerBaseAnchor,
-                                            CVector3( 0.0640f, -0.0175f, 0.0495f),
+                                            sOriginAnchor,
+                                            CVector3( 0.0440f, -0.0175f, 0.0515f),
                                             CQuaternion(0.5f * CRadians::PI, CVector3( 0.0000,  1.0000, 0)),
                                             0.05f);
       m_vecSimulatedInterfaces.emplace_back("2",
-                                            sLowerBaseAnchor,
-                                            CVector3( 0.0523f, -0.0522f, 0.0495f),
+                                            sOriginAnchor,
+                                            CVector3( 0.0323f, -0.0522f, 0.0515f),
                                             CQuaternion(0.5f * CRadians::PI, CVector3( 0.7071,  0.7071, 0)),
                                             0.05f);
       m_vecSimulatedInterfaces.emplace_back("3",
-                                            sLowerBaseAnchor,
-                                            CVector3( 0.0175f, -0.0640f, 0.0495f),
+                                            sOriginAnchor,
+                                            CVector3(-0.0025f, -0.0640f, 0.0515f),
                                             CQuaternion(0.5f * CRadians::PI, CVector3( 1.0000,  0.0000, 0)),
                                             0.05f);
       m_vecSimulatedInterfaces.emplace_back("4",
-                                            sLowerBaseAnchor,
-                                            CVector3(-0.0175f, -0.0640f, 0.0495f),
+                                            sOriginAnchor,
+                                            CVector3(-0.0375f, -0.0640f, 0.0515f),
                                             CQuaternion(0.5f * CRadians::PI, CVector3( 1.0000,  0.0000, 0)),
                                             0.05f);
       m_vecSimulatedInterfaces.emplace_back("5",
-                                            sLowerBaseAnchor,
-                                            CVector3(-0.0522f, -0.0523f, 0.0495f),
+                                            sOriginAnchor,
+                                            CVector3(-0.0722f, -0.0523f, 0.0515f),
                                             CQuaternion(0.5f * CRadians::PI, CVector3( 0.7071, -0.7071, 0)),
                                             0.05f);
       m_vecSimulatedInterfaces.emplace_back("6",
-                                            sLowerBaseAnchor,
-                                            CVector3(-0.0640f, -0.0175f, 0.0495f),
+                                            sOriginAnchor,
+                                            CVector3(-0.0840f, -0.0175f, 0.0515f),
                                             CQuaternion(0.5f * CRadians::PI, CVector3( 0.0000, -1.0000, 0)),
                                             0.05f);
       m_vecSimulatedInterfaces.emplace_back("7",
-                                            sLowerBaseAnchor,
-                                            CVector3(-0.0640f,  0.0175f, 0.0495f),
+                                            sOriginAnchor,
+                                            CVector3(-0.0840f,  0.0175f, 0.0515f),
                                             CQuaternion(0.5f * CRadians::PI, CVector3( 0.0000, -1.0000, 0)),
                                             0.05f);
       m_vecSimulatedInterfaces.emplace_back("8",
-                                            sLowerBaseAnchor,
-                                            CVector3(-0.0522f,  0.0523f, 0.0495f),
+                                            sOriginAnchor,
+                                            CVector3(-0.0722f,  0.0523f, 0.0515f),
                                             CQuaternion(0.5f * CRadians::PI, CVector3(-0.7071, -0.7071, 0)),
                                             0.05f);
       m_vecSimulatedInterfaces.emplace_back("9",
-                                            sLowerBaseAnchor,
-                                            CVector3(-0.0175f,  0.0640f, 0.0495f),
+                                            sOriginAnchor,
+                                            CVector3(-0.0375f,  0.0640f, 0.0515f),
                                             CQuaternion(0.5f * CRadians::PI, CVector3(-1.0000,  0.0000, 0)),
                                             0.05f);
       m_vecSimulatedInterfaces.emplace_back("10",
-                                            sLowerBaseAnchor,
-                                            CVector3( 0.0175f,  0.0640f, 0.0495f),
+                                            sOriginAnchor,
+                                            CVector3(-0.0025f,  0.0640f, 0.0515f),
                                             CQuaternion(0.5f * CRadians::PI, CVector3(-1.0000,  0.0000, 0)),
                                             0.05f);
       m_vecSimulatedInterfaces.emplace_back("11",
-                                            sLowerBaseAnchor,
-                                            CVector3( 0.0523f,  0.0522f, 0.0495f),
+                                            sOriginAnchor,
+                                            CVector3( 0.0323f,  0.0522f, 0.0515f),
                                             CQuaternion(0.5f * CRadians::PI, CVector3(-0.7071,  0.7071, 0)),
                                             0.05f);
       m_vecSimulatedInterfaces.emplace_back("12",
-                                            sLowerBaseAnchor,
-                                            CVector3( 0.0640f,  0.0175f, 0.0495f),
+                                            sOriginAnchor,
+                                            CVector3( 0.0440f,  0.0175f, 0.0515f),
                                             CQuaternion(0.5f * CRadians::PI, CVector3( 0.0000,  1.0000, 0)),
                                             0.05f);
       m_vecSimulatedInterfaces.emplace_back("left",

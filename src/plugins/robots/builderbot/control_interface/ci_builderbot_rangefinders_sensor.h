@@ -12,6 +12,8 @@ namespace argos {
 }
 
 #include <argos3/core/control_interface/ci_sensor.h>
+#include <argos3/core/utility/math/vector3.h>
+#include <argos3/core/utility/math/quaternion.h>
 
 namespace argos {
 
@@ -20,13 +22,22 @@ namespace argos {
    public:
 
       struct SInterface {
-         SInterface(const std::string& str_label) :
+         SInterface(const std::string& str_label,
+                    const std::string& str_anchor,
+                    const CVector3& c_position_offset,
+                    const CQuaternion& c_quaternion_offset) :
             Label(str_label),
             Proximity(0.0f),
-            Illuminance(0.0f) {}
+            Illuminance(0.0f),
+            Anchor(str_anchor),
+            PositionOffset(c_position_offset),
+            OrientationOffset(c_quaternion_offset) {}
          std::string Label;
          Real Proximity;
          Real Illuminance;
+         std::string Anchor;
+         CVector3 PositionOffset;
+         CQuaternion OrientationOffset;
          using TVector = std::vector<SInterface*>;
       };
 
