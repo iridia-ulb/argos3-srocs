@@ -24,9 +24,9 @@ namespace argos {
       /* Fetch a collision shape for this model */
       const std::shared_ptr<btCollisionShape>& ptrShape = 
          CDynamics3DShapeManager::RequestBox(
-            btVector3(m_fBlockSideLength * 0.5f,
-                      m_fBlockSideLength * 0.5f, 
-                      m_fBlockSideLength * 0.5f));
+            btVector3(m_fBlockSideLength * 0.5,
+                      m_fBlockSideLength * 0.5,
+                      m_fBlockSideLength * 0.5));
       /* Get the origin anchor */
       SAnchor& sAnchor = c_block.GetEmbodiedEntity().GetOriginAnchor();
       const CQuaternion& cOrientation = sAnchor.Orientation;
@@ -42,15 +42,19 @@ namespace argos {
                   -cPosition.GetY()));
       /* Calculate the center of mass offset */
       const btTransform& cCenterOfMassOffset = btTransform(
-         btQuaternion(0.0f, 0.0f, 0.0f, 1.0f),
-         btVector3(0.0f, -m_fBlockSideLength * 0.5f, 0.0f));
+         btQuaternion(0.0, 0.0, 0.0, 1.0),
+         btVector3(0.0f, -m_fBlockSideLength * 0.5, 0.0));
       /* Initialize mass and inertia to zero (static object) */
-      btVector3 cInertia(0.0f, 0.0f, 0.0f);
-      ptrShape->calculateLocalInertia(m_fBlockMass, cInertia);
+      btScalar fMass = 0.0;
+      btVector3 cInertia(0.0, 0.0, 0.0);
+      if(c_block.GetEmbodiedEntity().IsMovable()) {
+         fMass = m_fBlockMass;
+         ptrShape->calculateLocalInertia(fMass, cInertia);
+      }
       /* Use the default friction */
       btScalar fFriction = GetEngine().GetDefaultFriction();
       /* Set up body data */
-      CBody::SData sData(cStartTransform, cCenterOfMassOffset, cInertia, m_fBlockMass, fFriction);
+      CBody::SData sData(cStartTransform, cCenterOfMassOffset, cInertia, fMass, fFriction);
       /* Create the body */
       m_ptrBody = std::make_shared<CBody>(*this, &sAnchor, ptrShape, sData);
       /* Transfer the body to the base class */

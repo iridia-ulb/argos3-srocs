@@ -44,13 +44,17 @@ namespace argos {
          CComposableEntity::Init(t_tree);
          /* check if we are debugging */
          GetNodeAttributeOrDefault(t_tree, "debug", m_bDebug, m_bDebug);
-         /* Create and initialize the embodied entity */
+         /* create and initialize the embodied entity */
          m_pcEmbodiedEntity = new CEmbodiedEntity(this, "body_0");
          AddComponent(*m_pcEmbodiedEntity);
          m_pcEmbodiedEntity->Init(GetNode(t_tree, "body"));
-         /* Get a reference to the origin anchor */
+         /* check if this block is movable */
+         bool bMovable = true;
+         GetNodeAttributeOrDefault(t_tree, "movable", bMovable, bMovable);
+         m_pcEmbodiedEntity->SetMovable(bMovable);
+         /* get a reference to the origin anchor */
          SAnchor& sOriginAnchor = m_pcEmbodiedEntity->GetOriginAnchor();
-         /* Create and initialize the tags */
+         /* create and initialize the tags */
          m_pcTagEquippedEntity = new CTagEquippedEntity(this, "tags_0");
          for(const std::tuple<std::string, CVector3, CQuaternion>& c_face : m_arrFaces) {
             /* add a tag */
@@ -67,7 +71,7 @@ namespace argos {
          m_pcTagEquippedEntity->SetMedium(cTagMedium);
          m_pcTagEquippedEntity->Enable();
          AddComponent(*m_pcTagEquippedEntity);
-         /* Create and initialize the radios */
+         /* create and initialize the radios */
          m_pcRadioEquippedEntity = new CRadioEquippedEntity(this, "radios_0");
          for(const std::tuple<std::string, CVector3, CQuaternion>& c_face : m_arrFaces) {
             /* add a radio */
@@ -81,7 +85,7 @@ namespace argos {
          m_pcRadioEquippedEntity->SetMedium(cRadioMedium);
          m_pcRadioEquippedEntity->Enable();
          AddComponent(*m_pcRadioEquippedEntity);
-         /* Create and initialize the directional LEDs */
+         /* create and initialize the directional LEDs */
          m_pcDirectionalLEDEquippedEntity = new CDirectionalLEDEquippedEntity(this, "directional_leds_0");
          for(const std::tuple<std::string, CVector3, CQuaternion>& c_face : m_arrFaces) {
             for(UInt32 un_index = 0; un_index < m_arrLEDs.size(); un_index++) {
@@ -106,11 +110,11 @@ namespace argos {
          m_pcDirectionalLEDEquippedEntity->SetMedium(cDirectionalLEDMedium);
          m_pcDirectionalLEDEquippedEntity->Enable();
          AddComponent(*m_pcDirectionalLEDEquippedEntity);
-         /* Create and initialize the controllable entity */
+         /* create and initialize the controllable entity */
          m_pcControllableEntity = new CControllableEntity(this);
          AddComponent(*m_pcControllableEntity);
          m_pcControllableEntity->Init(GetNode(t_tree, "controller"));
-         /* Update components */
+         /* update components */
          UpdateComponents();
       }
       catch(CARGoSException& ex) {
