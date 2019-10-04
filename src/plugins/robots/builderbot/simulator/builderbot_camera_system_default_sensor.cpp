@@ -59,6 +59,8 @@ namespace argos {
       m_cOffsetOrientation.FromEulerAngles(-0.50f * CRadians::PI,
                                             0.75f * CRadians::PI,
                                             0.00f * CRadians::PI);
+      /* export the name of the anchor to the control interface */
+      m_strAnchor.assign("end_effector");
       /* transformation matrix */
       m_cOffset.SetFromComponents(m_cOffsetOrientation, m_cOffsetPosition);
    }

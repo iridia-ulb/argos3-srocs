@@ -97,8 +97,6 @@ namespace argos {
       /* cached data for operator() */
       /* TODO: remove dependency on m_cOffset */
       CTransformationMatrix3 m_cOffset;
-      CQuaternion m_cOffsetOrientation;
-      CVector3 m_cOffsetPosition;
 
       CVector3 m_cCameraPosition;
       CQuaternion m_cCameraOrientation;

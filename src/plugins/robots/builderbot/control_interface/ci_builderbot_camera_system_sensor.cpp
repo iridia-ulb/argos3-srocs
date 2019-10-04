@@ -110,6 +110,11 @@ namespace argos {
          CLuaUtility::EndTable(pt_lua_state);
       }
       CLuaUtility::EndTable(pt_lua_state);
+      CLuaUtility::StartTable(pt_lua_state, "transform");
+      CLuaUtility::AddToTable(pt_lua_state, "position", m_cOffsetPosition);
+      CLuaUtility::AddToTable(pt_lua_state, "orientation", m_cOffsetOrientation);
+      CLuaUtility::AddToTable(pt_lua_state, "anchor", m_strAnchor);
+      CLuaUtility::EndTable(pt_lua_state);
       CLuaUtility::CloseRobotStateTable(pt_lua_state);
    }
 #endif
@@ -117,11 +122,15 @@ namespace argos {
    /****************************************/
    /****************************************/
 
+
+
+
+
 #ifdef ARGOS_WITH_LUA
    void CCI_BuilderBotCameraSystemSensor::ReadingsToLuaState(lua_State* pt_lua_state) {
-      CLuaUtility::OpenRobotStateTable(pt_lua_state, "camera_system");
+      lua_getfield(pt_lua_state, -1, "camera_system");
       CLuaUtility::AddToTable(pt_lua_state, "timestamp", m_fTimestamp);
-      CLuaUtility::StartTable(pt_lua_state, "tags");
+      lua_getfield(pt_lua_state, -1, "tags");
       /* get the tag count from last time */
       size_t unLastTagCount = lua_rawlen(pt_lua_state, -1);     
       for(size_t i = 0; i < m_tTags.size(); ++i) {
@@ -147,8 +156,8 @@ namespace argos {
             lua_settable  (pt_lua_state, -3);
          }
       }
-      CLuaUtility::EndTable(pt_lua_state);
-      CLuaUtility::CloseRobotStateTable(pt_lua_state);
+      lua_pop(pt_lua_state, 1);
+      lua_pop(pt_lua_state, 1);
    }
 #endif
 
