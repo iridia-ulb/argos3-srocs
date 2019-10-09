@@ -54,7 +54,9 @@ namespace argos {
       m_fNearPlaneWidth = fWidthToDepthRatio * CAMERA_RANGE_MIN;
       m_fFarPlaneHeight = fHeightToDepthRatio * CAMERA_RANGE_MAX;
       m_fFarPlaneWidth = fWidthToDepthRatio * CAMERA_RANGE_MAX;
-      /* offset from end effector anchor */
+      /* set the resolution of the camera in the control interface */
+      m_cResolution.Set(CAMERA_RESOLUTION_X, CAMERA_RESOLUTION_Y);
+      /* set the offset from end effector anchor in the control interface */
       m_cOffsetPosition.Set(0.0f, 0.0f, 0.075f);
       m_cOffsetOrientation.FromEulerAngles(-0.50f * CRadians::PI,
                                             0.75f * CRadians::PI,

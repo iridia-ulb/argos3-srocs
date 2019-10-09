@@ -100,6 +100,7 @@ namespace argos {
       /* the timestamp of the current frame */
       Real m_fTimestamp;
       /* the position, orientation, and anchor of the camera sensor */
+      CVector2 m_cResolution;
       CVector3 m_cOffsetPosition;
       CQuaternion m_cOffsetOrientation;
       std::string m_strAnchor;

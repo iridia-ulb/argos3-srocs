@@ -115,6 +115,7 @@ namespace argos {
       CLuaUtility::AddToTable(pt_lua_state, "orientation", m_cOffsetOrientation);
       CLuaUtility::AddToTable(pt_lua_state, "anchor", m_strAnchor);
       CLuaUtility::EndTable(pt_lua_state);
+      CLuaUtility::AddToTable(pt_lua_state, "resolution", m_cResolution);
       CLuaUtility::CloseRobotStateTable(pt_lua_state);
    }
 #endif
