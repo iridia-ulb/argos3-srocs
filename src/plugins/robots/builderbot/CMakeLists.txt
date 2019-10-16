@@ -42,7 +42,7 @@ if(ARGOS_BUILD_FOR_SIMULATOR)
       ${ARGOS3_HEADERS_PLUGINS_ROBOTS_BUILDERBOT_SIMULATOR}
       simulator/qtopengl_builderbot.h)
   endif(ARGOS_COMPILE_QTOPENGL)
-else(ARGOS_BUILD_FOR_SIMULATOR)
+elseif(ARGOS_BUILD_FOR = "builderbot")
   # argos3/plugins/robots/builderbot/hardware
   set(ARGOS3_HEADERS_PLUGINS_ROBOTS_BUILDERBOT_HARDWARE
     hardware/builderbot.h
@@ -108,7 +108,7 @@ if(ARGOS_BUILD_FOR_SIMULATOR)
       ${ARGOS3_SOURCES_PLUGINS_ROBOTS_BUILDERBOT}
       simulator/qtopengl_builderbot.cpp)
   endif(ARGOS_COMPILE_QTOPENGL)
-else(ARGOS_BUILD_FOR_SIMULATOR)
+elseif(ARGOS_BUILD_FOR = "builderbot")
   # argos3/plugins/robots/builderbot/hardware
   set(ARGOS3_SOURCES_PLUGINS_ROBOTS_BUILDERBOT
     ${ARGOS3_SOURCES_PLUGINS_ROBOTS_BUILDERBOT}
@@ -149,18 +149,17 @@ if(ARGOS_BUILD_FOR_SIMULATOR)
     RUNTIME DESTINATION bin
     LIBRARY DESTINATION lib/argos3
     ARCHIVE DESTINATION lib/argos3)
-else(ARGOS_BUILD_FOR_SIMULATOR)
+elseif(ARGOS_BUILD_FOR = "builderbot")
   # Create an executable for the robot
   add_executable(argos3 ${ARGOS3_SOURCES_PLUGINS_ROBOTS_BUILDERBOT})
-  target_link_libraries(argos3
+  target_link_libraries(argos3 stdc++fs
     ${ARGOS_CORE_LIBRARY}
     ${LUA_LIBRARIES}
     ${PTHREADS_LIBRARY}
     ${APRILTAG_LIBRARY}
     ${IIO_LIBRARY}
     ${MEDIACTL_LIBRARY}
-    ${V4L2SUBDEV_LIBRARY}
-    stdc++fs)
+    ${V4L2SUBDEV_LIBRARY})
   install(TARGETS argos3
     RUNTIME DESTINATION bin
     LIBRARY DESTINATION lib/argos3
@@ -174,7 +173,7 @@ if(ARGOS_BUILD_FOR_SIMULATOR)
   if(ARGOS_COMPILE_QTOPENGL)
     install(DIRECTORY simulator/models DESTINATION include/argos3/plugins/simulator/visualizations/qt-opengl)
   endif(ARGOS_COMPILE_QTOPENGL)
-else(ARGOS_BUILD_FOR_SIMULATOR)
+elseif(ARGOS_BUILD_FOR = "builderbot")
   install(FILES ${ARGOS3_HEADERS_PLUGINS_ROBOTS_BUILDERBOT_HARDWARE} DESTINATION include/argos3/plugins/robots/builderbot/hardware)
 endif(ARGOS_BUILD_FOR_SIMULATOR)
 

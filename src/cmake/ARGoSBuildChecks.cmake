@@ -23,13 +23,13 @@ elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
   set(ARGOS_START_LIB_GROUP -Wl,--start-group)
   set(ARGOS_END_LIB_GROUP -Wl,--end-group)
 
-  if(APPLE)
-    # On Apple it must be >= 4.8.1
-    check_gcc(4.8.1)
-  else(APPLE)
-    # On Linux it must be >= 4.8.1
-    check_gcc(4.8.1)
-  endif(APPLE)
+  if(ARGOS_BUILD_FOR_SIMULATOR)
+    # For the simulator it must be >= 6.1.0
+    check_gcc(6.1.0)
+  else(ARGOS_BUILD_FOR_SIMULATOR)
+    # For a hardware build it must be >= 9.1.0
+    check_gcc(9.1.0)
+  endif(ARGOS_BUILD_FOR_SIMULATOR)
 endif()
 
 #

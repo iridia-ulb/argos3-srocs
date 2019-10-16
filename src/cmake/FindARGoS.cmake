@@ -9,14 +9,28 @@
 #
 #=============================================================================
 
-SET (ARGOS_FOUND 0)
-SET (ARGOS_REQUIRED_PLUGINS)
+set(ARGOS_FOUND 0)
+set(ARGOS_REQUIRED_PLUGINS)
 
 # find the include directory
-FIND_PATH (ARGOS_INCLUDE_DIR argos3/core/config.h)
+find_path (ARGOS_INCLUDE_DIR argos3/core/config.h)
+
+if(NOT ARGOS_INCLUDE_DIR)
+   message(FATAL_ERROR "Can not locate the header file: argos3/core/config.h")
+endif(NOT ARGOS_INCLUDE_DIR)
+
+# read the config.h file to get the installations configuration
+file(READ ${ARGOS_INCLUDE_DIR}/argos3/core/config.h ARGOS_CONFIGURATION)
+
+# parse and version and release strings
+string(REGEX MATCH "\#define ARGOS_VERSION \"([^\"]*)\"" UNUSED_VARIABLE ${ARGOS_CONFIGURATION})
+set(ARGOS_VERSION ${CMAKE_MATCH_1})
+string(REGEX MATCH "\#define ARGOS_RELEASE \"([^\"]*)\"" UNUSED_VARIABLE ${ARGOS_CONFIGURATION})
+set(ARGOS_RELEASE ${CMAKE_MATCH_1})
+set(ARGOS_VERSION_RELEASE "${ARGOS_VERSION}-${ARGOS_RELEASE}")
 
 # find the core library
-FIND_LIBRARY (ARGOS_CORE_LIBRARY
+find_library(ARGOS_CORE_LIBRARY
   NAMES argos3core_${ARGOS_BUILD_FOR}
   PATH_SUFFIXES argos3
   DOC "The ARGoS core library"
@@ -27,20 +41,21 @@ foreach(PLUGIN ${ARGoS_FIND_COMPONENTS})
   string(TOUPPER "ARGOS_${PLUGIN}_LIBRARY" ARGOS_PLUGIN_LIBRARY)
   # if the plugin is required, add it to ARGOS_REQUIRED_PLUGINS
   if(${ARGoS_FIND_REQUIRED_${PLUGIN}})
-    LIST (APPEND ARGOS_REQUIRED_PLUGINS ARGOS_PLUGIN_LIBRARY)
+    list(APPEND ARGOS_REQUIRED_PLUGINS ARGOS_PLUGIN_LIBRARY)
   endif(${ARGoS_FIND_REQUIRED_${PLUGIN}})
-  FIND_LIBRARY (${ARGOS_PLUGIN_LIBRARY}
+  find_library(${ARGOS_PLUGIN_LIBRARY}
     NAMES argos3plugin_${ARGOS_BUILD_FOR}_${PLUGIN}
     PATH_SUFFIXES argos3
     DOC "The ARGoS ${PLUGIN} library"
   )
   # compile Qt-OpenGL visualization if the plugin was found
   if(ARGOS_PLUGIN_LIBRARY STREQUAL "ARGOS_QTOPENGL_LIBRARY")
-    if(NOT ARGOS_QTOPENGL_LIBRARY STREQUAL "ARGOS_QTOPENGL_LIBRARY-NOTFOUND")
+    if(ARGOS_QTOPENGL_LIBRARY)
       include(ARGoSCheckQTOpenGL)
-    endif(NOT ARGOS_QTOPENGL_LIBRARY STREQUAL "ARGOS_QTOPENGL_LIBRARY-NOTFOUND")
+    endif(ARGOS_QTOPENGL_LIBRARY)
   endif(ARGOS_PLUGIN_LIBRARY STREQUAL "ARGOS_QTOPENGL_LIBRARY")
 endforeach(PLUGIN ${ARGoS_FIND_COMPONENTS})
+
 
 #=============================================================================
 
@@ -48,5 +63,9 @@ INCLUDE (FindPackageHandleStandardArgs)
 FIND_PACKAGE_HANDLE_STANDARD_ARGS (
   ARGoS
   FOUND_VAR ARGOS_FOUND
-  REQUIRED_VARS ARGOS_CORE_LIBRARY ${ARGOS_REQUIRED_PLUGINS} ARGOS_INCLUDE_DIR)
+  REQUIRED_VARS ARGOS_CORE_LIBRARY ${ARGOS_REQUIRED_PLUGINS} ARGOS_INCLUDE_DIR
+  VERSION_VAR ARGOS_VERSION_RELEASE
+#  HANDLE_COMPONENTS
+)
 
+#  
