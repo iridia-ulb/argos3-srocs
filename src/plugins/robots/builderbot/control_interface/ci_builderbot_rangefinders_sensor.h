@@ -15,6 +15,9 @@ namespace argos {
 #include <argos3/core/utility/math/vector3.h>
 #include <argos3/core/utility/math/quaternion.h>
 
+#include <map>
+#include <tuple>
+
 namespace argos {
 
    class CCI_BuilderBotRangefindersSensor : public CCI_Sensor {
@@ -22,22 +25,19 @@ namespace argos {
    public:
 
       struct SInterface {
-         SInterface(const std::string& str_label,
-                    const std::string& str_anchor,
-                    const CVector3& c_position_offset,
-                    const CQuaternion& c_quaternion_offset) :
+         SInterface(const std::string& str_label) :
             Label(str_label),
             Proximity(0.0f),
             Illuminance(0.0f),
-            Anchor(str_anchor),
-            PositionOffset(c_position_offset),
-            OrientationOffset(c_quaternion_offset) {}
+            Anchor(std::get<std::string>(m_mapSensorConfig.at(str_label))),
+            PositionOffset(std::get<CVector3>(m_mapSensorConfig.at(str_label))),
+            OrientationOffset(std::get<CQuaternion>(m_mapSensorConfig.at(str_label))) {}
          std::string Label;
          Real Proximity;
          Real Illuminance;
-         std::string Anchor;
-         CVector3 PositionOffset;
-         CQuaternion OrientationOffset;
+         const std::string& Anchor;
+         const CVector3& PositionOffset;
+         const CQuaternion& OrientationOffset;
          using TVector = std::vector<SInterface*>;
       };
 
@@ -54,6 +54,8 @@ namespace argos {
    protected:
 
       SInterface::TVector m_vecInterfaces;
+
+      static const std::map<std::string, std::tuple<std::string, CVector3, CQuaternion> > m_mapSensorConfig;
 
    };
 

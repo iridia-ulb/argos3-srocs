@@ -29,12 +29,11 @@ endif(ARGOS_BUILD_FOR_SIMULATOR)
 #
 add_library(argos3srocs_${ARGOS_BUILD_FOR}_genericrobot SHARED ${ARGOS3_SOURCES_PLUGINS_ROBOTS_GENERIC})
 target_link_libraries(argos3srocs_${ARGOS_BUILD_FOR}_genericrobot
-   argos3srocs_${ARGOS_BUILD_FOR}_entities
-   ${ARGOS_CORE_LIBRARY}
-   ${ARGOS_ENTITIES_LIBRARY})
+   ${ARGOS_CORE_LIBRARY})
 if(ARGOS_BUILD_FOR_SIMULATOR)
   target_link_libraries(argos3srocs_${ARGOS_BUILD_FOR}_genericrobot
-    argos3srocs_${ARGOS_BUILD_FOR}_entities)
+   ${ARGOS_ENTITIES_LIBRARY}
+   argos3srocs_${ARGOS_BUILD_FOR}_entities)
 endif(ARGOS_BUILD_FOR_SIMULATOR)
 
 #
