@@ -14,8 +14,8 @@ namespace argos {
 struct iio_context;
 struct iio_device;
 
-#include <argos3/core/hardware/sensor.h>
-#include <argos3/core/hardware/actuator.h>
+#include <argos3/plugins/robots/generic/hardware/actuator.h>
+#include <argos3/plugins/robots/generic/hardware/sensor.h>
 #include <argos3/core/utility/math/rng.h>
 #include <argos3/core/utility/configuration/argos_configuration.h>
 
@@ -93,8 +93,6 @@ namespace argos {
       iio_context* m_psContext;
       iio_device* m_psSensorUpdateTrigger;
       iio_device* m_psActuatorUpdateTrigger;
-
-      CPhysicalSensor* m_pcCamera;
    };
 
 }

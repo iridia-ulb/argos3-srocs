@@ -17,7 +17,7 @@ struct iio_channel;
 
 #include <cmath>
 
-#include <argos3/core/hardware/actuator.h>
+#include <argos3/plugins/robots/generic/hardware/actuator.h>
 #include <argos3/plugins/robots/builderbot/control_interface/ci_builderbot_lift_system_actuator.h>
 
 namespace argos {

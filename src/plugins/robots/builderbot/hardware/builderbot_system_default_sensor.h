@@ -11,7 +11,7 @@ namespace argos {
    class CBuilderBotSystemDefaultSensor;
 }
 
-#include <argos3/core/hardware/sensor.h>
+#include <argos3/plugins/robots/generic/hardware/sensor.h>
 #include <argos3/plugins/robots/builderbot/control_interface/ci_builderbot_system_sensor.h>
 
 #include <chrono>
