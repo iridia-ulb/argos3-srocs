@@ -68,7 +68,7 @@ else(APPLE)
   # Get rid of annoying warnings
   add_definitions(-Wno-psabi)
   # Avoid discarding unused symbols to allow plugins to work
-  set(CMAKE_SHARED_LINKER_FLAGS "-Wl,--no-as-needed")
+  set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,--no-as-needed")
   set(ARGOS_SHARED_LIBRARY_EXTENSION "so")
   set(ARGOS_MODULE_LIBRARY_EXTENSION "so")
   set(ARGOS_DYNAMIC_LIBRARY_VARIABLE "LD_LIBRARY_PATH")

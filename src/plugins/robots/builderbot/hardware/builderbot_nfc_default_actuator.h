@@ -11,8 +11,8 @@ namespace argos {
    class CBuilderBotNFCDefaultActuator;
 }
 
+#include <argos3/plugins/robots/generic/hardware/actuator.h>
 #include <argos3/plugins/robots/builderbot/control_interface/ci_builderbot_nfc_actuator.h>
-#include <argos3/core/hardware/actuator.h>
 
 namespace argos {
 

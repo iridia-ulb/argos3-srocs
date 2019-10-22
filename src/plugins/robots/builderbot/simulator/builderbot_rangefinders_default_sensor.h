@@ -30,8 +30,6 @@ namespace argos {
          /* constructor */
          SSimulatedInterface(const std::string& str_label,
                              const SAnchor& s_anchor,
-                             const CVector3& c_position_offset,
-                             const CQuaternion& c_orientation_offset,
                              Real f_range);
          /* members */
          const SAnchor& Anchor;

@@ -19,7 +19,7 @@ struct iio_device;
 struct iio_channel;
 struct iio_buffer;
 
-#include <argos3/core/hardware/sensor.h>
+#include <argos3/plugins/robots/generic/hardware/sensor.h>
 #include <argos3/plugins/robots/builderbot/control_interface/ci_builderbot_rangefinders_sensor.h>
 
 namespace argos {
@@ -30,6 +30,7 @@ namespace argos {
    public:
 
       struct SPhysicalInterface : SInterface {
+         /* constructor */
          SPhysicalInterface(const std::string& str_label,
                             iio_device* ps_device,
                             iio_channel* ps_proximity_channel,
@@ -41,6 +42,7 @@ namespace argos {
             IlluminanceChannel(ps_illuminance_channel),
             Buffer(ps_buffer),
             Calibration({0.0, 0.0}) {}
+         /* members */
          iio_device* Device;
          iio_channel* ProximityChannel;
          iio_channel* IlluminanceChannel;
