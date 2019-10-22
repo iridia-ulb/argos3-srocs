@@ -1,5 +1,5 @@
 /**
- * @file <argos3/core/hardware/sensor.h>
+ * @file <argos3/plugins/robots/generic/hardware/sensor.h>
  *
  * @author Michael Allwright - <allsey87@gmail.com>
  */

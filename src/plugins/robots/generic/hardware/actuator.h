@@ -1,5 +1,5 @@
 /**
- * @file <argos3/core/hardware/actuator.h>
+ * @file <argos3/plugins/robots/generic/hardware/actuator.h>
  *
  * @author Michael Allwright - <allsey87@gmail.com>
  */
