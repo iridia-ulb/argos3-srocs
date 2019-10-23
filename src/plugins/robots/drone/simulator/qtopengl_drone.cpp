@@ -6,6 +6,7 @@
 
 #include "qtopengl_drone.h"
 
+#include <argos3/core/simulator/simulator.h>
 #include <argos3/core/utility/datatypes/color.h>
 #include <argos3/core/utility/math/vector2.h>
 #include <argos3/plugins/robots/drone/simulator/drone_entity.h>
@@ -20,7 +21,8 @@ namespace argos {
 
     CQTOpenGLDrone::CQTOpenGLDrone() :
       /* create the model */
-      m_cDroneModel("drone.obj") //,
+      m_cDroneModel("drone.obj"),
+      m_cPropellerModel("e305_propeller.obj") //,
       /* get pointers to the LED materials */
       /*
       m_arrLEDs {
@@ -36,16 +38,7 @@ namespace argos {
          &m_cDroneModel.GetMaterial("led_9"),
          &m_cDroneModel.GetMaterial("led_10"),
          &m_cDroneModel.GetMaterial("led_11"),
-      } */ {
-
-
-      std::cerr << "m_cDroneModel.m_vecVertexCoords.size() = " << m_cDroneModel.m_vecVertexCoords.size() << std::endl;
-      std::cerr << "m_cDroneModel.m_vecTextureCoords.size() = " << m_cDroneModel.m_vecTextureCoords.size() << std::endl;
-      std::cerr << "m_cDroneModel.m_vecNormals.size() = " << m_cDroneModel.m_vecNormals.size() << std::endl;
-
-
-
-   }
+      } */ {}
 
    /****************************************/
    /****************************************/
@@ -85,6 +78,34 @@ namespace argos {
       glRotatef(ToDegrees(cYAngle).GetValue(), 0.0f, 1.0f, 0.0f);
       glRotatef(ToDegrees(cZAngle).GetValue(), 0.0f, 0.0f, 1.0f);
       m_cDroneModel.Draw();
+      /* start of draw propellers */
+      UInt32 unPropellerAngle = 
+         CSimulator::GetInstance().GetSpace().GetSimulationClock() % 360;
+      /* (1, 1) */
+      glPushMatrix();
+      glTranslatef(m_cPropellerOffset.GetX(), m_cPropellerOffset.GetY(), m_cPropellerOffset.GetZ());
+      glRotatef(unPropellerAngle, 0.0f, 0.0f, 1.0f);
+      m_cPropellerModel.Draw();
+      glPopMatrix();
+      /* (-1, 1) */
+      glPushMatrix();
+      glTranslatef(-m_cPropellerOffset.GetX(), m_cPropellerOffset.GetY(), m_cPropellerOffset.GetZ());
+      glRotatef(unPropellerAngle, 0.0f, 0.0f, 1.0f);
+      m_cPropellerModel.Draw();
+      glPopMatrix();
+      /* (-1, -1) */
+      glPushMatrix();
+      glTranslatef(-m_cPropellerOffset.GetX(), -m_cPropellerOffset.GetY(), m_cPropellerOffset.GetZ());
+      glRotatef(unPropellerAngle, 0.0f, 0.0f, 1.0f);
+      m_cPropellerModel.Draw();
+      glPopMatrix();
+      /* (1, -1) */
+      glPushMatrix();
+      glTranslatef(m_cPropellerOffset.GetX(), -m_cPropellerOffset.GetY(), m_cPropellerOffset.GetZ());
+      glRotatef(unPropellerAngle, 0.0f, 0.0f, 1.0f);
+      m_cPropellerModel.Draw();
+      glPopMatrix();
+      /* end of draw propellers */
       glPopMatrix();
    }
 
@@ -217,6 +238,8 @@ namespace argos {
    const std::array<GLfloat, 1> CQTOpenGLDroneDebug::m_arrDefaultShininess  {0.0};
 
    const CVector3 CQTOpenGLDroneDebug::m_cExtents {0.7, 0.7, 0.2};
+   const CVector3 CQTOpenGLDrone::m_cPropellerOffset {0.159, 0.159, 0.208};
+
 
    /****************************************/
    /****************************************/

@@ -1,0 +1,30 @@
+<?xml version="1.0" ?>
+<argos-configuration>
+
+  <!-- General configuration -->
+  <framework>
+    <experiment length="0" ticks_per_second="5" random_seed="0"/>
+  </framework>
+
+  <!-- Controller -->
+  <controllers>
+    <lua_controller id="test_differential_drive">
+      <actuators>
+        <builderbot_differential_drive
+          implementation="default"
+          device="dds-actr"
+          left="anglvel0"
+          right="anglvel1" />
+      </actuators>
+      <sensors>
+        <builderbot_differential_drive
+          implementation="default"
+          device="dds-sens"
+          left="anglvel0"
+          right="anglvel1" />
+      </sensors>
+      <params script="/usr/share/argos3/testing/test_differential_drive.lua"/>
+    </lua_controller>
+  </controllers>
+
+</argos-configuration>

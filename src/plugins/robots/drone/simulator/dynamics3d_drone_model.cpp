@@ -64,7 +64,7 @@ namespace argos {
    /****************************************/
    /****************************************/
 
-   const btVector3 CDynamics3DDroneModel::m_cDroneHalfExtents(0.35, 0.1, 0.35);
+   const btVector3 CDynamics3DDroneModel::m_cDroneHalfExtents(0.352, 0.115, 0.352);
    const btScalar  CDynamics3DDroneModel::m_fDroneMass(0.500);
 
    /****************************************/

@@ -1,0 +1,28 @@
+<?xml version="1.0" ?>
+<argos-configuration>
+
+  <!-- General configuration -->
+  <framework>
+    <experiment length="0" ticks_per_second="5" random_seed="0"/>
+  </framework>
+
+  <!-- Controller -->
+  <controllers>
+    <lua_controller id="test_electromagnet_system">
+      <actuators>
+        <builderbot_electromagnet_system
+          implementation="default"
+          device="ems-actr"
+          mode="index0" />
+      </actuators>
+      <sensors>
+        <builderbot_electromagnet_system
+          implementation="default" 
+          device="ems-sens"
+          voltage="voltage0" />
+      </sensors>
+      <params script="/usr/share/argos3/testing/test_electromagnet_system.lua"/>
+    </lua_controller>
+  </controllers>
+
+</argos-configuration>

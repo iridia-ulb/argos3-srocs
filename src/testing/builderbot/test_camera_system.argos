@@ -1,0 +1,65 @@
+<?xml version="1.0" ?>
+<argos-configuration>
+
+  <framework>
+    <experiment length="0" ticks_per_second="5" random_seed="0"/>
+  </framework>
+
+  <controllers>
+    <lua_controller id="test_camera_system">
+      <actuators />
+      <sensors>
+        <builderbot_camera_system implementation="default" />
+      </sensors>
+      <params script="src/testing/test_camera_system.lua" />
+      <params script="/usr/share/argos3/testing/test_camera_system.lua" />
+    </lua_controller>
+    <lua_controller id="test_block">
+      <actuators />
+      <sensors />
+      <params />
+    </lua_controller>
+  </controllers>
+
+  <arena size="1, 1, 1" center="0, 0, 0.25">
+    <builderbot id="bb01">
+      <body position="0,0,0" orientation="0,0,0" />
+      <controller config="test_camera_system" />
+    </builderbot>
+    <block id="block_0">
+      <body position="0.175,0,0" orientation="0,0,0" />
+      <controller config="test_block" />
+    </block>
+  </arena>
+
+  <physics_engines>
+    <dynamics3d id="dyn3d" iterations="50">
+      <floor height="0.01"/>
+      <gravity g="9.8" />
+    </dynamics3d>
+  </physics_engines>
+
+  <media>
+    <directional_led id="directional_leds" index="grid" grid_size="20,20,20" />
+    <tag id="tags" index="grid" grid_size="20,20,20" />
+    <radio id="nfc" index="grid" grid_size="20,20,20" />
+    <radio id="wifi" index="grid" grid_size="20,20,20" />
+  </media>
+
+  <!--visualization>
+    <qt-opengl lua_editor="false">
+      <camera>
+        <placement idx="0" position=" 0,   -1.25,0.5" look_at="0,0,0.05" lens_focal_length="78" />
+        <placement idx="1" position=" 1.25,-1.25,0.6" look_at="0,0,0.05" lens_focal_length="92" />
+        <placement idx="2" position=" 1.25, 0,   0.5" look_at="0,0,0.05" lens_focal_length="78" />
+        <placement idx="3" position=" 1.25, 1.25,0.6" look_at="0,0,0.05" lens_focal_length="92" />
+        <placement idx="4" position=" 0,    1.25,0.5" look_at="0,0,0.05" lens_focal_length="78" />
+        <placement idx="5" position="-1.25, 1.25,0.6" look_at="0,0,0.05" lens_focal_length="92" />
+        <placement idx="6" position="-1.25, 0,   0.5" look_at="0,0,0.05" lens_focal_length="78" />
+        <placement idx="7" position="-1.25,-1.25,0.6" look_at="0,0,0.05" lens_focal_length="92" />
+        <placement idx="8" position="0,0,0.5" look_at="0.0,0.0,0.125" up="1,0,0" lens_focal_length="40"/>
+      </camera>
+    </qt-opengl>
+  </visualization-->
+
+</argos-configuration>
