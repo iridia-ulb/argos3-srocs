@@ -12,8 +12,8 @@ namespace argos {
    class CTCPSocket;
 }
 
+#include <argos3/plugins/robots/generic/hardware/sensor.h>
 #include <argos3/plugins/robots/drone/control_interface/ci_drone_wifi_sensor.h>
-#include <argos3/core/hardware/sensor.h>
 
 namespace argos {
 

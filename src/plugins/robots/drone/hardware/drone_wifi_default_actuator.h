@@ -12,7 +12,7 @@ namespace argos {
    class CTCPSocket;
 }
 
-#include <argos3/core/hardware/actuator.h>
+#include <argos3/plugins/robots/generic/hardware/actuator.h>
 #include <argos3/plugins/robots/drone/control_interface/ci_drone_wifi_actuator.h>
 
 namespace argos {

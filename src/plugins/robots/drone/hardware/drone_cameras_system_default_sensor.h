@@ -23,12 +23,12 @@ struct v4l2_buffer;
 #include <apriltag/apriltag_pose.h>
 #include <apriltag/common/image_u8.h>
 
-#include <argos3/core/hardware/sensor.h>
 #include <argos3/core/utility/math/quaternion.h>
 #include <argos3/core/utility/math/rng.h>
 #include <argos3/core/utility/math/vector2.h>
 #include <argos3/core/utility/math/vector3.h>
 
+#include <argos3/plugins/robots/generic/hardware/sensor.h>
 #include <argos3/plugins/robots/drone/control_interface/ci_drone_cameras_system_sensor.h>
 
 namespace argos {
