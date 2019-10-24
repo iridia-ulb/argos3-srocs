@@ -23,7 +23,7 @@ if(ARGOS_BUILD_FOR_SIMULATOR)
       ${ARGOS3_HEADERS_PLUGINS_ROBOTS_DRONE_SIMULATOR}
       simulator/qtopengl_drone.h)
   endif(ARGOS_COMPILE_QTOPENGL)
-elseif(ARGOS_BUILD_FOR = "drone")
+elseif(ARGOS_BUILD_FOR STREQUAL "drone")
   # argos3/plugins/robots/drone/hardware
   set(ARGOS3_HEADERS_PLUGINS_ROBOTS_DRONE_HARDWARE
     hardware/drone.h
@@ -60,7 +60,7 @@ if(ARGOS_BUILD_FOR_SIMULATOR)
       ${ARGOS3_SOURCES_PLUGINS_ROBOTS_DRONE}
       simulator/qtopengl_drone.cpp)
   endif(ARGOS_COMPILE_QTOPENGL)
-elseif(ARGOS_BUILD_FOR = "drone")
+elseif(ARGOS_BUILD_FOR STREQUAL "drone")
   # argos3/plugins/robots/drone/hardware
   set(ARGOS3_SOURCES_PLUGINS_ROBOTS_DRONE
     ${ARGOS3_SOURCES_PLUGINS_ROBOTS_DRONE}
@@ -91,7 +91,7 @@ if(ARGOS_BUILD_FOR_SIMULATOR)
     RUNTIME DESTINATION bin
     LIBRARY DESTINATION lib/argos3
     ARCHIVE DESTINATION lib/argos3)
-elseif(ARGOS_BUILD_FOR = "drone")
+elseif(ARGOS_BUILD_FOR STREQUAL "drone")
   # Create an executable for the robot
   add_executable(argos3 ${ARGOS3_SOURCES_PLUGINS_ROBOTS_DRONE})
   target_link_libraries(argos3 tbb
@@ -112,7 +112,7 @@ if(ARGOS_BUILD_FOR_SIMULATOR)
   if(ARGOS_COMPILE_QTOPENGL)
     install(DIRECTORY simulator/models DESTINATION include/argos3/plugins/simulator/visualizations/qt-opengl)
   endif(ARGOS_COMPILE_QTOPENGL)
-elseif(ARGOS_BUILD_FOR = "drone")
+elseif(ARGOS_BUILD_FOR STREQUAL "drone")
   install(FILES ${ARGOS3_HEADERS_PLUGINS_ROBOTS_DRONE_HARDWARE} DESTINATION include/argos3/plugins/robots/drone/hardware)
 endif(ARGOS_BUILD_FOR_SIMULATOR)
 

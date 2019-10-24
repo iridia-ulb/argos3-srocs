@@ -18,12 +18,14 @@
 #include <thread>
 
 #include <argos3/core/control_interface/ci_controller.h>
-#include <argos3/core/hardware/actuator.h>
-#include <argos3/core/hardware/sensor.h>
 #include <argos3/core/utility/logging/argos_log.h>
 #include <argos3/core/utility/plugins/factory.h>
 #include <argos3/core/utility/rate.h>
 #include <argos3/core/wrappers/lua/lua_controller.h>
+
+#include <argos3/plugins/robots/generic/hardware/sensor.h>
+#include <argos3/plugins/robots/generic/hardware/actuator.h>
+
 
 #define ADD_TRIGGER_PATH "/sys/bus/iio/devices/iio_sysfs_trigger/add_trigger"
 #define REMOVE_TRIGGER_PATH "/sys/bus/iio/devices/iio_sysfs_trigger/remove_trigger"
@@ -155,7 +157,18 @@ namespace argos {
          m_pcController = dynamic_cast<CLuaController*>(pcController);
          if(m_pcController == nullptr) {
             THROW_ARGOSEXCEPTION("ERROR: controller \"" << strControllerLabel << "\" is not a Lua controller");
+         }        
+         /* connect to the router to emulate the wifi */
+         std::string strRouterConfig;
+         TConfigurationNode& tEnvironment = GetNode(*itController, "environment");
+         GetNodeAttribute(tEnvironment, "router", strRouterConfig);
+         size_t unHostnamePortPos = strRouterConfig.find_last_of(':');
+         if(unHostnamePortPos == std::string::npos) {
+            THROW_ARGOSEXCEPTION("the address of the router must be provided as \"hostname:port\"");
          }
+         SInt32 nPort = std::stoi(strRouterConfig.substr(unHostnamePortPos + 1), nullptr, 0);
+         m_cSocket.Connect(strRouterConfig.substr(0,unHostnamePortPos), nPort);
+         /* go through the actuators */
          std::string strImpl;
          /* Go through actuators */
          TConfigurationNode& tActuators = GetNode(*itController, "actuators");
@@ -230,18 +243,18 @@ namespace argos {
       CRate cRate(m_unTicksPerSec);
       /* start the main control loop */
       try {
-         for(;;) {
+         for(UInt32 unControllerTick = 0;
+             !m_unLength || unControllerTick < m_unLength;
+             ++unControllerTick) {
             /* request samples from the sensors */
             ::iio_device_attr_write_bool(m_psSensorUpdateTrigger, "trigger_now", true);
             /* update the sensors on this thread */
             for(CPhysicalSensor* pc_sensor : m_vecSensors) {
                pc_sensor->Update();
                if(m_bSignalRaised) {
-                  THROW_ARGOSEXCEPTION("Signal " << m_nSignal << " raised during sensor update");
+                  THROW_ARGOSEXCEPTION(m_strSignal << " signal raised during sensor update");
                }
             }
-            /* sleep if required */
-            cRate.Sleep();
             /* step the provided controller */
             m_pcController->ControlStep();
             /* check for errors */
@@ -253,7 +266,7 @@ namespace argos {
             for(CPhysicalActuator* pc_actuator : m_vecActuators) {
                pc_actuator->Update();
                if(m_bSignalRaised) {
-                  THROW_ARGOSEXCEPTION("Signal " << m_nSignal << " raised during actuator update");
+                  THROW_ARGOSEXCEPTION(m_strSignal << " signal raised during actuator update");
                }
             }
             /* push data to the actuators */
@@ -261,13 +274,14 @@ namespace argos {
             /* flush the logs */
             LOG.Flush();
             LOGERR.Flush();
+            /* sleep if required */
+            cRate.Sleep();
          }
       }
       catch(CARGoSException& ex) {
-         LOG.Flush();
-         LOGERR << "[FATAL] Exception thrown in the control loop" << std::endl
+         LOG << "[NOTE] Control loop aborted" << std::endl
                 << ex.what() << std::endl;
-         LOGERR.Flush();
+         LOG.Flush();
          return;
       }
    }

@@ -17,12 +17,13 @@
 #include <thread>
 
 #include <argos3/core/control_interface/ci_controller.h>
-#include <argos3/core/hardware/actuator.h>
-#include <argos3/core/hardware/sensor.h>
 #include <argos3/core/utility/logging/argos_log.h>
 #include <argos3/core/utility/plugins/factory.h>
 #include <argos3/core/utility/rate.h>
 #include <argos3/core/wrappers/lua/lua_controller.h>
+
+#include <argos3/plugins/robots/generic/hardware/sensor.h>
+#include <argos3/plugins/robots/generic/hardware/actuator.h>
 
 namespace argos {
 
@@ -120,6 +121,7 @@ namespace argos {
          m_cSocket.Connect(strRouterConfig.substr(0,unHostnamePortPos), nPort);
          /* go through the actuators */
          std::string strImpl;
+         /* Go through actuators */
          TConfigurationNode& tActuators = GetNode(*itController, "actuators");
          TConfigurationNodeIterator itAct;
          for(itAct = itAct.begin(&tActuators);
@@ -136,7 +138,7 @@ namespace argos {
             m_vecActuators.emplace_back(pcAct);
             m_pcController->AddActuator(itAct->Value(), pcCIAct);
          }
-         /* go through the sensors */
+         /* Go through sensors */
          TConfigurationNode& tSensors = GetNode(*itController, "sensors");
          TConfigurationNodeIterator itSens;
          for(itSens = itSens.begin(&tSensors);
