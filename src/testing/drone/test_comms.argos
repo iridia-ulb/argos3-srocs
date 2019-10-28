@@ -1,0 +1,31 @@
+<?xml version="1.0" ?>
+<argos-configuration>
+
+  <!-- ************************* -->
+  <!-- * General configuration * -->
+  <!-- ************************* -->
+  <framework>
+    <system threads="0" />
+    <experiment length="5" ticks_per_second="5" random_seed="12345" />
+  </framework>
+  
+  <!-- *************** -->
+  <!-- * Controllers * -->
+  <!-- *************** -->
+  <controllers>
+    <lua_controller id="drone">
+      <environment router="localhost:4950"/>
+      <actuators>
+        <drone_wifi implementation="default" />
+      </actuators>
+      <sensors>
+        <drone_camera_system implementation="default"
+          calibration="src/calibration/drone_camera_system.xml"
+          devices="2,3,4,5"/>
+        <drone_wifi implementation="default" />
+      </sensors>
+      <params script="src/testing/test_comms.lua" />
+    </lua_controller>
+  </controllers>
+
+</argos-configuration>
