@@ -26,6 +26,10 @@ namespace argos {
 
       virtual ~CDynamics3DDroneModel() {}
 
+      std::shared_ptr<CBody>& GetBody() {
+         return m_ptrBody;
+      }
+
    private:
 
       std::shared_ptr<CBody> m_ptrBody;

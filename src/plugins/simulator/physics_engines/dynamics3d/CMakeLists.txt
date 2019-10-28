@@ -18,6 +18,7 @@
 #
 set(ARGOS3_HEADERS_PLUGINS_SIMULATOR_PHYSICS_ENGINES_DYNAMICS3D
   dynamics3d_block_model.h
+  dynamics3d_flight_dynamics_plugin.h
   dynamics3d_virtual_magnetism_plugin.h)
   
 #
@@ -26,6 +27,7 @@ set(ARGOS3_HEADERS_PLUGINS_SIMULATOR_PHYSICS_ENGINES_DYNAMICS3D
 set(ARGOS3_SOURCES_PLUGINS_SIMULATOR_PHYSICS_ENGINES_DYNAMICS3D
   ${ARGOS3_HEADERS_PLUGINS_SIMULATOR_PHYSICS_ENGINES_DYNAMICS3D}
   dynamics3d_block_model.cpp
+  dynamics3d_flight_dynamics_plugin.cpp
   dynamics3d_virtual_magnetism_plugin.cpp)
 
 #
@@ -41,6 +43,7 @@ endif(ARGOS_USE_DOUBLE)
 target_compile_definitions(argos3srocs_${ARGOS_BUILD_FOR}_dynamics3d PUBLIC BT_NO_PROFILE=1)
 
 target_link_libraries(argos3srocs_${ARGOS_BUILD_FOR}_dynamics3d
+  argos3srocs_${ARGOS_BUILD_FOR}_drone
   argos3srocs_${ARGOS_BUILD_FOR}_builderbot
   argos3srocs_${ARGOS_BUILD_FOR}_entities
   ${ARGOS_CORE_LIBRARY}
