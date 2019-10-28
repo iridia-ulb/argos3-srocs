@@ -85,9 +85,7 @@ namespace argos {
    /****************************************/
    /****************************************/
 
-   CDroneCamerasSystemDefaultSensor::CDroneCamera::CDroneCamera(//const std::string& str_label,
-                                                                TConfigurationNode& t_calibration) :
-//      CCI_DroneCamera(str_label),
+   CDroneCamerasSystemDefaultSensor::CDroneCamera::CDroneCamera(TConfigurationNode& t_calibration) :
       m_sCalibration(t_calibration) {
       /* initialize the apriltag components */
       m_ptTagFamily = ::tag36h11_create();
@@ -491,7 +489,7 @@ namespace argos {
    /****************************************/
    
    REGISTER_SENSOR(CDroneCamerasSystemDefaultSensor,
-                   "drone_camera_system", "default",
+                   "drone_cameras_system", "default",
                    "Michael Allwright [allsey87@gmail.com]",
                    "1.0",
                    "Camera sensor for the drone",

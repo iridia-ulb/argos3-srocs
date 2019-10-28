@@ -9,7 +9,7 @@ set(ARGOS3_HEADERS_PLUGINS_ROBOTS_DRONE_CONTROLINTERFACE
 if(ARGOS_BUILD_FOR_SIMULATOR)
   # argos3/plugins/robots/drone/simulator
   set(ARGOS3_HEADERS_PLUGINS_ROBOTS_DRONE_SIMULATOR
-#    simulator/drone_cameras_system_default_sensor.h
+    simulator/drone_cameras_system_default_sensor.h
     simulator/drone_entity.h
 #    simulator/drone_flight_system_default_actuator.h
 #    simulator/drone_flight_system_default_sensor.h
@@ -46,7 +46,7 @@ if(ARGOS_BUILD_FOR_SIMULATOR)
   set(ARGOS3_SOURCES_PLUGINS_ROBOTS_DRONE
     ${ARGOS3_SOURCES_PLUGINS_ROBOTS_DRONE}
     ${ARGOS3_HEADERS_PLUGINS_ROBOTS_DRONE_SIMULATOR}
-#    simulator/drone_cameras_system_default_sensor.cpp
+    simulator/drone_cameras_system_default_sensor.cpp
     simulator/drone_entity.cpp
 #    simulator/drone_flight_system_default_actuator.cpp
 #    simulator/drone_flight_system_default_sensor.cpp

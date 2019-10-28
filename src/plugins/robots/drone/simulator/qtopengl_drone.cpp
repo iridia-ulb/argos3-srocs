@@ -80,7 +80,7 @@ namespace argos {
       m_cDroneModel.Draw();
       /* start of draw propellers */
       UInt32 unPropellerAngle = 
-         CSimulator::GetInstance().GetSpace().GetSimulationClock() % 360;
+         (CSimulator::GetInstance().GetSpace().GetSimulationClock() * 10) % 360;
       /* (1, 1) */
       glPushMatrix();
       glTranslatef(m_cPropellerOffset.GetX(), m_cPropellerOffset.GetY(), m_cPropellerOffset.GetZ());

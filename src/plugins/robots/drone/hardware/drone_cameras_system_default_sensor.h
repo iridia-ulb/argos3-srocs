@@ -52,8 +52,7 @@ namespace argos {
 
       class CDroneCamera : public CCI_DroneCamera {
       public:
-         CDroneCamera(//const std::string& str_label,
-                      TConfigurationNode& t_calibration);
+         CDroneCamera(TConfigurationNode& t_calibration);
          ~CDroneCamera();
 
          void Open(const std::string& str_device);

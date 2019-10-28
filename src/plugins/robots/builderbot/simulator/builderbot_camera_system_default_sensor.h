@@ -4,8 +4,8 @@
  * @author Michael Allwright - <allsey87@gmail.com>
  */
 
-#ifndef CAMERAS_DEFAULT_SENSOR_H
-#define CAMERAS_DEFAULT_SENSOR_H
+#ifndef BUILDERBOT_CAMERA_SYSTEM_DEFAULT_SENSOR_H
+#define BUILDERBOT_CAMERA_SYSTEM_DEFAULT_SENSOR_H
 
 namespace argos {
    class CEmbodiedEntity;
