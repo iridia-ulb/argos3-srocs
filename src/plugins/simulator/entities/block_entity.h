@@ -33,6 +33,10 @@ namespace argos {
 
       virtual void Init(TConfigurationNode& t_tree);
 
+      virtual std::string GetTypeDescription() const {
+         return "block";
+      }
+
       inline CControllableEntity& GetControllableEntity() {
          return *m_pcControllableEntity;
       }
