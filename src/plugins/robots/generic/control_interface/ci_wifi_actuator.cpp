@@ -1,10 +1,10 @@
 /**
- * @file <argos3/plugins/robots/drone/control_interface/ci_drone_wifi_actuator.cpp>
+ * @file <argos3/plugins/robots/generic/control_interface/ci_wifi_actuator.cpp>
  *
  * @author Michael Allwright <allsey87@gmail.com>
  */
 
-#include "ci_drone_wifi_actuator.h"
+#include "ci_wifi_actuator.h"
 
 #ifdef ARGOS_WITH_LUA
 #include <argos3/core/wrappers/lua/lua_utility.h>
@@ -85,7 +85,7 @@ namespace argos {
     * The stack must have one value:
     * 1. message to be sent (a string)
     */
-   int LuaTxDataDroneWifiActuator(lua_State* pt_lua_state) {
+   int LuaTxDataWifiActuator(lua_State* pt_lua_state) {
       /* Check parameters */
       if(lua_gettop(pt_lua_state) != 1) {
          return luaL_error(pt_lua_state, "robot.wifi.tx_data() requires 1 argument");
@@ -95,10 +95,10 @@ namespace argos {
       CByteArray cData;
       LuaSerializeTable(cData, pt_lua_state, 1);
       /* get the actuator */
-      CCI_DroneWifiActuator* m_pcCIDroneWifiActuator =
-         CLuaUtility::GetDeviceInstance<CCI_DroneWifiActuator>(pt_lua_state, "wifi");
+      CCI_WifiActuator* m_pcCIWifiActuator =
+         CLuaUtility::GetDeviceInstance<CCI_WifiActuator>(pt_lua_state, "wifi");
       /* enqueue the data to be transmitted */
-      m_pcCIDroneWifiActuator->Enqueue(cData);
+      m_pcCIWifiActuator->Enqueue(cData);
       return 0;
    }
 #endif
@@ -107,12 +107,12 @@ namespace argos {
    /****************************************/
 
 #ifdef ARGOS_WITH_LUA
-   void CCI_DroneWifiActuator::CreateLuaState(lua_State* pt_lua_state) {
+   void CCI_WifiActuator::CreateLuaState(lua_State* pt_lua_state) {
       CLuaUtility::OpenRobotStateTable(pt_lua_state, "wifi");
       CLuaUtility::AddToTable(pt_lua_state, "_instance", this);
       CLuaUtility::AddToTable(pt_lua_state,
                               "tx_data",
-                              &LuaTxDataDroneWifiActuator);
+                              &LuaTxDataWifiActuator);
       CLuaUtility::CloseRobotStateTable(pt_lua_state);
    }
 #endif

@@ -1,11 +1,9 @@
 #
-# drone headers
+# Drone headers
 #
 # argos3/plugins/robots/drone/control_interface
 set(ARGOS3_HEADERS_PLUGINS_ROBOTS_DRONE_CONTROLINTERFACE
-  control_interface/ci_drone_cameras_system_sensor.h
-  control_interface/ci_drone_wifi_actuator.h
-  control_interface/ci_drone_wifi_sensor.h)
+  control_interface/ci_drone_cameras_system_sensor.h)
 if(ARGOS_BUILD_FOR_SIMULATOR)
   # argos3/plugins/robots/drone/simulator
   set(ARGOS3_HEADERS_PLUGINS_ROBOTS_DRONE_SIMULATOR
@@ -15,8 +13,6 @@ if(ARGOS_BUILD_FOR_SIMULATOR)
 #    simulator/drone_flight_system_default_sensor.h
 #    simulator/drone_flight_system_entity.h
 #    simulator/drone_system_default_sensor.h
-    simulator/drone_wifi_default_actuator.h
-    simulator/drone_wifi_default_sensor.h
     simulator/dynamics3d_drone_model.h)
   if(ARGOS_COMPILE_QTOPENGL)
     set(ARGOS3_HEADERS_PLUGINS_ROBOTS_DRONE_SIMULATOR
@@ -27,20 +23,16 @@ elseif(ARGOS_BUILD_FOR STREQUAL "drone")
   # argos3/plugins/robots/drone/hardware
   set(ARGOS3_HEADERS_PLUGINS_ROBOTS_DRONE_HARDWARE
     hardware/drone.h
-    hardware/drone_cameras_system_default_sensor.h
-    hardware/drone_wifi_default_actuator.h
-    hardware/drone_wifi_default_sensor.h)
+    hardware/drone_cameras_system_default_sensor.h)
 endif(ARGOS_BUILD_FOR_SIMULATOR)
 
 #
-# drone sources
+# Drone sources
 #
 # argos3/plugins/robots/drone/control_interface
 set(ARGOS3_SOURCES_PLUGINS_ROBOTS_DRONE
   ${ARGOS3_HEADERS_PLUGINS_ROBOTS_DRONE_CONTROLINTERFACE}
-  control_interface/ci_drone_cameras_system_sensor.cpp
-  control_interface/ci_drone_wifi_actuator.cpp
-  control_interface/ci_drone_wifi_sensor.cpp)
+  control_interface/ci_drone_cameras_system_sensor.cpp)
 if(ARGOS_BUILD_FOR_SIMULATOR)
   # argos3/plugins/robots/drone/simulator
   set(ARGOS3_SOURCES_PLUGINS_ROBOTS_DRONE
@@ -52,8 +44,6 @@ if(ARGOS_BUILD_FOR_SIMULATOR)
 #    simulator/drone_flight_system_default_sensor.cpp
 #    simulator/drone_flight_system_entity.cpp
 #    simulator/drone_system_default_sensor.cpp
-    simulator/drone_wifi_default_actuator.cpp
-    simulator/drone_wifi_default_sensor.cpp
     simulator/dynamics3d_drone_model.cpp)
   if(ARGOS_COMPILE_QTOPENGL)
     set(ARGOS3_SOURCES_PLUGINS_ROBOTS_DRONE
@@ -67,8 +57,6 @@ elseif(ARGOS_BUILD_FOR STREQUAL "drone")
     ${ARGOS3_HEADERS_PLUGINS_ROBOTS_DRONE_HARDWARE}
     hardware/drone.cpp
     hardware/drone_cameras_system_default_sensor.cpp
-    hardware/drone_wifi_default_actuator.cpp
-    hardware/drone_wifi_default_sensor.cpp
     hardware/main.cpp)
 endif(ARGOS_BUILD_FOR_SIMULATOR)
 

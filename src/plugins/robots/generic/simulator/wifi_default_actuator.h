@@ -1,30 +1,30 @@
 /**
- * @file <argos3/plugins/robots/drone/simulator/drone_wifi_default_actuator.h>
+ * @file <argos3/plugins/robots/generic/simulator/wifi_default_actuator.h>
  *
  * @author Michael Allwright - <allsey87@gmail.com>
  */
 
-#ifndef DRONE_WIFI_DEFAULT_ACTUATOR_H
-#define DRONE_WIFI_DEFAULT_ACTUATOR_H
+#ifndef WIFI_DEFAULT_ACTUATOR_H
+#define WIFI_DEFAULT_ACTUATOR_H
 
 namespace argos {
-   class CDroneWifiDefaultActuator;
+   class CWifiDefaultActuator;
    class CRadioEntity;
 }
 
 #include <argos3/core/simulator/actuator.h>
-#include <argos3/plugins/robots/drone/control_interface/ci_drone_wifi_actuator.h>
+#include <argos3/plugins/robots/generic/control_interface/ci_wifi_actuator.h>
 #include <argos3/plugins/simulator/media/radio_medium.h>
 
 namespace argos {
 
-   class CDroneWifiDefaultActuator : public CSimulatedActuator,
-                                         public CCI_DroneWifiActuator {
+   class CWifiDefaultActuator : public CSimulatedActuator,
+                                         public CCI_WifiActuator {
    public:
 
-      CDroneWifiDefaultActuator();
+      CWifiDefaultActuator();
 
-      virtual ~CDroneWifiDefaultActuator() {}
+      virtual ~CWifiDefaultActuator() {}
 
       virtual void SetRobot(CComposableEntity& c_entity);
 

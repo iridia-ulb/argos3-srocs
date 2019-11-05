@@ -20,12 +20,12 @@
           calibration="src/calibration/builderbot_differential_drive.xml" />
         <builderbot_lift_system implementation="default" />
         <builderbot_nfc implementation="default" />
-        <builderbot_wifi implementation="default" />
         <debug implementation="default">
           <interface id="logerr" output="stderr" />
           <interface id="log" output="stdout" />
           <interface id="draw" />
         </debug>
+        <wifi implementation="default" />
       </actuators>
       <sensors>
         <builderbot_camera_system implementation="default"
@@ -39,6 +39,7 @@
         <builderbot_electromagnet_system implementation="default" />
         <builderbot_lift_system implementation="default" />
         <builderbot_nfc implementation="default" show_rays="true" />
+        <wifi implementation="default" />
       </sensors>
       <params script="test_builderbot.lua" />
     </lua_controller>

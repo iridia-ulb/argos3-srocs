@@ -1,10 +1,10 @@
 /**
- * @file <argos3/plugins/robots/drone/simulator/drone_wifi_default_actuator.cpp>
+ * @file <argos3/plugins/robots//simulator/wifi_default_actuator.cpp>
  *
  * @author Michael Allwright - <allsey87@gmail.com>
  */
 
-#include "drone_wifi_default_actuator.h"
+#include "wifi_default_actuator.h"
 
 #include <argos3/core/simulator/entity/composable_entity.h>
 
@@ -16,14 +16,14 @@ namespace argos {
    /****************************************/
    /****************************************/
 
-   CDroneWifiDefaultActuator::CDroneWifiDefaultActuator() :
+   CWifiDefaultActuator::CWifiDefaultActuator() :
       m_pcRadioEntity(nullptr) {
    }
 
    /****************************************/
    /****************************************/
 
-   void CDroneWifiDefaultActuator::SetRobot(CComposableEntity& c_entity) {
+   void CWifiDefaultActuator::SetRobot(CComposableEntity& c_entity) {
       try {
          /* Get and enable omndirectional radio equipped entity */
          m_pcRadioEntity = &(c_entity.GetComponent<CRadioEntity>("radios[radios_0].radio"));
@@ -36,13 +36,13 @@ namespace argos {
    /****************************************/
    /****************************************/
 
-   void CDroneWifiDefaultActuator::Init(TConfigurationNode& t_tree) {
+   void CWifiDefaultActuator::Init(TConfigurationNode& t_tree) {
       try {
          /* Parent class init */
-         CCI_DroneWifiActuator::Init(t_tree);
+         CCI_WifiActuator::Init(t_tree);
       }
       catch(CARGoSException& ex) {
-         THROW_ARGOSEXCEPTION_NESTED("Error initializing the Drone WiFi default actuator", ex);
+         THROW_ARGOSEXCEPTION_NESTED("Error initializing the  WiFi default actuator", ex);
       }
    }
 
@@ -50,7 +50,7 @@ namespace argos {
    /****************************************/
    /****************************************/
 
-   void CDroneWifiDefaultActuator::Update() {
+   void CWifiDefaultActuator::Update() {
       if(!m_lstMessages.empty()) {
          /* Create operation instance */
          CTxOperation cTxOperation(*m_pcRadioEntity, m_lstMessages);
@@ -70,14 +70,14 @@ namespace argos {
    /****************************************/
    /****************************************/
 
-   void CDroneWifiDefaultActuator::Reset() {
+   void CWifiDefaultActuator::Reset() {
       m_lstMessages.clear();
    }
 
    /****************************************/
    /****************************************/
 
-   CDroneWifiDefaultActuator::CTxOperation::CTxOperation(const CRadioEntity& c_tx_radio,
+   CWifiDefaultActuator::CTxOperation::CTxOperation(const CRadioEntity& c_tx_radio,
                                                              const std::list<CByteArray>& lst_tx_data) :
       m_cTxRadio(c_tx_radio),
       m_lstTxData(lst_tx_data) {}
@@ -85,7 +85,7 @@ namespace argos {
    /****************************************/
    /****************************************/
 
-   bool CDroneWifiDefaultActuator::CTxOperation::operator()(CRadioEntity& c_rx_radio) {
+   bool CWifiDefaultActuator::CTxOperation::operator()(CRadioEntity& c_rx_radio) {
       if(&c_rx_radio != &m_cTxRadio) {
          const CVector3& cRxRadioPosition = c_rx_radio.GetPosition();
          const CVector3& cTxRadioPosition = m_cTxRadio.GetPosition();
@@ -102,14 +102,14 @@ namespace argos {
    /****************************************/
    /****************************************/
 
-   REGISTER_ACTUATOR(CDroneWifiDefaultActuator,
-                  "drone_wifi", "default",
-                  "Michael Allwright [allsey87@gmail.com]",
-                  "1.0",
-                  "The Drone WiFi actuator.",
-                  "This actuator sends messages over the near-field communication"
-                  "interface of the drone.",
-                  "Usable"
+   REGISTER_ACTUATOR(CWifiDefaultActuator,
+                     "wifi", "default",
+                     "Michael Allwright [allsey87@gmail.com]",
+                     "1.0",
+                     "The  WiFi actuator.",
+                     "This actuator sends messages over the near-field communication"
+                     "interface of the .",
+                     "Usable"
    );
 
    /****************************************/

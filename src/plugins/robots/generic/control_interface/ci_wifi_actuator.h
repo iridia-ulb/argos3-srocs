@@ -1,14 +1,14 @@
 /**
- * @file <argos3/plugins/robots/drone/control_interface/ci_drone_wifi_actuator.h>
+ * @file <argos3/plugins/robots/generic/control_interface/ci_wifi_actuator.h>
  *
  * @author Michael Allwright <allsey87@gmail.com>
  */
 
-#ifndef CCI_DRONE_WIFI_ACTUATOR_H
-#define CCI_DRONE_WIFI_ACTUATOR_H
+#ifndef CCI_WIFI_ACTUATOR_H
+#define CCI_WIFI_ACTUATOR_H
 
 namespace argos {
-   class CCI_DroneWifiActuator;
+   class CCI_WifiActuator;
 }
 
 #include <argos3/core/control_interface/ci_actuator.h>
@@ -18,13 +18,13 @@ namespace argos {
 
 namespace argos {
 
-   class CCI_DroneWifiActuator : public CCI_Actuator {
+   class CCI_WifiActuator : public CCI_Actuator {
 
    public:
 
-      CCI_DroneWifiActuator() {}
+      CCI_WifiActuator() {}
 
-      virtual ~CCI_DroneWifiActuator() {}
+      virtual ~CCI_WifiActuator() {}
 
       virtual void Enqueue(const CByteArray& c_data) {
          m_lstMessages.emplace_back(c_data);

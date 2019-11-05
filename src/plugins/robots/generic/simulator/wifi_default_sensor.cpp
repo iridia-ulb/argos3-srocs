@@ -1,10 +1,10 @@
 /**
- * @file <argos3/plugins/robots/generic/simulator/builderbot_wifi_default_sensor.cpp>
+ * @file <argos3/plugins/robots/generic/simulator/wifi_default_sensor.cpp>
  *
  * @author Michael Allwright - <allsey87@gmail.com>
  */
 
-#include "builderbot_wifi_default_sensor.h"
+#include "wifi_default_sensor.h"
 
 #include <argos3/core/simulator/entity/composable_entity.h>
 #include <argos3/core/simulator/entity/controllable_entity.h>
@@ -17,7 +17,7 @@ namespace argos {
    /****************************************/
    /****************************************/
 
-   CBuilderBotWifiDefaultSensor::CBuilderBotWifiDefaultSensor() :
+   CWifiDefaultSensor::CWifiDefaultSensor() :
       m_pcRadioEntity(nullptr),
       m_pcControllableEntity(nullptr),
       m_bShowRays(false) {}
@@ -25,7 +25,7 @@ namespace argos {
    /****************************************/
    /****************************************/
 
-   void CBuilderBotWifiDefaultSensor::SetRobot(CComposableEntity& c_entity) {
+   void CWifiDefaultSensor::SetRobot(CComposableEntity& c_entity) {
       try {
          /* Get the radio entity */
          m_pcRadioEntity = &(c_entity.GetComponent<CRadioEntity>("radios[radios_0].radio"));
@@ -40,22 +40,22 @@ namespace argos {
    /****************************************/
    /****************************************/
 
-   void CBuilderBotWifiDefaultSensor::Init(TConfigurationNode& t_tree) {
+   void CWifiDefaultSensor::Init(TConfigurationNode& t_tree) {
       try {
          /* Parent class init */
-         CCI_BuilderBotWifiSensor::Init(t_tree);
+         CCI_WifiSensor::Init(t_tree);
          /* Show rays? */
          GetNodeAttributeOrDefault(t_tree, "show_rays", m_bShowRays, m_bShowRays);
       }
       catch(CARGoSException& ex) {
-         THROW_ARGOSEXCEPTION_NESTED("Error initializing the BuilderBot WiFi default sensor", ex);
+         THROW_ARGOSEXCEPTION_NESTED("Error initializing the  WiFi default sensor", ex);
       }
    }
 
    /****************************************/
    /****************************************/
 
-   void CBuilderBotWifiDefaultSensor::Update() {
+   void CWifiDefaultSensor::Update() {
       /* clear the messages from the interface */
       m_vecMessages.clear();
       /* copy the new messages from the radio entity to the control interface */
@@ -73,7 +73,7 @@ namespace argos {
    /****************************************/
    /****************************************/
 
-   void CBuilderBotWifiDefaultSensor::Reset() {
+   void CWifiDefaultSensor::Reset() {
       /* Clear the existing data */
       m_vecMessages.clear();
    }
@@ -81,13 +81,13 @@ namespace argos {
    /****************************************/
    /****************************************/
 
-   REGISTER_SENSOR(CBuilderBotWifiDefaultSensor,
-                   "builderbot_wifi", "default",
+   REGISTER_SENSOR(CWifiDefaultSensor,
+                   "wifi", "default",
                    "Michael Allwright [allsey87@gmail.com]",
                    "1.0",
-                   "The builderbot WIFI sensor.",
+                   "The  WIFI sensor.",
                    "This sensor receives messages over the near-field communication"
-                   "interface of the builderbot.",
+                   "interface of the .",
                    "Usable"
    );
 

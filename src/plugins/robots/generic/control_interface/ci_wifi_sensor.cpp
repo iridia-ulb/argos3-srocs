@@ -1,10 +1,10 @@
 /**
- * @file <argos3/plugins/robots/builderbot/control_interface/ci_builderbot_wifi_sensor.cpp>
+ * @file <argos3/plugins/robots/generic/control_interface/ci_wifi_sensor.cpp>
  *
  * @author Michael Allwright <allsey87@gmail.com>
  */
 
-#include "ci_builderbot_wifi_sensor.h"
+#include "ci_wifi_sensor.h"
 
 #ifdef ARGOS_WITH_LUA
 #include <argos3/core/wrappers/lua/lua_utility.h>
@@ -16,7 +16,7 @@ namespace argos {
    /****************************************/
 
 #ifdef ARGOS_WITH_LUA
-   void CCI_BuilderBotWifiSensor::CreateLuaState(lua_State* pt_lua_state) {
+   void CCI_WifiSensor::CreateLuaState(lua_State* pt_lua_state) {
       CLuaUtility::OpenRobotStateTable(pt_lua_state, "wifi");
       CLuaUtility::StartTable(pt_lua_state, "rx_data");
       CLuaUtility::EndTable(pt_lua_state);
@@ -94,7 +94,7 @@ namespace argos {
    /****************************************/
 
 #ifdef ARGOS_WITH_LUA
-   void CCI_BuilderBotWifiSensor::ReadingsToLuaState(lua_State* pt_lua_state) {
+   void CCI_WifiSensor::ReadingsToLuaState(lua_State* pt_lua_state) {
       lua_getfield(pt_lua_state, -1, "wifi");
       lua_getfield(pt_lua_state, -1, "rx_data");
       size_t unLastMessageCount = lua_rawlen(pt_lua_state, -1);

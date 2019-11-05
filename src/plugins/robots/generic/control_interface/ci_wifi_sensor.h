@@ -1,14 +1,14 @@
 /**
- * @file <argos3/plugins/robots/builderbot/control_interface/ci_builderbot_wifi_sensor.h>
+ * @file <argos3/plugins/robots/generic/control_interface/ci_wifi_sensor.h>
  *
  * @author Michael Allwright <allsey87@gmail.com>
  */
 
-#ifndef CCI_BUILDERBOT_WIFI_SENSOR_H
-#define CCI_BUILDERBOT_WIFI_SENSOR_H
+#ifndef CCI_WIFI_SENSOR_H
+#define CCI_WIFI_SENSOR_H
 
 namespace argos {
-   class CCI_BuilderBotWifiSensor;
+   class CCI_WifiSensor;
 }
 
 #include <argos3/core/control_interface/ci_sensor.h>
@@ -18,13 +18,13 @@ namespace argos {
 
 namespace argos {
 
-   class CCI_BuilderBotWifiSensor : public CCI_Sensor {
+   class CCI_WifiSensor : public CCI_Sensor {
 
    public:
 
-      CCI_BuilderBotWifiSensor() {}
+      CCI_WifiSensor() {}
 
-      virtual ~CCI_BuilderBotWifiSensor() {}
+      virtual ~CCI_WifiSensor() {}
 
       const std::vector<CByteArray>& GetMessages() {
          return m_vecMessages;
