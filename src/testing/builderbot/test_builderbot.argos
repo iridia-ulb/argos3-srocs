@@ -81,7 +81,6 @@
   <!-- * Physics engines * -->
   <!-- ******************* -->
   <physics_engines>
-    <pointmass3d id="pm3d" />
     <dynamics3d id="dyn3d" iterations="25" default_friction="10">
       <gravity g="9.8" />
       <floor friction="10" />
