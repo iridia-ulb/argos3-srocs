@@ -47,7 +47,7 @@ namespace argos {
          AddComponent(*m_pcEmbodiedEntity);
          m_pcEmbodiedEntity->Init(GetNode(t_tree, "body"));
          /* create anchors */
-         m_pcEmbodiedEntity->AddAnchor("body", {0.0, 0.0, 0.001});
+         m_pcEmbodiedEntity->AddAnchor("body", {0.0, 0.0, 0.00125});
          m_pcEmbodiedEntity->AddAnchor("left_wheel");
          m_pcEmbodiedEntity->AddAnchor("right_wheel");
          /* get wifi medium */
