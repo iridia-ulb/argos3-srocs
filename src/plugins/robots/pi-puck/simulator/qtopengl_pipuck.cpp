@@ -241,8 +241,8 @@ namespace argos {
    /****************************************/
    /****************************************/
 
-   const CVector3 CQTOpenGLPiPuckDebug::m_cBodyScaling                       {0.036, 0.036, 0.135};
-   const CVector3 CQTOpenGLPiPuckDebug::m_cWheelScaling                      {0.04, 0.04, 0.015};
+   const CVector3 CQTOpenGLPiPuckDebug::m_cBodyScaling                       {0.0724, 0.0724, 0.0472};
+   const CVector3 CQTOpenGLPiPuckDebug::m_cWheelScaling                      {0.0425, 0.0425, 0.003};
    const std::array<GLfloat, 4> CQTOpenGLPiPuckDebug::m_arrDefaultColor      {0.5f, 0.5f, 0.5f, 1.0f};
    const std::array<GLfloat, 4> CQTOpenGLPiPuckDebug::m_arrDefaultSpecular   {0.0f, 0.0f, 0.0f, 1.0f};
    const std::array<GLfloat, 4> CQTOpenGLPiPuckDebug::m_arrDefaultEmission   {0.0f, 0.0f, 0.0f, 1.0f};

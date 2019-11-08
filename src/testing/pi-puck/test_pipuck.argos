@@ -44,7 +44,7 @@
   <!-- *********************** -->
   <arena size="1, 1, 2" center="0, 0, 0.5">
 
-    <pipuck id="pipuck">
+    <pipuck id="pipuck" debug="false">
       <body position="0,0,0" orientation="0,0,0"/>
       <controller config="pipuck"/>
     </pipuck>

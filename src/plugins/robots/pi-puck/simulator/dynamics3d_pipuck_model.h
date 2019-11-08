@@ -68,6 +68,7 @@ namespace argos {
       static const btVector3 m_cLeftWheelToBodyJointOffset;
       static const btQuaternion m_cBodyToLeftWheelJointRotation;
       static const btScalar m_fWheelMotorMaxImpulse;
+      static const btScalar m_fWheelFriction;
    };
 }
 

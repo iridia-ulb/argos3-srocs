@@ -60,13 +60,13 @@ namespace argos {
          m_cWheelGeometricOffset,
          cWheelInertia,
          m_fWheelMass,
-         GetEngine().GetDefaultFriction());
+         m_fWheelFriction);
       CAbstractBody::SData sRightWheelData(
          cStartTransform * m_cRightWheelOffset,
          m_cWheelGeometricOffset,
          cWheelInertia,
          m_fWheelMass,
-         GetEngine().GetDefaultFriction());
+         m_fWheelFriction);
       /*
        *   Can the lower base or another body be used directly with the origin anchor?
        *
@@ -196,23 +196,24 @@ namespace argos {
    /****************************************/
    /****************************************/
 
-   const btVector3    CDynamics3DPiPuckModel::m_cBodyHalfExtents(0.065, 0.0196783, 0.07);
-   const btScalar     CDynamics3DPiPuckModel::m_fBodyMass(0.282);
-   const btTransform  CDynamics3DPiPuckModel::m_cBodyOffset(btQuaternion(0.0, 0.0, 0.0, 1.0), btVector3(-0.020,0.002,-0.0));
-   const btTransform  CDynamics3DPiPuckModel::m_cBodyGeometricOffset(btQuaternion(0.0, 0.0, 0.0, 1.0), btVector3(0.0, -0.0196783, 0.0));
-
-   const btVector3    CDynamics3DPiPuckModel::m_cWheelHalfExtents(0.02,0.0075,0.02);
-   const btScalar     CDynamics3DPiPuckModel::m_fWheelMass(0.2);
-   const btTransform  CDynamics3DPiPuckModel::m_cWheelGeometricOffset(btQuaternion(0.0, 0.0, 0.0, 1.0), btVector3(0.0,-0.0075,0.0));
-   const btTransform  CDynamics3DPiPuckModel::m_cLeftWheelOffset(btQuaternion(btVector3(-1,0,0), SIMD_HALF_PI), btVector3(0.0, 0.02, -0.0525));
-   const btTransform  CDynamics3DPiPuckModel::m_cRightWheelOffset(btQuaternion(btVector3(1,0,0), SIMD_HALF_PI), btVector3(0.0, 0.02, 0.0525));
-   const btVector3    CDynamics3DPiPuckModel::m_cBodyToRightWheelJointOffset(0.02, -0.0016783, 0.0525);
-   const btVector3    CDynamics3DPiPuckModel::m_cRightWheelToBodyJointOffset(0.0, 0.0075, 0.0);
+   const btVector3    CDynamics3DPiPuckModel::m_cBodyHalfExtents(0.0362, 0.0236, 0.0362);
+   const btScalar     CDynamics3DPiPuckModel::m_fBodyMass(0.242);
+   const btTransform  CDynamics3DPiPuckModel::m_cBodyOffset(btQuaternion(0.0, 0.0, 0.0, 1.0), btVector3(0.0,0.00125,0.0));
+   const btTransform  CDynamics3DPiPuckModel::m_cBodyGeometricOffset(btQuaternion(0.0, 0.0, 0.0, 1.0), btVector3(0.0, -0.0236, 0.0));
+   const btVector3    CDynamics3DPiPuckModel::m_cWheelHalfExtents(0.02125,0.0015,0.02125);
+   const btScalar     CDynamics3DPiPuckModel::m_fWheelMass(0.006);
+   const btTransform  CDynamics3DPiPuckModel::m_cWheelGeometricOffset(btQuaternion(0.0, 0.0, 0.0, 1.0), btVector3(0.0,-0.0015,0.0));
+   const btTransform  CDynamics3DPiPuckModel::m_cLeftWheelOffset(btQuaternion(btVector3(-1,0,0), SIMD_HALF_PI), btVector3(0.0, 0.02125, -0.0255));
+   const btTransform  CDynamics3DPiPuckModel::m_cRightWheelOffset(btQuaternion(btVector3(1,0,0), SIMD_HALF_PI), btVector3(0.0, 0.02125, 0.0255));
+   const btVector3    CDynamics3DPiPuckModel::m_cBodyToRightWheelJointOffset(0.0, -0.0036, 0.0255);
+   const btVector3    CDynamics3DPiPuckModel::m_cRightWheelToBodyJointOffset(0.0, 0.0015, 0.0);
    const btQuaternion CDynamics3DPiPuckModel::m_cBodyToRightWheelJointRotation(btVector3(-1,0,0), SIMD_HALF_PI);
-   const btVector3    CDynamics3DPiPuckModel::m_cBodyToLeftWheelJointOffset(0.02, -0.0016783, -0.0525);
-   const btVector3    CDynamics3DPiPuckModel::m_cLeftWheelToBodyJointOffset(0.0, 0.0075, -0.0);
+   const btVector3    CDynamics3DPiPuckModel::m_cBodyToLeftWheelJointOffset(0.0, -0.0036, -0.0255);
+   const btVector3    CDynamics3DPiPuckModel::m_cLeftWheelToBodyJointOffset(0.0, 0.0015, -0.0);
    const btQuaternion CDynamics3DPiPuckModel::m_cBodyToLeftWheelJointRotation(btVector3(1,0,0), SIMD_HALF_PI);
+   /* TODO calibrate these values */
    const btScalar     CDynamics3DPiPuckModel::m_fWheelMotorMaxImpulse(0.15);
+   const btScalar     CDynamics3DPiPuckModel::m_fWheelFriction(5.0);
 
    /****************************************/
    /****************************************/
