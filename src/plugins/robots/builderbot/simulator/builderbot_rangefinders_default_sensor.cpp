@@ -46,22 +46,22 @@ namespace argos {
       SAnchor& sOriginAnchor = m_pcEmbodiedEntity->GetOriginAnchor();
       SAnchor& sEndEffectorAnchor = m_pcEmbodiedEntity->GetAnchor("end_effector");
       /* instantiate sensors */
-      m_vecSimulatedInterfaces.emplace_back("1", sOriginAnchor, 0.05f);
-      m_vecSimulatedInterfaces.emplace_back("2", sOriginAnchor, 0.05f);
-      m_vecSimulatedInterfaces.emplace_back("3", sOriginAnchor, 0.05f);
-      m_vecSimulatedInterfaces.emplace_back("4", sOriginAnchor, 0.05f);
-      m_vecSimulatedInterfaces.emplace_back("5", sOriginAnchor, 0.05f);
-      m_vecSimulatedInterfaces.emplace_back("6", sOriginAnchor, 0.05f);
-      m_vecSimulatedInterfaces.emplace_back("7", sOriginAnchor, 0.05f);
-      m_vecSimulatedInterfaces.emplace_back("8", sOriginAnchor, 0.05f);
-      m_vecSimulatedInterfaces.emplace_back("9", sOriginAnchor, 0.05f);
-      m_vecSimulatedInterfaces.emplace_back("10", sOriginAnchor, 0.05f);
-      m_vecSimulatedInterfaces.emplace_back("11", sOriginAnchor, 0.05f);
-      m_vecSimulatedInterfaces.emplace_back("12", sOriginAnchor, 0.05f);
-      m_vecSimulatedInterfaces.emplace_back("left", sEndEffectorAnchor, 0.05f);
-      m_vecSimulatedInterfaces.emplace_back("right", sEndEffectorAnchor, 0.05f);
-      m_vecSimulatedInterfaces.emplace_back("underneath", sEndEffectorAnchor, 0.05f);
-      m_vecSimulatedInterfaces.emplace_back("front", sEndEffectorAnchor, 0.05f);
+      m_vecSimulatedInterfaces.emplace_back("1", sOriginAnchor, 0.05);
+      m_vecSimulatedInterfaces.emplace_back("2", sOriginAnchor, 0.05);
+      m_vecSimulatedInterfaces.emplace_back("3", sOriginAnchor, 0.05);
+      m_vecSimulatedInterfaces.emplace_back("4", sOriginAnchor, 0.05);
+      m_vecSimulatedInterfaces.emplace_back("5", sOriginAnchor, 0.05);
+      m_vecSimulatedInterfaces.emplace_back("6", sOriginAnchor, 0.05);
+      m_vecSimulatedInterfaces.emplace_back("7", sOriginAnchor, 0.05);
+      m_vecSimulatedInterfaces.emplace_back("8", sOriginAnchor, 0.05);
+      m_vecSimulatedInterfaces.emplace_back("9", sOriginAnchor, 0.05);
+      m_vecSimulatedInterfaces.emplace_back("10", sOriginAnchor, 0.05);
+      m_vecSimulatedInterfaces.emplace_back("11", sOriginAnchor, 0.05);
+      m_vecSimulatedInterfaces.emplace_back("12", sOriginAnchor, 0.05);
+      m_vecSimulatedInterfaces.emplace_back("left", sEndEffectorAnchor, 0.05);
+      m_vecSimulatedInterfaces.emplace_back("right", sEndEffectorAnchor, 0.05);
+      m_vecSimulatedInterfaces.emplace_back("underneath", sEndEffectorAnchor, 0.05);
+      m_vecSimulatedInterfaces.emplace_back("front", sEndEffectorAnchor, 0.05);
       /* copy pointers to the the base class */
       for(SSimulatedInterface& s_simulated_interface : m_vecSimulatedInterfaces) {
          m_vecInterfaces.push_back(&s_simulated_interface);
@@ -112,7 +112,7 @@ namespace argos {
          }
          else {
             /* No intersection */
-            s_simulated_interface.Proximity = 0.0f;
+            s_simulated_interface.Proximity = 0.05;
             if(m_bShowRays) {
                m_pcControllableEntity->AddCheckedRay(false, cScanningRay);
             }
@@ -125,7 +125,7 @@ namespace argos {
    
    void CBuilderBotRangefindersDefaultSensor::Reset() {
       for(SSimulatedInterface& s_simulated_interface : m_vecSimulatedInterfaces) {
-         s_simulated_interface.Proximity = 0.0f;
+         s_simulated_interface.Proximity = 0.05;
       }
    }
    

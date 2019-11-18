@@ -27,8 +27,8 @@ namespace argos {
       struct SInterface {
          SInterface(const std::string& str_label) :
             Label(str_label),
-            Proximity(0.0f),
-            Illuminance(0.0f),
+            Proximity(0.05),
+            Illuminance(0.0),
             Anchor(std::get<std::string>(m_mapSensorConfig.at(str_label))),
             PositionOffset(std::get<CVector3>(m_mapSensorConfig.at(str_label))),
             OrientationOffset(std::get<CQuaternion>(m_mapSensorConfig.at(str_label))) {}
