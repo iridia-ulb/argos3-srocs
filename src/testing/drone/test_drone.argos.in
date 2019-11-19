@@ -20,14 +20,16 @@
           <interface id="log" output="stdout" />
           <interface id="draw" />
         </debug>
-        <drone_wifi implementation="default" />
+        <drone_flight_system implementation="default" />
+        <wifi implementation="default" />
       </actuators>
       <sensors>
-        <drone_cameras_system implementation="default"
-          show_frustum="true" show_tag_rays="true" show_led_rays="true" />
-        <drone_wifi implementation="default" />
+        <!--drone_cameras_system implementation="default"
+          show_frustum="true" show_tag_rays="true" show_led_rays="true" /-->
+        <drone_flight_system implementation="default" />
+        <wifi implementation="default" />
       </sensors>
-      <params script="test_drone_simulator.lua" />
+      <params script="@CMAKE_BINARY_DIR@/testing/drone/test_drone.lua" />
     </lua_controller>
 
   </controllers>
@@ -35,9 +37,9 @@
   <!-- *********************** -->
   <!-- * Arena configuration * -->
   <!-- *********************** -->
-  <arena size="1, 1, 200" center="0, 0, 0.5">
+  <arena size="3, 3, 1.5" center="0, 0, 0.5">
     <drone id="drone">
-      <body position="0,0,0.25" orientation="0,0,0"/>
+      <body position="0,0,0.125" orientation="0,0,0"/>
       <controller config="drone"/>
     </drone> 
   </arena>
@@ -46,11 +48,7 @@
   <!-- * Physics engines * -->
   <!-- ******************* -->
   <physics_engines>
-    <dynamics3d id="dyn3d" iterations="25" default_friction="10">
-      <gravity g="9.8" />
-      <floor friction="10" />
-      <flight_dynamics />
-    </dynamics3d>
+    <pointmass3d id="pm3d" iterations="10" />
   </physics_engines>
 
   <!-- ********* -->
@@ -59,7 +57,6 @@
   <media>
     <directional_led id="directional_leds" index="grid" grid_size="20,20,20"/>
     <tag id="tags" index="grid" grid_size="20,20,20" />
-    <radio id="nfc" index="grid" grid_size="20,20,20" />
     <radio id="wifi" index="grid" grid_size="20,20,20" />
   </media>
 
@@ -71,15 +68,15 @@
     <qt-opengl lua_editor="true">
       <!--user_functions label="srocs_qtopengl_user_functions" /-->
       <camera>
-        <placement idx="0" position=" 0,  -2.5,1" look_at="0,0,0.05" lens_focal_length="78" />
-        <placement idx="1" position=" 2.5,-2.5,1" look_at="0,0,0.05" lens_focal_length="92" />
-        <placement idx="2" position=" 2.5, 0,  1" look_at="0,0,0.05" lens_focal_length="78" />
-        <placement idx="3" position=" 2.5, 2.5,1" look_at="0,0,0.05" lens_focal_length="92" />
-        <placement idx="4" position=" 0,   2.5,1" look_at="0,0,0.05" lens_focal_length="78" />
-        <placement idx="5" position="-2.5, 2.5,1" look_at="0,0,0.05" lens_focal_length="92" />
-        <placement idx="6" position="-2.5, 0,  1" look_at="0,0,0.05" lens_focal_length="78" />
-        <placement idx="7" position="-2.5,-2.5,1" look_at="0,0,0.05" lens_focal_length="92" />
-        <placement idx="8" position="0,0,0.5" look_at="0.0,0.0,0.125" up="1,0,0" lens_focal_length="40" />
+        <placement idx="0" position=" 0,  -7.5,2" look_at="0,0,0.05" lens_focal_length="78" />
+        <placement idx="1" position=" 7.5,-7.5,2" look_at="0,0,0.05" lens_focal_length="92" />
+        <placement idx="2" position=" 7.5, 0,  2" look_at="0,0,0.05" lens_focal_length="78" />
+        <placement idx="3" position=" 7.5, 7.5,2" look_at="0,0,0.05" lens_focal_length="92" />
+        <placement idx="4" position=" 0,   7.5,2" look_at="0,0,0.05" lens_focal_length="78" />
+        <placement idx="5" position="-7.5, 7.5,2" look_at="0,0,0.05" lens_focal_length="92" />
+        <placement idx="6" position="-7.5, 0,  2" look_at="0,0,0.05" lens_focal_length="78" />
+        <placement idx="7" position="-7.5,-7.5,2" look_at="0,0,0.05" lens_focal_length="92" />
+        <placement idx="8" position="0,0,2.5" look_at="0.0,0.0,0.125" up="1,0,0" lens_focal_length="40" />
       </camera>
     </qt-opengl>
   </visualization>

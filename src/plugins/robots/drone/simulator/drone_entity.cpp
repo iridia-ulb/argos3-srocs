@@ -9,11 +9,12 @@
 #include <argos3/core/simulator/simulator.h>
 #include <argos3/core/simulator/entity/controllable_entity.h>
 #include <argos3/core/simulator/entity/embodied_entity.h>
+
 #include <argos3/plugins/simulator/entities/radio_equipped_entity.h>
 #include <argos3/plugins/simulator/entities/debug_entity.h>
-
 #include <argos3/plugins/simulator/media/radio_medium.h>
-//#include <argos3/plugins/robots/drone/simulator/drone_flight_system_entity.h>
+
+#include <argos3/plugins/robots/drone/simulator/drone_flight_system_entity.h>
 
 namespace argos {
 
@@ -30,7 +31,7 @@ namespace argos {
       m_pcControllableEntity(nullptr),
       m_pcDebugEntity(nullptr),
       m_pcEmbodiedEntity(nullptr),
-//      m_pcFlightSystemEntity(nullptr),
+      m_pcFlightSystemEntity(nullptr),
       m_bDebug(false) {}
 
    /****************************************/
@@ -50,12 +51,10 @@ namespace argos {
          /* get mediums */
          CRadioMedium& cWifiRadioMedium = CSimulator::GetInstance().GetMedium<CRadioMedium>("wifi");
          /* create and initialize the flight system entity */
-         /*
          m_pcFlightSystemEntity = 
             new CDroneFlightSystemEntity(this, "flight_system_0");
          AddComponent(*m_pcFlightSystemEntity);
          m_pcFlightSystemEntity->Enable();
-         */
          /* create and initialize a radio equipped entity for WiFi */
          m_pcWifiRadioEquippedEntity = new CRadioEquippedEntity(this, "radios_0");
          AddComponent(*m_pcWifiRadioEquippedEntity);

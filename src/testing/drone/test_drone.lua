@@ -6,11 +6,9 @@ end
 --[[ This function is executed at each time step
      It must contain the logic of your controller ]]
 function step()
-   if robot.debug ~= nil then
-      robot.debug.draw("arrow(red)(0.125,0,0.05)(0.25,0,0.05)")
-      robot.debug.draw("arrow(green)(0,0.125,0.05)(0,0.25,0.05)")
-      robot.debug.draw("arrow(blue)(0,0,0.25)(0,0,0.50)")
-   end
+   robot.flight_system.set_targets(vector3(1,1,1), 1)
+   log("accelerometer = ", tostring(robot.flight_system.accelerometer))
+   log("gyroscope = ", tostring(robot.flight_system.gyroscope))
 end
 
 --[[ This function is executed every time you press the 'reset'
