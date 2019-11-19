@@ -6,6 +6,7 @@ set(ARGOS3_HEADERS_PLUGINS_ROBOTS_PIPUCK_CONTROLINTERFACE
   control_interface/ci_pipuck_camera_system_sensor.h
   control_interface/ci_pipuck_differential_drive_actuator.h
   control_interface/ci_pipuck_differential_drive_sensor.h
+  control_interface/ci_pipuck_ground_sensor.h
   control_interface/ci_pipuck_system_sensor.h
   control_interface/ci_pipuck_rangefinders_sensor.h)
 if(ARGOS_BUILD_FOR_SIMULATOR)
@@ -17,6 +18,7 @@ if(ARGOS_BUILD_FOR_SIMULATOR)
     simulator/pipuck_differential_drive_default_sensor.h
     simulator/pipuck_differential_drive_entity.h
     simulator/pipuck_entity.h
+    simulator/pipuck_ground_default_sensor.h
     simulator/pipuck_system_default_sensor.h
     simulator/pipuck_rangefinders_default_sensor.h)
   if(ARGOS_COMPILE_QTOPENGL)
@@ -31,6 +33,7 @@ elseif(ARGOS_BUILD_FOR STREQUAL "pipuck")
     hardware/pipuck_camera_system_default_sensor.h
     hardware/pipuck_differential_drive_default_actuator.h
     hardware/pipuck_differential_drive_default_sensor.h
+    #hardware/pipuck_ground_default_sensor.h
     hardware/pipuck_system_default_sensor.h
     hardware/pipuck_rangefinders_default_sensor.h)
 endif(ARGOS_BUILD_FOR_SIMULATOR)
@@ -44,6 +47,7 @@ set(ARGOS3_SOURCES_PLUGINS_ROBOTS_PIPUCK
   control_interface/ci_pipuck_camera_system_sensor.cpp
   control_interface/ci_pipuck_differential_drive_actuator.cpp
   control_interface/ci_pipuck_differential_drive_sensor.cpp
+  control_interface/ci_pipuck_ground_sensor.cpp
   control_interface/ci_pipuck_system_sensor.cpp
   control_interface/ci_pipuck_rangefinders_sensor.cpp)
 if(ARGOS_BUILD_FOR_SIMULATOR)
@@ -57,6 +61,7 @@ if(ARGOS_BUILD_FOR_SIMULATOR)
     simulator/pipuck_differential_drive_default_sensor.cpp
     simulator/pipuck_differential_drive_entity.cpp
     simulator/pipuck_entity.cpp
+    simulator/pipuck_ground_default_sensor.cpp
     simulator/pipuck_system_default_sensor.cpp
     simulator/pipuck_rangefinders_default_sensor.cpp)
   if(ARGOS_COMPILE_QTOPENGL)
@@ -74,11 +79,7 @@ elseif(ARGOS_BUILD_FOR STREQUAL "pipuck")
     hardware/pipuck_camera_system_default_sensor.cpp
     hardware/pipuck_differential_drive_default_actuator.cpp
     hardware/pipuck_differential_drive_default_sensor.cpp
-    hardware/pipuck_electromagnet_system_default_actuator.cpp
-    hardware/pipuck_electromagnet_system_default_sensor.cpp
-    hardware/pipuck_lift_system_default_actuator.cpp
-    hardware/pipuck_lift_system_default_sensor.cpp
-    hardware/pipuck_nfc_default_actuator.cpp
+    #hardware/pipuck_ground_default_sensor.cpp
     hardware/pipuck_system_default_sensor.cpp
     hardware/pipuck_rangefinders_default_sensor.cpp)
 endif(ARGOS_BUILD_FOR_SIMULATOR)

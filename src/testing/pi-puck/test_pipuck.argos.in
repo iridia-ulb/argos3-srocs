@@ -27,14 +27,12 @@
         <!--pipuck_camera_system implementation="default"
           calibration="src/calibration/builderbot_camera_system.xml"
           show_frustum="true" show_tag_rays="true" show_led_rays="true" /-->
-        <pipuck_rangefinders implementation="default"
-          calibration="src/calibration/builderbot_rangefinders.xml"
-          show_rays="true" />
-        <pipuck_differential_drive implementation="default"
-          calibration="src/calibration/builderbot_differential_drive.xml" />
+        <pipuck_rangefinders implementation="default" />
+        <pipuck_differential_drive implementation="default" />
+        <!--pipuck_ground implementation="default" show_rays="true" /-->
         <wifi implementation="default" />
       </sensors>
-      <params script="test_pipuck.lua" />
+      <params script="@CMAKE_BINARY_DIR@/testing/pi-puck/test_pipuck.lua" />
     </lua_controller>
 
   </controllers>
@@ -42,13 +40,25 @@
   <!-- *********************** -->
   <!-- * Arena configuration * -->
   <!-- *********************** -->
-  <arena size="1, 1, 2" center="0, 0, 0.5">
-
+  <arena size="1, 1, 1" center="0, 0, 0.25">
+    <floor id="floor" source="image" pixels_per_meter="1000"
+           path="@CMAKE_BINARY_DIR@/testing/pi-puck/test_pipuck_track.png" />
+    <box id="north" size="0.025,0.975,0.025" movable="false" mass="10">
+      <body position="0.4875,0.0125,0"  orientation="0,0,0" />
+    </box>
+    <box id="east" size="0.975,0.025,0.025" movable="false" mass="10">
+      <body position="0.0125,-0.4875,0"  orientation="0,0,0" />
+    </box>
+    <box id="south" size="0.025,0.975,0.025" movable="false" mass="10">
+      <body position="-0.4875,-0.0125,0"  orientation="0,0,0" />
+    </box>
+    <box id="west" size="0.975,0.025,0.025" movable="false" mass="10">
+      <body position="-0.0125,0.4875,0"  orientation="0,0,0" />
+    </box>
     <pipuck id="pipuck" debug="false">
       <body position="0,0,0" orientation="0,0,0"/>
       <controller config="pipuck"/>
     </pipuck>
-   
   </arena>
 
   <!-- ******************* -->
@@ -58,7 +68,6 @@
     <dynamics3d id="dyn3d" iterations="25" default_friction="10">
       <gravity g="9.8" />
       <floor friction="10" />
-      <virtual_magnetism />
     </dynamics3d>
   </physics_engines>
 
@@ -68,7 +77,6 @@
   <media>
     <directional_led id="directional_leds" index="grid" grid_size="20,20,20"/>
     <tag id="tags" index="grid" grid_size="20,20,20" />
-    <radio id="nfc" index="grid" grid_size="20,20,20" />
     <radio id="wifi" index="grid" grid_size="20,20,20" />
   </media>
 
