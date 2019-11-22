@@ -15,9 +15,9 @@ namespace argos {
 #include <argos3/core/utility/math/vector3.h>
 #include <argos3/core/utility/math/quaternion.h>
 
-#include <array>
 #include <map>
 #include <tuple>
+#include <functional>
 
 namespace argos {
 
@@ -25,9 +25,25 @@ namespace argos {
 
    public:
 
+      using TConfiguration = std::tuple<std::string, CVector3, CQuaternion, Real>;
+
+      struct SInterface {
+         /* constructor */
+         SInterface(const std::string& str_label) :
+            Label(str_label),
+            Configuration(m_mapSensorConfig.at(str_label)),
+            Reading(0.0) {}
+         /* members */
+         const std::string& Label;
+         const TConfiguration& Configuration;
+         Real Reading;
+      };
+
+   public:
+
       virtual ~CCI_PiPuckGroundSensor() {}
 
-      const std::array<Real, 3>& GetReadings() const;
+      virtual void ForEachInterface(std::function<void(const SInterface&)>) = 0;
 
 #ifdef ARGOS_WITH_LUA
       virtual void CreateLuaState(lua_State* pt_lua_state);
@@ -37,9 +53,7 @@ namespace argos {
 
    protected:
 
-      std::array<Real, 3> m_arrReadings;
-
-      static const std::map<UInt8, std::tuple<std::string, CVector3, CQuaternion> > m_mapSensorConfig;
+      static const std::map<std::string, TConfiguration> m_mapSensorConfig;
 
    };
 

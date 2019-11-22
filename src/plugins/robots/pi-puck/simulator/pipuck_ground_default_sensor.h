@@ -22,6 +22,18 @@ namespace argos {
 
    public:
 
+      struct SSimulatedInterface : SInterface {
+         /* constructor */
+         SSimulatedInterface(const std::string& str_label,
+                             const SAnchor& s_anchor) :
+            SInterface(str_label),
+            Anchor(s_anchor) {}
+         /* members */
+         const SAnchor& Anchor;
+      };
+
+   public:
+
       CPiPuckGroundDefaultSensor();
 
       virtual ~CPiPuckGroundDefaultSensor() {}
@@ -34,13 +46,15 @@ namespace argos {
 
       virtual void Reset();
 
-   protected:
+      virtual void ForEachInterface(std::function<void(const SInterface&)> fn);
 
-      /** Reference to embodied entity associated to this sensor */
-      CEmbodiedEntity* m_pcEmbodiedEntity;
+   private:
 
-      /** Reference to floor entity */
-      CFloorEntity* m_pcFloorEntity;
+      bool m_bShowRays;
+      CControllableEntity* m_pcControllableEntity;
+      CFloorEntity& m_cFloorEntity;
+      std::vector<SSimulatedInterface> m_vecSimulatedInterfaces;
+      static const CPlane m_cFloor;
 
    };
 

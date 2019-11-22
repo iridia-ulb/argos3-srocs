@@ -18,15 +18,24 @@ namespace argos {
    /****************************************/
 
    CPiPuckGroundDefaultSensor::CPiPuckGroundDefaultSensor() :
-      m_pcEmbodiedEntity(nullptr),
-      m_pcFloorEntity(nullptr) {}
+      m_bShowRays(false),
+      m_pcControllableEntity(nullptr),
+      m_cFloorEntity(CSimulator::GetInstance().GetSpace().GetFloorEntity()) {}
 
    /****************************************/
    /****************************************/
 
    void CPiPuckGroundDefaultSensor::SetRobot(CComposableEntity& c_entity) {
-      m_pcEmbodiedEntity = &(c_entity.GetComponent<CEmbodiedEntity>("body"));
-      m_pcFloorEntity = &CSimulator::GetInstance().GetSpace().GetFloorEntity();
+      m_pcControllableEntity = &(c_entity.GetComponent<CControllableEntity>("controller"));
+      /* allocate memory for the sensor interfaces */
+      m_vecSimulatedInterfaces.reserve(m_mapSensorConfig.size());
+      /* get the anchors for the sensor interfaces from m_mapSensorConfig */
+      for(const std::pair<const std::string, TConfiguration>& t_config : m_mapSensorConfig) {
+         const std::string& strAnchor = std::get<std::string>(t_config.second);
+         SAnchor& sAnchor =
+            c_entity.GetComponent<CEmbodiedEntity>("body").GetAnchor(strAnchor);
+         m_vecSimulatedInterfaces.emplace_back(t_config.first, sAnchor);
+      }
    }
 
    /****************************************/
@@ -35,9 +44,10 @@ namespace argos {
    void CPiPuckGroundDefaultSensor::Init(TConfigurationNode& t_tree) {
       try {
          CCI_PiPuckGroundSensor::Init(t_tree);
+         GetNodeAttributeOrDefault(t_tree, "show_rays", m_bShowRays, m_bShowRays);
       }
       catch(CARGoSException& ex) {
-         THROW_ARGOSEXCEPTION_NESTED("Initialization error in pipuck ground sensor", ex);
+         THROW_ARGOSEXCEPTION_NESTED("Initialization error in Pi-Puck ground sensor", ex);
       }
    }
 
@@ -45,30 +55,32 @@ namespace argos {
    /****************************************/
 
    void CPiPuckGroundDefaultSensor::Update() {
-      using TSensorConfig = 
-         std::pair<const UInt8, std::tuple<std::string, CVector3, CQuaternion> >;
-      CPlane cFloor(m_pcEmbodiedEntity->GetOriginAnchor().Position, CVector3::Z);
       CVector3 cRayStart, cRayEnd, cIntersection;
       CRay3 cSensorRay;
       /* go through the sensors */
-      for(const TSensorConfig& t_config : m_mapSensorConfig) {
-         // fix this calculation
-         /*
-         cRayStart = s_simulated_interface.PositionOffset;
-         cRayStart.Rotate(s_simulated_interface.Anchor.Orientation);
-         cRayStart += s_simulated_interface.Anchor.Position;
-         cRayEnd = CVector3::Z * s_simulated_interface.Range;
-         cRayEnd.Rotate(s_simulated_interface.OrientationOffset);
-         cRayEnd.Rotate(s_simulated_interface.Anchor.Orientation);
+      for(SSimulatedInterface& s_interface : m_vecSimulatedInterfaces) {
+         cRayStart = std::get<CVector3>(s_interface.Configuration);
+         cRayStart.Rotate(s_interface.Anchor.Orientation);
+         cRayStart += s_interface.Anchor.Position;
+         cRayEnd = CVector3::Z * std::get<Real>(s_interface.Configuration);
+         cRayEnd.Rotate(std::get<CQuaternion>(s_interface.Configuration));
+         cRayEnd.Rotate(s_interface.Anchor.Orientation);
          cRayEnd += cRayStart;
          cSensorRay.Set(cRayStart, cRayEnd);
-         cSensorRay.Intersects(cFloor, cIntersection);
-         */
-         /* Get the color */
-         const CColor& cColor =
-            m_pcFloorEntity->GetColorAtPoint(cIntersection.GetX(), cIntersection.GetY());
-         /* Set the reading */
-         m_arrReadings[t_config.first] = cColor.ToGrayScale() / 255.0;
+         bool bIntersection = cSensorRay.Intersects(m_cFloor, cIntersection);
+         if(m_bShowRays) {
+            m_pcControllableEntity->GetCheckedRays().emplace_back(bIntersection, cSensorRay);
+         }
+         if(bIntersection) {
+            /* get the color */
+            const CColor& cColor =
+               m_cFloorEntity.GetColorAtPoint(cIntersection.GetX(), cIntersection.GetY());
+            /* set reading */
+            s_interface.Reading = cColor.ToGrayScale() / 255.0;
+         }
+         else {
+            s_interface.Reading = 1.0;
+         }
       }
    }
 
@@ -76,10 +88,24 @@ namespace argos {
    /****************************************/
 
    void CPiPuckGroundDefaultSensor::Reset() {
-      for(Real& f_reading : m_arrReadings) {
-         f_reading = 0.0;
+      for(SSimulatedInterface& s_interface : m_vecSimulatedInterfaces) {
+         s_interface.Reading = 0.0;
       }
    }
+
+   /****************************************/
+   /****************************************/
+
+   void CPiPuckGroundDefaultSensor::ForEachInterface(std::function<void(const SInterface&)> fn) {
+      for(const SSimulatedInterface& s_interface : m_vecSimulatedInterfaces) {
+         fn(s_interface);
+      }
+   }
+
+   /****************************************/
+   /****************************************/
+
+   const CPlane CPiPuckGroundDefaultSensor::m_cFloor(CVector3::ZERO, CVector3::Z);
 
    /****************************************/
    /****************************************/
@@ -88,9 +114,12 @@ namespace argos {
                    "pipuck_ground", "default",
                    "Michael Allwright [allsey87@gmail.com]",
                    "1.0",
-                   "The PiPuck ground sensor.",
-                   "Long description",
+                   "The pipuck ground sensor.",
+                   "This sensor measures the color of the ground beneath the pipuck.",
                    "Usable"
    );
+
+   /****************************************/
+   /****************************************/
 
 }

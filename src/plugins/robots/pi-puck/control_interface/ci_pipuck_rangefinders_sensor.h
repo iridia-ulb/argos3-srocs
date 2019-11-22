@@ -17,6 +17,7 @@ namespace argos {
 
 #include <map>
 #include <tuple>
+#include <functional>
 
 namespace argos {
 
@@ -24,26 +25,21 @@ namespace argos {
 
    public:
 
+      using TConfiguration = std::tuple<std::string, CVector3, CQuaternion, Real>;
+
       struct SInterface {
-         SInterface(const std::string& str_label) :
-            Label(str_label),
-            Proximity(0.0f),
-            Illuminance(0.0f),
-            Anchor(std::get<std::string>(m_mapSensorConfig.at(str_label))),
-            PositionOffset(std::get<CVector3>(m_mapSensorConfig.at(str_label))),
-            OrientationOffset(std::get<CQuaternion>(m_mapSensorConfig.at(str_label))) {}
-         std::string Label;
-         Real Proximity;
-         Real Illuminance;
-         const std::string& Anchor;
-         const CVector3& PositionOffset;
-         const CQuaternion& OrientationOffset;
-         using TVector = std::vector<SInterface*>;
+         SInterface(const UInt8& un_label) :
+            Label(un_label),
+            Configuration(m_mapSensorConfig.at(un_label)),
+            Reading(0.0f) {}
+         const UInt8& Label;
+         const TConfiguration& Configuration;
+         Real Reading;
       };
 
       virtual ~CCI_PiPuckRangefindersSensor() {}
 
-      const SInterface::TVector& GetInterfaces() const;
+      virtual void ForEachInterface(std::function<void(const SInterface&)>) = 0;
 
 #ifdef ARGOS_WITH_LUA
       virtual void CreateLuaState(lua_State* pt_lua_state);
@@ -53,9 +49,7 @@ namespace argos {
 
    protected:
 
-      SInterface::TVector m_vecInterfaces;
-
-      static const std::map<std::string, std::tuple<std::string, CVector3, CQuaternion> > m_mapSensorConfig;
+      static const std::map<UInt8, TConfiguration> m_mapSensorConfig;
 
    };
 

@@ -28,12 +28,12 @@ namespace argos {
 
       struct SSimulatedInterface : SInterface {
          /* constructor */
-         SSimulatedInterface(const std::string& str_label,
-                             const SAnchor& s_anchor,
-                             Real f_range);
+         SSimulatedInterface(const UInt8& un_label,
+                             const SAnchor& s_anchor) :
+            SInterface(un_label),
+            Anchor(s_anchor) {}
          /* members */
          const SAnchor& Anchor;
-         Real Range;
       };
 
       CPiPuckRangefindersDefaultSensor();
@@ -48,7 +48,10 @@ namespace argos {
 
       virtual void Reset();
 
+      virtual void ForEachInterface(std::function<void(const SInterface&)> fn);
+
    private:
+
       Real ConvertToMeters(Real f_raw) {
          static const Real fConversionFactor = Real(1.0);
          return (f_raw * fConversionFactor);
@@ -60,11 +63,9 @@ namespace argos {
       }
 
    private:
-      CEmbodiedEntity* m_pcEmbodiedEntity;
-      CControllableEntity* m_pcControllableEntity;
 
       bool m_bShowRays;
-
+      CControllableEntity* m_pcControllableEntity;
       std::vector<SSimulatedInterface> m_vecSimulatedInterfaces;
 
    };
