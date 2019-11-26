@@ -53,9 +53,9 @@ namespace argos {
    /****************************************/
 
    const std::map<std::string, CCI_PiPuckGroundSensor::TConfiguration> CCI_PiPuckGroundSensor::m_mapSensorConfig = {
-      std::make_pair("left",   std::make_tuple("origin", CVector3(0.03,  0.009, 0.001), CQuaternion(CRadians::PI, CVector3::Y), 0.005)),
-      std::make_pair("center", std::make_tuple("origin", CVector3(0.03,  0.0,   0.001), CQuaternion(CRadians::PI, CVector3::Y), 0.005)),
-      std::make_pair("right",  std::make_tuple("origin", CVector3(0.03, -0.009, 0.001), CQuaternion(CRadians::PI, CVector3::Y), 0.005)),
+      std::make_pair("left",   std::make_tuple("origin", CVector3(0.03,  0.01, 0.002), CQuaternion(CRadians::PI, CVector3::Y), 0.005)),
+      std::make_pair("center", std::make_tuple("origin", CVector3(0.03,  0.0,   0.002), CQuaternion(CRadians::PI, CVector3::Y), 0.005)),
+      std::make_pair("right",  std::make_tuple("origin", CVector3(0.03, -0.01, 0.002), CQuaternion(CRadians::PI, CVector3::Y), 0.005)),
    };
 
    /****************************************/
