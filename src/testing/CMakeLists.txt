@@ -14,8 +14,19 @@ configure_file(
   ${CMAKE_BINARY_DIR}/testing/pi-puck/test_pipuck.lua
   COPYONLY)
 configure_file(
-  ${CMAKE_SOURCE_DIR}/testing/pi-puck/test_pipuck_track.png
-  ${CMAKE_BINARY_DIR}/testing/pi-puck/test_pipuck_track.png
+  ${CMAKE_SOURCE_DIR}/testing/pi-puck/test_pipuck.png
+  ${CMAKE_BINARY_DIR}/testing/pi-puck/test_pipuck.png
+  COPYONLY)
+configure_file(
+  ${CMAKE_SOURCE_DIR}/testing/pi-puck/calibrate_pipuck.argos.in
+  ${CMAKE_BINARY_DIR}/testing/pi-puck/calibrate_pipuck.argos)
+configure_file(
+  ${CMAKE_SOURCE_DIR}/testing/pi-puck/calibrate_pipuck.lua
+  ${CMAKE_BINARY_DIR}/testing/pi-puck/calibrate_pipuck.lua
+  COPYONLY)
+configure_file(
+  ${CMAKE_SOURCE_DIR}/testing/pi-puck/calibrate_pipuck.png
+  ${CMAKE_BINARY_DIR}/testing/pi-puck/calibrate_pipuck.png
   COPYONLY)
 # Drone
 configure_file(
