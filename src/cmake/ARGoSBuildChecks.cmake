@@ -46,27 +46,6 @@ endif(NOT ARGOS_FOUND)
 include_directories(${ARGOS_INCLUDE_DIR})
 
 #
-# Check for dynamic library loading facility
-#
-if(ARGOS_DYNAMIC_LIBRARY_LOADING)
-  find_package(DLFCN)
-  if(NOT DLFCN_FOUND)
-    message(FATAL_ERROR "Required library dl not found.")
-  endif(NOT DLFCN_FOUND)
-  include_directories(${DLFCN_INCLUDE_DIR})
-endif(ARGOS_DYNAMIC_LIBRARY_LOADING)
-
-#
-# Check for PThreads
-#
-find_package(Pthreads)
-if(NOT PTHREADS_FOUND)
- message(FATAL_ERROR "Required library pthreads not found.")
-endif(NOT PTHREADS_FOUND)
-add_definitions(${PTHREADS_DEFINITIONS})
-include_directories(${PTHREADS_INCLUDE_DIR})
-
-#
 # Check for the AprilTag library
 # It is required only when compiling for the hardware
 #
@@ -112,36 +91,4 @@ if(ARGOS_BUILD_FOR STREQUAL "builderbot")
   endif(NOT MEDIACTL_FOUND)
   include_directories(${MEDIACTL_INCLUDE_DIR})
 endif(ARGOS_BUILD_FOR STREQUAL "builderbot")
-
-
-#
-# Check for Doxygen
-#
-set(ARGOS_BUILD_API OFF)
-if(ARGOS_DOCUMENTATION)
-  find_package(Doxygen)
-  if(DOXYGEN_FOUND)
-    if(DOXYGEN_DOT_FOUND)
-      set(ARGOS_BUILD_API ON)
-    else(DOXYGEN_DOT_FOUND)
-      message(WARNING "GraphViz/Dot not found, API documentation won't be generated")
-    endif(DOXYGEN_DOT_FOUND)
-  else(DOXYGEN_FOUND)
-    message(WARNING "Doxygen not found, API documentation won't be generated")
-  endif(DOXYGEN_FOUND)
-endif(ARGOS_DOCUMENTATION)
-
-#
-# Check for ASCIIDoc
-#
-find_package(ASCIIDoc)
-
-#
-# Check for Lua 5.2
-#
-find_package(Lua52)
-if(LUA52_FOUND)
-  set(ARGOS_WITH_LUA ON)
-  include_directories(${LUA_INCLUDE_DIR})
-endif(LUA52_FOUND)
 
