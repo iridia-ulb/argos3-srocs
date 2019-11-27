@@ -28,10 +28,14 @@ namespace argos {
 
       virtual void Init(TConfigurationNode& t_tree);
 
-      virtual void DrawInWorld() {}
+      virtual void EntityMoved(CEntity& c_entity,
+                               const CVector3& c_old_pos,
+                               const CVector3& c_new_pos);
 
       using CQTOpenGLUserFunctions::Draw;
       virtual void Draw(CBuilderBotEntity& c_builderbot);
+
+
 
    public slots:
 

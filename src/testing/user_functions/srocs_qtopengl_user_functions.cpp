@@ -5,6 +5,7 @@
 #include <argos3/plugins/simulator/visualizations/qt-opengl/qtopengl_render.h>
 #include <argos3/plugins/simulator/visualizations/qt-opengl/qtopengl_main_window.h>
 #include <argos3/plugins/robots/builderbot/simulator/builderbot_entity.h>
+#include <argos3/plugins//simulator/entities/block_entity.h>
 #include <argos3/plugins/simulator/entities/debug_entity.h>
 
 #include <QDockWidget>
@@ -17,6 +18,7 @@
 #include "builderbot_qtopengl_widget.h"
 
 #define GL_NUMBER_VERTICES 36u
+#define BLOCK_SIDE_LENGTH 0.055
 
 namespace argos {
 
@@ -33,6 +35,45 @@ namespace argos {
 
    CSRoCSQTOpenGLUserFunctions::~CSRoCSQTOpenGLUserFunctions() {
 
+   }
+
+   /********************************************************************************/
+   /********************************************************************************/
+
+   void CSRoCSQTOpenGLUserFunctions::EntityMoved(CEntity& c_entity,
+                                                 const CVector3& c_old_pos,
+                                                 const CVector3& c_new_pos) {
+      /* was a builderbot moved? */
+      CBuilderBotEntity* pcBuilderBot = dynamic_cast<CBuilderBotEntity*>(&c_entity);
+      if(pcBuilderBot == nullptr) {
+         return;
+      }
+      /* at this point the end effector of the robot has already been moved, 
+         so we need to figure out where it was */
+      const SAnchor& sEndEffectorAnchor = 
+         pcBuilderBot->GetEmbodiedEntity().GetAnchor("end_effector");
+      CVector3 cDeltaPos(c_new_pos - c_old_pos);
+      CVector3 cOldEndEffectorPos(sEndEffectorAnchor.Position - cDeltaPos);
+      /* get the potential position of a block */
+      CVector3 cBlockTestPos = cOldEndEffectorPos - (CVector3::Z * BLOCK_SIDE_LENGTH);
+      try {
+         using TValueType = std::pair<const std::string, CAny>;
+         for(const TValueType& t_block : m_pcSpace->GetEntitiesByType("block")) {
+            CEmbodiedEntity& cEmbodiedEntity = 
+               any_cast<CBlockEntity*>(t_block.second)->GetEmbodiedEntity();
+            const SAnchor& sBlockAnchor = cEmbodiedEntity.GetOriginAnchor();
+            /* if the origin of a block is within 0.005 meters of where
+               we expected to find a block, move it */
+            if(Distance(cBlockTestPos, sBlockAnchor.Position) < 0.005) {
+               /* here, we drop the blocks position by 0.0005 meters to compensate for 
+                  inaccuracies in the physics engine */
+               cEmbodiedEntity.MoveTo(sBlockAnchor.Position + cDeltaPos - (CVector3::Z * 0.0005),
+                                      sBlockAnchor.Orientation);
+               return;
+            }
+         }
+      }
+      catch(CARGoSException& ex) {}
    }
 
    /********************************************************************************/
