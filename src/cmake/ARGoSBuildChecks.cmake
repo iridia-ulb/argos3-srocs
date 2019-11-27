@@ -92,3 +92,14 @@ if(ARGOS_BUILD_FOR STREQUAL "builderbot")
   include_directories(${MEDIACTL_INCLUDE_DIR})
 endif(ARGOS_BUILD_FOR STREQUAL "builderbot")
 
+#
+# Check for Lua 5.3
+#
+find_package(Lua53)
+if(LUA53_FOUND)
+  set(ARGOS_WITH_LUA ON)
+  include_directories(${LUA_INCLUDE_DIR})
+else(LUA53_FOUND)
+  message(FATAL_ERROR "Lua 5.3 not found")
+endif(LUA53_FOUND)
+
