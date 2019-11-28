@@ -16,6 +16,7 @@ if(ARGOS_BUILD_FOR_SIMULATOR)
 else(ARGOS_BUILD_FOR_SIMULATOR)
   # argos3/plugins/robots/generic/hardware
   set(ARGOS3_HEADERS_PLUGINS_ROBOTS_GENERIC_HARDWARE
+    hardware/robot.h
     hardware/wifi_default_actuator.h
     hardware/wifi_default_sensor.h)
 endif(ARGOS_BUILD_FOR_SIMULATOR)

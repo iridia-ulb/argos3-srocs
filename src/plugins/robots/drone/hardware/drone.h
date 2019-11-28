@@ -16,10 +16,11 @@ namespace argos {
 #include <argos3/core/utility/math/rng.h>
 #include <argos3/core/utility/networking/tcp_socket.h>
 #include <argos3/core/utility/configuration/argos_configuration.h>
+#include <argos3/plugins/robots/generic/hardware/robot.h>
 
 namespace argos {
 
-   class CDrone {
+   class CDrone : public CRobot {
 
    public:
       static CDrone& GetInstance() {
@@ -34,21 +35,17 @@ namespace argos {
 
       void Init(TConfigurationNode& t_tree,
                 const std::string& str_controller_id);
+
       void Destroy();
+
       void InitFramework(TConfigurationNode& t_tree);
+
       void InitController(TConfigurationNode& t_tree,
                           const std::string& str_controller_id);
-      void InitHardware();
-
-
       void Execute();
 
       UInt32 GetTicksPerSec() {
          return m_unTicksPerSec;
-      }
-
-      CTCPSocket& GetSocket() {
-         return m_cSocket;
       }
 
    private:
@@ -78,8 +75,6 @@ namespace argos {
       std::vector<CPhysicalActuator*> m_vecActuators;
       /* the vector of sensors */
       std::vector<CPhysicalSensor*> m_vecSensors;
-      /* the TCP socket for WiFi communication */
-      CTCPSocket m_cSocket;
    };
 
 }

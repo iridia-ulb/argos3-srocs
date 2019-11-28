@@ -7,6 +7,10 @@
 #ifndef PHYSICAL_ACTUATOR_H
 #define PHYSICAL_ACTUATOR_H
 
+namespace argos {
+   class CRobot;
+}
+
 #include <argos3/core/utility/plugins/factory.h>
 
 namespace argos {
@@ -25,6 +29,11 @@ namespace argos {
        * Class destructor.
        */
       virtual ~CPhysicalActuator() {}
+
+      /**
+       * Assigns the robot to this actuator.
+       */
+      virtual void SetRobot(CRobot& c_robot) {}
 
       /**
        * Updates the state of the entity associated to this actuator.

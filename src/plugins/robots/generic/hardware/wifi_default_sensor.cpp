@@ -6,16 +6,18 @@
 
 #include "wifi_default_sensor.h"
 
+#include <argos3/core/utility/logging/argos_log.h>
 #include <argos3/core/utility/networking/tcp_socket.h>
-#include <argos3/plugins/robots//hardware/.h>
+#include <argos3/plugins/robots/generic/hardware/robot.h>
 
 namespace argos {
 
    /****************************************/
    /****************************************/
 
-   CWifiDefaultSensor::CWifiDefaultSensor() :
-      m_cSocket(C::GetInstance().GetSocket()) {}
+   void CWifiDefaultSensor::SetRobot(CRobot& c_robot) {
+      m_pcSocket = &c_robot.GetSocket();
+   }
 
    /****************************************/
    /****************************************/
@@ -24,13 +26,12 @@ namespace argos {
       try {
          /* Parent class init */
          CCI_WifiSensor::Init(t_tree);
-         /* Check if the socket is connected */
-         if(!m_cSocket.IsConnected()) {
-            THROW_ARGOSEXCEPTION("The socket is not connected");
+         if(!m_pcSocket->IsConnected()) {
+            LOGERR << "[WARNING] Robot is not connected to a router" << std::endl;
          }
       }
       catch(CARGoSException& ex) {
-         THROW_ARGOSEXCEPTION_NESTED("Error initializing the  WiFi default sensor", ex);
+         THROW_ARGOSEXCEPTION_NESTED("Error initializing the wifi default sensor", ex);
       }
    }
 
@@ -40,15 +41,18 @@ namespace argos {
    void CWifiDefaultSensor::Update() {
       /* clear the messages from the interface */
       m_vecMessages.clear();
-      /* buffer for receiving messages */
-      CByteArray cMessage;
-      /* read in the new messages to the control interface */
-      while(m_cSocket.GetEvents().count(CTCPSocket::EEvent::InputReady) == 1) {
-         if(m_cSocket.ReceiveByteArray(cMessage) == false) {
-            break;
-         }
-         else {
-            m_vecMessages.emplace_back(cMessage);
+      /* receive messages if the socket is connected */
+      if(m_pcSocket->IsConnected()) {
+         /* buffer for receiving messages */
+         CByteArray cMessage;
+         /* read in the new messages to the control interface */
+         while(m_pcSocket->GetEvents().count(CTCPSocket::EEvent::InputReady) == 1) {
+            if(m_pcSocket->ReceiveByteArray(cMessage) == false) {
+               break;
+            }
+            else {
+               m_vecMessages.emplace_back(cMessage);
+            }
          }
       }
    }
@@ -68,8 +72,8 @@ namespace argos {
                    "wifi", "default",
                    "Michael Allwright [allsey87@gmail.com]",
                    "1.0",
-                   "A generic WiFi sensor.",
-                   "This sensor receives messages from other robots using WiFi",
+                   "Hardware implementation of the wifi sensor.",
+                   "This sensor receives messages from other robots using the local network.",
                    "Usable"
    );
 

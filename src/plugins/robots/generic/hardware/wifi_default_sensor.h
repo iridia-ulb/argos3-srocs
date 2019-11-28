@@ -10,22 +10,26 @@
 namespace argos {
    class CWifiDefaultSensor;
    class CTCPSocket;
+   class CRobot;
 }
 
 #include <argos3/plugins/robots/generic/hardware/sensor.h>
-#include <argos3/plugins/robots//control_interface/ci_wifi_sensor.h>
+#include <argos3/plugins/robots/generic/control_interface/ci_wifi_sensor.h>
 
 namespace argos {
 
    class CWifiDefaultSensor : public CPhysicalSensor,
-                                   public CCI_WifiSensor {
+                              public CCI_WifiSensor {
    public:
 
-      CWifiDefaultSensor();
+      CWifiDefaultSensor() :
+         m_pcSocket(nullptr) {}
 
       virtual ~CWifiDefaultSensor() {}
 
       virtual void Init(TConfigurationNode& t_tree);
+
+      virtual void SetRobot(CRobot& c_robot);
 
       virtual void Update();
 
@@ -33,7 +37,7 @@ namespace argos {
 
    private:
   
-      CTCPSocket& m_cSocket;
+      CTCPSocket* m_pcSocket;
 
    };
 }

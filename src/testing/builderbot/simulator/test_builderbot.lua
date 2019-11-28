@@ -23,7 +23,7 @@ end
      called. The state of sensors and actuators is reset
      automatically by ARGoS. ]]
 function reset()
-   robot.differential_drive.set_target_velocity(-0.0,-0.0);
+   robot.differential_drive.set_target_velocity(0.01,0.01);
    robot.lift_system.calibrate();
 end
 

@@ -31,11 +31,11 @@ fi
 echo "creating video devices `seq -s, ${1} $((${1}+${2}-1))`"
 sudo modprobe v4l2loopback video_nr=`seq -s, ${1} $((${1}+${2}-1))` || exit 1
 
-tmux new-session -d -s ffmpeg "./v4l2source /dev/video${1} output.yuyv422"
+tmux new-session -d -s ffmpeg "./v4l2source /dev/video${1} input.yuyv422"
 for n in `seq $((${1}+1)) $((${1}+${2}-1))`
 do
 sleep 0.25
-tmux split-window -h "./v4l2source /dev/video${n} output.yuyv422"
+tmux split-window -h "./v4l2source /dev/video${n} input.yuyv422"
 done
 
 tmux unbind-key C-c

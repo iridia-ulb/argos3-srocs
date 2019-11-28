@@ -19,10 +19,11 @@ struct iio_device;
 #include <argos3/core/utility/math/rng.h>
 #include <argos3/core/utility/networking/tcp_socket.h>
 #include <argos3/core/utility/configuration/argos_configuration.h>
+#include <argos3/plugins/robots/generic/hardware/robot.h>
 
 namespace argos {
 
-   class CBuilderBot {
+   class CBuilderBot : public CRobot {
 
    public:
       static CBuilderBot& GetInstance() {
@@ -37,12 +38,13 @@ namespace argos {
 
       void Init(TConfigurationNode& t_tree,
                 const std::string& str_controller_id);
+
       void Destroy();
+
       void InitFramework(TConfigurationNode& t_tree);
+
       void InitController(TConfigurationNode& t_tree,
                           const std::string& str_controller_id);
-      void InitHardware();
-
 
       void Execute();
 
@@ -60,10 +62,6 @@ namespace argos {
 
       UInt32 GetTicksPerSec() {
          return m_unTicksPerSec;
-      }
-
-      CTCPSocket& GetSocket() {
-         return m_cSocket;
       }
 
    private:
@@ -99,8 +97,6 @@ namespace argos {
       iio_context* m_psContext;
       iio_device* m_psSensorUpdateTrigger;
       iio_device* m_psActuatorUpdateTrigger;
-      /* the TCP socket for WiFi communication */
-      CTCPSocket m_cSocket;
    };
 
 }

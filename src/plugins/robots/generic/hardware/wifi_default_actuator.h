@@ -10,22 +10,26 @@
 namespace argos {
    class CWifiDefaultActuator;
    class CTCPSocket;
+   class CRobot;
 }
 
 #include <argos3/plugins/robots/generic/hardware/actuator.h>
-#include <argos3/plugins/robots//control_interface/ci_wifi_actuator.h>
+#include <argos3/plugins/robots/generic/control_interface/ci_wifi_actuator.h>
 
 namespace argos {
 
    class CWifiDefaultActuator : public CPhysicalActuator,
-                                     public CCI_WifiActuator {
+                                public CCI_WifiActuator {
    public:
 
-      CWifiDefaultActuator();
+      CWifiDefaultActuator() :
+         m_pcSocket(nullptr) {}
 
       virtual ~CWifiDefaultActuator() {}
 
       virtual void Init(TConfigurationNode& t_tree);
+
+      virtual void SetRobot(CRobot& c_robot);
 
       virtual void Update();
 
@@ -33,7 +37,7 @@ namespace argos {
 
    private:
 
-      CTCPSocket& m_cSocket;
+      CTCPSocket* m_pcSocket;
 
    };
 }

@@ -71,7 +71,7 @@
     </block>
 
     <builderbot id="builderbot">
-      <body position="-0.25,-0.25,0" orientation="0,0,0"/>
+      <body position="0,0,0" orientation="0,0,0"/>
       <controller config="builderbot"/>
     </builderbot>
    

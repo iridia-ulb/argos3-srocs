@@ -87,6 +87,7 @@ elseif(ARGOS_BUILD_FOR STREQUAL "drone")
   # Create an executable for the robot
   add_executable(argos3 ${ARGOS3_SOURCES_PLUGINS_ROBOTS_DRONE})
   target_link_libraries(argos3 tbb
+    argos3srocs_${ARGOS_BUILD_FOR}_genericrobot
     ${ARGOS_CORE_LIBRARY}
     ${LUA_LIBRARIES}
     ${PTHREADS_LIBRARY}

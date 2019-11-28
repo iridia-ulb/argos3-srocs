@@ -7,6 +7,10 @@
 #ifndef PHYSICAL_SENSOR_H
 #define PHYSICAL_SENSOR_H
 
+namespace argos {
+   class CRobot;
+}
+
 #include <argos3/core/utility/plugins/factory.h>
 
 namespace argos {
@@ -25,6 +29,11 @@ namespace argos {
        * Class destructor.
        */
       virtual ~CPhysicalSensor() {}
+
+      /**
+       * Assigns the robot to this sensor.
+       */
+      virtual void SetRobot(CRobot& c_robot) {}
 
       /**
        * Updates the sensor with readings from the hardware.

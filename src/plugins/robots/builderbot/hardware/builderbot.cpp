@@ -159,15 +159,20 @@ namespace argos {
             THROW_ARGOSEXCEPTION("ERROR: controller \"" << strControllerLabel << "\" is not a Lua controller");
          }        
          /* connect to the router to emulate the wifi */
-         std::string strRouterConfig;
-         TConfigurationNode& tEnvironment = GetNode(*itController, "environment");
-         GetNodeAttribute(tEnvironment, "router", strRouterConfig);
-         size_t unHostnamePortPos = strRouterConfig.find_last_of(':');
-         if(unHostnamePortPos == std::string::npos) {
-            THROW_ARGOSEXCEPTION("the address of the router must be provided as \"hostname:port\"");
+         try {
+            std::string strRouterConfig;
+            TConfigurationNode& tEnvironment = GetNode(*itController, "environment");
+            GetNodeAttribute(tEnvironment, "router", strRouterConfig);
+            size_t unHostnamePortPos = strRouterConfig.find_last_of(':');
+            if(unHostnamePortPos == std::string::npos) {
+               THROW_ARGOSEXCEPTION("the address of the router must be provided as \"hostname:port\"");
+            }
+            SInt32 nPort = std::stoi(strRouterConfig.substr(unHostnamePortPos + 1), nullptr, 0);
+            m_cSocket.Connect(strRouterConfig.substr(0, unHostnamePortPos), nPort);
          }
-         SInt32 nPort = std::stoi(strRouterConfig.substr(unHostnamePortPos + 1), nullptr, 0);
-         m_cSocket.Connect(strRouterConfig.substr(0,unHostnamePortPos), nPort);
+         catch(CARGoSException& ex) {
+            LOGERR << "[ERROR] Could not connect to router: " << ex.what() << std::endl;
+         }
          /* go through the actuators */
          std::string strImpl;
          /* Go through actuators */
@@ -183,6 +188,7 @@ namespace argos {
             if(pcCIAct == nullptr) {
                THROW_ARGOSEXCEPTION("BUG: actuator \"" << itAct->Value() << "\" does not inherit from CCI_Actuator");
             }
+            pcAct->SetRobot(*this);
             pcCIAct->Init(*itAct);
             m_vecActuators.emplace_back(pcAct);
             m_pcController->AddActuator(itAct->Value(), pcCIAct);
@@ -200,6 +206,7 @@ namespace argos {
             if(pcCISens == nullptr) {
                THROW_ARGOSEXCEPTION("BUG: sensor \"" << itSens->Value() << "\" does not inherit from CCI_Sensor");
             }
+            pcSens->SetRobot(*this);
             pcCISens->Init(*itSens);
             m_vecSensors.emplace_back(pcSens);
             m_pcController->AddSensor(itSens->Value(), pcCISens);
