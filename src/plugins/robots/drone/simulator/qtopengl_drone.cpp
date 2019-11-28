@@ -84,7 +84,7 @@ namespace argos {
       /* (1, 1) */
       glPushMatrix();
       glTranslatef(m_cPropellerOffset.GetX(), m_cPropellerOffset.GetY(), m_cPropellerOffset.GetZ());
-      glRotatef(unPropellerAngle, 0.0f, 0.0f, 1.0f);
+      glRotatef(unPropellerAngle, 0.0f, 0.0f, -1.0f);
       m_cPropellerModel.Draw();
       glPopMatrix();
       /* (-1, 1) */
@@ -96,7 +96,7 @@ namespace argos {
       /* (-1, -1) */
       glPushMatrix();
       glTranslatef(-m_cPropellerOffset.GetX(), -m_cPropellerOffset.GetY(), m_cPropellerOffset.GetZ());
-      glRotatef(unPropellerAngle, 0.0f, 0.0f, 1.0f);
+      glRotatef(unPropellerAngle, 0.0f, 0.0f, -1.0f);
       m_cPropellerModel.Draw();
       glPopMatrix();
       /* (1, -1) */
