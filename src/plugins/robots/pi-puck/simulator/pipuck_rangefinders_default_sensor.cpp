@@ -30,9 +30,9 @@ namespace argos {
       m_vecSimulatedInterfaces.reserve(m_mapSensorConfig.size());
       /* get the anchors for the sensor interfaces from m_mapSensorConfig */
       for(const std::pair<const UInt8, TConfiguration>& t_config : m_mapSensorConfig) {
-         const std::string& strAnchor = std::get<std::string>(t_config.second);
+         const char* pchAnchor = std::get<const char*>(t_config.second);
          SAnchor& sAnchor =
-            c_entity.GetComponent<CEmbodiedEntity>("body").GetAnchor(strAnchor);
+            c_entity.GetComponent<CEmbodiedEntity>("body").GetAnchor(pchAnchor);
          m_vecSimulatedInterfaces.emplace_back(t_config.first, sAnchor);
       }
    }
@@ -80,7 +80,7 @@ namespace argos {
          }
          else {
             /* No intersection */
-            s_interface.Reading = 0.0;
+            s_interface.Reading = std::get<Real>(s_interface.Configuration);
             if(m_bShowRays) {
                m_pcControllableEntity->AddCheckedRay(false, cSensorRay);
             }
@@ -93,7 +93,7 @@ namespace argos {
    
    void CPiPuckRangefindersDefaultSensor::Reset() {
       for(SSimulatedInterface& s_interface : m_vecSimulatedInterfaces) {
-         s_interface.Reading = 0.0;
+         s_interface.Reading = std::get<Real>(s_interface.Configuration);
       }
    }
    

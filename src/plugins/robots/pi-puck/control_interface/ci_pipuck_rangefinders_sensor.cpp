@@ -24,7 +24,7 @@ namespace argos {
          CLuaUtility::StartTable(pt_lua_state, "transform");
          CLuaUtility::AddToTable(pt_lua_state, "position", std::get<CVector3>(s_interface.Configuration));
          CLuaUtility::AddToTable(pt_lua_state, "orientation", std::get<CQuaternion>(s_interface.Configuration));
-         CLuaUtility::AddToTable(pt_lua_state, "anchor", std::get<std::string>(s_interface.Configuration));
+         CLuaUtility::AddToTable(pt_lua_state, "anchor", std::get<const char*>(s_interface.Configuration));
          CLuaUtility::EndTable(pt_lua_state);
          CLuaUtility::EndTable(pt_lua_state);
       });
@@ -54,16 +54,16 @@ namespace argos {
    /****************************************/
 
    const std::map<UInt8, CCI_PiPuckRangefindersSensor::TConfiguration > CCI_PiPuckRangefindersSensor::m_mapSensorConfig = {
-      std::make_pair(1, std::make_tuple("origin", CVector3( 0, 0, 0.02), CQuaternion(0.5 * CRadians::PI, CVector3( 0.000,  1.000, 0)), 0.1)),
-      std::make_pair(2, std::make_tuple("origin", CVector3( 0, 0, 0.02), CQuaternion(0.5 * CRadians::PI, CVector3( 0.707,  0.707, 0)), 0.1)),
-      std::make_pair(3, std::make_tuple("origin", CVector3( 0, 0, 0.02), CQuaternion(0.5 * CRadians::PI, CVector3( 1.000,  0.000, 0)), 0.1)),
-      std::make_pair(4, std::make_tuple("origin", CVector3( 0, 0, 0.02), CQuaternion(0.5 * CRadians::PI, CVector3( 0.707, -0.707, 0)), 0.1)),
-      std::make_pair(5, std::make_tuple("origin", CVector3( 0, 0, 0.02), CQuaternion(0.5 * CRadians::PI, CVector3( 0.000, -1.000, 0)), 0.1)),
-      std::make_pair(6, std::make_tuple("origin", CVector3( 0, 0, 0.02), CQuaternion(0.5 * CRadians::PI, CVector3(-0.707, -0.707, 0)), 0.1)),
-      std::make_pair(7, std::make_tuple("origin", CVector3( 0, 0, 0.02), CQuaternion(0.5 * CRadians::PI, CVector3(-1.000,  0.000, 0)), 0.1)),
-      std::make_pair(8, std::make_tuple("origin", CVector3( 0, 0, 0.02), CQuaternion(0.5 * CRadians::PI, CVector3(-0.707,  0.707, 0)), 0.1)),
-   };
+      std::make_pair(1, std::make_tuple("origin", CVector3(0.04,0,0.04), CQuaternion(0.5 * CRadians::PI, CVector3( 0.000,  1.000, 0)), 0.1)),
+      std::make_pair(2, std::make_tuple("origin", CVector3(0.028,-0.028,0.04), CQuaternion(0.5 * CRadians::PI, CVector3( 0.707,  0.707, 0)), 0.1)),
+      std::make_pair(3, std::make_tuple("origin", CVector3(0,-0.04,0.04), CQuaternion(0.5 * CRadians::PI, CVector3( 1.000,  0.000, 0)), 0.1)),
+      std::make_pair(4, std::make_tuple("origin", CVector3(-0.028,-0.028,0.04), CQuaternion(0.5 * CRadians::PI, CVector3( 0.707, -0.707, 0)), 0.1)),
+      std::make_pair(5, std::make_tuple("origin", CVector3(-0.04,0,0.04), CQuaternion(0.5 * CRadians::PI, CVector3( 0.000, -1.000, 0)), 0.1)),
+      std::make_pair(6, std::make_tuple("origin", CVector3(-0.028,0.028,0.04), CQuaternion(0.5 * CRadians::PI, CVector3(-0.707, -0.707, 0)), 0.1)),
+      std::make_pair(7, std::make_tuple("origin", CVector3(0,0.04,0.04), CQuaternion(0.5 * CRadians::PI, CVector3(-1.000,  0.000, 0)), 0.1)),
+      std::make_pair(8, std::make_tuple("origin", CVector3(0.028,0.028,0.04), CQuaternion(0.5 * CRadians::PI, CVector3(-0.707,  0.707, 0)), 0.1)),
 
+   };
    /****************************************/
    /****************************************/
 

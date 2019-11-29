@@ -25,7 +25,7 @@ namespace argos {
 
    public:
 
-      using TConfiguration = std::tuple<std::string, CVector3, CQuaternion, Real>;
+      using TConfiguration = std::tuple<const char*, CVector3, CQuaternion, Real>;
 
       struct SInterface {
          SInterface(const UInt8& un_label) :
