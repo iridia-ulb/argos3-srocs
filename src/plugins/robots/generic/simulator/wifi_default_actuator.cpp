@@ -78,7 +78,7 @@ namespace argos {
    /****************************************/
 
    CWifiDefaultActuator::CTxOperation::CTxOperation(const CRadioEntity& c_tx_radio,
-                                                             const std::list<CByteArray>& lst_tx_data) :
+                                                    const std::list<CByteArray>& lst_tx_data) :
       m_cTxRadio(c_tx_radio),
       m_lstTxData(lst_tx_data) {}
 
@@ -106,9 +106,8 @@ namespace argos {
                      "wifi", "default",
                      "Michael Allwright [allsey87@gmail.com]",
                      "1.0",
-                     "The  WiFi actuator.",
-                     "This actuator sends messages over the near-field communication"
-                     "interface of the .",
+                     "The wifi actuator.",
+                     "This actuator sends messages over wifi.",
                      "Usable"
    );
 

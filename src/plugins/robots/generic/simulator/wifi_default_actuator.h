@@ -19,7 +19,7 @@ namespace argos {
 namespace argos {
 
    class CWifiDefaultActuator : public CSimulatedActuator,
-                                         public CCI_WifiActuator {
+                                public CCI_WifiActuator {
    public:
 
       CWifiDefaultActuator();

@@ -20,7 +20,8 @@ namespace argos {
    /****************************************/
    /****************************************/
 
-   static const Real WIFI_TRANSMISSION_RANGE = 10.0f;
+   const CVector3   CPiPuckEntity::WIFI_OFFSET_POSITION(0.0, 0.0, 0.05);
+   const Real       CPiPuckEntity::WIFI_TRANSMISSION_RANGE(10.0);
 
    /****************************************/
    /****************************************/
@@ -32,6 +33,55 @@ namespace argos {
       m_pcEmbodiedEntity(nullptr),
       m_pcDifferentialDriveEntity(nullptr),
       m_bDebug(false) {}
+
+   /****************************************/
+   /****************************************/
+
+   CPiPuckEntity::CPiPuckEntity(const std::string& str_id,
+                                const std::string& str_controller_id,
+                                const CVector3& c_position,
+                                const CQuaternion& c_orientation,
+                                const std::string& str_wifi_medium,
+                                bool b_debug) :
+      CComposableEntity(nullptr, str_id),
+      m_pcControllableEntity(nullptr),
+      m_pcDebugEntity(nullptr),
+      m_pcEmbodiedEntity(nullptr),
+      m_pcDifferentialDriveEntity(nullptr),
+      m_bDebug(b_debug) {
+      /* create and initialize the embodied entity */
+      m_pcEmbodiedEntity = new CEmbodiedEntity(this, "body_0", c_position, c_orientation);
+      AddComponent(*m_pcEmbodiedEntity);
+      m_pcEmbodiedEntity->AddAnchor("body", {0.0, 0.0, 0.00125});
+      m_pcEmbodiedEntity->AddAnchor("left_wheel");
+      m_pcEmbodiedEntity->AddAnchor("right_wheel");
+      /* create and initialize the differential drive entity */
+      m_pcDifferentialDriveEntity
+         = new CPiPuckDifferentialDriveEntity(this, "differential_drive_0");
+      AddComponent(*m_pcDifferentialDriveEntity);
+      m_pcDifferentialDriveEntity->Enable();
+      /* get wifi medium */
+      CRadioMedium& cWifiRadioMedium =
+         CSimulator::GetInstance().GetMedium<CRadioMedium>(str_wifi_medium);
+      /* create and initialize a radio equipped entity for WiFi */
+      m_pcWifiRadioEquippedEntity = new CRadioEquippedEntity(this, "radios_0");
+      AddComponent(*m_pcWifiRadioEquippedEntity);
+      m_pcWifiRadioEquippedEntity->AddRadio("wifi",
+         WIFI_OFFSET_POSITION,
+         m_pcEmbodiedEntity->GetOriginAnchor(),
+         WIFI_TRANSMISSION_RANGE);
+      m_pcWifiRadioEquippedEntity->SetMedium(cWifiRadioMedium);
+      m_pcWifiRadioEquippedEntity->Enable();
+      /* create and initialize a debugging entity */
+      m_pcDebugEntity = new CDebugEntity(this, "debug_0");
+      AddComponent(*m_pcDebugEntity);
+      /* Create and initialize the controllable entity */
+      m_pcControllableEntity = new CControllableEntity(this, "controller_0");
+      AddComponent(*m_pcControllableEntity);
+      m_pcControllableEntity->SetController(str_controller_id);
+      /* Update components */
+      UpdateComponents();
+   }
 
    /****************************************/
    /****************************************/
@@ -50,13 +100,15 @@ namespace argos {
          m_pcEmbodiedEntity->AddAnchor("body", {0.0, 0.0, 0.00125});
          m_pcEmbodiedEntity->AddAnchor("left_wheel");
          m_pcEmbodiedEntity->AddAnchor("right_wheel");
-         /* get wifi medium */
-         CRadioMedium& cWifiRadioMedium = CSimulator::GetInstance().GetMedium<CRadioMedium>("wifi");
          /* create and initialize the differential drive entity */
          m_pcDifferentialDriveEntity 
             = new CPiPuckDifferentialDriveEntity(this, "differential_drive_0");
          AddComponent(*m_pcDifferentialDriveEntity);
          m_pcDifferentialDriveEntity->Enable();
+         /* get wifi medium */
+         std::string strWifiMedium("wifi");
+         GetNodeAttributeOrDefault(t_tree, "wifi", strWifiMedium, strWifiMedium);
+         CRadioMedium& cWifiRadioMedium = CSimulator::GetInstance().GetMedium<CRadioMedium>(strWifiMedium);
          /* create and initialize a radio equipped entity for WiFi */
          m_pcWifiRadioEquippedEntity = new CRadioEquippedEntity(this, "radios_0");
          AddComponent(*m_pcWifiRadioEquippedEntity);

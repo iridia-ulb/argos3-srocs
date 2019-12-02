@@ -29,6 +29,13 @@ namespace argos {
 
       CPiPuckEntity();
 
+      CPiPuckEntity(const std::string& str_id,
+                    const std::string& str_controller_id,
+                    const CVector3& c_position,
+                    const CQuaternion& c_orientation,
+                    const std::string& str_wifi_medium = "wifi",
+                    bool b_debug = false);
+
       virtual ~CPiPuckEntity() {}
 
       virtual void Init(TConfigurationNode& t_tree);
@@ -81,6 +88,9 @@ namespace argos {
       CRadioEquippedEntity*                  m_pcWifiRadioEquippedEntity;
 
       bool m_bDebug;
+
+      static const CVector3   WIFI_OFFSET_POSITION;
+      static const Real       WIFI_TRANSMISSION_RANGE;
    };
 
 }

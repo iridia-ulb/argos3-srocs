@@ -85,9 +85,8 @@ namespace argos {
                    "wifi", "default",
                    "Michael Allwright [allsey87@gmail.com]",
                    "1.0",
-                   "The  WIFI sensor.",
-                   "This sensor receives messages over the near-field communication"
-                   "interface of the .",
+                   "The wifi sensor.",
+                   "This sensor receives messages over wifi",
                    "Usable"
    );
 

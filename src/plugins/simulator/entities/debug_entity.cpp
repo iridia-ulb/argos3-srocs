@@ -35,7 +35,7 @@ namespace argos {
    /****************************************/
 
    void CDebugEntity::AppendToBuffer(const std::string& str_buffer_id,
-                                               const std::string& str_contents) {
+                                     const std::string& str_contents) {
       m_mapBuffers[str_buffer_id] += str_contents;
    }
 
@@ -53,7 +53,7 @@ namespace argos {
       std::map<std::string, std::string>::const_iterator itBuffer =
          m_mapBuffers.find(str_buffer_id);
       if(itBuffer == std::end(m_mapBuffers)) {
-         static std::string strEmpty;
+         static const std::string strEmpty;
          return strEmpty;
       }
       else {
