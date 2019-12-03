@@ -38,16 +38,16 @@
   <arena size="1, 1, 1" center="0, 0, 0.25">
     <floor id="floor" source="image" pixels_per_meter="1000"
            path="@CMAKE_BINARY_DIR@/testing/pi-puck/test_pipuck.png" />
-    <box id="north" size="0.025,0.975,0.025" movable="false" mass="10">
+    <box id="north" size="0.025,0.975,0.06" movable="false" mass="10">
       <body position="0.4875,0.0125,0"  orientation="0,0,0" />
     </box>
-    <box id="east" size="0.975,0.025,0.025" movable="false" mass="10">
+    <box id="east" size="0.975,0.025,0.06" movable="false" mass="10">
       <body position="0.0125,-0.4875,0"  orientation="0,0,0" />
     </box>
-    <box id="south" size="0.025,0.975,0.025" movable="false" mass="10">
+    <box id="south" size="0.025,0.975,0.06" movable="false" mass="10">
       <body position="-0.4875,-0.0125,0"  orientation="0,0,0" />
     </box>
-    <box id="west" size="0.975,0.025,0.025" movable="false" mass="10">
+    <box id="west" size="0.975,0.025,0.06" movable="false" mass="10">
       <body position="-0.0125,0.4875,0"  orientation="0,0,0" />
     </box>
     <pipuck id="pipuck" debug="false">
