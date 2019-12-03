@@ -107,13 +107,14 @@ namespace argos {
          m_pcDifferentialDriveEntity->Enable();
          /* get wifi medium */
          std::string strWifiMedium("wifi");
-         GetNodeAttributeOrDefault(t_tree, "wifi", strWifiMedium, strWifiMedium);
-         CRadioMedium& cWifiRadioMedium = CSimulator::GetInstance().GetMedium<CRadioMedium>(strWifiMedium);
+         GetNodeAttributeOrDefault(t_tree, "wifi_medium", strWifiMedium, strWifiMedium);
+         CRadioMedium& cWifiRadioMedium =
+            CSimulator::GetInstance().GetMedium<CRadioMedium>(strWifiMedium);
          /* create and initialize a radio equipped entity for WiFi */
          m_pcWifiRadioEquippedEntity = new CRadioEquippedEntity(this, "radios_0");
          AddComponent(*m_pcWifiRadioEquippedEntity);
          m_pcWifiRadioEquippedEntity->AddRadio("wifi",
-            CVector3(0.0, 0.0, 0.05),
+            WIFI_OFFSET_POSITION,
             m_pcEmbodiedEntity->GetOriginAnchor(),
             WIFI_TRANSMISSION_RANGE);
          m_pcWifiRadioEquippedEntity->SetMedium(cWifiRadioMedium);
@@ -142,7 +143,7 @@ namespace argos {
          /* Create and initialize the controllable entity */
          m_pcControllableEntity = new CControllableEntity(this);
          AddComponent(*m_pcControllableEntity);
-         m_pcControllableEntity->Init(GetNode(t_tree, "controller"));
+         m_pcControllableEntity->Init(GetNode(t_tree, "controller_0"));
          /* Update components */
          UpdateComponents();
       }
