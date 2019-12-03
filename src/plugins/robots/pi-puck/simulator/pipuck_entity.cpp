@@ -143,7 +143,7 @@ namespace argos {
          /* Create and initialize the controllable entity */
          m_pcControllableEntity = new CControllableEntity(this);
          AddComponent(*m_pcControllableEntity);
-         m_pcControllableEntity->Init(GetNode(t_tree, "controller_0"));
+         m_pcControllableEntity->Init(GetNode(t_tree, "controller"));
          /* Update components */
          UpdateComponents();
       }
