@@ -34,7 +34,7 @@ namespace argos {
 
       virtual void Reset();
 
-   private:
+   protected:
 
       CRadioEntity* m_pcRadioEntity;
 
