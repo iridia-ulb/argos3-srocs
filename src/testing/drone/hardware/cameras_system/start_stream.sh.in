@@ -1,0 +1,36 @@
+#!/bin/bash
+
+# check arguments
+if [ ${#} -ne "2" ]; then
+   echo "usage: $0 [first device] [number of devices]"
+   exit 1
+fi
+
+if [ "${1}" -lt "0" ]; then
+   echo "[first device] must be a non-negative integer"
+   exit 1
+fi
+
+if [ "${2}" -lt "1" ]; then
+   echo "[number of devices] must be at least 1"
+   exit 1
+fi
+
+# load loopback module with four devices
+echo "creating video devices `seq -s, ${1} $((${1}+${2}-1))`"
+
+if ! [ $(id -u) = 0 ]; then
+   sudo modprobe v4l2loopback video_nr=`seq -s, ${1} $((${1}+${2}-1))` || exit 1
+else
+   modprobe v4l2loopback video_nr=`seq -s, ${1} $((${1}+${2}-1))` || exit 1
+fi
+
+tmux new-session -d -s streamer "@CMAKE_BINARY_DIR@/testing/drone/cameras_system/streamer /dev/video${1} @CMAKE_BINARY_DIR@/testing/drone/cameras_system/input.raw"
+for n in `seq $((${1}+1)) $((${1}+${2}-1))`
+do
+sleep 0.5
+tmux split-window -h "@CMAKE_BINARY_DIR@/testing/drone/cameras_system/streamer /dev/video${n} @CMAKE_BINARY_DIR@/testing/drone/cameras_system/input.raw"
+done
+
+date +%s.%N > start.tp
+

@@ -6,7 +6,6 @@
 
 #include "drone.h"
 
-#include <sys/time.h>
 #include <unistd.h>
 
 #include <chrono>
@@ -26,108 +25,41 @@
 #include <argos3/plugins/robots/generic/hardware/actuator.h>
 
 namespace argos {
-
-   void CDrone::Init(TConfigurationNode& t_tree, const std::string& str_controller_id) {
-      /* Initialize the framework */
-      InitFramework(GetNode(t_tree, "framework"));
-      /* Initialize the controller */
-      InitController(GetNode(t_tree, "controllers"), str_controller_id);
-   }
-   
-   /****************************************/
-   /****************************************/
-
-   void CDrone::Destroy() {
-      /* delete actuators */
-      for(CPhysicalActuator* pc_actuator : m_vecActuators)
-         delete pc_actuator;
-      /* delete sensors */
-      for(CPhysicalSensor* pc_sensor : m_vecSensors)
-         delete pc_sensor;
-      /* uninitialize the RNG */
-      CRandom::RemoveCategory("argos");
-      LOG << "[INFO] Controller terminated" << std::endl;
-   }
   
    /****************************************/
    /****************************************/
 
-   void CDrone::InitFramework(TConfigurationNode& t_tree) {
-      try {
-         /* Get the experiment node */
-         TConfigurationNode tExperiment = GetNode(t_tree, "experiment");
-         /* Parse random seed */
-         UInt32 unRandomSeed;
-         GetNodeAttributeOrDefault(tExperiment,
-                                   "random_seed",
-                                   unRandomSeed,
-                                   static_cast<UInt32>(0));
-         /* If random seed is 0 or is not specified */
-         if(unRandomSeed == 0) {
-            /* Set the random seed based on the current clock time */
-            struct timeval sTimeValue;
-            ::gettimeofday(&sTimeValue, nullptr);
-            unRandomSeed = static_cast<UInt32>(sTimeValue.tv_usec);
-         }
-         /* Create and initialize the RNG */
-         CRandom::CreateCategory("argos", unRandomSeed);
-         LOG << "[INFO] Using random seed = " << unRandomSeed << std::endl;
-         m_pcRNG = CRandom::CreateRNG("argos");
-         /* Set the target tick length */
-         GetNodeAttribute(tExperiment, "ticks_per_second", m_unTicksPerSec);
-         /* Set the target number of ticks */
-         GetNodeAttributeOrDefault(tExperiment, "length", m_unLength, m_unLength);
-      }
-      catch(CARGoSException& ex) {
-         THROW_ARGOSEXCEPTION_NESTED("Failed to initialize framework", ex);
-      }
-   }
-
-   /****************************************/
-   /****************************************/
-
-   void CDrone::InitController(TConfigurationNode& t_tree, const std::string& str_controller_id) {
-      try {
-         std::string strControllerLabel;
-         TConfigurationNodeIterator itController;
-         for(itController = itController.begin(&t_tree);
-             itController != itController.end();
-             ++itController) {
-            std::string strControllerId;
-            GetNodeAttributeOrDefault(*itController, "id", strControllerId, strControllerId);
-            if(str_controller_id.empty() || strControllerId == str_controller_id) {
-               strControllerLabel = itController->Value();
-               break;
-            }
-         }
-         if(strControllerLabel.empty()) {
-            THROW_ARGOSEXCEPTION("could not find controller in the experiment configuration file")
-         }
-         /* Create the controller */
-         CCI_Controller* pcController = CFactory<CCI_Controller>::New(strControllerLabel);
+   void CDrone::Init(TConfigurationNode& t_controller,
+                     UInt32 un_ticks_per_sec,
+                     UInt32 un_length) {
+      m_unTicksPerSec = un_ticks_per_sec;
+      m_unLength = un_length;
+      try {        
+         /* Create an instance of the controller controller */
+         CCI_Controller* pcController = CFactory<CCI_Controller>::New(t_controller.Value());
          m_pcController = dynamic_cast<CLuaController*>(pcController);
          if(m_pcController == nullptr) {
-            THROW_ARGOSEXCEPTION("ERROR: controller \"" << strControllerLabel << "\" is not a Lua controller");
+            THROW_ARGOSEXCEPTION("ERROR: controller \"" << t_controller.Value() << "\" is not a Lua controller");
          }        
          /* connect to the router to emulate the wifi */
          try {
             std::string strRouterConfig;
-            TConfigurationNode& tEnvironment = GetNode(*itController, "environment");
+            TConfigurationNode& tEnvironment = GetNode(t_controller, "environment");
             GetNodeAttribute(tEnvironment, "router", strRouterConfig);
             size_t unHostnamePortPos = strRouterConfig.find_last_of(':');
             if(unHostnamePortPos == std::string::npos) {
-               THROW_ARGOSEXCEPTION("the address of the router must be provided as \"hostname:port\"");
+               THROW_ARGOSEXCEPTION("The address of the router must be provided as \"hostname:port\"");
             }
             SInt32 nPort = std::stoi(strRouterConfig.substr(unHostnamePortPos + 1), nullptr, 0);
             m_cSocket.Connect(strRouterConfig.substr(0, unHostnamePortPos), nPort);
          }
          catch(CARGoSException& ex) {
-            LOGERR << "[ERROR] Could not connect to router: " << ex.what() << std::endl;
+            LOGERR << "[WARNING] Could not connect to router" << std::endl;
          }
          /* go through the actuators */
          std::string strImpl;
          /* Go through actuators */
-         TConfigurationNode& tActuators = GetNode(*itController, "actuators");
+         TConfigurationNode& tActuators = GetNode(t_controller, "actuators");
          TConfigurationNodeIterator itAct;
          for(itAct = itAct.begin(&tActuators);
              itAct != itAct.end();
@@ -145,7 +77,7 @@ namespace argos {
             m_pcController->AddActuator(itAct->Value(), pcCIAct);
          }
          /* Go through sensors */
-         TConfigurationNode& tSensors = GetNode(*itController, "sensors");
+         TConfigurationNode& tSensors = GetNode(t_controller, "sensors");
          TConfigurationNodeIterator itSens;
          for(itSens = itSens.begin(&tSensors);
              itSens != itSens.end();
@@ -163,8 +95,8 @@ namespace argos {
             m_pcController->AddSensor(itSens->Value(), pcCISens);
          }        
          /* Set the controller id */
-         char pchBuffer[32];
-         if (::gethostname(pchBuffer, 32) == 0) {
+         char pchBuffer[64];
+         if (::gethostname(pchBuffer, 64) == 0) {
             LOG << "[INFO] Setting controller id to hostname \""
                 << pchBuffer << "\""
                 << std::endl;
@@ -177,12 +109,12 @@ namespace argos {
             m_pcController->SetId("drone");
          }
          /* If the parameters node doesn't exist, create one */
-         if(!NodeExists(*itController, "params")) {
+         if(!NodeExists(t_controller, "params")) {
             TConfigurationNode tParamsNode("params");
-            AddChildNode(*itController, tParamsNode);
+            AddChildNode(t_controller, tParamsNode);
          }
          /* Init the controller with the parameters */
-         m_pcController->Init(GetNode(*itController, "params"));
+         m_pcController->Init(GetNode(t_controller, "params"));
          /* check for errors */
          if(!m_pcController->IsOK()) {
             THROW_ARGOSEXCEPTION("Controller: " << m_pcController->GetErrorMessage());
@@ -238,6 +170,19 @@ namespace argos {
          LOG.Flush();
          return;
       }
+   }
+
+   /****************************************/
+   /****************************************/
+
+   void CDrone::Destroy() {
+      /* delete actuators */
+      for(CPhysicalActuator* pc_actuator : m_vecActuators)
+         delete pc_actuator;
+      /* delete sensors */
+      for(CPhysicalSensor* pc_sensor : m_vecSensors)
+         delete pc_sensor;
+      LOG << "[INFO] Controller terminated" << std::endl;
    }
 
    /****************************************/

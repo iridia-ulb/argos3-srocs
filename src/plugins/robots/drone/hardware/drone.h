@@ -23,26 +23,24 @@ namespace argos {
    class CDrone : public CRobot {
 
    public:
+
       static CDrone& GetInstance() {
          static CDrone cDrone;
          return cDrone;
       }
+      
+      void Init(TConfigurationNode& t_controller,
+                UInt32 un_ticks_per_sec,
+                UInt32 un_length);
+
+      void Execute();
+
+      void Destroy();
 
       void SetSignal(int n_signal) {
          m_bSignalRaised = true;
          m_strSignal = ::strsignal(n_signal);
       }
-
-      void Init(TConfigurationNode& t_tree,
-                const std::string& str_controller_id);
-
-      void Destroy();
-
-      void InitFramework(TConfigurationNode& t_tree);
-
-      void InitController(TConfigurationNode& t_tree,
-                          const std::string& str_controller_id);
-      void Execute();
 
       UInt32 GetTicksPerSec() {
          return m_unTicksPerSec;
@@ -52,7 +50,6 @@ namespace argos {
 
       CDrone() :
          m_bSignalRaised(false),
-         m_pcRNG(nullptr),
          m_unTicksPerSec(0),
          m_unLength(0),
          m_pcController(nullptr) {}
@@ -60,19 +57,23 @@ namespace argos {
       virtual ~CDrone() {}
 
    private:
+
       /* signal handling variables */
       bool m_bSignalRaised;
       std::string m_strSignal;
-      /* pointer to the RNG */
-      CRandom::CRNG* m_pcRNG;
+
       /* target tick length for the controller */
       UInt32 m_unTicksPerSec;
+
       /* number of ticks to run */
       UInt32 m_unLength;
+
       /* pointer to the controller */
       CLuaController* m_pcController;
+
       /* the vector of actuators */
       std::vector<CPhysicalActuator*> m_vecActuators;
+
       /* the vector of sensors */
       std::vector<CPhysicalSensor*> m_vecSensors;
    };

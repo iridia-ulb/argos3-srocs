@@ -5,10 +5,9 @@
   <!-- * General configuration * -->
   <!-- ************************* -->
   <framework>
-    <system threads="0" />
-    <experiment length="0" ticks_per_second="10" random_seed="12345" />
-    <execute script="stream_on.sh" arguments="6 4" on="robot_pre_init"/>
-    <execute script="stream_off.sh" arguments="" on="robot_post_destroy"/>
+    <experiment length="100" ticks_per_second="10" />
+    <script path="@CMAKE_BINARY_DIR@/testing/drone/cameras_system/start_stream.sh" arguments="6 4" event="pre_init"/>
+    <script path="@CMAKE_BINARY_DIR@/testing/drone/cameras_system/stop_stream.sh" event="post_destroy"/>
   </framework>
   
   <!-- *************** -->
@@ -21,12 +20,15 @@
         <wifi implementation="default" />
       </actuators>
       <sensors>
-        <drone_camera_system implementation="default"
+        <!-- resolution is 800 x height, where height is 600, 500, 400 etc -->
+        <drone_cameras_system implementation="default"
           calibration="src/calibration/drone_camera_system.xml"
-          devices="6,7,8,9"/>
+          devices="6,7,8,9"
+          height="600"
+          threads="1"/>
         <wifi implementation="default" />
       </sensors>
-      <params script="src/testing/test_cv.lua" />
+      <params script="@CMAKE_BINARY_DIR@/testing/drone/cameras_system/controller.lua" />
     </lua_controller>
   </controllers>
 

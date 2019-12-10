@@ -70,16 +70,16 @@ namespace argos {
          GetNodeAttribute(t_calibration, "principal_point", cPrincipalPoint);
          GetNodeAttribute(t_calibration, "position_error", PositionError);
          GetNodeAttribute(t_calibration, "orientation_error", OrientationError);
+         /* set the camera matrix */
+         CameraMatrix.SetIdentityMatrix();
+         CameraMatrix(0,0) = cFocalLength.GetX();
+         CameraMatrix(1,1) = cFocalLength.GetY();
+         CameraMatrix(0,2) = cPrincipalPoint.GetX();
+         CameraMatrix(1,2) = cPrincipalPoint.GetY();
       }
       catch(CARGoSException& ex) {
          LOGERR << "[WARNING] Failed to parse calibration data" << std::endl; 
       }
-      /* set the camera matrix */
-      CameraMatrix.SetIdentityMatrix();
-      CameraMatrix(0,0) = cFocalLength.GetX();
-      CameraMatrix(1,1) = cFocalLength.GetY();
-      CameraMatrix(0,2) = cPrincipalPoint.GetX();
-      CameraMatrix(1,2) = cPrincipalPoint.GetY();
    }
 
    /****************************************/
@@ -98,14 +98,22 @@ namespace argos {
       m_ptTagDetector->quad_sigma = 0.0f;
       m_ptTagDetector->refine_edges = 1;
       m_ptTagDetector->decode_sharpening = 0.25;
-      m_ptTagDetector->nthreads = 1;
+      int nThreads;
+      GetNodeAttribute(t_calibration, "threads", nThreads);
+      m_ptTagDetector->nthreads = nThreads;
+      LOG << "[INFO] Using " << nThreads << " threads per camera" << std::endl; 
+      // BEGIN TEST CODE
+      UInt32 unImageHeight;
+      GetNodeAttribute(t_calibration, "height", unImageHeight);
+      LOG << "[INFO] Testing at 800x" << static_cast<int>(unImageHeight) << std::endl; 
+      // END TEST CODE
       /* allocate image memory */
-      m_ptImage = ::image_u8_create_alignment(IMAGE_WIDTH, IMAGE_HEIGHT, 96);
+      m_ptImage = ::image_u8_create_alignment(IMAGE_WIDTH, unImageHeight, 96);
       /* update the tag detection info structure */
       m_tTagDetectionInfo.fx = 315; // m_sCalibration.CameraMatrix(0,0);
       m_tTagDetectionInfo.fy = 315; // m_sCalibration.CameraMatrix(1,1);
       m_tTagDetectionInfo.cx = 400; //m_sCalibration.CameraMatrix(0,2);
-      m_tTagDetectionInfo.cy = 300; //m_sCalibration.CameraMatrix(1,2);
+      m_tTagDetectionInfo.cy = unImageHeight / 2; //m_sCalibration.CameraMatrix(1,2);
       m_tTagDetectionInfo.tagsize = TAG_SIDE_LENGTH;
    }
 
@@ -350,7 +358,7 @@ namespace argos {
             std::array<CVector2, 4> arrCornerPixels;
             /* run the apriltags algorithm */
             ::zarray_t* ptDetectionArray =
-                 ::apriltag_detector_detect(m_ptTagDetector, m_ptImage);
+               ::apriltag_detector_detect(m_ptTagDetector, m_ptImage);
             /* get the detected tags count */
             size_t unTagCount = static_cast<size_t>(::zarray_size(ptDetectionArray));
             /* reserve space for the tags */

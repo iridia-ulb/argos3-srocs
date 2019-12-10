@@ -59,7 +59,3 @@ configure_file(
   ${CMAKE_BINARY_DIR}/setup_env.sh
   @ONLY)
 
-#
-# Install test configurations
-#
-install(DIRECTORY testing DESTINATION share/argos3)

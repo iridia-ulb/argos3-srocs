@@ -1,0 +1,23 @@
+#!/bin/bash
+
+echo -e "-------------------"
+
+# print the time taken
+START_TIME=$(cat start.tp)
+rm start.tp
+END_TIME=$(date +%s.%N)
+echo -e "Time = $(echo "$END_TIME - $START_TIME" | bc)"
+
+# stop streaming
+pkill --signal 2 --full streamer
+sleep 1
+
+# attempt to remove loopback devices
+echo -e "Attempting to remove video devices."
+if ! [ $(id -u) = 0 ]; then
+   sudo modprobe -qr v4l2loopback || echo -e "Failed: Please run 'sudo modprobe -r v4l2loopback'"
+else
+   modprobe -qr v4l2loopback || echo -e "Failed: Please run 'modprobe -r v4l2loopback'"
+fi
+
+echo -e "-------------------"

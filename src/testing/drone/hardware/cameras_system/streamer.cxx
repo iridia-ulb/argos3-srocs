@@ -9,6 +9,7 @@
 
 #include <list>
 #include <array>
+#include <csignal>
 #include <cstdlib>
 #include <cstring>
 #include <iostream>
@@ -18,7 +19,29 @@
 #define BYTES_PER_PIXEL 2
 #define BUFFER_SIZE (WIDTH * HEIGHT * BYTES_PER_PIXEL)
 
+bool bSignalRecv = false;
+
+void handler(int n_signal) {
+  bSignalRecv = true;
+  /* allow the user to kill application immediately with ctrl-c */
+  std::signal(SIGINT, SIG_DFL);
+  /* ignore other signals and attempt to allow the robot to shutdown */
+  std::signal(SIGABRT, SIG_IGN);
+  std::signal(SIGFPE, SIG_IGN);
+  std::signal(SIGILL, SIG_IGN);
+  std::signal(SIGSEGV, SIG_IGN);
+  std::signal(SIGTERM, SIG_IGN);
+}
+
 int main(int argc, char **argv) {
+   /* capture signals */
+   std::signal(SIGINT, handler);
+   std::signal(SIGABRT, handler);
+   std::signal(SIGFPE, handler);
+   std::signal(SIGILL, handler);
+   std::signal(SIGSEGV, handler);
+   std::signal(SIGTERM, handler);
+
    /* check and parse arguments */
    if( argc != 3 ) {
       std::cerr << "usage: " << argv[0] << " SINK SOURCE" << std::endl;
@@ -36,7 +59,7 @@ int main(int argc, char **argv) {
    int source = ::open(argv[2], O_RDONLY);
    if(source < 0 ) {
       std::cerr << "failed to open source file: " << std::strerror(errno) << std::endl;
-      std::exit(-2);
+      std::exit(-3);
    }
 
    /* load frames */
@@ -49,11 +72,13 @@ int main(int argc, char **argv) {
       }
    }
    ::close(source);
+
+   /* check if at least one source frame was loaded */
    std::list<std::array<char, BUFFER_SIZE> >::iterator next =
       std::begin(lst_frames);
    if(next == std::end(lst_frames)) {
       std::cerr << "failed to load frames" << std::endl;
-      std::exit(-3);
+      std::exit(-4);
    }
 
    /* setup video for proper format */
@@ -71,7 +96,7 @@ int main(int argc, char **argv) {
       std::exit(ret);
    
    /* start main loop */
-   for (;;) {
+   while (!bSignalRecv) {
       if(::write(sink, next->data(), BUFFER_SIZE) != BUFFER_SIZE) {
          break;
       }
@@ -79,10 +104,10 @@ int main(int argc, char **argv) {
       if(next == std::end(lst_frames)) {
          next = std::begin(lst_frames);
       }
-      std::cerr << ".";
       ::usleep(1000000 / 30);
    }
    ::close(sink);
+   std::cerr << "closed " << argv[1] << std::endl;
    return 0;
 }
 
