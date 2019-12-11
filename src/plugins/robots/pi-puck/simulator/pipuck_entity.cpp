@@ -9,10 +9,11 @@
 #include <argos3/core/simulator/simulator.h>
 #include <argos3/core/simulator/entity/controllable_entity.h>
 #include <argos3/core/simulator/entity/embodied_entity.h>
-#include <argos3/plugins/simulator/entities/radio_equipped_entity.h>
 #include <argos3/plugins/simulator/entities/debug_entity.h>
-
+#include <argos3/plugins/simulator/entities/radio_equipped_entity.h>
+#include <argos3/plugins/simulator/entities/tag_equipped_entity.h>
 #include <argos3/plugins/simulator/media/radio_medium.h>
+#include <argos3/plugins/simulator/media/tag_medium.h>
 #include <argos3/plugins/robots/pi-puck/simulator/pipuck_differential_drive_entity.h>
 
 namespace argos {
@@ -20,19 +21,13 @@ namespace argos {
    /****************************************/
    /****************************************/
 
-   const CVector3   CPiPuckEntity::WIFI_OFFSET_POSITION(0.0, 0.0, 0.05);
-   const Real       CPiPuckEntity::WIFI_TRANSMISSION_RANGE(10.0);
+   const CVector3 CPiPuckEntity::TAG_OFFSET_POSITION = {0.0, 0.0, 0.1385};
 
-   /****************************************/
-   /****************************************/
+   const CVector3 CPiPuckEntity::WIFI_OFFSET_POSITION = {0.0, 0.0, 0.05};
 
-   CPiPuckEntity::CPiPuckEntity() :
-      CComposableEntity(nullptr),
-      m_pcControllableEntity(nullptr),
-      m_pcDebugEntity(nullptr),
-      m_pcEmbodiedEntity(nullptr),
-      m_pcDifferentialDriveEntity(nullptr),
-      m_bDebug(false) {}
+   const Real     CPiPuckEntity::TAG_SIDE_LENGTH = 0.0235;
+
+   const Real     CPiPuckEntity::WIFI_TRANSMISSION_RANGE = 10.0;
 
    /****************************************/
    /****************************************/
@@ -42,6 +37,7 @@ namespace argos {
                                 const CVector3& c_position,
                                 const CQuaternion& c_orientation,
                                 const std::string& str_wifi_medium,
+                                const std::string& str_tag_medium,
                                 bool b_debug) :
       CComposableEntity(nullptr, str_id),
       m_pcControllableEntity(nullptr),
@@ -60,6 +56,20 @@ namespace argos {
          = new CPiPuckDifferentialDriveEntity(this, "differential_drive_0");
       AddComponent(*m_pcDifferentialDriveEntity);
       m_pcDifferentialDriveEntity->Enable();
+      /* create and initialize the tags */
+      m_pcTagEquippedEntity = new CTagEquippedEntity(this, "tags_0");
+      m_pcTagEquippedEntity->AddTag("tag_0",
+                                    TAG_OFFSET_POSITION,
+                                    CQuaternion(),
+                                    m_pcEmbodiedEntity->GetOriginAnchor(),
+                                    CRadians::PI_OVER_THREE,
+                                    TAG_SIDE_LENGTH,
+                                    GetId());
+      CTagMedium& cTagMedium = 
+         CSimulator::GetInstance().GetMedium<CTagMedium>(str_tag_medium);
+      m_pcTagEquippedEntity->SetMedium(cTagMedium);
+      m_pcTagEquippedEntity->Enable();
+      AddComponent(*m_pcTagEquippedEntity);
       /* get wifi medium */
       CRadioMedium& cWifiRadioMedium =
          CSimulator::GetInstance().GetMedium<CRadioMedium>(str_wifi_medium);
@@ -105,6 +115,22 @@ namespace argos {
             = new CPiPuckDifferentialDriveEntity(this, "differential_drive_0");
          AddComponent(*m_pcDifferentialDriveEntity);
          m_pcDifferentialDriveEntity->Enable();
+         /* create and initialize the tags */
+         m_pcTagEquippedEntity = new CTagEquippedEntity(this, "tags_0");
+         m_pcTagEquippedEntity->AddTag("tag_0",
+                                       TAG_OFFSET_POSITION,
+                                       CQuaternion(),
+                                       m_pcEmbodiedEntity->GetOriginAnchor(),
+                                       CRadians::PI_OVER_THREE,
+                                       TAG_SIDE_LENGTH,
+                                       GetId());
+         std::string strTagMedium("tags");
+         GetNodeAttributeOrDefault(t_tree, "tag_medium", strTagMedium, strTagMedium);
+         CTagMedium& cTagMedium = 
+            CSimulator::GetInstance().GetMedium<CTagMedium>(strTagMedium);
+         m_pcTagEquippedEntity->SetMedium(cTagMedium);
+         m_pcTagEquippedEntity->Enable();
+         AddComponent(*m_pcTagEquippedEntity);
          /* get wifi medium */
          std::string strWifiMedium("wifi");
          GetNodeAttributeOrDefault(t_tree, "wifi_medium", strWifiMedium, strWifiMedium);
@@ -167,7 +193,7 @@ namespace argos {
                    "pipuck",
                    "1.0",
                    "Michael Allwright [allsey87@gmail.com]",
-                   "The PiPuck robot",
+                   "The Pi-Puck robot",
                    "Long description",
                    "Usable"
    );
