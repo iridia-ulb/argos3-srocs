@@ -17,10 +17,47 @@
 #include <argos3/plugins/simulator/media/radio_medium.h>
 #include <argos3/plugins/simulator/media/tag_medium.h>
 
-#define TAG_SIDE_LENGTH 0.0235f
-#define NFC_TRANSMISSION_RANGE 0.02f
-
 namespace argos {
+
+   /****************************************/
+   /****************************************/
+
+   const Real CBlockEntity::TAG_SIDE_LENGTH = 0.0235;
+
+   const Real CBlockEntity::NFC_TRANSMISSION_RANGE = 0.020;
+
+   const Real CBlockEntity::BLOCK_SIDE_LENGTH = 0.055;
+
+   /* these face descriptors are used for calculating the positions of the LEDs radios, and tags.
+      Since these entities need to be detected by sensors, the offset is increased by 1% so that
+      the entity sits just above the surface of the block */
+   const std::array<std::tuple<std::string, CVector3, CQuaternion>, 6> CBlockEntity::FACE_DESCRIPTORS = {
+      std::make_tuple("north",
+                      CVector3( 0.505,  0.000,  0.505) * BLOCK_SIDE_LENGTH,
+                      CQuaternion( 0.5 * CRadians::PI, CVector3::Y)),
+      std::make_tuple("east",
+                      CVector3( 0.000, -0.505,  0.505) * BLOCK_SIDE_LENGTH,
+                      CQuaternion( 0.5 * CRadians::PI, CVector3::X)),
+      std::make_tuple("south",
+                      CVector3(-0.505,  0.000,  0.505) * BLOCK_SIDE_LENGTH,
+                      CQuaternion(-0.5 * CRadians::PI, CVector3::Y)),
+      std::make_tuple("west",
+                      CVector3( 0.000,  0.505,  0.505) * BLOCK_SIDE_LENGTH,
+                      CQuaternion(-0.5 * CRadians::PI, CVector3::X)),
+      std::make_tuple("top",
+                      CVector3( 0.000,  0.000,  1.010) * BLOCK_SIDE_LENGTH,
+                      CQuaternion( 0.0 * CRadians::PI, CVector3::X)),
+      std::make_tuple("bottom",
+                      CVector3( 0.000,  0.000, -0.010) * BLOCK_SIDE_LENGTH,
+                      CQuaternion( 1.0 * CRadians::PI, CVector3::X)),
+   };
+
+   const std::array<CVector3, 4> CBlockEntity::LED_DESCRIPTORS = {
+      CVector3( 0.02,  0.00, 0.0),
+      CVector3( 0.00,  0.02, 0.0),
+      CVector3(-0.02,  0.00, 0.0),
+      CVector3( 0.00, -0.02, 0.0),
+   };
 
    /****************************************/
    /****************************************/
@@ -56,7 +93,7 @@ namespace argos {
          SAnchor& sOriginAnchor = m_pcEmbodiedEntity->GetOriginAnchor();
          /* create and initialize the tags */
          m_pcTagEquippedEntity = new CTagEquippedEntity(this, "tags_0");
-         for(const std::tuple<std::string, CVector3, CQuaternion>& c_face : m_arrFaces) {
+         for(const std::tuple<std::string, CVector3, CQuaternion>& c_face : FACE_DESCRIPTORS) {
             /* add a tag */
             m_pcTagEquippedEntity->AddTag(std::get<std::string>(c_face),
                                           std::get<CVector3>(c_face),
@@ -73,7 +110,7 @@ namespace argos {
          AddComponent(*m_pcTagEquippedEntity);
          /* create and initialize the radios */
          m_pcRadioEquippedEntity = new CRadioEquippedEntity(this, "radios_0");
-         for(const std::tuple<std::string, CVector3, CQuaternion>& c_face : m_arrFaces) {
+         for(const std::tuple<std::string, CVector3, CQuaternion>& c_face : FACE_DESCRIPTORS) {
             /* add a radio */
             m_pcRadioEquippedEntity->AddRadio(std::get<std::string>(c_face),
                                               std::get<CVector3>(c_face),
@@ -87,10 +124,10 @@ namespace argos {
          AddComponent(*m_pcRadioEquippedEntity);
          /* create and initialize the directional LEDs */
          m_pcDirectionalLEDEquippedEntity = new CDirectionalLEDEquippedEntity(this, "directional_leds_0");
-         for(const std::tuple<std::string, CVector3, CQuaternion>& c_face : m_arrFaces) {
-            for(UInt32 un_index = 0; un_index < m_arrLEDs.size(); un_index++) {
+         for(const std::tuple<std::string, CVector3, CQuaternion>& c_face : FACE_DESCRIPTORS) {
+            for(UInt32 un_index = 0; un_index < LED_DESCRIPTORS.size(); un_index++) {
                /* calculate the LED offset from the origin anchor */
-               CVector3 cPosition(m_arrLEDs[un_index]);
+               CVector3 cPosition(LED_DESCRIPTORS[un_index]);
                cPosition.Rotate(std::get<CQuaternion>(c_face));
                cPosition += std::get<CVector3>(c_face);
                /* create an id for the LED */
@@ -148,43 +185,6 @@ namespace argos {
    /****************************************/
 
    REGISTER_STANDARD_SPACE_OPERATIONS_ON_COMPOSABLE(CBlockEntity);
-
-   /****************************************/
-   /****************************************/
-
-   const Real CBlockEntity::m_fBlockSideLength = Real(0.055);
-
-   /* these face offsets are used for calculating the positions of the LEDs
-      radios, and tags. Since the LEDs and the tags need to be seen by
-      cameras, the offset is increased by 1% so that the entity sits just
-      above the surface of the block */
-   const std::array<std::tuple<std::string, CVector3, CQuaternion>, 6> CBlockEntity::m_arrFaces = {
-      std::make_tuple("north",
-                      CVector3( 0.505f,  0.000f,  0.505f) * m_fBlockSideLength,
-                      CQuaternion( 0.5f * CRadians::PI, CVector3::Y)),
-      std::make_tuple("east",
-                      CVector3( 0.000f, -0.505f,  0.505f) * m_fBlockSideLength,
-                      CQuaternion( 0.5f * CRadians::PI, CVector3::X)),
-      std::make_tuple("south",
-                      CVector3(-0.505f,  0.000f,  0.505f) * m_fBlockSideLength,
-                      CQuaternion(-0.5f * CRadians::PI, CVector3::Y)),
-      std::make_tuple("west",
-                      CVector3( 0.000f,  0.505f,  0.505f) * m_fBlockSideLength,
-                      CQuaternion(-0.5f * CRadians::PI, CVector3::X)),
-      std::make_tuple("top",
-                      CVector3( 0.000f,  0.000f,  1.010f) * m_fBlockSideLength,
-                      CQuaternion( 0.0f * CRadians::PI, CVector3::X)),
-      std::make_tuple("bottom",
-                      CVector3( 0.000f,  0.000f, -0.010f) * m_fBlockSideLength,
-                      CQuaternion( 1.0f * CRadians::PI, CVector3::X)),
-   };
-
-   const std::array<CVector3, 4> CBlockEntity::m_arrLEDs = {
-      CVector3(0.02f,0.0f,0.0f),
-      CVector3(0.0f,0.02f,0.0f),
-      CVector3(-0.02f,0.0f,0.0f),
-      CVector3(0.0f,-0.02f,0.0f),
-   };
 
    /****************************************/
    /****************************************/

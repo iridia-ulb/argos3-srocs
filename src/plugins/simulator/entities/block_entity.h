@@ -81,9 +81,12 @@ namespace argos {
 
       bool m_bDebug;
 
-      static const Real m_fBlockSideLength;
-      static const std::array<std::tuple<std::string, CVector3, CQuaternion>, 6> m_arrFaces;
-      static const std::array<CVector3, 4> m_arrLEDs;
+      /* constants */
+      static const Real TAG_SIDE_LENGTH;
+      static const Real NFC_TRANSMISSION_RANGE;
+      static const Real BLOCK_SIDE_LENGTH;
+      static const std::array<std::tuple<std::string, CVector3, CQuaternion>, 6> FACE_DESCRIPTORS;
+      static const std::array<CVector3, 4> LED_DESCRIPTORS;
    };
 
 }
