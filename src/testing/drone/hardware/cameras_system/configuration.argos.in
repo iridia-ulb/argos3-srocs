@@ -26,6 +26,7 @@
           devices="6,7,8,9"
           height="600"
           threads="1"/>
+        <drone_system implementation="default" />
         <wifi implementation="default" />
       </sensors>
       <params script="@CMAKE_BINARY_DIR@/testing/drone/cameras_system/controller.lua" />

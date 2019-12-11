@@ -7,7 +7,13 @@ end
 
 --[[ This function is executed at each time step
      It must contain the logic of your controller ]]
-function step()  
+function step()
+   print("time = " .. tostring(robot.system.time))
+   local str = "temperatures = "
+   for i, temp in ipairs(robot.system.temperatures) do
+      str = str .. tostring(temp) .. " "
+   end
+   print(str)
    for i, camera in ipairs(robot.cameras_system) do 
       print("camera " .. i)
       for j, tag in ipairs(camera.tags) do
