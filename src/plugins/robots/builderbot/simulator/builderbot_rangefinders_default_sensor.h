@@ -15,9 +15,11 @@ namespace argos {
 }
 
 #include <argos3/core/simulator/sensor.h>
+#include <argos3/core/simulator/space/positional_indices/positional_index.h>
 #include <argos3/core/utility/math/vector3.h>
 #include <argos3/core/utility/math/quaternion.h>
 #include <argos3/plugins/robots/builderbot/control_interface/ci_builderbot_rangefinders_sensor.h>
+#include <argos3/plugins/simulator/entities/led_entity.h>
 
 namespace argos {
 
@@ -30,10 +32,16 @@ namespace argos {
          /* constructor */
          SSimulatedInterface(const std::string& str_label,
                              const SAnchor& s_anchor,
-                             Real f_range);
+                             CEmbodiedEntity& c_embodied_entity,
+                             CControllableEntity& c_controllable_entity,
+                             Real f_range,
+                             const bool& b_show_rays);
          /* members */
          const SAnchor& Anchor;
+         CEmbodiedEntity& EmbodiedEntity;
+         CControllableEntity& ControllableEntity;
          Real Range;
+         const bool& ShowRays;
       };
 
       CBuilderBotRangefindersDefaultSensor();
@@ -49,12 +57,12 @@ namespace argos {
       virtual void Reset();
 
    private:
-      Real ConvertToMeters(Real f_raw) {
+      static Real ConvertToMeters(Real f_raw) {
          static const Real fConversionFactor = Real(1.0);
          return (f_raw * fConversionFactor);
       }
 
-      Real ConvertToLux(Real f_raw) {
+      static Real ConvertToLux(Real f_raw) {
          static const Real fConversionFactor = Real(1.0);
          return (f_raw * fConversionFactor);
       }
@@ -62,6 +70,7 @@ namespace argos {
    private:
       CEmbodiedEntity* m_pcEmbodiedEntity;
       CControllableEntity* m_pcControllableEntity;
+      CPositionalIndex<CLEDEntity>* m_pcLightIndex;
 
       bool m_bShowRays;
 
