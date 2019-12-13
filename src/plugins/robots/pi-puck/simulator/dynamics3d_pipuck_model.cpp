@@ -196,19 +196,19 @@ namespace argos {
    /****************************************/
    /****************************************/
 
-   const btVector3    CDynamics3DPiPuckModel::m_cBodyHalfExtents(0.0362, 0.0236, 0.0362);
+   const btVector3    CDynamics3DPiPuckModel::m_cBodyHalfExtents(0.0362, 0.069, 0.0362);
    const btScalar     CDynamics3DPiPuckModel::m_fBodyMass(0.242);
    const btTransform  CDynamics3DPiPuckModel::m_cBodyOffset(btQuaternion(0.0, 0.0, 0.0, 1.0), btVector3(0.0,0.00125,0.0));
-   const btTransform  CDynamics3DPiPuckModel::m_cBodyGeometricOffset(btQuaternion(0.0, 0.0, 0.0, 1.0), btVector3(0.0, -0.0236, 0.0));
-   const btVector3    CDynamics3DPiPuckModel::m_cWheelHalfExtents(0.02125,0.0015,0.02125);
+   const btTransform  CDynamics3DPiPuckModel::m_cBodyGeometricOffset(btQuaternion(0.0, 0.0, 0.0, 1.0), btVector3(0.0, -0.069, 0.0));
+   const btVector3    CDynamics3DPiPuckModel::m_cWheelHalfExtents(0.02125, 0.0015, 0.02125);
    const btScalar     CDynamics3DPiPuckModel::m_fWheelMass(0.006);
-   const btTransform  CDynamics3DPiPuckModel::m_cWheelGeometricOffset(btQuaternion(0.0, 0.0, 0.0, 1.0), btVector3(0.0,-0.0015,0.0));
+   const btTransform  CDynamics3DPiPuckModel::m_cWheelGeometricOffset(btQuaternion(0.0, 0.0, 0.0, 1.0), btVector3(0.0, -0.0015, 0.0));
    const btTransform  CDynamics3DPiPuckModel::m_cLeftWheelOffset(btQuaternion(btVector3(-1,0,0), SIMD_HALF_PI), btVector3(0.0, 0.02125, -0.0255));
    const btTransform  CDynamics3DPiPuckModel::m_cRightWheelOffset(btQuaternion(btVector3(1,0,0), SIMD_HALF_PI), btVector3(0.0, 0.02125, 0.0255));
-   const btVector3    CDynamics3DPiPuckModel::m_cBodyToRightWheelJointOffset(0.0, -0.0036, 0.0255);
+   const btVector3    CDynamics3DPiPuckModel::m_cBodyToRightWheelJointOffset(0.0, -0.049, 0.0255);
    const btVector3    CDynamics3DPiPuckModel::m_cRightWheelToBodyJointOffset(0.0, 0.0015, 0.0);
    const btQuaternion CDynamics3DPiPuckModel::m_cBodyToRightWheelJointRotation(btVector3(-1,0,0), SIMD_HALF_PI);
-   const btVector3    CDynamics3DPiPuckModel::m_cBodyToLeftWheelJointOffset(0.0, -0.0036, -0.0255);
+   const btVector3    CDynamics3DPiPuckModel::m_cBodyToLeftWheelJointOffset(0.0, -0.049, -0.0255);
    const btVector3    CDynamics3DPiPuckModel::m_cLeftWheelToBodyJointOffset(0.0, 0.0015, -0.0);
    const btQuaternion CDynamics3DPiPuckModel::m_cBodyToLeftWheelJointRotation(btVector3(1,0,0), SIMD_HALF_PI);
    /* TODO calibrate these values */
