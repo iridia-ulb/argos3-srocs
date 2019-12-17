@@ -20,11 +20,12 @@
         <wifi implementation="default" />
       </actuators>
       <sensors>
-        <!-- resolution is 800 x height, where height is 600, 500, 400 etc -->
         <drone_cameras_system implementation="default"
           calibration="src/calibration/drone_camera_system.xml"
           devices="6,7,8,9"
-          height="600"
+          capture_resolution="1024,768"
+          processing_resolution="700,700"
+          processing_offset="162,34"
           threads="1"/>
         <drone_system implementation="default" />
         <wifi implementation="default" />

@@ -27,7 +27,7 @@
 #include <linux/videodev2.h>
 #include <libv4l2.h>
 
-#include <regex>
+#include <array>
 #include <chrono>
 #include <algorithm>
 #include <execution>
@@ -101,19 +101,36 @@ namespace argos {
       int nThreads;
       GetNodeAttribute(t_calibration, "threads", nThreads);
       m_ptTagDetector->nthreads = nThreads;
-      LOG << "[INFO] Using " << nThreads << " threads per camera" << std::endl; 
       // BEGIN TEST CODE
-      UInt32 unImageHeight;
-      GetNodeAttribute(t_calibration, "height", unImageHeight);
-      LOG << "[INFO] Testing at 800x" << static_cast<int>(unImageHeight) << std::endl; 
+      std::string strCaptureResolution;
+      std::string strProcessingResolution;
+      std::string strProcessingOffset;
+      GetNodeAttribute(t_calibration, "capture_resolution", strCaptureResolution);
+      GetNodeAttribute(t_calibration, "processing_resolution", strProcessingResolution);
+      GetNodeAttribute(t_calibration, "processing_offset", strProcessingOffset);
+      ParseValues<UInt32>(strCaptureResolution, 2, m_arrCaptureResolution.data(), ',');
+      ParseValues<UInt32>(strProcessingResolution, 2, m_arrProcessingResolution.data(), ',');
+      ParseValues<UInt32>(strProcessingOffset, 2, m_arrProcessingOffset.data(), ',');
+      LOG << "[INFO] Camera system using " << nThreads
+          << " threads: processing "
+          << static_cast<int>(m_arrProcessingResolution[0])
+          << "x"
+          << static_cast<int>(m_arrProcessingResolution[1])
+          << " from "
+          << static_cast<int>(m_arrCaptureResolution[0])
+          << "x"
+          << static_cast<int>(m_arrCaptureResolution[1])
+          << std::endl;
+
       // END TEST CODE
       /* allocate image memory */
-      m_ptImage = ::image_u8_create_alignment(IMAGE_WIDTH, unImageHeight, 96);
+      m_ptImage =
+         ::image_u8_create_alignment(m_arrProcessingResolution[0], m_arrProcessingResolution[1], 96);
       /* update the tag detection info structure */
       m_tTagDetectionInfo.fx = 315; // m_sCalibration.CameraMatrix(0,0);
       m_tTagDetectionInfo.fy = 315; // m_sCalibration.CameraMatrix(1,1);
-      m_tTagDetectionInfo.cx = 400; //m_sCalibration.CameraMatrix(0,2);
-      m_tTagDetectionInfo.cy = unImageHeight / 2; //m_sCalibration.CameraMatrix(1,2);
+      m_tTagDetectionInfo.cx = m_arrProcessingResolution[0] / 2; //m_sCalibration.CameraMatrix(0,2);
+      m_tTagDetectionInfo.cy = m_arrProcessingResolution[1] / 2; //m_sCalibration.CameraMatrix(1,2);
       m_tTagDetectionInfo.tagsize = TAG_SIDE_LENGTH;
    }
 
@@ -143,10 +160,10 @@ namespace argos {
       /* set camera format*/
       v4l2_format sFormat;
       sFormat.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
-      sFormat.fmt.pix.width = IMAGE_WIDTH;
-      sFormat.fmt.pix.height = IMAGE_HEIGHT;
-      sFormat.fmt.pix.sizeimage = IMAGE_WIDTH * IMAGE_HEIGHT * IMAGE_BYTES_PER_PIXEL;
-      sFormat.fmt.pix.bytesperline = IMAGE_WIDTH * IMAGE_BYTES_PER_PIXEL;
+      sFormat.fmt.pix.width = m_arrCaptureResolution[0];
+      sFormat.fmt.pix.height = m_arrCaptureResolution[1];
+      sFormat.fmt.pix.sizeimage = m_arrCaptureResolution[0] * m_arrCaptureResolution[1] * IMAGE_BYTES_PER_PIXEL;
+      sFormat.fmt.pix.bytesperline = m_arrCaptureResolution[0] * IMAGE_BYTES_PER_PIXEL;
       sFormat.fmt.pix.pixelformat = V4L2_PIX_FMT_YUYV;
       sFormat.fmt.pix.field = V4L2_FIELD_NONE;
       if (::ioctl(m_nCameraHandle, VIDIOC_S_FMT, &sFormat) < 0)
@@ -338,11 +355,13 @@ namespace argos {
             /* get a pointer to the image data */
             uint8_t* punImageData = static_cast<uint8_t*>(m_itCurrentBuffer->second);
             /* create the gray scale image based on the luminance data */
-            UInt32 unSourceIndex = 0;
-            UInt32 unDestinationIndex = 0;
             const UInt32 unImageStride = m_ptImage->stride;
             const UInt32 unImageWidth = m_ptImage->width;
             const UInt32 unImageHeight = m_ptImage->height;
+            /* copy requested pixels from V4L2 buffer to m_ptImage */
+            UInt32 unSourceIndex =
+               IMAGE_BYTES_PER_PIXEL * (m_arrCaptureResolution[0] * m_arrProcessingOffset[1] + m_arrProcessingOffset[0]);
+            UInt32 unDestinationIndex = 0;
             /* extract the luminance from the data (assumes V4L2_PIX_FMT_YUYV) */
             for (UInt32 un_height_index = 0; un_height_index < unImageHeight; un_height_index++) {
                for (UInt32 un_width_index = 0; un_width_index < unImageWidth; un_width_index++) {
@@ -351,8 +370,18 @@ namespace argos {
                   /* move to the next pixel */
                   unSourceIndex += 2;
                }
+               unSourceIndex += (2 * (m_arrCaptureResolution[0] - m_arrProcessingResolution[0]));
                unDestinationIndex += (unImageStride - unImageWidth);
             }
+            /*
+            std::string strTest = "output/camera";
+            strTest += std::to_string(m_nCameraHandle);
+            strTest += "_";
+            strTest += std::to_string(static_cast<int>(unFrameId));
+            strTest += ".pnm";
+            ::image_u8_write_pnm(m_ptImage, strTest.c_str());
+            */
+            unFrameId += 1;
             /* detect the tags */
             CVector2 cCenterPixel;
             std::array<CVector2, 4> arrCornerPixels;

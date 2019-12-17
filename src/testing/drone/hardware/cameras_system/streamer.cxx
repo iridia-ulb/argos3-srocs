@@ -14,8 +14,8 @@
 #include <cstring>
 #include <iostream>
 
-#define WIDTH 800
-#define HEIGHT 600
+#define WIDTH 1024
+#define HEIGHT 768
 #define BYTES_PER_PIXEL 2
 #define BUFFER_SIZE (WIDTH * HEIGHT * BYTES_PER_PIXEL)
 

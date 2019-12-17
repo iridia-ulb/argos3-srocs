@@ -75,6 +75,10 @@ namespace argos {
             CQuaternion OrientationError;
             CSquareMatrix<3> CameraMatrix;
          } m_sCalibration;
+         /* sensor configuration */
+         std::array<UInt32, 2> m_arrCaptureResolution;
+         std::array<UInt32, 2> m_arrProcessingResolution;
+         std::array<UInt32, 2> m_arrProcessingOffset;
          /* tag detector data */
          ::image_u8_t* m_ptImage;
          ::apriltag_family* m_ptTagFamily;
@@ -86,6 +90,8 @@ namespace argos {
          std::array<std::pair<UInt32, void*>, 2> m_arrBuffers;
          std::array<std::pair<UInt32, void*>, 2>::iterator m_itCurrentBuffer;
          std::array<std::pair<UInt32, void*>, 2>::iterator m_itNextBuffer;
+         /* frame counter */
+         UInt32 unFrameId = 0;
       };
 
       /* time at initialization */
