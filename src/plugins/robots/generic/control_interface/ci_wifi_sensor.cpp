@@ -7,7 +7,14 @@
 #include "ci_wifi_sensor.h"
 
 #ifdef ARGOS_WITH_LUA
-#include <argos3/core/wrappers/lua/lua_utility.h>
+   #include <argos3/core/wrappers/lua/lua_utility.h>
+   #include <argos3/core/wrappers/lua/lua_vector2.h>
+   #include <argos3/core/wrappers/lua/lua_vector3.h>
+   #include <argos3/core/wrappers/lua/lua_quaternion.h>
+   /* attention: these definitions must match those in ci_wifi_actuator.cpp */
+   #define LUA_TUSERDATA_VECTOR2 1
+   #define LUA_TUSERDATA_VECTOR3 2
+   #define LUA_TUSERDATA_QUATERNION 3
 #endif
 
 namespace argos {
@@ -31,8 +38,9 @@ namespace argos {
    void LuaDeserializeTable(CByteArray& c_data, lua_State* pt_lua_state) {
       SInt8 nKeyType, nValueType;
       std::string strBuffer;
-      Real fBuffer;
+      Real fBuffer[4];
       SInt8 nBuffer;
+      UInt8 unUserDataSubtype;
       bool bContinue = true;
       while(bContinue && !c_data.Empty()) {
          c_data >> nKeyType;
@@ -42,8 +50,8 @@ namespace argos {
             lua_pushstring(pt_lua_state, strBuffer.c_str());
             break;
          case LUA_TNUMBER:
-            c_data >> fBuffer;
-            lua_pushnumber(pt_lua_state, fBuffer);
+            c_data >> fBuffer[0];
+            lua_pushnumber(pt_lua_state, fBuffer[0]);
             break;
          case LUA_TBOOLEAN:
             c_data >> nBuffer;
@@ -52,6 +60,28 @@ namespace argos {
          case LUA_TTABLE:
             lua_newtable (pt_lua_state);
             LuaDeserializeTable(c_data, pt_lua_state);
+            break;
+         case LUA_TUSERDATA:
+            c_data >> unUserDataSubtype;
+            switch(unUserDataSubtype) {
+            case LUA_TUSERDATA_VECTOR2:
+               c_data >> fBuffer[0] >> fBuffer[1];
+               CLuaVector2::PushVector2(pt_lua_state, fBuffer[0], fBuffer[1]);
+               break;
+            case LUA_TUSERDATA_VECTOR3:
+               c_data >> fBuffer[0] >> fBuffer[1] >> fBuffer[2];
+               CLuaVector3::PushVector3(pt_lua_state, fBuffer[0], fBuffer[1], fBuffer[2]);
+               break;
+            case LUA_TUSERDATA_QUATERNION:
+               c_data >> fBuffer[0] >> fBuffer[1] >> fBuffer[2] >> fBuffer[3];
+               CLuaQuaternion::PushQuaternion(pt_lua_state, fBuffer[0], fBuffer[1], fBuffer[2], fBuffer[3]);
+               break;
+            default:
+               /* key is not a recognized subtype of userdata */
+               bContinue = false;
+               continue;
+               break;
+            }
             break;
          default:
             /* sentinel or the key is not a recognized type */
@@ -66,8 +96,8 @@ namespace argos {
             lua_pushstring(pt_lua_state, strBuffer.c_str());
             break;
          case LUA_TNUMBER:
-            c_data >> fBuffer;
-            lua_pushnumber(pt_lua_state, fBuffer);
+            c_data >> fBuffer[0];
+            lua_pushnumber(pt_lua_state, fBuffer[0]);
             break;
          case LUA_TBOOLEAN:
             c_data >> nBuffer;
@@ -76,6 +106,30 @@ namespace argos {
          case LUA_TTABLE:
             lua_newtable (pt_lua_state);
             LuaDeserializeTable(c_data, pt_lua_state);
+            break;
+         case LUA_TUSERDATA:
+            c_data >> unUserDataSubtype;
+            switch(unUserDataSubtype) {
+            case LUA_TUSERDATA_VECTOR2:
+               c_data >> fBuffer[0] >> fBuffer[1];
+               CLuaVector2::PushVector2(pt_lua_state, fBuffer[0], fBuffer[1]);
+               break;
+            case LUA_TUSERDATA_VECTOR3:
+               c_data >> fBuffer[0] >> fBuffer[1] >> fBuffer[2];
+               CLuaVector3::PushVector3(pt_lua_state, fBuffer[0], fBuffer[1], fBuffer[2]);
+               break;
+            case LUA_TUSERDATA_QUATERNION:
+               c_data >> fBuffer[0] >> fBuffer[1] >> fBuffer[2] >> fBuffer[3];
+               CLuaQuaternion::PushQuaternion(pt_lua_state, fBuffer[0], fBuffer[1], fBuffer[2], fBuffer[3]);
+               break;
+            default:
+               /* key is not a recognized subtype of userdata */
+               bContinue = false;
+               /* remove the key from the stack */
+               lua_pop(pt_lua_state, 1);
+               continue;
+               break;
+            }
             break;
          default:
             /* the value is not a recognized type */
