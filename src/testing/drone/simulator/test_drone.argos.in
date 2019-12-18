@@ -19,6 +19,7 @@
         <wifi implementation="default" />
       </actuators>
       <sensors>
+        <drone_cameras_system implementation="default" show_frustum="true" />
         <drone_flight_system implementation="default" />
         <wifi implementation="default" />
       </sensors>
@@ -34,7 +35,7 @@
     <drone id="drone">
       <body position="0,0,0" orientation="0,0,0"/>
       <controller config="drone"/>
-    </drone> 
+    </drone>
   </arena>
 
   <!-- ******************* -->
@@ -56,7 +57,6 @@
   <!-- ****************** -->
   <!-- * Visualization * -->
   <!-- ****************** -->
-
   <visualization>
     <qt-opengl lua_editor="false">
       <camera>

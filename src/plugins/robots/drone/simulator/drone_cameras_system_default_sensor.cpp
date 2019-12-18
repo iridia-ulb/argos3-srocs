@@ -14,22 +14,23 @@
 #include <argos3/plugins/simulator/media/directional_led_medium.h>
 #include <argos3/plugins/simulator/media/tag_medium.h>
 
-#define CAMERA_RESOLUTION_X 320.0
-#define CAMERA_RESOLUTION_Y 240.0
-/* focal length is based on a camera with a diagonal field of view of 65 degrees */
-#define CAMERA_FOCAL_LENGTH_X 313.9
-#define CAMERA_FOCAL_LENGTH_Y 313.9
-#define CAMERA_PRINCIPAL_POINT_X 160.0
-#define CAMERA_PRINCIPAL_POINT_Y 120.0
+#define CAMERA_RESOLUTION_X 700.0
+#define CAMERA_RESOLUTION_Y 700.0
+#define CAMERA_FOCAL_LENGTH_X 1039.4975
+#define CAMERA_FOCAL_LENGTH_Y 1039.4975
+#define CAMERA_PRINCIPAL_POINT_X 350.0
+#define CAMERA_PRINCIPAL_POINT_Y 350.0
+
 #define CAMERA_RANGE_MIN 0.001
-#define CAMERA_RANGE_MAX 0.125
+#define CAMERA_RANGE_MAX 1.800
 /* when detecting LEDs, an LED should be within 0.5 cm of the sampled location
    this prevents the detection of adjacent LEDs on the stigmergic block */
 #define DETECT_LED_DIST_THRES 0.005
 
-#define ORIGIN_CAMERA_X_OFFSET 0.10
-#define ORIGIN_CAMERA_Y_OFFSET 0.10
-#define ORIGIN_CAMERA_Z_OFFSET 0.15
+#define ORIGIN_CAMERA_X_OFFSET 0.12
+#define ORIGIN_CAMERA_Y_OFFSET 0.12
+#define ORIGIN_CAMERA_Z_OFFSET 0.16
+#define ORIENTATION_CAMERA_RADANGLE (M_PI - 27.0 / 180 * M_PI)
 
 namespace argos {
 
@@ -45,10 +46,20 @@ namespace argos {
       m_bShowTagRays(false),
       m_bShowLEDRays(false),
       m_arrCameras {
-         std::make_tuple(this, CVector3( ORIGIN_CAMERA_X_OFFSET,  ORIGIN_CAMERA_Y_OFFSET, ORIGIN_CAMERA_Z_OFFSET), CQuaternion(0,1,0,0)),
-         std::make_tuple(this, CVector3(-ORIGIN_CAMERA_X_OFFSET,  ORIGIN_CAMERA_Y_OFFSET, ORIGIN_CAMERA_Z_OFFSET), CQuaternion(0,1,0,0)),
-         std::make_tuple(this, CVector3(-ORIGIN_CAMERA_X_OFFSET, -ORIGIN_CAMERA_Y_OFFSET, ORIGIN_CAMERA_Z_OFFSET), CQuaternion(0,1,0,0)),
-         std::make_tuple(this, CVector3( ORIGIN_CAMERA_X_OFFSET, -ORIGIN_CAMERA_Y_OFFSET, ORIGIN_CAMERA_Z_OFFSET), CQuaternion(0,1,0,0)),
+         std::make_tuple(this, CVector3( ORIGIN_CAMERA_X_OFFSET,  ORIGIN_CAMERA_Y_OFFSET, ORIGIN_CAMERA_Z_OFFSET), 
+            CQuaternion(CRadians(ORIENTATION_CAMERA_RADANGLE),CVector3(-1,1,0))
+            * CQuaternion(CRadians(M_PI),CVector3(0,0,1))
+         ),
+         std::make_tuple(this, CVector3(-ORIGIN_CAMERA_X_OFFSET,  ORIGIN_CAMERA_Y_OFFSET, ORIGIN_CAMERA_Z_OFFSET), 
+            CQuaternion(CRadians(ORIENTATION_CAMERA_RADANGLE),CVector3(-1,-1,0))
+         ),
+         std::make_tuple(this, CVector3(-ORIGIN_CAMERA_X_OFFSET, -ORIGIN_CAMERA_Y_OFFSET, ORIGIN_CAMERA_Z_OFFSET), 
+            CQuaternion(CRadians(ORIENTATION_CAMERA_RADANGLE),CVector3(1,-1,0))
+            * CQuaternion(CRadians(M_PI),CVector3(0,0,1))
+         ),
+         std::make_tuple(this, CVector3( ORIGIN_CAMERA_X_OFFSET, -ORIGIN_CAMERA_Y_OFFSET, ORIGIN_CAMERA_Z_OFFSET), 
+            CQuaternion(CRadians(ORIENTATION_CAMERA_RADANGLE),CVector3(1,1,0))
+         ),
       } {}
 
    /****************************************/
