@@ -23,7 +23,7 @@ end
 function step()
    for timestamp, path in pairs(trajectory) do
       if time == timestamp then
-         robot.flight_system.set_targets(unpack(path))
+         robot.flight_system.set_targets(table.unpack(path))
          log(tostring(time) .. ": " .. tostring(robot.flight_system.position))
       end
    end
