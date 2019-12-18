@@ -1,28 +1,38 @@
 --[[ This function is executed every time you press the 'execute' button ]]
+
+-- trajectory = { time: number -> { position: vector3, yaw: number }}
+trajectory = {
+   [1]  =  { vector3( 0,  0,   0),  0.0},
+   [10] =  { vector3( 0,  0, 1.5),  0.0},
+   [40] =  { vector3( 4,  2, 1.5),  0.0},
+   [60] =  { vector3( 0,  0, 1.5),  0.0},
+   [80] =  { vector3( 2, -4, 1.5),  0.0},
+   [100] = { vector3( 0,  0, 1.5),  0.0},
+   [120] = { vector3( 0,  0, 1.5),  0.5},  
+   [140] = { vector3( 4,  2, 1.5),  0.5},
+   [160] = { vector3( 0,  0, 1.5),  0.5},
+   [180] = { vector3( 0,  0, 1.5), -0.5},
+   [200] = { vector3(-2, -4, 1.5), -0.5},
+   [220] = { vector3( 0,  0, 1.5),  0.0},
+}
+
 function init()
-   reset()
+   time = 1
 end
 
---[[ This function is executed at each time step
-     It must contain the logic of your controller ]]
 function step()
-   robot.flight_system.set_targets(vector3(1,1,1), 1)
-   log("accelerometer = ", tostring(robot.flight_system.accelerometer))
-   log("gyroscope = ", tostring(robot.flight_system.gyroscope))
+   for timestamp, path in pairs(trajectory) do
+      if time == timestamp then
+         robot.flight_system.set_targets(unpack(path))
+         log(tostring(time) .. ": " .. tostring(robot.flight_system.position))
+      end
+   end
+   time = time + 1
 end
 
---[[ This function is executed every time you press the 'reset'
-     button in the GUI. It is supposed to restore the state
-     of the controller to whatever it was right after init() was
-     called. The state of sensors and actuators is reset
-     automatically by ARGoS. ]]
 function reset()
+   init()
 end
 
-
-
---[[ This function is executed only once, when the robot is removed
-     from the simulation ]]
 function destroy()
-   -- put your code here
 end

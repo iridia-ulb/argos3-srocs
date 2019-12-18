@@ -13,6 +13,7 @@ namespace argos {
 
 #include <argos3/core/control_interface/ci_sensor.h>
 #include <argos3/core/utility/math/vector3.h>
+#include <argos3/core/utility/math/quaternion.h>
 
 namespace argos {
 
@@ -21,24 +22,36 @@ namespace argos {
    public:
 
       CCI_DroneFlightSystemSensor() :
-         m_cAccelerometerReading(CVector3::ZERO),
-         m_cGyroscopeReading(CVector3::ZERO) {}
+         m_cPositionReading(CVector3::ZERO),
+         m_cOrientationReading(CVector3::ZERO),
+         m_cVelocityReading(CVector3::ZERO),
+         m_cAngularVelocityReading(CVector3::ZERO) {}
       
       virtual ~CCI_DroneFlightSystemSensor() {}
       
       virtual void Reset() {
-         m_cAccelerometerReading = CVector3::ZERO;
-         m_cGyroscopeReading = CVector3::ZERO;
+         m_cPositionReading = CVector3::ZERO;
+         m_cOrientationReading = CVector3::ZERO;
+         m_cVelocityReading = CVector3::ZERO;
+         m_cAngularVelocityReading = CVector3::ZERO;
       }
 
-      const CVector3& GetAccelerometerReading() {
-         return m_cAccelerometerReading;
+      const CVector3& GetPositionReading() const {
+         return m_cPositionReading;
       }
 
-      const CVector3& GetGyroscopeReading() {
-         return m_cGyroscopeReading;
+      const CVector3& GetOrientationReading() const {
+         return m_cOrientationReading;
       }
-      
+
+      const CVector3& GetVelocityReading() const {
+         return m_cVelocityReading;
+      }
+
+      const CVector3& GetAngularVelocityReading() const {
+         return m_cAngularVelocityReading;
+      }
+
 #ifdef ARGOS_WITH_LUA
       virtual void CreateLuaState(lua_State* pt_lua_state);
 
@@ -46,10 +59,10 @@ namespace argos {
 #endif
 
    protected:
-
-      CVector3 m_cAccelerometerReading;
-      CVector3 m_cGyroscopeReading;
-      
+      CVector3 m_cPositionReading;
+      CVector3 m_cOrientationReading;
+      CVector3 m_cVelocityReading;
+      CVector3 m_cAngularVelocityReading;    
    };
 }
 

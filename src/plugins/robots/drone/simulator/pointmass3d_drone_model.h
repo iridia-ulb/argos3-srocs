@@ -35,7 +35,7 @@ namespace argos {
 
       virtual void UpdatePhysics();
 
-      virtual void Step();
+      virtual void Step() {}
 
       virtual void MoveTo(const CVector3& c_position,
                           const CQuaternion& c_orientation);
@@ -49,19 +49,85 @@ namespace argos {
 
    private:
 
-      const static Real m_fBodyHeight;
-      const static Real m_fArmLength;
-      const static Real m_fMass;
+      /* pid controller */
+      static Real CalculatePIDResponse(Real  f_cur_error,
+                                       Real  f_vel_error,
+                                       Real  f_sum_error,
+                                       Real  f_k_p,
+                                       Real  f_k_i,
+                                       Real  f_k_d);
 
-   private:
-
-      /* reference to the drone entity */
+      
+      
+      /* reference to the flight system entity */ 
       CDroneFlightSystemEntity& m_cFlightSystemEntity;
-
-      /* position and orientation of the drone in the GCS */
+      /* position and yaw input from the controller */ 
+      CRadians m_cInputYawAngle;
+      CVector3 m_cInputPosition;
+      /* local copy of the drone's position */
       CVector3 m_cDronePosition;
-      CQuaternion m_cDroneOrientation;
+      /* local copy of the drone's orientation */
+      CVector3 m_cDroneOrientation;
+      /* local copy of the drone's orientation (roll, pitch, and yaw) */
+      CRadians m_cRollAngle;
+      CRadians m_cPitchAngle;
+      CRadians m_cYawAngle;
+      /* velocity of the drone */
+      CVector3 m_cDroneVelocity;
+      CVector3 m_cDroneVelocityPrev;
+      /* angular velocity of the drone */
+      CVector3 m_cDroneAngularVelocity;
+      CVector3 m_cDroneAngularVelocityPrev;
+      /* acceleration of the drone */
+      CVector3 m_cDroneAccelerationPrev;
+      /* angular acceleration of the drone */
+      CVector3 m_cDroneAngularAccelerationPrev;
+      
 
+      CVector3 m_cDroneOrientationTargetPrev;
+      CVector3 m_cDroneAngularVelocityCumulativeError;
+
+      Real m_fAltitudeCumulativeError;
+      Real m_fTargetPositionZPrev;
+
+const static Real ROOT_TWO;
+      /* height of the drone's body */ 
+      const static Real HEIGHT;
+      /* length of the drone's arms */
+      const static Real ARM_LENGTH;
+      /* mass of the drone */
+      const static Real MASS;
+      /* inertia of the drone */      
+      const static CVector3 INERTIA;
+      /* thrust factor */
+      const static Real B;
+      /* torque factor */
+      const static Real D;
+      /* rotor coefficient */ 
+      const static Real JR;
+      /* position controller output limit */
+      const static CRange<Real> ROLL_PITCH_LIMIT;
+      /* thrust limit */
+      const static CRange<Real> THRUST_LIMIT;
+      /* torque limit */
+      const static CRange<Real> TORQUE_LIMIT;    
+      /* max velocity can be achieved in the XY plane */
+      const static Real XY_VEL_MAX;
+      /* max velocity can be achieved on the Z axis */
+      const static Real Z_VEL_MAX;
+      /* position controller parameters*/ 
+      const static Real XY_POS_KP;
+      const static Real XY_VEL_KP;
+      /* PID controller constants */
+      const static Real ALTITUDE_KP;     
+      const static Real ALTITUDE_KI;
+      const static Real ALTITUDE_KD;
+      const static Real ROLL_PITCH_KP; 
+      const static Real ROLL_PITCH_KI; 
+      const static Real ROLL_PITCH_KD;
+      const static Real YAW_KP; 
+      const static Real YAW_KI; 
+      const static Real YAW_KD; 
    };
 
 }

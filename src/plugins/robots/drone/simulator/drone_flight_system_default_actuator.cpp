@@ -48,8 +48,8 @@ namespace argos {
    /****************************************/
 
    void CDroneFlightSystemDefaultActuator::Update() {
-      m_pcFlightSystemEntity->SetTargetVelocity(m_cTargetVelocity);
-      m_pcFlightSystemEntity->SetTargetYawRate(m_fTargetYawRate);
+      m_pcFlightSystemEntity->SetTargetPosition(m_cTargetPosition);
+      m_pcFlightSystemEntity->SetTargetYawAngle(m_fTargetYawAngle);
    }
 
    /****************************************/

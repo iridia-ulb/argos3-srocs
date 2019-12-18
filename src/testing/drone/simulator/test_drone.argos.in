@@ -15,17 +15,10 @@
   <controllers>
     <lua_controller id="drone">
       <actuators>
-        <debug implementation="default">
-          <interface id="logerr" output="stderr" />
-          <interface id="log" output="stdout" />
-          <interface id="draw" />
-        </debug>
         <drone_flight_system implementation="default" />
         <wifi implementation="default" />
       </actuators>
       <sensors>
-        <!--drone_cameras_system implementation="default"
-          show_frustum="true" show_tag_rays="true" show_led_rays="true" /-->
         <drone_flight_system implementation="default" />
         <wifi implementation="default" />
       </sensors>
@@ -37,9 +30,9 @@
   <!-- *********************** -->
   <!-- * Arena configuration * -->
   <!-- *********************** -->
-  <arena size="3, 3, 1.5" center="0, 0, 0.5">
+  <arena size="10, 10, 5" center="0, 0, 2">
     <drone id="drone">
-      <body position="0,0,0.125" orientation="0,0,0"/>
+      <body position="0,0,0" orientation="0,0,0"/>
       <controller config="drone"/>
     </drone> 
   </arena>
@@ -65,18 +58,17 @@
   <!-- ****************** -->
 
   <visualization>
-    <qt-opengl lua_editor="true">
-      <!--user_functions label="srocs_qtopengl_user_functions" /-->
+    <qt-opengl lua_editor="false">
       <camera>
-        <placement idx="0" position=" 0,  -7.5,2" look_at="0,0,0.05" lens_focal_length="78" />
-        <placement idx="1" position=" 7.5,-7.5,2" look_at="0,0,0.05" lens_focal_length="92" />
-        <placement idx="2" position=" 7.5, 0,  2" look_at="0,0,0.05" lens_focal_length="78" />
-        <placement idx="3" position=" 7.5, 7.5,2" look_at="0,0,0.05" lens_focal_length="92" />
-        <placement idx="4" position=" 0,   7.5,2" look_at="0,0,0.05" lens_focal_length="78" />
-        <placement idx="5" position="-7.5, 7.5,2" look_at="0,0,0.05" lens_focal_length="92" />
-        <placement idx="6" position="-7.5, 0,  2" look_at="0,0,0.05" lens_focal_length="78" />
-        <placement idx="7" position="-7.5,-7.5,2" look_at="0,0,0.05" lens_focal_length="92" />
-        <placement idx="8" position="0,0,2.5" look_at="0.0,0.0,0.125" up="1,0,0" lens_focal_length="40" />
+        <placement idx="0" position=" 0,  -7.5, 2" look_at="0,0,0.05" lens_focal_length="78" />
+        <placement idx="1" position=" 7.5,-7.5, 2" look_at="0,0,0.05" lens_focal_length="92" />
+        <placement idx="2" position=" 7.5, 0,   2" look_at="0,0,0.05" lens_focal_length="78" />
+        <placement idx="3" position=" 7.5, 7.5, 2" look_at="0,0,0.05" lens_focal_length="92" />
+        <placement idx="4" position=" 0,   7.5, 2" look_at="0,0,0.05" lens_focal_length="78" />
+        <placement idx="5" position="-7.5, 7.5, 2" look_at="0,0,0.05" lens_focal_length="92" />
+        <placement idx="6" position="-7.5, 0,   2" look_at="0,0,0.05" lens_focal_length="78" />
+        <placement idx="7" position="-7.5,-7.5, 2" look_at="0,0,0.05" lens_focal_length="92" />
+        <placement idx="8" position="   0, 0,  10" look_at="0.0,0.0,0.125" up="1,0,0"  lens_focal_length="40" />
       </camera>
     </qt-opengl>
   </visualization>

@@ -77,7 +77,6 @@ namespace argos {
       CDebugEntity*                          m_pcDebugEntity;
       CEmbodiedEntity*                       m_pcEmbodiedEntity;
       CDroneFlightSystemEntity*              m_pcFlightSystemEntity;
-
       CRadioEquippedEntity*                  m_pcWifiRadioEquippedEntity;
 
       bool m_bDebug;

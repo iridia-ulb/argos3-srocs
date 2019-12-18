@@ -21,32 +21,31 @@ namespace argos {
    public:
 
       CCI_DroneFlightSystemActuator() :
-         m_cTargetVelocity(CVector3::ZERO),
-         m_fTargetYawRate(0.0) {}
+         m_cTargetPosition(CVector3::ZERO),
+         m_fTargetYawAngle(0.0 ) {} 
 
       virtual ~CCI_DroneFlightSystemActuator() {}
 
       virtual void Reset() {
-         m_cTargetVelocity = CVector3::ZERO;
-         m_fTargetYawRate = 0.0;
+         m_cTargetPosition = CVector3::ZERO;
+         m_fTargetYawAngle.SetValue(0.0);
       }
 
-      void SetTargetVelocity(const CVector3& c_velocity) {
-         m_cTargetVelocity = c_velocity;
+      void SetTargetPosition(const CVector3& c_position) {
+          m_cTargetPosition = c_position;
       }
 
-      void SetTargetYawRate(Real f_yaw_rate) {
-         m_fTargetYawRate = f_yaw_rate;
-      }    
+      void SetTargetYawAngle(Real f_yaw_angle) {
 
+         m_fTargetYawAngle.SignedNormalize().SetValue(f_yaw_angle);
+      }   
 #ifdef ARGOS_WITH_LUA
       virtual void CreateLuaState(lua_State* pt_lua_state);
 #endif
 
    protected:
-
-      CVector3 m_cTargetVelocity;
-      Real m_fTargetYawRate;
+      CVector3 m_cTargetPosition;
+      CRadians m_fTargetYawAngle;
       
    };
 

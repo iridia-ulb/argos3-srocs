@@ -19,9 +19,10 @@ namespace argos {
 #ifdef ARGOS_WITH_LUA
    /*
     * The stack must have two values in this order:
-    * 1. target velocity (vector3)
-    * 2. target yaw rate (number)
+    * 1. target position (vector3)
+    * 2. target yaw angle (number)
     */
+
    int LuaSetDroneFlightSystemTargets(lua_State* pt_lua_state) {
       /* Check parameters */
       if(lua_gettop(pt_lua_state) != 2) {
@@ -33,9 +34,10 @@ namespace argos {
       CCI_DroneFlightSystemActuator* pcFlightSystemActuator =
          CLuaUtility::GetDeviceInstance<CCI_DroneFlightSystemActuator>(pt_lua_state, "flight_system");
       /* Update actuator */
-      const CVector3& cTargetVelocity = CLuaVector3::ToVector3(pt_lua_state, 1);     
-      pcFlightSystemActuator->SetTargetVelocity(cTargetVelocity);
-      pcFlightSystemActuator->SetTargetYawRate(lua_tonumber(pt_lua_state, 2));
+      const CVector3& cTargetPosition = CLuaVector3::ToVector3(pt_lua_state, 1);     
+      pcFlightSystemActuator->SetTargetPosition(cTargetPosition);
+      pcFlightSystemActuator->SetTargetYawAngle(lua_tonumber(pt_lua_state, 2));
+      
       return 0;
    }
 #endif

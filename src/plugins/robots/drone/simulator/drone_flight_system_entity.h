@@ -13,6 +13,7 @@ namespace argos {
 
 #include <argos3/core/simulator/entity/entity.h>
 #include <argos3/core/utility/math/vector3.h>
+#include <argos3/core/utility/math/quaternion.h>
 
 namespace argos {
 
@@ -38,48 +39,65 @@ namespace argos {
 
       virtual void Reset();
 
-      void SetAccelerometerReading(const CVector3& c_reading) {
-         m_cAccelerometerReading = c_reading;
+      void SetPositionReading(const CVector3& c_reading) {
+         m_cPositionReading = c_reading;
       }
 
-      const CVector3& GetAccelerometerReading() const {
-         return m_cAccelerometerReading;
+      const CVector3& GetPositionReading() const {
+         return m_cPositionReading;
       }
 
-      void SetGyroscopeReading(const CVector3& c_reading) {
-         m_cGyroscopeReading = c_reading;
+      void SetOrientationReading(const CVector3& c_reading) {
+         m_cOrientationReading = c_reading;
       }
 
-      const CVector3& GetGyroscopeReading() const {
-         return m_cGyroscopeReading;
-      }
-     
-      void SetTargetVelocity(const CVector3& c_velocity) {
-         m_cTargetVelocity = c_velocity;
+      const CVector3& GetOrientationReading() const {
+         return m_cOrientationReading;
       }
 
-      const CVector3& GetTargetVelocity() const {
-         return m_cTargetVelocity;
+      void SetVelocityReading(const CVector3& c_reading) {
+         m_cVelocityReading = c_reading;
       }
 
-      void SetTargetYawRate(Real f_yaw_rate) {
-         m_fTargetYawRate = f_yaw_rate;
+      const CVector3& GetVelocityReading() const {
+         return m_cVelocityReading;
       }
 
-      Real GetTargetYawRate() const {
-         return m_fTargetYawRate;
+      void SetAngularVelocityReading(const CVector3& c_reading) {
+         m_cAngularVelocityReading = c_reading;
       }
-      
+
+      const CVector3& GetAngularVelocityReading() const {
+         return m_cAngularVelocityReading;
+      }
+
+      void SetTargetPosition(const CVector3& c_position) {
+         m_cTargetPosition = c_position;
+      }
+
+      const CVector3& GetTargetPosition() const {
+         return m_cTargetPosition;
+      }
+
+      void SetTargetYawAngle(const CRadians f_yaw_angle) {
+         m_fTargetYawAngle = f_yaw_angle;
+      }
+
+      const CRadians& GetTargetYawAngle() const {
+         return m_fTargetYawAngle;
+      }
+
       virtual std::string GetTypeDescription() const {
          return "flight_system";
       }
 
    private:
-      CVector3 m_cAccelerometerReading;
-      CVector3 m_cGyroscopeReading;
-
-      CVector3 m_cTargetVelocity;
-      Real m_fTargetYawRate;     
+      CVector3 m_cPositionReading;
+      CVector3 m_cOrientationReading;
+      CVector3 m_cVelocityReading;
+      CVector3 m_cAngularVelocityReading;
+      CVector3 m_cTargetPosition;
+      CRadians m_fTargetYawAngle;
       
    };
 }

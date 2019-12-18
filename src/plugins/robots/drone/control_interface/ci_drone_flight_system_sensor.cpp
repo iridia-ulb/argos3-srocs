@@ -18,8 +18,10 @@ namespace argos {
 #ifdef ARGOS_WITH_LUA
    void CCI_DroneFlightSystemSensor::CreateLuaState(lua_State* pt_lua_state) {
       CLuaUtility::OpenRobotStateTable(pt_lua_state, "flight_system");
-      CLuaUtility::AddToTable(pt_lua_state, "accelerometer", GetAccelerometerReading());
-      CLuaUtility::AddToTable(pt_lua_state, "gyroscope", GetGyroscopeReading());
+      CLuaUtility::AddToTable(pt_lua_state, "position", GetPositionReading());
+      CLuaUtility::AddToTable(pt_lua_state, "orientation", GetOrientationReading());
+      CLuaUtility::AddToTable(pt_lua_state, "velocity", GetVelocityReading());
+      CLuaUtility::AddToTable(pt_lua_state, "angular_velocity", GetAngularVelocityReading());
       CLuaUtility::CloseRobotStateTable(pt_lua_state);
    }
 #endif
@@ -30,8 +32,10 @@ namespace argos {
 #ifdef ARGOS_WITH_LUA
    void CCI_DroneFlightSystemSensor::ReadingsToLuaState(lua_State* pt_lua_state) {
       lua_getfield(pt_lua_state, -1, "flight_system");
-      CLuaUtility::AddToTable(pt_lua_state, "accelerometer", GetAccelerometerReading());
-      CLuaUtility::AddToTable(pt_lua_state, "gyroscope", GetGyroscopeReading());
+      CLuaUtility::AddToTable(pt_lua_state, "position", GetPositionReading());
+      CLuaUtility::AddToTable(pt_lua_state, "orientation", GetOrientationReading());
+      CLuaUtility::AddToTable(pt_lua_state, "velocity", GetVelocityReading());
+      CLuaUtility::AddToTable(pt_lua_state, "angular_velocity", GetAngularVelocityReading());
       lua_pop(pt_lua_state, 1);
    }
 #endif

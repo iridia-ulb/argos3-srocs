@@ -16,10 +16,14 @@ namespace argos {
 
    CDroneFlightSystemEntity::CDroneFlightSystemEntity(CComposableEntity* pc_parent) :
       CEntity(pc_parent),
-      m_cAccelerometerReading(CVector3::ZERO),
-      m_cGyroscopeReading(CVector3::ZERO),
-      m_cTargetVelocity(CVector3::ZERO),
-      m_fTargetYawRate(0.0) {}
+      m_cPositionReading(CVector3::ZERO),
+      m_cOrientationReading(CVector3::ZERO),
+      m_cVelocityReading(CVector3::ZERO),
+      m_cAngularVelocityReading(CVector3::ZERO),
+      m_cTargetPosition(CVector3::ZERO),
+      m_fTargetYawAngle(0.0) {}
+
+
 
    /****************************************/
    /****************************************/
@@ -27,19 +31,23 @@ namespace argos {
    CDroneFlightSystemEntity::CDroneFlightSystemEntity(CComposableEntity* pc_parent,
                                                       const std::string& str_id) :
       CEntity(pc_parent, str_id),
-      m_cAccelerometerReading(CVector3::ZERO),
-      m_cGyroscopeReading(CVector3::ZERO),
-      m_cTargetVelocity(CVector3::ZERO),
-      m_fTargetYawRate(0.0) {}
-  
+      m_cPositionReading(CVector3::ZERO),
+      m_cOrientationReading(CVector3::ZERO),
+      m_cVelocityReading(CVector3::ZERO),
+      m_cAngularVelocityReading(CVector3::ZERO),
+      m_cTargetPosition(CVector3::ZERO),
+      m_fTargetYawAngle(0.0) {}
+
    /****************************************/
    /****************************************/
     
    void CDroneFlightSystemEntity::Reset() {
-      m_cAccelerometerReading = CVector3::ZERO;
-      m_cGyroscopeReading = CVector3::ZERO;
-      m_cTargetVelocity = CVector3::ZERO;
-      m_fTargetYawRate = 0.0;
+      m_cPositionReading = CVector3::ZERO;
+      m_cOrientationReading = CVector3::ZERO;
+      m_cVelocityReading = CVector3::ZERO;
+      m_cAngularVelocityReading = CVector3::ZERO;
+      m_cTargetPosition = CVector3::ZERO;
+      m_fTargetYawAngle = CRadians::ZERO;
    }
 
    /****************************************/
