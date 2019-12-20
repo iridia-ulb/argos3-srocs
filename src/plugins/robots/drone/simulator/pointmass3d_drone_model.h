@@ -64,14 +64,14 @@ namespace argos {
       /* position and yaw input from the controller */ 
       CRadians m_cInputYawAngle;
       CVector3 m_cInputPosition;
+
+      Real m_fHomeYawAngle;
+      CVector3 m_cHomePosition; //?
+
       /* local copy of the drone's position */
       CVector3 m_cDronePosition;
       /* local copy of the drone's orientation */
       CVector3 m_cDroneOrientation;
-      /* local copy of the drone's orientation (roll, pitch, and yaw) */
-      CRadians m_cRollAngle;
-      CRadians m_cPitchAngle;
-      CRadians m_cYawAngle;
       /* velocity of the drone */
       CVector3 m_cDroneVelocity;
       CVector3 m_cDroneVelocityPrev;
@@ -90,7 +90,7 @@ namespace argos {
       Real m_fAltitudeCumulativeError;
       Real m_fTargetPositionZPrev;
 
-const static Real ROOT_TWO;
+      const static Real ROOT_TWO;
       /* height of the drone's body */ 
       const static Real HEIGHT;
       /* length of the drone's arms */
