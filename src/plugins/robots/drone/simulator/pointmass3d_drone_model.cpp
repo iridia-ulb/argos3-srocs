@@ -37,30 +37,30 @@ namespace argos
 
    void CPointMass3DDroneModel::Reset() {
       /* reset the drone's position */
-      m_cDronePosition = GetEmbodiedEntity().GetOriginAnchor().Position;
+      m_cPosition = GetEmbodiedEntity().GetOriginAnchor().Position;
       /* reset the home position (may have been changed by MoveTo or by added noise) */
-      m_cHomePosition = m_cDronePosition;
+      m_cHomePosition = m_cPosition;
       /* reset the drone's orientation */
       CRadians cYaw, cPitch, cRoll;
       GetEmbodiedEntity().GetOriginAnchor().Orientation.ToEulerAngles(cYaw, cPitch, cRoll);
-      m_cDroneOrientation.SetX(cRoll.GetValue());
-      m_cDroneOrientation.SetY(cPitch.GetValue());
-      m_cDroneOrientation.SetZ(cYaw.GetValue());
+      m_cOrientation.SetX(cRoll.GetValue());
+      m_cOrientation.SetY(cPitch.GetValue());
+      m_cOrientation.SetZ(cYaw.GetValue());
       /* reset the home yaw angle (may have been changed by MoveTo or by added noise) */
       m_fHomeYawAngle = cYaw.GetValue();
       /* reset the drone's velocity */
-      m_cDroneVelocity.Set(0.0, 0.0, 0.0);
-      m_cDroneVelocityPrev.Set(0.0, 0.0, 0.0);
+      m_cVelocity.Set(0.0, 0.0, 0.0);
+      m_cVelocityPrev.Set(0.0, 0.0, 0.0);
       /* reset the drone's angular velocity */
-      m_cDroneAngularVelocity.Set(0.0, 0.0, 0.0);
-      m_cDroneAngularVelocityPrev.Set(0.0, 0.0, 0.0);
+      m_cAngularVelocity.Set(0.0, 0.0, 0.0);
+      m_cAngularVelocityPrev.Set(0.0, 0.0, 0.0);
       /* reset the drone's previous acceleration */
-      m_cDroneAccelerationPrev.Set(0.0, 0.0, 0.0);
+      m_cAccelerationPrev.Set(0.0, 0.0, 0.0);
       /* reset the drone's previous angular acceleration */
-      m_cDroneAngularAccelerationPrev.Set(0.0, 0.0, 0.0);
+      m_cAngularAccelerationPrev.Set(0.0, 0.0, 0.0);
       /* TODO verify if the following variables are necessary */
-      m_cDroneOrientationTargetPrev.Set(0.0, 0.0, 0.0);
-      m_cDroneAngularVelocityCumulativeError.Set(0.0, 0.0, 0.0);
+      m_cOrientationTargetPrev.Set(0.0, 0.0, 0.0);
+      m_cAngularVelocityCumulativeError.Set(0.0, 0.0, 0.0);
       m_fAltitudeCumulativeError = 0.0;
       m_fTargetPositionZPrev = 0.0;
       /* update the axis-aligned bounding box, anchors, and entities */
@@ -73,10 +73,10 @@ namespace argos
    void CPointMass3DDroneModel::UpdateEntityStatus() {
       /* push sensor data to the control interface */
       /* TODO: model the actual sensor behavior and take modeled sensor data */
-      m_cFlightSystemEntity.SetPositionReading(m_cDronePosition - m_cHomePosition);
-      m_cFlightSystemEntity.SetOrientationReading(m_cDroneOrientation - (CVector3::Z * m_fHomeYawAngle));
-      m_cFlightSystemEntity.SetVelocityReading(m_cDroneVelocity);
-      m_cFlightSystemEntity.SetAngularVelocityReading(m_cDroneAngularVelocity);
+      m_cFlightSystemEntity.SetPositionReading(m_cPosition - m_cHomePosition);
+      m_cFlightSystemEntity.SetOrientationReading(m_cOrientation - (CVector3::Z * m_fHomeYawAngle));
+      m_cFlightSystemEntity.SetVelocityReading(m_cVelocity);
+      m_cFlightSystemEntity.SetAngularVelocityReading(m_cAngularVelocity);
       /* update the axis-aligned bounding box, anchors, and entities */
       CPointMass3DModel::UpdateEntityStatus();
    }
@@ -96,7 +96,7 @@ namespace argos
    void CPointMass3DDroneModel::UpdatePhysics() {
       /* update the position (XY) and altitude (Z) controller */
       /* calculate position error */
-      CVector3 cPositionalError((m_cHomePosition + m_cInputPosition) - m_cDronePosition);
+      CVector3 cPositionalError((m_cHomePosition + m_cInputPosition) - m_cPosition);
       /* accumulate the altitude error */
       m_fAltitudeCumulativeError += cPositionalError.GetZ() * GetPM3DEngine().GetPhysicsClockTick();
       /* calculate the azimuth contribution to the navigation of drone on XY plane */
@@ -121,22 +121,22 @@ namespace argos
       m_fTargetPositionZPrev = m_cInputPosition.GetZ();
       /* store XYZ velocity error */
       CVector3 cTransVelocityError(fTargetTransVelX, fTargetTransVelY, fTargetTransVelZ);
-      cTransVelocityError -= m_cDroneVelocity;
+      cTransVelocityError -= m_cVelocity;
       /* calculate XY desired accelerations */
       CVector3 cTargetTransAcc = cTransVelocityError * XY_VEL_KP;
       /* yaw angle correction to get downward Z axis in the right handed coordinate system */
-      Real fYawAngleCorrected(m_cDroneOrientation.GetZ() + M_PI);
+      Real fYawAngleCorrected(m_cOrientation.GetZ() + M_PI);
       /* outputs of the position controller */
-      Real fDesiredRollAngle = std::cos(m_cDroneOrientation.GetY()) * std::cos(m_cDroneOrientation.GetX()) * 
+      Real fDesiredRollAngle = std::cos(m_cOrientation.GetY()) * std::cos(m_cOrientation.GetX()) *
          (std::sin(fYawAngleCorrected) * cTargetTransAcc.GetX() - std::cos(fYawAngleCorrected) * cTargetTransAcc.GetY()) / m_cPM3DEngine.GetGravity();
-      Real fDesiredPitchAngle = std::cos(m_cDroneOrientation.GetY()) * std::cos(m_cDroneOrientation.GetX()) *
+      Real fDesiredPitchAngle = std::cos(m_cOrientation.GetY()) * std::cos(m_cOrientation.GetX()) *
          (std::cos(fYawAngleCorrected) * cTargetTransAcc.GetX() + std::sin(fYawAngleCorrected) * cTargetTransAcc.GetY()) / m_cPM3DEngine.GetGravity();
       Real fDesiredYawAngle = m_fHomeYawAngle + m_cInputYawAngle.GetValue();
       /* saturate the outputs of the position controller */
       ROLL_PITCH_LIMIT.TruncValue(fDesiredRollAngle);
       ROLL_PITCH_LIMIT.TruncValue(fDesiredPitchAngle);
       /* store the desired orientation values in a  vector */
-      CVector3 cDroneOrientationTarget(fDesiredRollAngle, fDesiredPitchAngle, fDesiredYawAngle);
+      CVector3 cOrientationTarget(fDesiredRollAngle, fDesiredPitchAngle, fDesiredYawAngle);
       /* output of the altitude controller */
       Real fAltitudeControlSignal = MASS * GetPM3DEngine().GetGravity() + 
          CalculatePIDResponse(cPositionalError.GetZ(),
@@ -144,41 +144,41 @@ namespace argos
                               cTransVelocityError.GetZ(),
                               ALTITUDE_KP,
                               ALTITUDE_KI,
-                              ALTITUDE_KD) / (std::cos(m_cDroneOrientation.GetX()) * std::cos(m_cDroneOrientation.GetY()));
+                              ALTITUDE_KD) / (std::cos(m_cOrientation.GetX()) * std::cos(m_cOrientation.GetY()));
       /*** attitude (roll, pitch, yaw) control ***/
       /* roll, pitch, yaw errors */
-      CVector3 cDroneOrientationError(cDroneOrientationTarget - m_cDroneOrientation);
+      CVector3 cOrientationError(cOrientationTarget - m_cOrientation);
       /* desired  roll, pitch, yaw rates */
-      CVector3 cDroneAngularVelocityTarget = 
-         (cDroneOrientationTarget - m_cDroneOrientationTargetPrev) / GetPM3DEngine().GetPhysicsClockTick();
+      CVector3 cAngularVelocityTarget =
+         (cOrientationTarget - m_cOrientationTargetPrev) / GetPM3DEngine().GetPhysicsClockTick();
       /* previous desired roll, pitch, yaw values for the controllers */
-      m_cDroneOrientationTargetPrev = cDroneOrientationTarget;
+      m_cOrientationTargetPrev = cOrientationTarget;
       /* rotational rate errors */
-      CVector3 cDroneAngularVelocityError(cDroneAngularVelocityTarget - m_cDroneAngularVelocity);
+      CVector3 cAngularVelocityError(cAngularVelocityTarget - m_cAngularVelocity);
       /* accumulated roll, pitch, yaw errors for the controllers */
-      m_cDroneAngularVelocityCumulativeError += 
-         cDroneAngularVelocityError * GetPM3DEngine().GetPhysicsClockTick();
+      m_cAngularVelocityCumulativeError +=
+         cAngularVelocityError * GetPM3DEngine().GetPhysicsClockTick();
       /* roll controller output signal */
       Real fAttitudeControlSignalX = INERTIA.GetX() *
-         CalculatePIDResponse(cDroneOrientationError.GetX(),
-                              m_cDroneAngularVelocityCumulativeError.GetX(),
-                              cDroneAngularVelocityError.GetX(),
+         CalculatePIDResponse(cOrientationError.GetX(),
+                              m_cAngularVelocityCumulativeError.GetX(),
+                              cAngularVelocityError.GetX(),
                               ROLL_PITCH_KP,
                               ROLL_PITCH_KI,
                               ROLL_PITCH_KD);
       /* pitch controller output signal */
       Real fAttitudeControlSignalY = INERTIA.GetY() * 
-         CalculatePIDResponse(cDroneOrientationError.GetY(),
-                              m_cDroneAngularVelocityCumulativeError.GetY(),
-                              cDroneAngularVelocityError.GetY(),
+         CalculatePIDResponse(cOrientationError.GetY(),
+                              m_cAngularVelocityCumulativeError.GetY(),
+                              cAngularVelocityError.GetY(),
                               ROLL_PITCH_KP,
                               ROLL_PITCH_KI,
                               ROLL_PITCH_KD);
       /* yaw controller output signal */
       Real fAttitudeControlSignalZ = INERTIA.GetZ() * 
-         CalculatePIDResponse(cDroneOrientationError.GetZ(),
-                              m_cDroneAngularVelocityCumulativeError.GetZ(),
-                              cDroneAngularVelocityError.GetZ(),
+         CalculatePIDResponse(cOrientationError.GetZ(),
+                              m_cAngularVelocityCumulativeError.GetZ(),
+                              cAngularVelocityError.GetZ(),
                               YAW_KP,
                               YAW_KI,
                               YAW_KD);
@@ -222,40 +222,40 @@ namespace argos
       /* saturate the thrust */
       THRUST_LIMIT.TruncValue(fThrust);
       /* calculate the system response: acceleration */
-      CVector3 cDroneAcceleration {
-         (std::cos(fYawAngleCorrected) * std::sin(m_cDroneOrientation.GetY()) * std::cos(m_cDroneOrientation.GetX()) +
-          std::sin(fYawAngleCorrected) * std::sin(m_cDroneOrientation.GetX())) * fThrust / MASS,
-         (std::sin(fYawAngleCorrected) * std::sin(m_cDroneOrientation.GetY()) * std::cos(m_cDroneOrientation.GetX()) -
-          std::cos(fYawAngleCorrected) * std::sin(m_cDroneOrientation.GetX())) * fThrust / MASS,
-         -m_cPM3DEngine.GetGravity() + (std::cos(m_cDroneOrientation.GetY()) * std::cos(m_cDroneOrientation.GetX()) * fThrust / MASS)
+      CVector3 cAcceleration {
+         (std::cos(fYawAngleCorrected) * std::sin(m_cOrientation.GetY()) * std::cos(m_cOrientation.GetX()) +
+          std::sin(fYawAngleCorrected) * std::sin(m_cOrientation.GetX())) * fThrust / MASS,
+         (std::sin(fYawAngleCorrected) * std::sin(m_cOrientation.GetY()) * std::cos(m_cOrientation.GetX()) -
+          std::cos(fYawAngleCorrected) * std::sin(m_cOrientation.GetX())) * fThrust / MASS,
+         -m_cPM3DEngine.GetGravity() + (std::cos(m_cOrientation.GetY()) * std::cos(m_cOrientation.GetX()) * fThrust / MASS)
       };
       /* calculate the system response: angular acceleration */
-      CVector3 cDroneAngularAcceleration {
+      CVector3 cAngularAcceleration {
          (fTorqueX / INERTIA.GetX()) -
-         (JR * m_cDroneAngularVelocity.GetY() * fOmegaR / INERTIA.GetX()) +
-         (m_cDroneAngularVelocity.GetZ() * m_cDroneAngularVelocity.GetY() * (INERTIA.GetY() - INERTIA.GetZ()) / INERTIA.GetX()),
+         (JR * m_cAngularVelocity.GetY() * fOmegaR / INERTIA.GetX()) +
+         (m_cAngularVelocity.GetZ() * m_cAngularVelocity.GetY() * (INERTIA.GetY() - INERTIA.GetZ()) / INERTIA.GetX()),
          (fTorqueY / INERTIA.GetY()) +
-         (JR * m_cDroneAngularVelocity.GetX() * fOmegaR / INERTIA.GetY()) +
-         (m_cDroneAngularVelocity.GetZ() * m_cDroneAngularVelocity.GetX() * (INERTIA.GetZ() - INERTIA.GetX()) / INERTIA.GetY()),
+         (JR * m_cAngularVelocity.GetX() * fOmegaR / INERTIA.GetY()) +
+         (m_cAngularVelocity.GetZ() * m_cAngularVelocity.GetX() * (INERTIA.GetZ() - INERTIA.GetX()) / INERTIA.GetY()),
          (fTorqueZ / INERTIA.GetZ()) +
-         (m_cDroneAngularVelocity.GetY() * m_cDroneAngularVelocity.GetX() * (INERTIA.GetX() - INERTIA.GetY()) / INERTIA.GetZ()),
+         (m_cAngularVelocity.GetY() * m_cAngularVelocity.GetX() * (INERTIA.GetX() - INERTIA.GetY()) / INERTIA.GetZ()),
       };
       /* update the velocity using trapezoid integration */
-      cDroneAcceleration = 0.5 * (m_cDroneAccelerationPrev + cDroneAcceleration);
-      m_cDroneVelocity += cDroneAcceleration * GetPM3DEngine().GetPhysicsClockTick();
-      m_cDroneAccelerationPrev = cDroneAcceleration;
+      cAcceleration = 0.5 * (m_cAccelerationPrev + cAcceleration);
+      m_cVelocity += cAcceleration * GetPM3DEngine().GetPhysicsClockTick();
+      m_cAccelerationPrev = cAcceleration;
       /* update the angular velocity using trapezoid integration */
-      cDroneAngularAcceleration = 0.5 * (m_cDroneAngularAccelerationPrev + cDroneAngularAcceleration);
-      m_cDroneAngularVelocity += cDroneAngularAcceleration * GetPM3DEngine().GetPhysicsClockTick();
-      m_cDroneAngularAccelerationPrev = cDroneAngularAcceleration;
+      cAngularAcceleration = 0.5 * (m_cAngularAccelerationPrev + cAngularAcceleration);
+      m_cAngularVelocity += cAngularAcceleration * GetPM3DEngine().GetPhysicsClockTick();
+      m_cAngularAccelerationPrev = cAngularAcceleration;
       /* update the position using trapezoid integration */
-      m_cDroneVelocity = 0.5 * (m_cDroneVelocityPrev + m_cDroneVelocity);
-      m_cDronePosition += m_cDroneVelocity * GetPM3DEngine().GetPhysicsClockTick();
-      m_cDroneVelocityPrev = m_cDroneVelocity;
+      m_cVelocity = 0.5 * (m_cVelocityPrev + m_cVelocity);
+      m_cPosition += m_cVelocity * GetPM3DEngine().GetPhysicsClockTick();
+      m_cVelocityPrev = m_cVelocity;
       /* update the orientation using trapezoid integration */
-      m_cDroneAngularVelocity = 0.5 * (m_cDroneAngularVelocityPrev + m_cDroneAngularVelocity);
-      m_cDroneOrientation += m_cDroneAngularVelocity * GetPM3DEngine().GetPhysicsClockTick();
-      m_cDroneAngularVelocityPrev = m_cDroneAngularVelocity;
+      m_cAngularVelocity = 0.5 * (m_cAngularVelocityPrev + m_cAngularVelocity);
+      m_cOrientation += m_cAngularVelocity * GetPM3DEngine().GetPhysicsClockTick();
+      m_cAngularVelocityPrev = m_cAngularVelocity;
    }
 
    /****************************************/
@@ -275,12 +275,12 @@ namespace argos
       CRadians cYaw, cPitch, cRoll;
       c_orientation.ToEulerAngles(cYaw, cPitch, cRoll);
       /* update the home position and home yaw */
-      m_cHomePosition += c_position - m_cDronePosition;
-      m_fHomeYawAngle += cYaw.GetValue() - m_cDronePosition.GetZ();
+      m_cHomePosition += c_position - m_cPosition;
+      m_fHomeYawAngle += cYaw.GetValue() - m_cPosition.GetZ();
       /* update the position and orientation */
-      m_cDronePosition = c_position;
+      m_cPosition = c_position;
       /* the drone orientation should include roll, pitch, yaw angles*/
-      m_cDroneOrientation.Set(cRoll.GetValue(),
+      m_cOrientation.Set(cRoll.GetValue(),
                               cPitch.GetValue(),
                               cYaw.GetValue());
       /* update the space */
@@ -314,7 +314,7 @@ namespace argos
       /* create a cylinder shape for testing the intersection */
       CCylinder m_cShape(ARM_LENGTH,
                          HEIGHT,
-                         m_cDronePosition,
+                         m_cPosition,
                          cDroneAxis);
       return m_cShape.Intersects(f_t_on_ray, c_ray);
    }
@@ -323,10 +323,10 @@ namespace argos
    /****************************************/
 
    void CPointMass3DDroneModel::UpdateOriginAnchor(SAnchor &s_anchor) {
-      s_anchor.Position = m_cDronePosition;
-      s_anchor.Orientation.FromEulerAngles(CRadians(m_cDroneOrientation.GetZ()),
-                                           CRadians(m_cDroneOrientation.GetY()),
-                                           CRadians(m_cDroneOrientation.GetX()));
+      s_anchor.Position = m_cPosition;
+      s_anchor.Orientation.FromEulerAngles(CRadians(m_cOrientation.GetZ()),
+                                           CRadians(m_cOrientation.GetY()),
+                                           CRadians(m_cOrientation.GetX()));
    }
 
    /****************************************/

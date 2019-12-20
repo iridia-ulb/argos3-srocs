@@ -64,29 +64,26 @@ namespace argos {
       /* position and yaw input from the controller */ 
       CRadians m_cInputYawAngle;
       CVector3 m_cInputPosition;
-
+      /* home position and yaw angle */
+      CVector3 m_cHomePosition;
       Real m_fHomeYawAngle;
-      CVector3 m_cHomePosition; //?
-
       /* local copy of the drone's position */
-      CVector3 m_cDronePosition;
+      CVector3 m_cPosition;
       /* local copy of the drone's orientation */
-      CVector3 m_cDroneOrientation;
+      CVector3 m_cOrientation;
       /* velocity of the drone */
-      CVector3 m_cDroneVelocity;
-      CVector3 m_cDroneVelocityPrev;
+      CVector3 m_cVelocity;
+      CVector3 m_cVelocityPrev;
       /* angular velocity of the drone */
-      CVector3 m_cDroneAngularVelocity;
-      CVector3 m_cDroneAngularVelocityPrev;
+      CVector3 m_cAngularVelocity;
+      CVector3 m_cAngularVelocityPrev;
       /* acceleration of the drone */
-      CVector3 m_cDroneAccelerationPrev;
+      CVector3 m_cAccelerationPrev;
       /* angular acceleration of the drone */
-      CVector3 m_cDroneAngularAccelerationPrev;
-      
-
-      CVector3 m_cDroneOrientationTargetPrev;
-      CVector3 m_cDroneAngularVelocityCumulativeError;
-
+      CVector3 m_cAngularAccelerationPrev;
+      /* TODO: improve naming of the following variables */
+      CVector3 m_cOrientationTargetPrev;
+      CVector3 m_cAngularVelocityCumulativeError;
       Real m_fAltitudeCumulativeError;
       Real m_fTargetPositionZPrev;
 
