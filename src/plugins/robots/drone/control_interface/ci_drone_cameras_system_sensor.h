@@ -16,6 +16,8 @@ namespace argos {
 #include <argos3/core/utility/math/vector3.h>
 #include <argos3/core/utility/math/quaternion.h>
 
+#include <functional>
+
 namespace argos {
 
    class CCI_DroneCamerasSystemSensor : public CCI_Sensor {
@@ -53,25 +55,24 @@ namespace argos {
          using TVector = std::vector<STag>;
       };
 
-      class CCI_DroneCamera {
-      public:
-         CCI_DroneCamera() :
-            m_bEnabled(false) {}
+      using TConfiguration = std::tuple<const char*, CVector3, CQuaternion>;
+
+      struct SInterface {
+         /* constructor */
+         SInterface(const UInt8& un_label) :
+            Label(un_label),
+            Configuration(SENSOR_CONFIGURATION.at(un_label)),
+            Enabled(false) {}
+         /* methods */
          virtual void Enable();
          virtual void Disable();
          virtual ELedState DetectLed(const CVector3& c_position) = 0;
-
-      // make private, parent class should still have access?
-         /* configuration */
-         bool m_bEnabled;
-         CVector2 m_cResolution;
-         CVector3 m_cOffsetPosition;
-         CQuaternion m_cOffsetOrientation;
-         std::string m_strAnchor;
-         /* readings */
-         STag::TVector m_vecTags;
-         /* vector of interfaces */
-         using TVector = std::vector<CCI_DroneCamera*>;
+         /* configuration data */
+         const UInt8& Label;
+         const TConfiguration& Configuration;
+         /* state */
+         bool Enabled;
+         STag::TVector Tags;
       };
 
    public:
@@ -80,18 +81,30 @@ namespace argos {
 
       virtual ~CCI_DroneCamerasSystemSensor() {}
 
+      virtual void ForEachInterface(std::function<void(SInterface&)>) = 0;
 
 #ifdef ARGOS_WITH_LUA
       virtual void CreateLuaState(lua_State* pt_lua_state);
 
       virtual void ReadingsToLuaState(lua_State* pt_lua_state);
 #endif
+
    protected:
 
       Real m_fTimestamp;
 
-      CCI_DroneCamera::TVector m_vecCameraInterfaces;
+   protected:
 
+      static const UInt32 CAMERA_RESOLUTION_X;
+      static const UInt32 CAMERA_RESOLUTION_Y;
+      static const Real CAMERA_FOCAL_LENGTH_X;
+      static const Real CAMERA_FOCAL_LENGTH_Y;
+      static const Real CAMERA_PRINCIPAL_POINT_X;
+      static const Real CAMERA_PRINCIPAL_POINT_Y;
+      static const Real CAMERA_XY_OFFSET;
+      static const Real CAMERA_Z_OFFSET;
+      static const CDegrees CAMERA_ANGLE;
+      static const std::map<UInt8, TConfiguration> SENSOR_CONFIGURATION;
 
    };
 

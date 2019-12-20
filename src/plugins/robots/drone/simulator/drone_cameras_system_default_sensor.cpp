@@ -14,23 +14,11 @@
 #include <argos3/plugins/simulator/media/directional_led_medium.h>
 #include <argos3/plugins/simulator/media/tag_medium.h>
 
-#define CAMERA_RESOLUTION_X 700.0
-#define CAMERA_RESOLUTION_Y 700.0
-#define CAMERA_FOCAL_LENGTH_X 1039.4975
-#define CAMERA_FOCAL_LENGTH_Y 1039.4975
-#define CAMERA_PRINCIPAL_POINT_X 350.0
-#define CAMERA_PRINCIPAL_POINT_Y 350.0
-
 #define CAMERA_RANGE_MIN 0.001
 #define CAMERA_RANGE_MAX 1.800
 /* when detecting LEDs, an LED should be within 0.5 cm of the sampled location
    this prevents the detection of adjacent LEDs on the stigmergic block */
 #define DETECT_LED_DIST_THRES 0.005
-
-#define ORIGIN_CAMERA_X_OFFSET 0.12
-#define ORIGIN_CAMERA_Y_OFFSET 0.12
-#define ORIGIN_CAMERA_Z_OFFSET 0.16
-#define ORIENTATION_CAMERA_RADANGLE (M_PI - 27.0 / 180 * M_PI)
 
 namespace argos {
 
@@ -44,23 +32,7 @@ namespace argos {
       m_pcTagIndex(nullptr),
       m_bShowFrustum(false),
       m_bShowTagRays(false),
-      m_bShowLEDRays(false),
-      m_arrCameras {
-         std::make_tuple(this, CVector3( ORIGIN_CAMERA_X_OFFSET,  ORIGIN_CAMERA_Y_OFFSET, ORIGIN_CAMERA_Z_OFFSET), 
-            CQuaternion(CRadians(ORIENTATION_CAMERA_RADANGLE),CVector3(-1,1,0))
-            * CQuaternion(CRadians(M_PI),CVector3(0,0,1))
-         ),
-         std::make_tuple(this, CVector3(-ORIGIN_CAMERA_X_OFFSET,  ORIGIN_CAMERA_Y_OFFSET, ORIGIN_CAMERA_Z_OFFSET), 
-            CQuaternion(CRadians(ORIENTATION_CAMERA_RADANGLE),CVector3(-1,-1,0))
-         ),
-         std::make_tuple(this, CVector3(-ORIGIN_CAMERA_X_OFFSET, -ORIGIN_CAMERA_Y_OFFSET, ORIGIN_CAMERA_Z_OFFSET), 
-            CQuaternion(CRadians(ORIENTATION_CAMERA_RADANGLE),CVector3(1,-1,0))
-            * CQuaternion(CRadians(M_PI),CVector3(0,0,1))
-         ),
-         std::make_tuple(this, CVector3( ORIGIN_CAMERA_X_OFFSET, -ORIGIN_CAMERA_Y_OFFSET, ORIGIN_CAMERA_Z_OFFSET), 
-            CQuaternion(CRadians(ORIENTATION_CAMERA_RADANGLE),CVector3(1,1,0))
-         ),
-      } {}
+      m_bShowLEDRays(false) {}
 
    /****************************************/
    /****************************************/
@@ -72,6 +44,15 @@ namespace argos {
             &(c_entity.GetComponent<CControllableEntity>("controller"));
          m_pcEmbodiedEntity =
             &(c_entity.GetComponent<CEmbodiedEntity>("body"));
+         /* allocate memory for the sensor interfaces */
+         m_vecSimulatedInterfaces.reserve(SENSOR_CONFIGURATION.size());
+         /* get the anchors for the sensor interfaces from m_mapSensorConfig */
+         for(const std::pair<const UInt8, TConfiguration>& t_config : SENSOR_CONFIGURATION) {
+            const char* pchAnchor = std::get<const char*>(t_config.second);
+            SAnchor& sAnchor =
+               c_entity.GetComponent<CEmbodiedEntity>("body").GetAnchor(pchAnchor);
+            m_vecSimulatedInterfaces.emplace_back(t_config.first, sAnchor, *this);
+         }
       }
       catch(CARGoSException& ex) {
          THROW_ARGOSEXCEPTION_NESTED("Error setting robot for the drone cameras system sensor", ex);
@@ -94,11 +75,6 @@ namespace argos {
             &(CSimulator::GetInstance().GetMedium<CTagMedium>("tags").GetIndex());
          m_pcLEDIndex =
             &(CSimulator::GetInstance().GetMedium<CDirectionalLEDMedium>("directional_leds").GetIndex());
-         /* enable cameras and add them to the control interface */
-         for(CDroneCamera& c_camera : m_arrCameras) {
-            c_camera.Enable();
-            m_vecCameraInterfaces.push_back(&c_camera);
-         }
       }
       catch(CARGoSException& ex) {
          THROW_ARGOSEXCEPTION_NESTED("Error initializing the drone cameras system sensor", ex);
@@ -113,38 +89,98 @@ namespace argos {
       /* increment the timestamp */
       m_fTimestamp += CPhysicsEngine::GetSimulationClockTick();
       /* update each camera */
-      for(CDroneCamera& c_camera : m_arrCameras) {
-         c_camera.Update();
+      for(SSimulatedInterface& s_simulated_interface : m_vecSimulatedInterfaces) {
+         s_simulated_interface.Update();
       }
    }
 
    /****************************************/
    /****************************************/
 
-   void CDroneCamerasSystemDefaultSensor::CDroneCamera::Update() {
+   void CDroneCamerasSystemDefaultSensor::Reset() {
+      /* reset the cameras */
+      for(SSimulatedInterface& s_simulated_interface : m_vecSimulatedInterfaces) {
+         s_simulated_interface.Reset();
+      }
+      /* reset the base class */
+      CCI_DroneCamerasSystemSensor::Reset();
+   }
+
+   /****************************************/
+   /****************************************/
+
+   void CDroneCamerasSystemDefaultSensor::ForEachInterface(std::function<void(SInterface&)> fn) {
+      for(SSimulatedInterface& s_interface : m_vecSimulatedInterfaces) {
+         fn(s_interface);
+      }
+   }
+
+   /****************************************/
+   /****************************************/
+
+   CDroneCamerasSystemDefaultSensor::SSimulatedInterface::SSimulatedInterface(const UInt8& un_label,
+                                                                              const SAnchor& s_anchor,
+                                                                              CDroneCamerasSystemDefaultSensor& c_parent) :
+      SInterface(un_label),
+      Anchor(s_anchor),
+      m_cParent(c_parent) {
+      /* set up the project matrix */
+      m_cProjectionMatrix.SetIdentityMatrix();
+      m_cProjectionMatrix(0,0) = CAMERA_FOCAL_LENGTH_X;
+      m_cProjectionMatrix(1,1) = CAMERA_FOCAL_LENGTH_Y;
+      m_cProjectionMatrix(0,2) = CAMERA_PRINCIPAL_POINT_X;
+      m_cProjectionMatrix(1,2) = CAMERA_PRINCIPAL_POINT_Y;
+      /* calculate fustrum constants */
+      Real fWidthToDepthRatio = (0.5 * CAMERA_RESOLUTION_X) / CAMERA_FOCAL_LENGTH_X;
+      Real fHeightToDepthRatio = (0.5 * CAMERA_RESOLUTION_Y) / CAMERA_FOCAL_LENGTH_Y;
+      m_fNearPlaneHeight = fHeightToDepthRatio * CAMERA_RANGE_MIN;
+      m_fNearPlaneWidth = fWidthToDepthRatio * CAMERA_RANGE_MIN;
+      m_fFarPlaneHeight = fHeightToDepthRatio * CAMERA_RANGE_MAX;
+      m_fFarPlaneWidth = fWidthToDepthRatio * CAMERA_RANGE_MAX;
+      /* transformation matrix */
+      m_cOffset.SetFromComponents(std::get<CQuaternion>(Configuration),
+                                  std::get<CVector3>(Configuration));
+   }
+
+   /****************************************/
+   /****************************************/
+
+   void CDroneCamerasSystemDefaultSensor::SSimulatedInterface::Reset() {
+      Tags.clear();
+      m_vecLedCache.clear();
+   }
+
+   /****************************************/
+   /****************************************/
+
+   void CDroneCamerasSystemDefaultSensor::SSimulatedInterface::Update() {
       /* clear out the readings from the last update */
-      m_vecTags.clear();
+      Tags.clear();
       m_vecLedCache.clear();
       /* if the sensor is enabled */
-      if(m_bEnabled) {
+      if(Enabled) {
          /* TODO move these sensor parameters to class wide to avoid recalling constructors */
          CTransformationMatrix3 cWorldToAnchorTransform;
          CTransformationMatrix3 cWorldToCameraTransform;
          CVector3 cLookAt, cUp;
          CVector3 cX, cY, cZ;
-         CVector3 cNearCenter, cNearTopLeft, cNearTopRight, cNearBottomLeft, cNearBottomRight;
-         CVector3 cFarCenter, cFarTopLeft, cFarTopRight, cFarBottomLeft, cFarBottomRight;
-         CVector3 cBoundingBoxMinCorner, cBoundingBoxMaxCorner;
-         CVector3 cBoundingBoxPosition, cBoundingBoxHalfExtents;
-
+         CVector3 cFarCenter, cNearCenter;
+         std::array<CVector3, 8> arrFrustumExtents;
+         CVector3& cNearTopLeft = arrFrustumExtents[0];
+         CVector3& cNearTopRight = arrFrustumExtents[1];
+         CVector3& cNearBottomLeft = arrFrustumExtents[2];
+         CVector3& cNearBottomRight = arrFrustumExtents[3];
+         CVector3& cFarTopLeft = arrFrustumExtents[4];
+         CVector3& cFarTopRight = arrFrustumExtents[5];
+         CVector3& cFarBottomLeft = arrFrustumExtents[6];
+         CVector3& cFarBottomRight = arrFrustumExtents[7];
          /* calculate transform matrices */
-         SAnchor& sOrigin = m_cParent.GetEmbodiedEntity().GetOriginAnchor();
-         cWorldToAnchorTransform.SetFromComponents(sOrigin.Orientation, sOrigin.Position);
+         cWorldToAnchorTransform.SetFromComponents(Anchor.Orientation, Anchor.Position);
          cWorldToCameraTransform = cWorldToAnchorTransform * m_cOffset;
          m_cCameraToWorldTransform = cWorldToCameraTransform.GetInverse();
          /* calculate camera direction vectors */
          m_cCameraPosition = cWorldToCameraTransform.GetTranslationVector();
-         m_cCameraOrientation = sOrigin.Orientation * m_cOffsetOrientation;
+         m_cCameraOrientation = Anchor.Orientation * std::get<CQuaternion>(Configuration);
          cLookAt = cWorldToCameraTransform * CVector3::Z;
          cUp = -CVector3::Y;
          cUp.Rotate(cWorldToCameraTransform.GetRotationMatrix());
@@ -175,7 +211,7 @@ namespace argos {
             vecCheckedRays.emplace_back(false, CRay3(cNearTopRight, cNearBottomRight));
             vecCheckedRays.emplace_back(false, CRay3(cNearBottomRight, cNearBottomLeft));
             vecCheckedRays.emplace_back(false, CRay3(cNearBottomLeft, cNearTopLeft));
-            vecCheckedRays.emplace_back(true,  CRay3(cFarTopLeft, cFarTopRight));
+            vecCheckedRays.emplace_back(false, CRay3(cFarTopLeft, cFarTopRight));
             vecCheckedRays.emplace_back(false, CRay3(cFarTopRight, cFarBottomRight));
             vecCheckedRays.emplace_back(false, CRay3(cFarBottomRight, cFarBottomLeft));
             vecCheckedRays.emplace_back(false, CRay3(cFarBottomLeft, cFarTopLeft));
@@ -185,35 +221,20 @@ namespace argos {
             vecCheckedRays.emplace_back(false, CRay3(cNearBottomLeft, cFarBottomLeft));
          }
          /* generate a bounding box for the frustum */
-         cBoundingBoxMinCorner = cNearCenter;
-         cBoundingBoxMaxCorner = cNearCenter;
-         for(const CVector3& c_point : {
-            cNearTopLeft, cNearTopRight, cNearBottomLeft, cNearBottomRight,
-            cFarTopLeft, cFarTopRight, cFarBottomLeft, cFarBottomRight
-         }) {
-            if(c_point.GetX() > cBoundingBoxMaxCorner.GetX()) {
-               cBoundingBoxMaxCorner.SetX(c_point.GetX());
-            }
-            if(c_point.GetX() < cBoundingBoxMinCorner.GetX()) {
-               cBoundingBoxMinCorner.SetX(c_point.GetX());
-            }
-            if(c_point.GetY() > cBoundingBoxMaxCorner.GetY()) {
-               cBoundingBoxMaxCorner.SetY(c_point.GetY());
-            }
-            if(c_point.GetY() < cBoundingBoxMinCorner.GetY()) {
-               cBoundingBoxMinCorner.SetY(c_point.GetY());
-            }
-            if(c_point.GetZ() > cBoundingBoxMaxCorner.GetZ()) {
-               cBoundingBoxMaxCorner.SetZ(c_point.GetZ());
-            }
-            if(c_point.GetZ() < cBoundingBoxMinCorner.GetZ()) {
-               cBoundingBoxMinCorner.SetZ(c_point.GetZ());
-            }
+         CVector3 cBoundingBoxMinCorner(cNearCenter);
+         CVector3 cBoundingBoxMaxCorner(cNearCenter);
+         for(const CVector3& c_point : arrFrustumExtents) {
+            if(c_point.GetX() > cBoundingBoxMaxCorner.GetX()) cBoundingBoxMaxCorner.SetX(c_point.GetX());
+            if(c_point.GetX() < cBoundingBoxMinCorner.GetX()) cBoundingBoxMinCorner.SetX(c_point.GetX());
+            if(c_point.GetY() > cBoundingBoxMaxCorner.GetY()) cBoundingBoxMaxCorner.SetY(c_point.GetY());
+            if(c_point.GetY() < cBoundingBoxMinCorner.GetY()) cBoundingBoxMinCorner.SetY(c_point.GetY());
+            if(c_point.GetZ() > cBoundingBoxMaxCorner.GetZ()) cBoundingBoxMaxCorner.SetZ(c_point.GetZ());
+            if(c_point.GetZ() < cBoundingBoxMinCorner.GetZ()) cBoundingBoxMinCorner.SetZ(c_point.GetZ());
          }
          cBoundingBoxMaxCorner *= 0.5f;
          cBoundingBoxMinCorner *= 0.5f;
-         cBoundingBoxPosition = (cBoundingBoxMaxCorner + cBoundingBoxMinCorner);
-         cBoundingBoxHalfExtents = (cBoundingBoxMaxCorner - cBoundingBoxMinCorner);
+         CVector3 cBoundingBoxPosition(cBoundingBoxMaxCorner + cBoundingBoxMinCorner);
+         CVector3 cBoundingBoxHalfExtents(cBoundingBoxMaxCorner - cBoundingBoxMinCorner);
          /* generate frustum planes */
          m_arrFrustumPlanes[0].SetFromThreePoints(cNearTopRight, cNearTopLeft, cFarTopLeft);
          m_arrFrustumPlanes[1].SetFromThreePoints(cNearBottomLeft, cNearBottomRight, cFarBottomRight);
@@ -237,59 +258,7 @@ namespace argos {
    /****************************************/
    /****************************************/
 
-   void CDroneCamerasSystemDefaultSensor::Reset() {
-      /* reset the cameras */
-      for(CDroneCamera& c_camera : m_arrCameras) {
-         c_camera.Reset();
-      }
-      /* reset the base class */
-      CCI_DroneCamerasSystemSensor::Reset();
-   }
-
-   /****************************************/
-   /****************************************/
-
-   void CDroneCamerasSystemDefaultSensor::CDroneCamera::Reset() {
-      m_vecTags.clear();
-      m_vecLedCache.clear();
-   }
-
-   /****************************************/
-   /****************************************/
-
-   CDroneCamerasSystemDefaultSensor::CDroneCamera::CDroneCamera(const std::tuple<CDroneCamerasSystemDefaultSensor*,
-                                                                                 CVector3,
-                                                                                 CQuaternion>& c_configuration) :
-
-      m_cParent(*std::get<CDroneCamerasSystemDefaultSensor*>(c_configuration)) {
-      /* set up the project matrix */
-      m_cProjectionMatrix.SetIdentityMatrix();
-      m_cProjectionMatrix(0,0) = CAMERA_FOCAL_LENGTH_X;
-      m_cProjectionMatrix(1,1) = CAMERA_FOCAL_LENGTH_Y;
-      m_cProjectionMatrix(0,2) = CAMERA_PRINCIPAL_POINT_X;
-      m_cProjectionMatrix(1,2) = CAMERA_PRINCIPAL_POINT_Y;
-      /* calculate fustrum constants */
-      Real fWidthToDepthRatio = (0.5 * CAMERA_RESOLUTION_X) / CAMERA_FOCAL_LENGTH_X;
-      Real fHeightToDepthRatio = (0.5 * CAMERA_RESOLUTION_Y) / CAMERA_FOCAL_LENGTH_Y;
-      m_fNearPlaneHeight = fHeightToDepthRatio * CAMERA_RANGE_MIN;
-      m_fNearPlaneWidth = fWidthToDepthRatio * CAMERA_RANGE_MIN;
-      m_fFarPlaneHeight = fHeightToDepthRatio * CAMERA_RANGE_MAX;
-      m_fFarPlaneWidth = fWidthToDepthRatio * CAMERA_RANGE_MAX;
-      /* set the resolution of the camera in the control interface */
-      m_cResolution.Set(CAMERA_RESOLUTION_X, CAMERA_RESOLUTION_Y);
-      /* export the offsets from the origin anchor to the control interface */
-      m_cOffsetPosition = std::get<CVector3>(c_configuration);
-      m_cOffsetOrientation = std::get<CQuaternion>(c_configuration);
-      /* export the name of the anchor to the control interface */
-      m_strAnchor.assign("origin");
-      /* transformation matrix */
-      m_cOffset.SetFromComponents(m_cOffsetOrientation, m_cOffsetPosition);
-   }
-
-   /****************************************/
-   /****************************************/
-
-   bool CDroneCamerasSystemDefaultSensor::CDroneCamera::operator()(CTagEntity& c_tag) {
+   bool CDroneCamerasSystemDefaultSensor::SSimulatedInterface::operator()(CTagEntity& c_tag) {
       if(GetAngleWithCamera(c_tag) > c_tag.GetObservableAngle()) {
          return true;
       }
@@ -309,18 +278,22 @@ namespace argos {
       }
       for(const CVector3& c_corner : m_arrTagCorners) {
          m_cOcclusionCheckRay.SetEnd(c_corner);
-         if(GetClosestEmbodiedEntityIntersectedByRay(m_sIntersectionItem, m_cOcclusionCheckRay)) {
-            /* corner is occluded */
-            if(m_cParent.ShowTagRays()) {
-               std::vector<std::pair<bool, CRay3> >& vecCheckedRays =
-                  m_cParent.GetControllableEntity().GetCheckedRays();
-               vecCheckedRays.emplace_back(true, m_cOcclusionCheckRay);
+         if(GetEmbodiedEntitiesIntersectedByRay(m_vecIntersections, m_cOcclusionCheckRay)) {
+            CEntity& cEntityWithTag = c_tag.GetRootEntity();
+            CEntity& cEntityWithCamera = m_cParent.GetControllableEntity().GetRootEntity();
+            for(const SEmbodiedEntityIntersectionItem& s_item : m_vecIntersections) {
+               CEntity& cIntersectionEntity = s_item.IntersectedEntity->GetRootEntity();
+               if(&cIntersectionEntity != &cEntityWithTag && &cIntersectionEntity != &cEntityWithCamera) {
+                  /* corner is occluded */
+                  if(m_cParent.ShowTagRays()) {
+                     std::vector<std::pair<bool, CRay3> >& vecCheckedRays =
+                        m_cParent.GetControllableEntity().GetCheckedRays();
+                     vecCheckedRays.emplace_back(true, m_cOcclusionCheckRay);
+                  }
+                  /* no more checks necessary, move on to the next tag */
+                  return true;
+               }
             }
-            /* no more checks necessary, move on to the next tag */
-            return true;
-         }
-         else {
-            /* corner not occluded */
             if(m_cParent.ShowTagRays()) {
                std::vector<std::pair<bool, CRay3> >& vecCheckedRays =
                   m_cParent.GetControllableEntity().GetCheckedRays();
@@ -338,23 +311,29 @@ namespace argos {
       /* try to convert tag payload to an unsigned integer */
       UInt32 unId = 0;
       try {
-         unId = std::stoul(c_tag.GetPayload());
+         std::string strId(c_tag.GetPayload());
+         auto itRemove =
+            std::remove_if(std::begin(strId),
+                           std::end(strId),
+                           [] (char ch) {
+                              return (std::isdigit(ch) == 0);
+                           }); 
+         strId.erase(itRemove, std::end(strId));
+         unId = std::stoul(strId);
       }
-      catch(const std::logic_error& err_logic) {
-         THROW_ARGOSEXCEPTION("Tag payload \"" << c_tag.GetPayload() << "\" can not be converted to an unsigned integer");
-      }
+      catch(const std::logic_error& err_logic) {}
       /* TODO: Update the position and orientation calculations to avoid the use of matrices */
       CVector3 cTagPosition = m_cCameraToWorldTransform * c_tag.GetPosition();
       CQuaternion cTagOrientation = m_cCameraOrientation.Inverse() * c_tag.GetOrientation();
       /* transfer readings to the control interface */
-      m_vecTags.emplace_back(unId, cTagPosition, cTagOrientation, cCenterPixel, m_arrTagCornerPixels);
+      Tags.emplace_back(unId, cTagPosition, cTagOrientation, cCenterPixel, m_arrTagCornerPixels);
       return true;
    }
 
    /****************************************/
    /****************************************/
 
-   bool CDroneCamerasSystemDefaultSensor::CDroneCamera::operator()(CDirectionalLEDEntity& c_led) {
+   bool CDroneCamerasSystemDefaultSensor::SSimulatedInterface::operator()(CDirectionalLEDEntity& c_led) {
       if(c_led.GetColor() == CColor::BLACK) {
          return true;
       }
@@ -366,20 +345,28 @@ namespace argos {
          return true;
       }
       m_cOcclusionCheckRay.SetEnd(cLedPosition);
-      if(!GetClosestEmbodiedEntityIntersectedByRay(m_sIntersectionItem, m_cOcclusionCheckRay)) {
-         m_vecLedCache.emplace_back(c_led.GetColor(), cLedPosition, ProjectOntoSensor(cLedPosition));
-         if(m_cParent.ShowLEDRays()) {
+      if(GetEmbodiedEntitiesIntersectedByRay(m_vecIntersections, m_cOcclusionCheckRay)) {
+         CEntity& cEntityWithLED = c_led.GetRootEntity();
+         CEntity& cEntityWithCamera = m_cParent.GetControllableEntity().GetRootEntity();
+         for(const SEmbodiedEntityIntersectionItem& s_item : m_vecIntersections) {
+            CEntity& cIntersectionEntity = s_item.IntersectedEntity->GetRootEntity();
+            if(&cIntersectionEntity != &cEntityWithLED && &cIntersectionEntity != &cEntityWithCamera) {
+               /* led is occluded */
+               if(m_cParent.ShowLEDRays()) {
+                  std::vector<std::pair<bool, CRay3> >& vecCheckedRays =
+                     m_cParent.GetControllableEntity().GetCheckedRays();
+                  vecCheckedRays.emplace_back(true, m_cOcclusionCheckRay);
+               }
+               /* no more checks necessary, move on to the next tag */
+               return true;
+            }
+         }
+      }
+      m_vecLedCache.emplace_back(c_led.GetColor(), cLedPosition, ProjectOntoSensor(cLedPosition));
+      if(m_cParent.ShowLEDRays()) {
             std::vector<std::pair<bool, CRay3> >& vecCheckedRays =
                m_cParent.GetControllableEntity().GetCheckedRays();
             vecCheckedRays.emplace_back(false, m_cOcclusionCheckRay);
-         }
-      }
-      else {
-         if(m_cParent.ShowLEDRays()) {
-            std::vector<std::pair<bool, CRay3> >& vecCheckedRays =
-               m_cParent.GetControllableEntity().GetCheckedRays();
-            vecCheckedRays.emplace_back(true, m_cOcclusionCheckRay);
-         }
       }
       return true;
    }
@@ -388,7 +375,7 @@ namespace argos {
    /****************************************/
 
    CDroneCamerasSystemDefaultSensor::ELedState
-      CDroneCamerasSystemDefaultSensor::CDroneCamera::DetectLed(const CVector3& c_position) {    
+      CDroneCamerasSystemDefaultSensor::SSimulatedInterface::DetectLed(const CVector3& c_position) {
       /* c_position is the led in camera's coordinate system, 
          transfer it to global coordinate system */
       CVector3 cLedPosition(c_position);
@@ -430,14 +417,14 @@ namespace argos {
    /****************************************/
    /****************************************/
 
-   CVector2 CDroneCamerasSystemDefaultSensor::CDroneCamera::GetResolution() const {
+   CVector2 CDroneCamerasSystemDefaultSensor::SSimulatedInterface::GetResolution() const {
       return CVector2(CAMERA_RESOLUTION_X, CAMERA_RESOLUTION_Y);
    }
 
    /****************************************/
    /****************************************/
 
-   CRadians CDroneCamerasSystemDefaultSensor::CDroneCamera::GetAngleWithCamera(const CPositionalEntity& c_entity) const {
+   CRadians CDroneCamerasSystemDefaultSensor::SSimulatedInterface::GetAngleWithCamera(const CPositionalEntity& c_entity) const {
       CVector3 cEntityToCamera(m_cCameraPosition - c_entity.GetPosition());
       CVector3 cEntityDirection(CVector3::Z);
       cEntityDirection.Rotate(c_entity.GetOrientation());
@@ -448,7 +435,7 @@ namespace argos {
    /****************************************/
    /****************************************/
 
-   CVector2 CDroneCamerasSystemDefaultSensor::CDroneCamera::ProjectOntoSensor(const CVector3& c_point) const {
+   CVector2 CDroneCamerasSystemDefaultSensor::SSimulatedInterface::ProjectOntoSensor(const CVector3& c_point) const {
       CVector3 cCameraToEntityTranslation(m_cCameraToWorldTransform * c_point);
       /* this could be avoided if CVector3 inherited from CMatrix<3,1> */
       CMatrix<3,1> cCameraToEntityTranslationMatrix;
@@ -466,7 +453,7 @@ namespace argos {
    /****************************************/
    /****************************************/
 
-   bool CDroneCamerasSystemDefaultSensor::CDroneCamera::IsInsideFrustum(const CVector3& c_point) const {
+   bool CDroneCamerasSystemDefaultSensor::SSimulatedInterface::IsInsideFrustum(const CVector3& c_point) const {
       for(const CPlane& c_plane : m_arrFrustumPlanes) {
          if(c_plane.GetNormal().DotProduct(c_point - c_plane.GetPosition()) < 0.0) {
             return false;
@@ -482,7 +469,7 @@ namespace argos {
                    "drone_cameras_system", "default",
                    "Michael Allwright [allsey87@gmail.com]",
                    "1.0",
-                   "The multi-camera sensor for the drone. Detects tags and LEDs.",
+                   "The multi-camera sensor for the drone (detects tags and directional LEDs).",
                    "Long description\n",
                    "Usable");
 }

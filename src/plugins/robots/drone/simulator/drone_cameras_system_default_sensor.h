@@ -46,21 +46,24 @@ namespace argos {
 
       virtual void Reset();
 
+      virtual void ForEachInterface(std::function<void(SInterface&)> fn);
+
    private:
 
-      class CDroneCamera : public CCI_DroneCamera,
-                           public CPositionalIndex<CTagEntity>::COperation,
-                           public CPositionalIndex<CDirectionalLEDEntity>::COperation {
-      public:
-         CDroneCamera(const std::tuple<CDroneCamerasSystemDefaultSensor*,
-                                       CVector3,
-                                       CQuaternion>& c_configuration);
-         ~CDroneCamera() {}
+      struct SSimulatedInterface : SInterface,
+                                   CPositionalIndex<CTagEntity>::COperation,
+                                   CPositionalIndex<CDirectionalLEDEntity>::COperation {
+         SSimulatedInterface(const UInt8& un_label,
+                             const SAnchor& s_anchor,
+                             CDroneCamerasSystemDefaultSensor& c_parent);
+         ~SSimulatedInterface() {}
 
          virtual void Reset();
+
          virtual void Update();
 
          virtual bool operator()(CTagEntity& c_tag);
+
          virtual bool operator()(CDirectionalLEDEntity& c_led);
 
          virtual ELedState DetectLed(const CVector3& c_position);
@@ -68,6 +71,8 @@ namespace argos {
          CVector2 GetResolution() const;
 
       private:
+
+         const SAnchor& Anchor;
 
          CDroneCamerasSystemDefaultSensor& m_cParent;
 
@@ -89,6 +94,7 @@ namespace argos {
          }
 
          /* AprilTag corner offsets / ordering */
+         // TODO make static, initialize in CPP
          const std::array<CVector3, 4> m_arrTagCornerOffsets = {{
             {-0.5, -0.5, 0},
             { 0.5, -0.5, 0},
@@ -116,8 +122,7 @@ namespace argos {
          std::array<CVector3, 4> m_arrTagCorners;
          std::array<CVector2, 4> m_arrTagCornerPixels;
          CRay3 m_cOcclusionCheckRay;
-         SEmbodiedEntityIntersectionItem m_sIntersectionItem;
-
+         std::vector<SEmbodiedEntityIntersectionItem> m_vecIntersections;
          std::vector<SLed> m_vecLedCache;
 
          /* utility methods */
@@ -125,8 +130,6 @@ namespace argos {
          CVector2 ProjectOntoSensor(const CVector3& c_point) const;
          bool IsInsideFrustum(const CVector3& c_point) const;
       };
-
-      /*****/
 
       CControllableEntity& GetControllableEntity() {
          return *m_pcControllableEntity;
@@ -168,7 +171,8 @@ namespace argos {
       bool m_bShowTagRays;
       bool m_bShowLEDRays;
 
-      std::array<CDroneCamera, 4> m_arrCameras;
+      std::vector<SSimulatedInterface> m_vecSimulatedInterfaces;
+
    };
 }
 
