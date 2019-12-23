@@ -199,16 +199,14 @@ namespace argos {
                                           * CQuaternion(CRadians::PI, CVector3::Z))),
       std::make_pair(2, std::make_tuple("origin",
                                         CVector3(-CAMERA_XY_OFFSET,  CAMERA_XY_OFFSET, CAMERA_Z_OFFSET),
-                                        CQuaternion(ToRadians(CAMERA_ANGLE), CVector3(-1,-1,0))
-                                          * CQuaternion(CRadians::PI, CVector3::Z))),
+                                        CQuaternion(ToRadians(CAMERA_ANGLE), CVector3(-1,-1,0)))),
       std::make_pair(3, std::make_tuple("origin",
                                         CVector3(-CAMERA_XY_OFFSET, -CAMERA_XY_OFFSET, CAMERA_Z_OFFSET),
                                         CQuaternion(ToRadians(CAMERA_ANGLE), CVector3(1,-1,0))
                                           * CQuaternion(CRadians::PI, CVector3::Z))),
       std::make_pair(4, std::make_tuple("origin",
                                         CVector3( CAMERA_XY_OFFSET, -CAMERA_XY_OFFSET, CAMERA_Z_OFFSET),
-                                        CQuaternion(ToRadians(CAMERA_ANGLE), CVector3(1,1,0))
-                                          * CQuaternion(CRadians::PI, CVector3::Z))),
+                                        CQuaternion(ToRadians(CAMERA_ANGLE), CVector3(1,1,0)))),
    };
 
    /****************************************/
