@@ -123,6 +123,8 @@ namespace argos {
          m_pcRadioEquippedEntity->Enable();
          AddComponent(*m_pcRadioEquippedEntity);
          /* create and initialize the directional LEDs */
+         CColor cInitLedColor = CColor::BLACK;
+         GetNodeAttributeOrDefault(t_tree, "init_led_color", cInitLedColor, cInitLedColor);
          m_pcDirectionalLEDEquippedEntity = new CDirectionalLEDEquippedEntity(this, "directional_leds_0");
          for(const std::tuple<std::string, CVector3, CQuaternion>& c_face : FACE_DESCRIPTORS) {
             for(UInt32 un_index = 0; un_index < LED_DESCRIPTORS.size(); un_index++) {
@@ -139,7 +141,7 @@ namespace argos {
                                                         std::get<CQuaternion>(c_face),
                                                         sOriginAnchor,
                                                         CRadians::PI_OVER_THREE,
-                                                        CColor::BLACK);
+                                                        cInitLedColor);
             }
          }
          CDirectionalLEDMedium& cDirectionalLEDMedium = 
