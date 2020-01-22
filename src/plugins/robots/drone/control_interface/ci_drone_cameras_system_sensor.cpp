@@ -186,7 +186,7 @@ namespace argos {
    const Real CCI_DroneCamerasSystemSensor::CAMERA_PRINCIPAL_POINT_Y = 350.0;
    const Real CCI_DroneCamerasSystemSensor::CAMERA_XY_OFFSET = 0.12;
    const Real CCI_DroneCamerasSystemSensor::CAMERA_Z_OFFSET = 0.16;
-   const CDegrees CCI_DroneCamerasSystemSensor::CAMERA_ANGLE = CDegrees(180 - 27);
+   const CDegrees CCI_DroneCamerasSystemSensor::CAMERA_ANGLE = CDegrees(180 - 18);
 
    /****************************************/
    /****************************************/
