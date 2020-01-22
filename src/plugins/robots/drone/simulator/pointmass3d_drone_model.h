@@ -62,7 +62,7 @@ namespace argos {
       /* reference to the flight system entity */ 
       CDroneFlightSystemEntity& m_cFlightSystemEntity;
       /* position and yaw input from the controller */ 
-      CRadians m_cInputYawAngle;
+      Real m_fInputYawAngle;
       CVector3 m_cInputPosition;
       /* home position and yaw angle */
       CVector3 m_cHomePosition;

@@ -86,8 +86,13 @@ namespace argos
 
    void CPointMass3DDroneModel::UpdateFromEntityStatus() {
       /* pull actuator data from the control interface */
-      m_cInputPosition = m_cFlightSystemEntity.GetTargetPosition();
-      m_cInputYawAngle = m_cFlightSystemEntity.GetTargetYawAngle();
+      /* CDroneFlightSystemEntity: local coordinate system of the drone */
+      /* CPointMass3DDroneModel: global coordinate system */
+      CVector3 cTargetPosition(m_cFlightSystemEntity.GetTargetPosition());
+      m_cInputPosition =
+         m_cHomePosition + cTargetPosition.RotateZ(CRadians(m_fHomeYawAngle));
+      m_fInputYawAngle =
+         m_fHomeYawAngle + m_cFlightSystemEntity.GetTargetYawAngle().GetValue();
    }
 
    /****************************************/
@@ -95,22 +100,21 @@ namespace argos
 
    void CPointMass3DDroneModel::UpdatePhysics() {
       /* update the position (XY) and altitude (Z) controller */
-      /* calculate position error */
-      CVector3 cPositionalError((m_cHomePosition + m_cInputPosition) - m_cPosition);
+      CVector3 cPositionError(m_cInputPosition - m_cPosition);
       /* accumulate the altitude error */
-      m_fAltitudeCumulativeError += cPositionalError.GetZ() * GetPM3DEngine().GetPhysicsClockTick();
+      m_fAltitudeCumulativeError += cPositionError.GetZ() * GetPM3DEngine().GetPhysicsClockTick();
       /* calculate the azimuth contribution to the navigation of drone on XY plane */
-      Real fAzimuth = std::atan2(std::abs(cPositionalError.GetY()),
-                                 std::abs(cPositionalError.GetX()));
+      Real fAzimuth = std::atan2(std::abs(cPositionError.GetY()),
+                                 std::abs(cPositionError.GetX()));
       /* calculate velocity limits */
       CRange<Real> cVelocityLimitX(-XY_VEL_MAX * std::cos(fAzimuth), XY_VEL_MAX * std::cos(fAzimuth));
       CRange<Real> cVelocityLimitY(-XY_VEL_MAX * std::sin(fAzimuth), XY_VEL_MAX * std::sin(fAzimuth));
       CRange<Real> cVelocityLimitZ(-Z_VEL_MAX, Z_VEL_MAX);
       /* calculate desired XYZ velocities */
-      Real fTargetTransVelX = 
-         cPositionalError.GetX() * XY_POS_KP;
+      Real fTargetTransVelX =
+         cPositionError.GetX() * XY_POS_KP;
       Real fTargetTransVelY =
-         cPositionalError.GetY() * XY_POS_KP;
+         cPositionError.GetY() * XY_POS_KP;
       Real fTargetTransVelZ =
          (m_cInputPosition.GetZ() - m_fTargetPositionZPrev) / GetPM3DEngine().GetPhysicsClockTick();
       /* saturate velocities */
@@ -131,7 +135,7 @@ namespace argos
          (std::sin(fYawAngleCorrected) * cTargetTransAcc.GetX() - std::cos(fYawAngleCorrected) * cTargetTransAcc.GetY()) / m_cPM3DEngine.GetGravity();
       Real fDesiredPitchAngle = std::cos(m_cOrientation.GetY()) * std::cos(m_cOrientation.GetX()) *
          (std::cos(fYawAngleCorrected) * cTargetTransAcc.GetX() + std::sin(fYawAngleCorrected) * cTargetTransAcc.GetY()) / m_cPM3DEngine.GetGravity();
-      Real fDesiredYawAngle = m_fHomeYawAngle + m_cInputYawAngle.GetValue();
+      Real fDesiredYawAngle = m_fInputYawAngle;
       /* saturate the outputs of the position controller */
       ROLL_PITCH_LIMIT.TruncValue(fDesiredRollAngle);
       ROLL_PITCH_LIMIT.TruncValue(fDesiredPitchAngle);
@@ -139,7 +143,7 @@ namespace argos
       CVector3 cOrientationTarget(fDesiredRollAngle, fDesiredPitchAngle, fDesiredYawAngle);
       /* output of the altitude controller */
       Real fAltitudeControlSignal = MASS * GetPM3DEngine().GetGravity() + 
-         CalculatePIDResponse(cPositionalError.GetZ(),
+         CalculatePIDResponse(cPositionError.GetZ(),
                               m_fAltitudeCumulativeError,
                               cTransVelocityError.GetZ(),
                               ALTITUDE_KP,
@@ -274,15 +278,18 @@ namespace argos
       /* convert to Euler angles */
       CRadians cYaw, cPitch, cRoll;
       c_orientation.ToEulerAngles(cYaw, cPitch, cRoll);
-      /* update the home position and home yaw */
-      m_cHomePosition += c_position - m_cPosition;
-      m_fHomeYawAngle += cYaw.GetValue() - m_cPosition.GetZ();
+      /* calculate the requested change in position and yaw */
+      Real fDeltaYaw = cYaw.GetValue() - m_cOrientation.GetZ();
+      CVector3 cDeltaPosition = c_position - m_cPosition;
+      /* update the home yaw and home position */
+      m_fHomeYawAngle += fDeltaYaw;
+      CVector3 cOffsetPosition(m_cHomePosition - m_cPosition);
+      m_cHomePosition = c_position + cOffsetPosition.RotateZ(CRadians(fDeltaYaw));
       /* update the position and orientation */
       m_cPosition = c_position;
-      /* the drone orientation should include roll, pitch, yaw angles*/
       m_cOrientation.Set(cRoll.GetValue(),
-                              cPitch.GetValue(),
-                              cYaw.GetValue());
+                         cPitch.GetValue(),
+                         cYaw.GetValue());
       /* update the space */
       UpdateEntityStatus();
    }
