@@ -280,7 +280,6 @@ namespace argos
       c_orientation.ToEulerAngles(cYaw, cPitch, cRoll);
       /* calculate the requested change in position and yaw */
       Real fDeltaYaw = cYaw.GetValue() - m_cOrientation.GetZ();
-      CVector3 cDeltaPosition = c_position - m_cPosition;
       /* update the home yaw and home position */
       m_fHomeYawAngle += fDeltaYaw;
       CVector3 cOffsetPosition(m_cHomePosition - m_cPosition);
