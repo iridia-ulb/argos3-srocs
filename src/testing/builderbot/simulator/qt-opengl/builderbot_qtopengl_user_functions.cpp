@@ -21,6 +21,7 @@
 
 #define GL_NUMBER_VERTICES 36u
 #define BLOCK_SIDE_LENGTH 0.055
+#define DELTA_Z 0.0005
 
 namespace argos {
 
@@ -28,60 +29,74 @@ namespace argos {
    /********************************************************************************/
 
    bool CBuilderBotQtOpenGLUserFunctionsMouseWheelEventHandler::eventFilter(QObject* pc_object, QEvent* pc_event) {
-      if (pc_event->type() == QEvent::Wheel) {
-         QWheelEvent *pcWheelEvent = static_cast<QWheelEvent*>(pc_event);
-         CEntity* pcEntity = m_pcUserFunctions->GetSelectedEntity();
-         if(pcEntity != nullptr) {
-            CBuilderBotEntity* pcBuilderBotEntity = dynamic_cast<CBuilderBotEntity*>(pcEntity);
-            if(pcBuilderBotEntity != nullptr) {
-               CEmbodiedEntity& cBuilderBotEmbodiedEntity = pcBuilderBotEntity->GetEmbodiedEntity();
-               /* get the potential position of a block */
-               CVector3 cTargetBlockPos(cBuilderBotEmbodiedEntity.GetAnchor("end_effector").Position);
-               cTargetBlockPos -= (CVector3::Z * BLOCK_SIDE_LENGTH);
-               try {
-                  std::map<std::string, CAny>& mapBlockEntities = 
-                     CSimulator::GetInstance().GetSpace().GetEntitiesByType("block");
-                  for(const std::pair<const std::string, CAny>& c_block : mapBlockEntities) {
-                     CEmbodiedEntity& cBlockEmbodiedEntity = 
-                        any_cast<CBlockEntity*>(c_block.second)->GetEmbodiedEntity();
-                     const SAnchor& sBlockAnchor = cBlockEmbodiedEntity.GetOriginAnchor();
-                     if(Distance(cTargetBlockPos, sBlockAnchor.Position) < 0.005) {
-                        const SAnchor& sBuilderBotAnchor = cBuilderBotEmbodiedEntity.GetOriginAnchor();
-                        /* we have found our block, save its position and move it to just below the floor */
-                        const CVector3 cBlockInitPosition(sBlockAnchor.Position);
-                        const CQuaternion cBlockInitOrientation(sBlockAnchor.Orientation);
-                        const CVector3 cBuilderBotInitPosition(sBuilderBotAnchor.Position);
-                        const CQuaternion cBuilderBotInitOrientation(sBuilderBotAnchor.Orientation);
-                        // step one: move the block to a temporary position */
-                        CVector3 cBlockTempPosition(cBlockInitPosition);
-                        cBlockTempPosition.SetZ(-2.0 * BLOCK_SIDE_LENGTH);
-                        if(cBlockEmbodiedEntity.MoveTo(cBlockTempPosition, sBlockAnchor.Orientation)) {
-                           CDegrees cDegrees(pcWheelEvent->angleDelta().y() / 8);
-                           CQuaternion cRotation(ToRadians(cDegrees), CVector3::Z);
-                           // step two: rotate the builderbot
-                           if(cBuilderBotEmbodiedEntity.MoveTo(cBuilderBotInitPosition, cBuilderBotInitOrientation * cRotation)) {
-                              // step three: rotate and translate the block
-                              CVector3 cBlockNewPosition(cBlockInitPosition - cBuilderBotInitPosition);
-                              cBlockNewPosition.Rotate(cRotation);
-                              cBlockNewPosition += cBuilderBotInitPosition;
-                              cBlockNewPosition -= (CVector3::Z * 0.0005);
-                              CQuaternion cBlockNewOrientation(cBlockInitOrientation * cRotation);
-                              if(cBlockEmbodiedEntity.MoveTo(cBlockNewPosition, cBlockNewOrientation)) {
-                                 m_pcUserFunctions->GetQTOpenGLWidget().update();
-                                 return true;
-                              }
-                           }
-                        }
-                        cBuilderBotEmbodiedEntity.MoveTo(cBuilderBotInitPosition, cBuilderBotInitOrientation);
-                        cBlockEmbodiedEntity.MoveTo(cBlockInitPosition, cBlockInitOrientation);
+      if (pc_event->type() != QEvent::Wheel) {
+         return QObject::eventFilter(pc_object, pc_event);
+      }
+      QWheelEvent *pcWheelEvent = static_cast<QWheelEvent*>(pc_event);
+      if(!(pcWheelEvent->modifiers() & Qt::ControlModifier)) {
+         return QObject::eventFilter(pc_object, pc_event);
+      }
+      CEntity* pcEntity = m_pcUserFunctions->GetSelectedEntity();
+      if(pcEntity == nullptr) {
+         return QObject::eventFilter(pc_object, pc_event);
+      }
+      CBuilderBotEntity* pcBuilderBotEntity = dynamic_cast<CBuilderBotEntity*>(pcEntity);
+      if(pcBuilderBotEntity == nullptr) {
+         return QObject::eventFilter(pc_object, pc_event);
+      }
+      CEmbodiedEntity& cBuilderBotEmbodiedEntity = pcBuilderBotEntity->GetEmbodiedEntity();
+      const SAnchor& sBuilderBotOriginAnchor = cBuilderBotEmbodiedEntity.GetOriginAnchor();
+      const SAnchor& sBuilderBotEndEffectorAnchor = cBuilderBotEmbodiedEntity.GetAnchor("end_effector");
+      /* get the target position of a block */
+      CVector3 cTargetBlockPos(sBuilderBotEndEffectorAnchor.Position);
+      cTargetBlockPos -= (CVector3::Z * BLOCK_SIDE_LENGTH);
+      try {
+         std::map<std::string, CAny>& mapBlockEntities =
+            CSimulator::GetInstance().GetSpace().GetEntitiesByType("block");
+         for(const std::pair<const std::string, CAny>& c_block : mapBlockEntities) {
+            CEmbodiedEntity& cBlockEmbodiedEntity =
+               any_cast<CBlockEntity*>(c_block.second)->GetEmbodiedEntity();
+            const SAnchor& sBlockOriginAnchor = cBlockEmbodiedEntity.GetOriginAnchor();
+            if(Distance(cTargetBlockPos, sBlockOriginAnchor.Position) < 0.005) {
+               /* we have found our block, save its position and move it to just below the floor */
+               const CVector3 cBlockInitPosition(sBlockOriginAnchor.Position);
+               const CQuaternion cBlockInitOrientation(sBlockOriginAnchor.Orientation);
+               const CVector3 cBuilderBotInitPosition(sBuilderBotOriginAnchor.Position);
+               const CQuaternion cBuilderBotInitOrientation(sBuilderBotOriginAnchor.Orientation);
+               // step one: move the block to a temporary position */
+               CVector3 cBlockTempPosition(cBlockInitPosition);
+               cBlockTempPosition.SetZ(-2.0 * BLOCK_SIDE_LENGTH);
+               if(cBlockEmbodiedEntity.MoveTo(cBlockTempPosition,
+                                              sBlockOriginAnchor.Orientation)) {
+                  CDegrees cDegrees(pcWheelEvent->angleDelta().y() / 8);
+                  CQuaternion cRotation(ToRadians(cDegrees), CVector3::Z);
+                  // step two: rotate the builderbot
+                  if(cBuilderBotEmbodiedEntity.MoveTo(cBuilderBotInitPosition,
+                                                      cBuilderBotInitOrientation * cRotation)) {
+                     // step three: rotate and translate the block
+                     CVector3 cBlockNewPosition(cBlockInitPosition - cBuilderBotInitPosition);
+                     cBlockNewPosition.Rotate(cRotation);
+                     cBlockNewPosition += cBuilderBotInitPosition;
+                     Real fBlockEndEffectorDistance =
+                        Distance(cBlockNewPosition, sBuilderBotEndEffectorAnchor.Position);
+                     if(fBlockEndEffectorDistance < BLOCK_SIDE_LENGTH + DELTA_Z) {
+                        cBlockNewPosition -= (CVector3::Z * DELTA_Z);
+                     }
+                     CQuaternion cBlockNewOrientation(cBlockInitOrientation * cRotation);
+                     if(cBlockEmbodiedEntity.MoveTo(cBlockNewPosition,
+                                                    cBlockNewOrientation)) {
+                        m_pcUserFunctions->GetQTOpenGLWidget().update();
                         return true;
                      }
                   }
                }
-               catch(CARGoSException& ex) {}
+               cBuilderBotEmbodiedEntity.MoveTo(cBuilderBotInitPosition, cBuilderBotInitOrientation);
+               cBlockEmbodiedEntity.MoveTo(cBlockInitPosition, cBlockInitOrientation);
+               return true;
             }
          }
       }
+      catch(CARGoSException& ex) {}
       return QObject::eventFilter(pc_object, pc_event);
    }
 
@@ -90,18 +105,13 @@ namespace argos {
 
    CBuilderBotQtOpenGLUserFunctions::CBuilderBotQtOpenGLUserFunctions() {
       RegisterUserFunction<CBuilderBotQtOpenGLUserFunctions, CBuilderBotEntity>(&CBuilderBotQtOpenGLUserFunctions::Draw);
-
-
    }
 
    /********************************************************************************/
    /********************************************************************************/
 
    CBuilderBotQtOpenGLUserFunctions::~CBuilderBotQtOpenGLUserFunctions() {
-
    }
-
-
 
    /********************************************************************************/
    /********************************************************************************/
