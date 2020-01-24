@@ -1,5 +1,5 @@
-#ifndef BUILDERBOT_QTOPENGL_WIDGET_H
-#define BUILDERBOT_QTOPENGL_WIDGET_H
+#ifndef BUILDERBOT_QTOPENGL_USER_FUNCTIONS_WIDGET_H
+#define BUILDERBOT_QTOPENGL_USER_FUNCTIONS_WIDGET_H
 
 namespace argos {
    class CCI_Controller;
@@ -16,13 +16,13 @@ class QTextEdit;
 #include <QWidget>
 
 namespace argos {
-   class CBuilderBotQtOpenGLWidget : public QWidget {
+   class CBuilderBotQtOpenGLUserFunctionsWidget : public QWidget {
       Q_OBJECT
 
    public:
-      CBuilderBotQtOpenGLWidget(QWidget* pc_parent,
-                                CBuilderBotEntity& c_robot);
-      ~CBuilderBotQtOpenGLWidget();
+      CBuilderBotQtOpenGLUserFunctionsWidget(QWidget* pc_parent,
+                                             CBuilderBotEntity& c_robot);
+      ~CBuilderBotQtOpenGLUserFunctionsWidget();
 
       void Update();
 
@@ -43,10 +43,7 @@ namespace argos {
       /* BuilderBot controller pointer */
       CCI_Controller* m_pcController;     
       /* BuilderBot sensors pointers */
-
-
       CBuilderBotCameraSystemDefaultSensor* m_pcCameraSystemSensor;
-
    };
 }
 #endif

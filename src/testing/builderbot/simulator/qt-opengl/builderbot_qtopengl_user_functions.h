@@ -1,9 +1,9 @@
-#ifndef SROCS_QTOPENGL_USER_FUNCTIONS_H
-#define SROCS_QTOPENGL_USER_FUNCTIONS_H
+#ifndef BUILDERBOT_QTOPENGL_USER_FUNCTIONS_H
+#define BUILDERBOT_QTOPENGL_USER_FUNCTIONS_H
 
 namespace argos {
-   class CPrototypeEntity;
-   class CBuilderBotQtOpenGLWidget;
+   class CBuilderBotQtOpenGLUserFunctionsWidget;
+   class CBuilderBotQtOpenGLUserFunctions;
 }
 
 class QDockWidget;
@@ -14,17 +14,30 @@ class QTabWidget;
 #include <argos3/plugins/robots/builderbot/simulator/builderbot_entity.h>
 #include <argos3/core/utility/datatypes/datatypes.h>
 
-
 namespace argos {
-   class CSRoCSQTOpenGLUserFunctions : public QObject, 
-                                       public CQTOpenGLUserFunctions {
+
+   class CBuilderBotQtOpenGLUserFunctionsMouseWheelEventHandler : public QObject {
+      Q_OBJECT
+   public:
+      CBuilderBotQtOpenGLUserFunctionsMouseWheelEventHandler(QObject* pc_parent,
+                                                             CBuilderBotQtOpenGLUserFunctions* pc_user_functions) :
+         QObject(pc_parent),
+         m_pcUserFunctions(pc_user_functions) {}
+   protected:
+      bool eventFilter(QObject* pc_object, QEvent* pc_event);
+   private:
+      CBuilderBotQtOpenGLUserFunctions* m_pcUserFunctions;
+   };
+
+   class CBuilderBotQtOpenGLUserFunctions : public QObject, 
+                                            public CQTOpenGLUserFunctions {
 
    Q_OBJECT
 
    public:
 
-      CSRoCSQTOpenGLUserFunctions();
-      virtual ~CSRoCSQTOpenGLUserFunctions();
+      CBuilderBotQtOpenGLUserFunctions();
+      virtual ~CBuilderBotQtOpenGLUserFunctions();
 
       virtual void Init(TConfigurationNode& t_tree);
 
@@ -103,21 +116,16 @@ namespace argos {
          GLuint m_unRing;
       };
 
-      CSpace* m_pcSpace;
-      CQTOpenGLMainWindow* m_pcMainWindow;
-      CQTOpenGLWidget* m_pcOpenGLWidget;
-
+      CBuilderBotQtOpenGLUserFunctionsMouseWheelEventHandler* m_pcMouseWheelEventHandler;
       QDockWidget* m_pcUserFunctionsDock;
       QTabWidget* m_pcTabWidget;
     
       struct SUserInterface {
          SInt32 TabIndex;
-         CBuilderBotQtOpenGLWidget* Widget;
+         CBuilderBotQtOpenGLUserFunctionsWidget* Widget;
       };
 
       std::list<std::pair<std::string, SUserInterface> > m_lstRobotUserInterfaces;
-
-
      
    };
 }

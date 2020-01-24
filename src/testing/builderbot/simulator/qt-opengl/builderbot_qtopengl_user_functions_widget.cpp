@@ -1,4 +1,4 @@
-#include "builderbot_qtopengl_widget.h"
+#include "builderbot_qtopengl_user_functions_widget.h"
 
 #include <argos3/plugins/simulator/visualizations/qt-opengl/qtopengl_log_stream.h>
 
@@ -16,7 +16,7 @@ namespace argos {
    /********************************************************************************/
    /********************************************************************************/
 
-   CBuilderBotQtOpenGLWidget::CBuilderBotQtOpenGLWidget(QWidget* pc_parent,
+   CBuilderBotQtOpenGLUserFunctionsWidget::CBuilderBotQtOpenGLUserFunctionsWidget(QWidget* pc_parent,
                                                         CBuilderBotEntity& c_robot) :
       QWidget(pc_parent),
       m_cRobot(c_robot),
@@ -56,7 +56,7 @@ namespace argos {
    /********************************************************************************/
    /********************************************************************************/
 
-   CBuilderBotQtOpenGLWidget::~CBuilderBotQtOpenGLWidget() {
+   CBuilderBotQtOpenGLUserFunctionsWidget::~CBuilderBotQtOpenGLUserFunctionsWidget() {
 
       delete m_pcLayout;
       delete m_pcViewport;
@@ -68,17 +68,7 @@ namespace argos {
    /********************************************************************************/
    /********************************************************************************/
 
-   void CBuilderBotQtOpenGLWidget::Update() {
-/*
-      QString strContents;
-      QTextStream(&strContents) << "<b>" << "Init" << "</b>";
-      m_pcLogTargetsBuffer->append(strContents);
-      m_pcLogStatesBuffer->append(strContents);
-
-*/
-
-
-
+   void CBuilderBotQtOpenGLUserFunctionsWidget::Update() {
       m_pcScene->clear();
       m_pcViewport->setBackgroundBrush(QBrush(Qt::black));
 

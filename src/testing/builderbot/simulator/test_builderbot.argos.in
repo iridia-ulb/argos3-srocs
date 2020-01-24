@@ -16,32 +16,22 @@
     <lua_controller id="builderbot">
       <actuators>
         <builderbot_electromagnet_system implementation="default" />
-        <builderbot_differential_drive implementation="default"
-          calibration="src/calibration/builderbot_differential_drive.xml" />
+        <builderbot_differential_drive implementation="default" />
         <builderbot_lift_system implementation="default" />
         <builderbot_nfc implementation="default" />
-        <debug implementation="default">
-          <interface id="logerr" output="stderr" />
-          <interface id="log" output="stdout" />
-          <interface id="draw" />
-        </debug>
         <wifi implementation="default" />
       </actuators>
       <sensors>
         <builderbot_camera_system implementation="default"
-          calibration="src/calibration/builderbot_camera_system.xml"
-          show_frustum="true" show_tag_rays="true" show_led_rays="true" />
-        <builderbot_rangefinders implementation="default"
-          calibration="src/calibration/builderbot_rangefinders.xml"
-          show_rays="true" />
-        <builderbot_differential_drive implementation="default"
-          calibration="src/calibration/builderbot_differential_drive.xml" />
+          show_frustum="false" show_tag_rays="false" show_led_rays="false" />
+        <builderbot_rangefinders implementation="default" show_rays="false" />
+        <builderbot_differential_drive implementation="default"/>
         <builderbot_electromagnet_system implementation="default" />
         <builderbot_lift_system implementation="default" />
-        <builderbot_nfc implementation="default" show_rays="true" />
+        <builderbot_nfc implementation="default" show_rays="false" />
         <wifi implementation="default" />
       </sensors>
-      <params script="test_builderbot.lua" />
+      <params script="@CMAKE_BINARY_DIR@/testing/builderbot/test_builderbot.lua" />
     </lua_controller>
 
     <lua_controller id="block">
@@ -52,7 +42,7 @@
       <sensors>
         <radios implementation="default" show_rays="true"/>
       </sensors>
-      <params script="test_block.lua" />
+      <params script="@CMAKE_BINARY_DIR@/testing/builderbot/test_block.lua" />
     </lua_controller>
   </controllers>
 
@@ -101,10 +91,10 @@
   <!-- ****************** -->
   <!-- * Visualization * -->
   <!-- ****************** -->
-
   <visualization>
-    <qt-opengl lua_editor="true">
-      <user_functions label="srocs_qtopengl_user_functions" />
+    <qt-opengl lua_editor="false" show_boundary="false">
+      <user_functions library="@CMAKE_BINARY_DIR@/testing/builderbot/libbuilderbot_qtopengl_user_functions"
+                      label="builderbot_qtopengl_user_functions" />
       <camera>
         <placement idx="0" position=" 0,  -2.5,1" look_at="0,0,0.05" lens_focal_length="78" />
         <placement idx="1" position=" 2.5,-2.5,1" look_at="0,0,0.05" lens_focal_length="92" />
