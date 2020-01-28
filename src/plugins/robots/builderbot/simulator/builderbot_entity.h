@@ -15,6 +15,7 @@ namespace argos {
    class CDebugEntity;
    class CEmbodiedEntity;
    class CRadioEquippedEntity;
+   class CTagEquippedEntity;
 }
 
 #include <argos3/core/simulator/entity/composable_entity.h>
@@ -83,6 +84,14 @@ namespace argos {
          return *m_pcEmbodiedEntity;
       }
 
+      inline CTagEquippedEntity& GetTagEquippedEntity() {
+         return *m_pcTagEquippedEntity;
+      }
+
+      inline const CTagEquippedEntity& GetTagEquippedEntity() const {
+         return *m_pcTagEquippedEntity;
+      }
+
       inline bool IsDebug() const {
          return m_bDebug;
       }
@@ -100,8 +109,14 @@ namespace argos {
       CBuilderBotLiftSystemEntity*           m_pcLiftSystemEntity;
       CRadioEquippedEntity*                  m_pcNFCRadioEquippedEntity;
       CRadioEquippedEntity*                  m_pcWifiRadioEquippedEntity;
+      CTagEquippedEntity*                    m_pcTagEquippedEntity;
 
       bool m_bDebug;
+
+      static const Real WIFI_TRANSMISSION_RANGE;
+      static const Real NFC_TRANSMISSION_RANGE;
+      static const Real TAG_SIDE_LENGTH;
+      static const CVector3 TAG_OFFSET_POSITION;
    };
 
 }

@@ -36,7 +36,11 @@ namespace argos {
       /* OBJ models */
       CQTOpenGLObjModel m_cBuilderBotModel;
       CQTOpenGLObjModel m_cBuilderBotManipulatorModel;
-      /* Pointer to the LED material within the OBJ model */
+      /* The tag texture */
+      const std::array<std::array<GLfloat, 3>, 100> m_arrTagTexture;
+      /* Precompiled list for drawing tags */
+      GLuint m_unTagList;
+      /* Pointers to the LED material within the OBJ model */
       //std::array<CQTOpenGLObjModel::SMaterial*, 12> m_arrLEDs;
    };
 

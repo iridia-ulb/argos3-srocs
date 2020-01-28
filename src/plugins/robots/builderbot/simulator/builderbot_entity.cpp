@@ -9,10 +9,13 @@
 #include <argos3/core/simulator/simulator.h>
 #include <argos3/core/simulator/entity/controllable_entity.h>
 #include <argos3/core/simulator/entity/embodied_entity.h>
-#include <argos3/plugins/simulator/entities/radio_equipped_entity.h>
-#include <argos3/plugins/simulator/entities/debug_entity.h>
 
+#include <argos3/plugins/simulator/entities/debug_entity.h>
+#include <argos3/plugins/simulator/entities/radio_equipped_entity.h>
+#include <argos3/plugins/simulator/entities/tag_equipped_entity.h>
 #include <argos3/plugins/simulator/media/radio_medium.h>
+#include <argos3/plugins/simulator/media/tag_medium.h>
+
 #include <argos3/plugins/robots/builderbot/simulator/builderbot_differential_drive_entity.h>
 #include <argos3/plugins/robots/builderbot/simulator/builderbot_electromagnet_system_entity.h>
 #include <argos3/plugins/robots/builderbot/simulator/builderbot_lift_system_entity.h>
@@ -22,8 +25,10 @@ namespace argos {
    /****************************************/
    /****************************************/
 
-   static const Real WIFI_TRANSMISSION_RANGE = 10.0f;
-   static const Real NFC_TRANSMISSION_RANGE  = 0.02f;
+   const Real CBuilderBotEntity::WIFI_TRANSMISSION_RANGE = 10.0;
+   const Real CBuilderBotEntity::NFC_TRANSMISSION_RANGE  = 0.02;
+   //const Real CBuilderBotEntity::TAG_SIDE_LENGTH = 0.0235;
+   //const CVector3 CBuilderBotEntity::TAG_OFFSET_POSITION = {0.0, 0.0, 0.3875};
 
    /****************************************/
    /****************************************/
@@ -36,6 +41,7 @@ namespace argos {
       m_pcDifferentialDriveEntity(nullptr),
       m_pcElectromagnetSystemEntity(nullptr),
       m_pcLiftSystemEntity(nullptr),
+      m_pcTagEquippedEntity(nullptr),
       m_bDebug(false) {}
 
    /****************************************/
@@ -83,6 +89,24 @@ namespace argos {
             new CBuilderBotLiftSystemEntity(this, "lift_system_0", sEndEffectorAnchor);
          AddComponent(*m_pcLiftSystemEntity);
          m_pcLiftSystemEntity->Enable();
+         /* create and initialize the tags */
+         m_pcTagEquippedEntity = new CTagEquippedEntity(this, "tags_0");
+         /*
+         m_pcTagEquippedEntity->AddTag("tag_0",
+                                       TAG_OFFSET_POSITION,
+                                       CQuaternion(),
+                                       m_pcEmbodiedEntity->GetOriginAnchor(),
+                                       CRadians::PI_OVER_THREE,
+                                       TAG_SIDE_LENGTH,
+                                       GetId());
+         */
+         std::string strTagMedium("tags");
+         GetNodeAttributeOrDefault(t_tree, "tag_medium", strTagMedium, strTagMedium);
+         CTagMedium& cTagMedium = 
+            CSimulator::GetInstance().GetMedium<CTagMedium>(strTagMedium);
+         m_pcTagEquippedEntity->SetMedium(cTagMedium);
+         m_pcTagEquippedEntity->Enable();
+         AddComponent(*m_pcTagEquippedEntity);
          /* create and initialize a radio equipped entity for WiFi */
          m_pcWifiRadioEquippedEntity = new CRadioEquippedEntity(this, "radios_0");
          AddComponent(*m_pcWifiRadioEquippedEntity);
