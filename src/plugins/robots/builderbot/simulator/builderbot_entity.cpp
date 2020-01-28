@@ -27,8 +27,8 @@ namespace argos {
 
    const Real CBuilderBotEntity::WIFI_TRANSMISSION_RANGE = 10.0;
    const Real CBuilderBotEntity::NFC_TRANSMISSION_RANGE  = 0.02;
-   //const Real CBuilderBotEntity::TAG_SIDE_LENGTH = 0.0235;
-   //const CVector3 CBuilderBotEntity::TAG_OFFSET_POSITION = {0.0, 0.0, 0.3875};
+   const Real CBuilderBotEntity::TAG_SIDE_LENGTH = 0.0235;
+   const CVector3 CBuilderBotEntity::TAG_OFFSET_POSITION = {0.0, 0.0, 0.3875};
 
    /****************************************/
    /****************************************/
@@ -91,7 +91,6 @@ namespace argos {
          m_pcLiftSystemEntity->Enable();
          /* create and initialize the tags */
          m_pcTagEquippedEntity = new CTagEquippedEntity(this, "tags_0");
-         /*
          m_pcTagEquippedEntity->AddTag("tag_0",
                                        TAG_OFFSET_POSITION,
                                        CQuaternion(),
@@ -99,7 +98,6 @@ namespace argos {
                                        CRadians::PI_OVER_THREE,
                                        TAG_SIDE_LENGTH,
                                        GetId());
-         */
          std::string strTagMedium("tags");
          GetNodeAttributeOrDefault(t_tree, "tag_medium", strTagMedium, strTagMedium);
          CTagMedium& cTagMedium = 
