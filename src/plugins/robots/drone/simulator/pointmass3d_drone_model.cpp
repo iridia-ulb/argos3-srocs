@@ -289,6 +289,8 @@ namespace argos
       m_cOrientation.Set(cRoll.GetValue(),
                          cPitch.GetValue(),
                          cYaw.GetValue());
+      /* update the previous orientation target */
+      m_cOrientationTargetPrev.SetZ(m_cOrientationTargetPrev.GetZ() + fDeltaYaw);
       /* update the space */
       UpdateEntityStatus();
    }
