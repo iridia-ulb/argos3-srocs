@@ -51,6 +51,7 @@ namespace argos {
 
          std::shared_ptr<CDynamics3DSingleBodyObjectModel::CBody> Body;
          std::array<SMagnet, 8> Magnets;
+         bool InteractingWithEndEffector = false;
       };
 
       struct SEndEffector {

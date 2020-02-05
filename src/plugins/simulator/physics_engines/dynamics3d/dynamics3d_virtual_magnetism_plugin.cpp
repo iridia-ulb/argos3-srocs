@@ -76,6 +76,7 @@ namespace argos {
    void CDynamics3DVirtualMagnetismPlugin::Update() {
       /* calculate the magnet offsets and positions for each block */
       for(SBlock& s_block : m_vecBlocks) {
+         s_block.InteractingWithEndEffector = false;
          /* for each of the eight magnets, calculate rotated offsets and positions */
          for(UInt32 un_index = 0; un_index < 8; un_index++) {
             s_block.Magnets[un_index].RotatedOffset = 
@@ -128,6 +129,7 @@ namespace argos {
                         /* force and torque for box */
                         s_block.Body->ApplyForce(cDirectionVector * fForce,
                                                  s_magnet.RotatedOffset);
+                        s_block.InteractingWithEndEffector = true;
                      }
                   }
                }
@@ -143,9 +145,15 @@ namespace argos {
       for(std::vector<SBlock>::iterator itBlock0 = std::begin(m_vecBlocks);
           itBlock0 != (std::end(m_vecBlocks) - 1);
           ++itBlock0) {
+         if(itBlock0->InteractingWithEndEffector) {
+            continue;
+         }
          for(std::vector<SBlock>::iterator itBlock1 = std::next(itBlock0, 1);
              itBlock1 != std::end(m_vecBlocks);
              ++itBlock1) {
+            if(itBlock1->InteractingWithEndEffector) {
+               continue;
+            }
             /* if a box is not movable, its mass is zero by default, 
              * so if one is zero, use the mass of the other one */
             btScalar fForce = MAGNET_FORCE_COEFFICIENT * itBlock0->Body->GetData().Mass;
