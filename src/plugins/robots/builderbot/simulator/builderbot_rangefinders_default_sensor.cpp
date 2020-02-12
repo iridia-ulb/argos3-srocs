@@ -150,9 +150,11 @@ namespace argos {
             fBrightness *= (fCosine + 1.0) / 2.0;
             /* decrease fBrightness with respect to obstacles between the light source and the sensor */
             m_cSensorRay.SetEnd(c_light.GetPosition());
+            /*
             if(GetClosestEmbodiedEntityIntersectedByRay(m_sIntersection, m_cSensorRay, m_sInterface.EmbodiedEntity)) {
                fBrightness *= Abs(0.5 - m_sIntersection.TOnRay);
             }
+            */
             m_fTotalLight += fBrightness;
             return true;
          }
