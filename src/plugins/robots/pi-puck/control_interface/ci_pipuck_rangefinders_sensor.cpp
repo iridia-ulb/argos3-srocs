@@ -54,18 +54,14 @@ namespace argos {
    /****************************************/
 
    const std::map<UInt8, CCI_PiPuckRangefindersSensor::TConfiguration > CCI_PiPuckRangefindersSensor::m_mapSensorConfig = {
-      std::make_pair(1,  std::make_tuple("origin", CVector3( 0.033, 0.009, 0.05125), CQuaternion(-0.5 * CRadians::PI, CVector3(0.26,-0.97,0)), 0.1)),
-      std::make_pair(2,  std::make_tuple("origin", CVector3( 0.022, 0.027, 0.05125), CQuaternion(-0.5 * CRadians::PI, CVector3(0.73,-0.65,0)), 0.1)),
-      std::make_pair(3,  std::make_tuple("origin", CVector3( 0.009, 0.033, 0.05125), CQuaternion(-0.5 * CRadians::PI, CVector3(0.97,-0.26,0)), 0.1)),
-      std::make_pair(4,  std::make_tuple("origin", CVector3(-0.009, 0.033, 0.05125), CQuaternion(-0.5 * CRadians::PI, CVector3(0.97, 0.26,0)), 0.1)),
-      std::make_pair(5,  std::make_tuple("origin", CVector3(-0.023, 0.025, 0.05125), CQuaternion(-0.5 * CRadians::PI, CVector3(0.73, 0.73,0)), 0.1)),
-      std::make_pair(6,  std::make_tuple("origin", CVector3(-0.032, 0.013, 0.05125), CQuaternion(-0.5 * CRadians::PI, CVector3(0.26, 0.97,0)), 0.1)),
-      std::make_pair(7,  std::make_tuple("origin", CVector3(-0.033,-0.009, 0.05125), CQuaternion( 0.5 * CRadians::PI, CVector3(0.26,-0.97,0)), 0.1)),
-      std::make_pair(8,  std::make_tuple("origin", CVector3(-0.024,-0.025, 0.05125), CQuaternion( 0.5 * CRadians::PI, CVector3(0.73,-0.73,0)), 0.1)),
-      std::make_pair(9,  std::make_tuple("origin", CVector3(-0.009,-0.033, 0.05125), CQuaternion( 0.5 * CRadians::PI, CVector3(0.97,-0.26,0)), 0.1)),
-      std::make_pair(10, std::make_tuple("origin", CVector3( 0.008,-0.034, 0.05125), CQuaternion( 0.5 * CRadians::PI, CVector3(0.97, 0.26,0)), 0.1)),
-      std::make_pair(11, std::make_tuple("origin", CVector3( 0.022,-0.026, 0.05125), CQuaternion( 0.5 * CRadians::PI, CVector3(0.73, 0.65,0)), 0.1)),
-      std::make_pair(12, std::make_tuple("origin", CVector3( 0.033,-0.009, 0.05125), CQuaternion( 0.5 * CRadians::PI, CVector3(0.26, 0.97,0)), 0.1)),
+      std::make_pair(1,  std::make_tuple("origin", CVector3( 0.0333,-0.0096, 0.0333), CQuaternion( 0.5 * CRadians::PI, CVector3(0.218, 0.976,0)), 0.1)),
+      std::make_pair(2,  std::make_tuple("origin", CVector3( 0.0234,-0.0264, 0.0333), CQuaternion( 0.5 * CRadians::PI, CVector3(0.730, 0.683,0)), 0.1)),
+      std::make_pair(3,  std::make_tuple("origin", CVector3( 0.0000,-0.0350, 0.0333), CQuaternion( 0.5 * CRadians::PI, CVector3(1.0,0,0)), 0.1)),
+      std::make_pair(4,  std::make_tuple("origin", CVector3(-0.0280,-0.0212, 0.0333), CQuaternion( 0.5 * CRadians::PI, CVector3(0.630,-0.776,0)), 0.1)),
+      std::make_pair(5,  std::make_tuple("origin", CVector3(-0.0280, 0.0212, 0.0333), CQuaternion(-0.5 * CRadians::PI, CVector3(0.630, 0.776,0)), 0.1)),
+      std::make_pair(6,  std::make_tuple("origin", CVector3( 0.0000, 0.0350, 0.0333), CQuaternion(-0.5 * CRadians::PI, CVector3(1.0,0,0)), 0.1)),
+      std::make_pair(7,  std::make_tuple("origin", CVector3( 0.0234, 0.0264, 0.0333), CQuaternion(-0.5 * CRadians::PI, CVector3(0.730,-0.683,0)), 0.1)),
+      std::make_pair(8,  std::make_tuple("origin", CVector3( 0.0333, 0.0096, 0.0333), CQuaternion(-0.5 * CRadians::PI, CVector3(0.218,-0.976,0)), 0.1)),
    };
 
    /****************************************/
