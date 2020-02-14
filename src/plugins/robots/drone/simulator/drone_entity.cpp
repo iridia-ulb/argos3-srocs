@@ -9,9 +9,13 @@
 #include <argos3/core/simulator/simulator.h>
 #include <argos3/core/simulator/entity/controllable_entity.h>
 #include <argos3/core/simulator/entity/embodied_entity.h>
+#include <argos3/core/utility/datatypes/color.h>
 
-#include <argos3/plugins/simulator/entities/radio_equipped_entity.h>
 #include <argos3/plugins/simulator/entities/debug_entity.h>
+#include <argos3/plugins/simulator/entities/directional_led_equipped_entity.h>
+#include <argos3/plugins/simulator/entities/radio_equipped_entity.h>
+
+#include <argos3/plugins/simulator/media/directional_led_medium.h>
 #include <argos3/plugins/simulator/media/radio_medium.h>
 
 #include <argos3/plugins/robots/drone/simulator/drone_flight_system_entity.h>
@@ -30,6 +34,7 @@ namespace argos {
       CComposableEntity(nullptr),
       m_pcControllableEntity(nullptr),
       m_pcDebugEntity(nullptr),
+      m_pcDirectionalLEDEquippedEntity(nullptr),
       m_pcEmbodiedEntity(nullptr),
       m_pcFlightSystemEntity(nullptr),
       m_bDebug(false) {}
@@ -61,6 +66,37 @@ namespace argos {
          m_pcWifiRadioEquippedEntity->AddRadio("wifi", CVector3(0.0f, 0.0f, 0.1f), sOriginAnchor, WIFI_TRANSMISSION_RANGE);
          m_pcWifiRadioEquippedEntity->SetMedium(cWifiRadioMedium);
          m_pcWifiRadioEquippedEntity->Enable();
+         /* create and initialize the directional LED equipped entity */
+         m_pcDirectionalLEDEquippedEntity = new CDirectionalLEDEquippedEntity(this);
+         m_pcDirectionalLEDEquippedEntity->AddLED("led_0",
+                                                  CVector3(0.1, 0, 0.1),
+                                                  CQuaternion(),
+                                                  sOriginAnchor,
+                                                  CRadians::PI_OVER_THREE,
+                                                  CColor::BLACK);
+         m_pcDirectionalLEDEquippedEntity->AddLED("led_1",
+                                                  CVector3(0, 0.1, 0.1),
+                                                  CQuaternion(), 
+                                                  sOriginAnchor,
+                                                  CRadians::PI_OVER_THREE,
+                                                  CColor::BLACK);
+         m_pcDirectionalLEDEquippedEntity->AddLED("led_2",
+                                                  CVector3(-0.1, 0, 0.1),
+                                                  CQuaternion(),
+                                                  sOriginAnchor,
+                                                  CRadians::PI_OVER_THREE,
+                                                  CColor::BLACK);
+         m_pcDirectionalLEDEquippedEntity->AddLED("led_3",
+                                                  CVector3(0, -0.1, 0.1),
+                                                  CQuaternion(),
+                                                  sOriginAnchor,
+                                                  CRadians::PI_OVER_THREE,
+                                                  CColor::BLACK);
+         CDirectionalLEDMedium& cDirectionalLEDMedium = 
+            CSimulator::GetInstance().GetMedium<CDirectionalLEDMedium>("directional_leds");
+         m_pcDirectionalLEDEquippedEntity->SetMedium(cDirectionalLEDMedium);
+         m_pcDirectionalLEDEquippedEntity->Enable();
+         AddComponent(*m_pcDirectionalLEDEquippedEntity);
          /* create and initialize a debugging entity */
          m_pcDebugEntity = new CDebugEntity(this, "debug_0");
          AddComponent(*m_pcDebugEntity);

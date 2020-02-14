@@ -37,7 +37,7 @@ namespace argos {
       CQTOpenGLObjModel m_cDroneModel;
       CQTOpenGLObjModel m_cPropellerModel;
       /* Pointer to the LED material within the OBJ model */
-      //std::array<CQTOpenGLObjModel::SMaterial*, 12> m_arrLEDs;
+      std::array<CQTOpenGLObjModel::SMaterial*, 4> m_arrLEDs;
       const static CVector3 m_cPropellerOffset;
    };
 

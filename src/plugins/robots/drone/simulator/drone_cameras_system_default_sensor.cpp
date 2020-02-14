@@ -294,11 +294,11 @@ namespace argos {
                   return true;
                }
             }
-            if(m_cParent.ShowTagRays()) {
-               std::vector<std::pair<bool, CRay3> >& vecCheckedRays =
-                  m_cParent.GetControllableEntity().GetCheckedRays();
-               vecCheckedRays.emplace_back(false, m_cOcclusionCheckRay);
-            }
+         }
+         if(m_cParent.ShowTagRays()) {
+            std::vector<std::pair<bool, CRay3> >& vecCheckedRays =
+               m_cParent.GetControllableEntity().GetCheckedRays();
+            vecCheckedRays.emplace_back(false, m_cOcclusionCheckRay);
          }
       }
       std::transform(std::begin(m_arrTagCorners),

@@ -10,6 +10,7 @@
 namespace argos {
    class CControllableEntity;
    class CDebugEntity;
+   class CDirectionalLEDEquippedEntity;
    class CDroneFlightSystemEntity;
    class CEmbodiedEntity;
    class CRadioEquippedEntity;
@@ -49,6 +50,14 @@ namespace argos {
          return *m_pcDebugEntity;
       }
 
+      inline CDirectionalLEDEquippedEntity& GetDirectionalLEDEquippedEntity() {
+         return *m_pcDirectionalLEDEquippedEntity;
+      }
+
+      inline const CDirectionalLEDEquippedEntity& GetDirectionalLEDEquippedEntity() const {
+         return *m_pcDirectionalLEDEquippedEntity;
+      }
+
       inline CDroneFlightSystemEntity& GetFlightSystemEntity() {
          return *m_pcFlightSystemEntity;
       }
@@ -75,6 +84,7 @@ namespace argos {
 
       CControllableEntity*                   m_pcControllableEntity;
       CDebugEntity*                          m_pcDebugEntity;
+      CDirectionalLEDEquippedEntity*         m_pcDirectionalLEDEquippedEntity;
       CEmbodiedEntity*                       m_pcEmbodiedEntity;
       CDroneFlightSystemEntity*              m_pcFlightSystemEntity;
       CRadioEquippedEntity*                  m_pcWifiRadioEquippedEntity;

@@ -16,6 +16,7 @@
     <lua_controller id="drone">
       <actuators>
         <drone_flight_system implementation="default" />
+        <directional_leds implementation="default" />
         <wifi implementation="default" />
       </actuators>
       <sensors>

@@ -11,6 +11,7 @@
 #include <argos3/core/utility/math/vector2.h>
 #include <argos3/plugins/robots/drone/simulator/drone_entity.h>
 #include <argos3/plugins/simulator/visualizations/qt-opengl/qtopengl_widget.h>
+#include <argos3/plugins/simulator/entities/directional_led_equipped_entity.h>
 
 #include <array>
 
@@ -22,23 +23,14 @@ namespace argos {
     CQTOpenGLDrone::CQTOpenGLDrone() :
       /* create the model */
       m_cDroneModel("drone.obj"),
-      m_cPropellerModel("e305_propeller.obj") //,
+      m_cPropellerModel("e305_propeller.obj"),
       /* get pointers to the LED materials */
-      /*
       m_arrLEDs {
          &m_cDroneModel.GetMaterial("led_0"),
          &m_cDroneModel.GetMaterial("led_1"),
          &m_cDroneModel.GetMaterial("led_2"),
-         &m_cDroneModel.GetMaterial("led_3"),
-         &m_cDroneModel.GetMaterial("led_4"),
-         &m_cDroneModel.GetMaterial("led_5"),
-         &m_cDroneModel.GetMaterial("led_6"),
-         &m_cDroneModel.GetMaterial("led_7"),
-         &m_cDroneModel.GetMaterial("led_8"),
-         &m_cDroneModel.GetMaterial("led_9"),
-         &m_cDroneModel.GetMaterial("led_10"),
-         &m_cDroneModel.GetMaterial("led_11"),
-      } */ {}
+         &m_cDroneModel.GetMaterial("led_3")        
+      } {}
 
    /****************************************/
    /****************************************/
@@ -49,7 +41,7 @@ namespace argos {
    /****************************************/
 
    void CQTOpenGLDrone::Draw(const CDroneEntity& c_entity) {
-      /* // Update LED materials
+      /* Update LED materials */
       const CDirectionalLEDEquippedEntity& c_leds = c_entity.GetDirectionalLEDEquippedEntity();
       for(UInt32 un_material_idx = 0;
           un_material_idx < m_arrLEDs.size();
@@ -63,11 +55,8 @@ namespace argos {
          };
          m_arrLEDs[un_material_idx]->Emission = arrColor;
       }
-      */
-
+      /* buffers for converting from quaternions to euler angles */
       CRadians cZAngle, cYAngle, cXAngle;
-
-
       /* draw the robot */
       const CVector3& cPosition = c_entity.GetEmbodiedEntity().GetOriginAnchor().Position;
       const CQuaternion& cOrientation = c_entity.GetEmbodiedEntity().GetOriginAnchor().Orientation;
