@@ -67,7 +67,7 @@ namespace argos {
          m_pcWifiRadioEquippedEntity->SetMedium(cWifiRadioMedium);
          m_pcWifiRadioEquippedEntity->Enable();
          /* create and initialize the directional LED equipped entity */
-         m_pcDirectionalLEDEquippedEntity = new CDirectionalLEDEquippedEntity(this);
+         m_pcDirectionalLEDEquippedEntity = new CDirectionalLEDEquippedEntity(this, "leds_0");
          m_pcDirectionalLEDEquippedEntity->AddLED("led_0",
                                                   CVector3(0.1, 0, 0.1),
                                                   CQuaternion(),
