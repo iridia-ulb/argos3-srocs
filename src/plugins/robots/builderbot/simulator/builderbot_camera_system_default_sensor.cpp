@@ -260,19 +260,23 @@ namespace argos {
       }
       for(const CVector3& c_corner : m_arrTagCorners) {
          m_cOcclusionCheckRay.SetEnd(c_corner);
-         if(GetClosestEmbodiedEntityIntersectedByRay(m_sIntersectionItem, m_cOcclusionCheckRay)) {
-            /* corner is occluded */
-            if(m_bShowTagRays) {
-               m_pcControllableEntity->GetCheckedRays().emplace_back(true, m_cOcclusionCheckRay);
+         if(GetEmbodiedEntitiesIntersectedByRay(m_vecIntersections, m_cOcclusionCheckRay)) {
+            CEntity& cEntityWithTag = c_tag.GetRootEntity();
+            for(const SEmbodiedEntityIntersectionItem& s_item : m_vecIntersections) {
+               CEntity& cIntersectionEntity = s_item.IntersectedEntity->GetRootEntity();
+               if(&cIntersectionEntity != &cEntityWithTag) {
+                  /* corner is occluded */
+                  if(m_bShowTagRays) {
+                     m_pcControllableEntity->GetCheckedRays().emplace_back(true, m_cOcclusionCheckRay);
+                  }
+                  /* no more checks necessary, move on to the next tag */
+                  return true;
+               }
             }
-            /* no more checks necessary, move on to the next tag */
-            return true;
          }
-         else {
-            /* corner not occluded */
-            if(m_bShowTagRays) {
-               m_pcControllableEntity->GetCheckedRays().emplace_back(false, m_cOcclusionCheckRay);
-            }
+         /* corner not occluded */
+         if(m_bShowTagRays) {
+            m_pcControllableEntity->GetCheckedRays().emplace_back(false, m_cOcclusionCheckRay);
          }
       }
       std::transform(std::begin(m_arrTagCorners),
@@ -313,17 +317,25 @@ namespace argos {
          return true;
       }
       m_cOcclusionCheckRay.SetEnd(cLedPosition);
-      if(!GetClosestEmbodiedEntityIntersectedByRay(m_sIntersectionItem, m_cOcclusionCheckRay)) {
-         m_vecLedCache.emplace_back(c_led.GetColor(), cLedPosition, ProjectOntoSensor(cLedPosition));
-         if(m_bShowLEDRays) {
-            m_pcControllableEntity->GetCheckedRays().emplace_back(false, m_cOcclusionCheckRay);
+      if(GetEmbodiedEntitiesIntersectedByRay(m_vecIntersections, m_cOcclusionCheckRay)) {
+         CEntity& cEntityWithTag = c_led.GetRootEntity();
+         for(const SEmbodiedEntityIntersectionItem& s_item : m_vecIntersections) {
+            CEntity& cIntersectionEntity = s_item.IntersectedEntity->GetRootEntity();
+            if(&cIntersectionEntity != &cEntityWithTag) {
+               /* led is occluded */
+               if(m_bShowLEDRays) {
+                  m_pcControllableEntity->GetCheckedRays().emplace_back(true, m_cOcclusionCheckRay);
+               }
+               return true;
+            }
          }
       }
-      else {
-         if(m_bShowLEDRays) {
-            m_pcControllableEntity->GetCheckedRays().emplace_back(true, m_cOcclusionCheckRay);
-         }
+      /* led not occluded */
+      m_vecLedCache.emplace_back(c_led.GetColor(), cLedPosition, ProjectOntoSensor(cLedPosition));
+      if(m_bShowLEDRays) {
+         m_pcControllableEntity->GetCheckedRays().emplace_back(false, m_cOcclusionCheckRay);
       }
+
       return true;
    }
 

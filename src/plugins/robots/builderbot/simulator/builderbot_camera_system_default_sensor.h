@@ -114,7 +114,7 @@ namespace argos {
       std::array<CVector3, 4> m_arrTagCorners;
       std::array<CVector2, 4> m_arrTagCornerPixels;
       CRay3 m_cOcclusionCheckRay;
-      SEmbodiedEntityIntersectionItem m_sIntersectionItem;
+      std::vector<SEmbodiedEntityIntersectionItem> m_vecIntersections;
 
       /* AprilTag corner offsets / ordering */
       const std::array<CVector3, 4> m_arrTagCornerOffsets = {{
