@@ -20,6 +20,8 @@ namespace argos {
 
 #include <argos3/plugins/simulator/visualizations/qt-opengl/qtopengl_obj_model.h>
 
+#include <array>
+
 namespace argos {
 
    class CQTOpenGLPiPuck {
@@ -37,9 +39,20 @@ namespace argos {
       CQTOpenGLObjModel m_cPiPuckModel;
       CQTOpenGLObjModel m_cPiPuckWheelModel;
       /* The tag texture */
-      const std::array<std::array<GLfloat, 3>, 100> m_arrTagTexture;
+      static const std::array<std::array<GLfloat, 3>, 100> m_arrTagTexture;
+      /* LED material overrides */
+      static const std::array<GLfloat, 4> m_arrRingLedOffAmbientDiffuse;
+      static const std::array<GLfloat, 4> m_arrRingLedOnAmbientDiffuse;
+      static const std::array<GLfloat, 4> m_arrBodyLedOffAmbientDiffuse;
+      static const std::array<GLfloat, 4> m_arrBodyLedOnAmbientDiffuse;
+      static const std::array<GLfloat, 4> m_arrFrontLedOffAmbientDiffuse;
+      static const std::array<GLfloat, 4> m_arrFrontLedOnAmbientDiffuse;
       /* Precompiled list for drawing tags */
       GLuint m_unTagList;
+      /* Pointer to the LED material within the OBJ model */
+      std::array<CQTOpenGLObjModel::SMaterial*, 8> m_arrRingLEDs;
+      CQTOpenGLObjModel::SMaterial& m_sBodyLED;
+      CQTOpenGLObjModel::SMaterial& m_sFrontLED;
    };
 
 

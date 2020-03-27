@@ -15,8 +15,8 @@
 
 #include <array>
 
-#define TAG_WHITE std::array<GLfloat, 3> {1.0f, 1.0f, 1.0f}
-#define TAG_BLACK std::array<GLfloat, 3> {0.0f, 0.0f, 0.0f}
+#define BODY_LED_INDEX 8
+#define FRONT_LED_INDEX 9
 
 namespace argos {
 
@@ -27,19 +27,18 @@ namespace argos {
       /* create the model */
       m_cPiPuckModel("pipuck.obj"),
       m_cPiPuckWheelModel("pipuck-wheel.obj"),
-      /* initialize the tag texture */
-      m_arrTagTexture {
-         TAG_WHITE, TAG_WHITE, TAG_WHITE, TAG_WHITE, TAG_WHITE, TAG_WHITE, TAG_WHITE, TAG_WHITE, TAG_WHITE, TAG_WHITE,
-         TAG_WHITE, TAG_BLACK, TAG_BLACK, TAG_BLACK, TAG_BLACK, TAG_BLACK, TAG_BLACK, TAG_BLACK, TAG_BLACK, TAG_WHITE,
-         TAG_WHITE, TAG_BLACK, TAG_BLACK, TAG_WHITE, TAG_WHITE, TAG_WHITE, TAG_BLACK, TAG_WHITE, TAG_BLACK, TAG_WHITE,
-         TAG_WHITE, TAG_BLACK, TAG_BLACK, TAG_WHITE, TAG_WHITE, TAG_BLACK, TAG_BLACK, TAG_BLACK, TAG_BLACK, TAG_WHITE,
-         TAG_WHITE, TAG_BLACK, TAG_BLACK, TAG_WHITE, TAG_BLACK, TAG_BLACK, TAG_BLACK, TAG_WHITE, TAG_BLACK, TAG_WHITE,
-         TAG_WHITE, TAG_BLACK, TAG_WHITE, TAG_WHITE, TAG_WHITE, TAG_BLACK, TAG_WHITE, TAG_BLACK, TAG_BLACK, TAG_WHITE,
-         TAG_WHITE, TAG_BLACK, TAG_BLACK, TAG_BLACK, TAG_WHITE, TAG_BLACK, TAG_BLACK, TAG_BLACK, TAG_BLACK, TAG_WHITE,
-         TAG_WHITE, TAG_BLACK, TAG_WHITE, TAG_BLACK, TAG_BLACK, TAG_BLACK, TAG_WHITE, TAG_BLACK, TAG_BLACK, TAG_WHITE,
-         TAG_WHITE, TAG_BLACK, TAG_BLACK, TAG_BLACK, TAG_BLACK, TAG_BLACK, TAG_BLACK, TAG_BLACK, TAG_BLACK, TAG_WHITE,
-         TAG_WHITE, TAG_WHITE, TAG_WHITE, TAG_WHITE, TAG_WHITE, TAG_WHITE, TAG_WHITE, TAG_WHITE, TAG_WHITE, TAG_WHITE,
-      } {
+      m_arrRingLEDs {
+         &m_cPiPuckModel.GetMaterial("Red-Ring-LED-0"),
+         &m_cPiPuckModel.GetMaterial("Red-Ring-LED-1"),
+         &m_cPiPuckModel.GetMaterial("Red-Ring-LED-2"),
+         &m_cPiPuckModel.GetMaterial("Red-Ring-LED-3"),
+         &m_cPiPuckModel.GetMaterial("Red-Ring-LED-4"),
+         &m_cPiPuckModel.GetMaterial("Red-Ring-LED-5"),
+         &m_cPiPuckModel.GetMaterial("Red-Ring-LED-6"),
+         &m_cPiPuckModel.GetMaterial("Red-Ring-LED-7"),
+      },
+      m_sBodyLED(m_cPiPuckModel.GetMaterial("Green-Body-LEDs")),
+      m_sFrontLED(m_cPiPuckModel.GetMaterial("Front-facing-Red-LED")) {
       /* generate the tag texture */
       GLuint unTagTex;
       glGenTextures(1, &unTagTex);
@@ -78,22 +77,36 @@ namespace argos {
    /****************************************/
 
    void CQTOpenGLPiPuck::Draw(const CPiPuckEntity& c_entity) {
-      /* // Update LED materials
+      /* Update LED materials */
       const CDirectionalLEDEquippedEntity& c_leds = c_entity.GetDirectionalLEDEquippedEntity();
-      for(UInt32 un_material_idx = 0;
-          un_material_idx < m_arrLEDs.size();
-          un_material_idx++) {
-         const CColor& cColor = c_leds.GetLED(un_material_idx).GetColor();
-         std::array<GLfloat, 4> arrColor = {
-            cColor.GetRed() / 255.0f,
-            cColor.GetGreen() / 255.0f,
-            cColor.GetBlue() / 255.0f,
-            1.0f
-         };
-         m_arrLEDs[un_material_idx]->Emission = arrColor;
+      for(UInt32 un_ring_led_index = 0;
+          un_ring_led_index < 8;
+          un_ring_led_index++) {
+         if(c_leds.GetLED(un_ring_led_index).GetColor() == CColor::BLACK) {
+            m_arrRingLEDs[un_ring_led_index]->Diffuse = m_arrRingLedOffAmbientDiffuse;
+            m_arrRingLEDs[un_ring_led_index]->Ambient = m_arrRingLedOffAmbientDiffuse;
+         }
+         else {
+            m_arrRingLEDs[un_ring_led_index]->Diffuse = m_arrRingLedOnAmbientDiffuse;
+            m_arrRingLEDs[un_ring_led_index]->Ambient = m_arrRingLedOnAmbientDiffuse;
+         }
       }
-      */
-
+      if(c_leds.GetLED(BODY_LED_INDEX).GetColor() == CColor::BLACK) {
+         m_sBodyLED.Diffuse = m_arrBodyLedOffAmbientDiffuse;
+         m_sBodyLED.Ambient = m_arrBodyLedOffAmbientDiffuse;
+      }
+      else {
+         m_sBodyLED.Diffuse = m_arrBodyLedOnAmbientDiffuse;
+         m_sBodyLED.Ambient = m_arrBodyLedOnAmbientDiffuse;
+      }
+      if(c_leds.GetLED(FRONT_LED_INDEX).GetColor() == CColor::BLACK) {
+         m_sFrontLED.Diffuse = m_arrFrontLedOffAmbientDiffuse;
+         m_sFrontLED.Ambient = m_arrFrontLedOffAmbientDiffuse;
+      }
+      else {
+         m_sFrontLED.Diffuse = m_arrFrontLedOnAmbientDiffuse;
+         m_sFrontLED.Ambient = m_arrFrontLedOnAmbientDiffuse;
+      }
       CRadians cZAngle, cYAngle, cXAngle;
       /* draw the body */
       const SAnchor& sBodyAnchor = c_entity.GetEmbodiedEntity().GetAnchor("body");
@@ -183,8 +196,6 @@ namespace argos {
    /****************************************/
 
    void CQTOpenGLPiPuckDebug::Draw(const CPiPuckEntity& c_entity) {
-      //glDisable(GL_CULL_FACE);
-      //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
       /* set materials */
       glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, m_arrDefaultSpecular.data());
       glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, m_arrDefaultShininess.data());
@@ -208,8 +219,6 @@ namespace argos {
          glCallList(std::get<GLuint>(c_item));
          glPopMatrix();
       }
-      //glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-      //glEnable(GL_CULL_FACE);
    }
 
    /****************************************/
@@ -290,12 +299,39 @@ namespace argos {
    /****************************************/
    /****************************************/
 
-   const CVector3 CQTOpenGLPiPuckDebug::m_cBodyScaling                       {0.0724, 0.0724, 0.0472};
-   const CVector3 CQTOpenGLPiPuckDebug::m_cWheelScaling                      {0.0425, 0.0425, 0.003};
-   const std::array<GLfloat, 4> CQTOpenGLPiPuckDebug::m_arrDefaultColor      {0.5f, 0.5f, 0.5f, 1.0f};
-   const std::array<GLfloat, 4> CQTOpenGLPiPuckDebug::m_arrDefaultSpecular   {0.0f, 0.0f, 0.0f, 1.0f};
-   const std::array<GLfloat, 4> CQTOpenGLPiPuckDebug::m_arrDefaultEmission   {0.0f, 0.0f, 0.0f, 1.0f};
-   const std::array<GLfloat, 1> CQTOpenGLPiPuckDebug::m_arrDefaultShininess  {0.0f};
+#define TAG_WHITE std::array<GLfloat, 3> {1.0f, 1.0f, 1.0f}
+#define TAG_BLACK std::array<GLfloat, 3> {0.0f, 0.0f, 0.0f}
+
+   const std::array<std::array<GLfloat, 3>, 100> CQTOpenGLPiPuck::m_arrTagTexture {
+      TAG_WHITE, TAG_WHITE, TAG_WHITE, TAG_WHITE, TAG_WHITE, TAG_WHITE, TAG_WHITE, TAG_WHITE, TAG_WHITE, TAG_WHITE,
+      TAG_WHITE, TAG_BLACK, TAG_BLACK, TAG_BLACK, TAG_BLACK, TAG_BLACK, TAG_BLACK, TAG_BLACK, TAG_BLACK, TAG_WHITE,
+      TAG_WHITE, TAG_BLACK, TAG_BLACK, TAG_WHITE, TAG_WHITE, TAG_WHITE, TAG_BLACK, TAG_WHITE, TAG_BLACK, TAG_WHITE,
+      TAG_WHITE, TAG_BLACK, TAG_BLACK, TAG_WHITE, TAG_WHITE, TAG_BLACK, TAG_BLACK, TAG_BLACK, TAG_BLACK, TAG_WHITE,
+      TAG_WHITE, TAG_BLACK, TAG_BLACK, TAG_WHITE, TAG_BLACK, TAG_BLACK, TAG_BLACK, TAG_WHITE, TAG_BLACK, TAG_WHITE,
+      TAG_WHITE, TAG_BLACK, TAG_WHITE, TAG_WHITE, TAG_WHITE, TAG_BLACK, TAG_WHITE, TAG_BLACK, TAG_BLACK, TAG_WHITE,
+      TAG_WHITE, TAG_BLACK, TAG_BLACK, TAG_BLACK, TAG_WHITE, TAG_BLACK, TAG_BLACK, TAG_BLACK, TAG_BLACK, TAG_WHITE,
+      TAG_WHITE, TAG_BLACK, TAG_WHITE, TAG_BLACK, TAG_BLACK, TAG_BLACK, TAG_WHITE, TAG_BLACK, TAG_BLACK, TAG_WHITE,
+      TAG_WHITE, TAG_BLACK, TAG_BLACK, TAG_BLACK, TAG_BLACK, TAG_BLACK, TAG_BLACK, TAG_BLACK, TAG_BLACK, TAG_WHITE,
+      TAG_WHITE, TAG_WHITE, TAG_WHITE, TAG_WHITE, TAG_WHITE, TAG_WHITE, TAG_WHITE, TAG_WHITE, TAG_WHITE, TAG_WHITE,
+   };
+
+   const std::array<GLfloat, 4> CQTOpenGLPiPuck::m_arrRingLedOffAmbientDiffuse  {0.75f, 0.75f, 0.75f, 0.8f};
+   const std::array<GLfloat, 4> CQTOpenGLPiPuck::m_arrRingLedOnAmbientDiffuse   {1.00f, 0.00f, 0.00f, 0.8f};
+   const std::array<GLfloat, 4> CQTOpenGLPiPuck::m_arrBodyLedOffAmbientDiffuse  {0.75f, 0.75f, 0.75f, 0.7f};
+   const std::array<GLfloat, 4> CQTOpenGLPiPuck::m_arrBodyLedOnAmbientDiffuse   {0.27f, 0.83f, 0.27f, 0.7f};
+   const std::array<GLfloat, 4> CQTOpenGLPiPuck::m_arrFrontLedOffAmbientDiffuse {0.75f, 0.75f, 0.75f, 0.8f};
+   const std::array<GLfloat, 4> CQTOpenGLPiPuck::m_arrFrontLedOnAmbientDiffuse  {1.00f, 0.00f, 0.00f, 0.8f};
+
+   /****************************************/
+   /****************************************/
+
+   const CVector3 CQTOpenGLPiPuckDebug::m_cBodyScaling                          {0.0724, 0.0724, 0.0472};
+   const CVector3 CQTOpenGLPiPuckDebug::m_cWheelScaling                         {0.0425, 0.0425, 0.003};
+
+   const std::array<GLfloat, 4> CQTOpenGLPiPuckDebug::m_arrDefaultColor         {0.5f, 0.5f, 0.5f, 1.0f};
+   const std::array<GLfloat, 4> CQTOpenGLPiPuckDebug::m_arrDefaultSpecular      {0.0f, 0.0f, 0.0f, 1.0f};
+   const std::array<GLfloat, 4> CQTOpenGLPiPuckDebug::m_arrDefaultEmission      {0.0f, 0.0f, 0.0f, 1.0f};
+   const std::array<GLfloat, 1> CQTOpenGLPiPuckDebug::m_arrDefaultShininess     {0.0f};
 
    /****************************************/
    /****************************************/

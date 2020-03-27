@@ -17,6 +17,7 @@
       <actuators>
         <pipuck_differential_drive implementation="default"/>
         <wifi implementation="default" />
+        <directional_leds implementation="default" />
       </actuators>
       <sensors>
         <!--pipuck_camera_system implementation="default"

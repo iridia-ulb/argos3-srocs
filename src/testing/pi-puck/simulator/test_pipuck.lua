@@ -1,6 +1,13 @@
 function step()
+   if count < 10 then
+      count = count + 1
+   else
+      count = 1
+   end
+   robot.directional_leds.set_all_colors('black')
+   robot.directional_leds.set_single_color(count, 'white')   
+   
    -- defaults
-   local mode = "straight ahead"
    local left = 0.005
    local right = 0.005
    -- override defaults if the line was detected
@@ -20,8 +27,8 @@ function step()
          right = 0.01
          mode = "left"
       else
-         left = -0.005
-         right = 0.005
+         left = -0.01
+         right = 0.01
          mode = "hard left"
       end
    end
@@ -34,9 +41,11 @@ function line_detected(sensor)
 end
 
 function init()
+   reset()
 end
 
 function reset() 
+   count = 1
 end
 
 function destroy()

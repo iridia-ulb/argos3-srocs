@@ -11,6 +11,7 @@ namespace argos {
    class CPiPuckDifferentialDriveEntity;
    class CControllableEntity;
    class CDebugEntity;
+   class CDirectionalLEDEquippedEntity;
    class CEmbodiedEntity;
    class CRadioEquippedEntity;
    class CTagEquippedEntity;
@@ -73,12 +74,12 @@ namespace argos {
          return *m_pcDifferentialDriveEntity;
       }
 
-      inline CTagEquippedEntity& GetTagEquippedEntity() {
-         return *m_pcTagEquippedEntity;
+      inline CDirectionalLEDEquippedEntity& GetDirectionalLEDEquippedEntity() {
+         return *m_pcDirectionalLEDEquippedEntity;
       }
 
-      inline const CTagEquippedEntity& GetTagEquippedEntity() const {
-         return *m_pcTagEquippedEntity;
+      inline const CDirectionalLEDEquippedEntity& GetDirectionalLEDEquippedEntity() const {
+         return *m_pcDirectionalLEDEquippedEntity;
       }
 
       inline CEmbodiedEntity& GetEmbodiedEntity() {
@@ -87,6 +88,14 @@ namespace argos {
 
       inline const CEmbodiedEntity& GetEmbodiedEntity() const {
          return *m_pcEmbodiedEntity;
+      }
+
+      inline CTagEquippedEntity& GetTagEquippedEntity() {
+         return *m_pcTagEquippedEntity;
+      }
+
+      inline const CTagEquippedEntity& GetTagEquippedEntity() const {
+         return *m_pcTagEquippedEntity;
       }
 
       inline bool IsDebug() const {
@@ -99,6 +108,7 @@ namespace argos {
 
       CControllableEntity*            m_pcControllableEntity;
       CDebugEntity*                   m_pcDebugEntity;
+      CDirectionalLEDEquippedEntity*  m_pcDirectionalLEDEquippedEntity;
       CEmbodiedEntity*                m_pcEmbodiedEntity;
       CPiPuckDifferentialDriveEntity* m_pcDifferentialDriveEntity;
       CRadioEquippedEntity*           m_pcWifiRadioEquippedEntity;

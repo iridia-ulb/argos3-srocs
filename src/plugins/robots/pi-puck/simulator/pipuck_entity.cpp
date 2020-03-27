@@ -9,11 +9,16 @@
 #include <argos3/core/simulator/simulator.h>
 #include <argos3/core/simulator/entity/controllable_entity.h>
 #include <argos3/core/simulator/entity/embodied_entity.h>
+#include <argos3/core/utility/datatypes/color.h>
+
 #include <argos3/plugins/simulator/entities/debug_entity.h>
+#include <argos3/plugins/simulator/entities/directional_led_equipped_entity.h>
 #include <argos3/plugins/simulator/entities/radio_equipped_entity.h>
 #include <argos3/plugins/simulator/entities/tag_equipped_entity.h>
+#include <argos3/plugins/simulator/media/directional_led_medium.h>
 #include <argos3/plugins/simulator/media/radio_medium.h>
 #include <argos3/plugins/simulator/media/tag_medium.h>
+
 #include <argos3/plugins/robots/pi-puck/simulator/pipuck_differential_drive_entity.h>
 
 namespace argos {
@@ -106,7 +111,8 @@ namespace argos {
          m_pcEmbodiedEntity = new CEmbodiedEntity(this);
          AddComponent(*m_pcEmbodiedEntity);
          m_pcEmbodiedEntity->Init(GetNode(t_tree, "body"));
-         /* create anchors */
+         SAnchor& sOriginAnchor = m_pcEmbodiedEntity->GetOriginAnchor();
+         /* create additional anchors */
          m_pcEmbodiedEntity->AddAnchor("body", {0.0, 0.0, 0.00125});
          m_pcEmbodiedEntity->AddAnchor("left_wheel");
          m_pcEmbodiedEntity->AddAnchor("right_wheel");
@@ -146,23 +152,77 @@ namespace argos {
          m_pcWifiRadioEquippedEntity->SetMedium(cWifiRadioMedium);
          m_pcWifiRadioEquippedEntity->Enable();
          /* create and initialize the directional LED equipped entity */
-         /*
-         m_pcDirectionalLEDEquippedEntity = new CDirectionalLEDEquippedEntity(this);
+         m_pcDirectionalLEDEquippedEntity = new CDirectionalLEDEquippedEntity(this, "leds_0");
+         m_pcDirectionalLEDEquippedEntity->AddLED("ring_led_0",
+                                                  CVector3(0, 0, 0.025),
+                                                  CQuaternion(),
+                                                  sOriginAnchor,
+                                                  CRadians::PI_OVER_THREE,
+                                                  CColor::BLACK);
+         m_pcDirectionalLEDEquippedEntity->AddLED("ring_led_1",
+                                                  CVector3(0, 0, 0.025),
+                                                  CQuaternion(), 
+                                                  sOriginAnchor,
+                                                  CRadians::PI_OVER_THREE,
+                                                  CColor::BLACK);
+         m_pcDirectionalLEDEquippedEntity->AddLED("ring_led_2",
+                                                  CVector3(0, 0, 0.025),
+                                                  CQuaternion(),
+                                                  sOriginAnchor,
+                                                  CRadians::PI_OVER_THREE,
+                                                  CColor::BLACK);
+         m_pcDirectionalLEDEquippedEntity->AddLED("ring_led_3",
+                                                  CVector3(0, 0, 0.025),
+                                                  CQuaternion(),
+                                                  sOriginAnchor,
+                                                  CRadians::PI_OVER_THREE,
+                                                  CColor::BLACK);
+         m_pcDirectionalLEDEquippedEntity->AddLED("ring_led_4",
+                                                  CVector3(0, 0, 0.025),
+                                                  CQuaternion(),
+                                                  sOriginAnchor,
+                                                  CRadians::PI_OVER_THREE,
+                                                  CColor::BLACK);
+         m_pcDirectionalLEDEquippedEntity->AddLED("ring_led_5",
+                                                  CVector3(0, 0, 0.025),
+                                                  CQuaternion(), 
+                                                  sOriginAnchor,
+                                                  CRadians::PI_OVER_THREE,
+                                                  CColor::BLACK);
+         m_pcDirectionalLEDEquippedEntity->AddLED("ring_led_6",
+                                                  CVector3(0, 0, 0.025),
+                                                  CQuaternion(),
+                                                  sOriginAnchor,
+                                                  CRadians::PI_OVER_THREE,
+                                                  CColor::BLACK);
+         m_pcDirectionalLEDEquippedEntity->AddLED("ring_led_7",
+                                                  CVector3(0, 0, 0.025),
+                                                  CQuaternion(),
+                                                  sOriginAnchor,
+                                                  CRadians::PI_OVER_THREE,
+                                                  CColor::BLACK);
+         m_pcDirectionalLEDEquippedEntity->AddLED("front_led",
+                                                  CVector3(0, 0, 0.025),
+                                                  CQuaternion(),
+                                                  sOriginAnchor,
+                                                  CRadians::PI_OVER_THREE,
+                                                  CColor::BLACK);
+         m_pcDirectionalLEDEquippedEntity->AddLED("body_led",
+                                                  CVector3(0, 0, 0.025),
+                                                  CQuaternion(),
+                                                  sOriginAnchor,
+                                                  CRadians::PI_OVER_THREE,
+                                                  CColor::BLACK);
+         try {
+            CDirectionalLEDMedium& cDirectionalLEDMedium = 
+               CSimulator::GetInstance().GetMedium<CDirectionalLEDMedium>("directional_leds");
+            m_pcDirectionalLEDEquippedEntity->SetMedium(cDirectionalLEDMedium);
+            m_pcDirectionalLEDEquippedEntity->Enable();
+         }
+         catch(CARGoSException& ex) {
+            LOGERR << "[WARNING] Could not add LEDs to medium" << std::endl;            
+         }
          AddComponent(*m_pcDirectionalLEDEquippedEntity);
-         m_pcDirectionalLEDEquippedEntity->AddLED("led_0", CColor::BLACK);
-         m_pcDirectionalLEDEquippedEntity->AddLED("led_1", CColor::BLACK);
-         m_pcDirectionalLEDEquippedEntity->AddLED("led_2", CColor::BLACK);
-         m_pcDirectionalLEDEquippedEntity->AddLED("led_3", CColor::BLACK);
-         m_pcDirectionalLEDEquippedEntity->AddLED("led_4", CColor::BLACK);
-         m_pcDirectionalLEDEquippedEntity->AddLED("led_5", CColor::BLACK);
-         m_pcDirectionalLEDEquippedEntity->AddLED("led_6", CColor::BLACK);
-         m_pcDirectionalLEDEquippedEntity->AddLED("led_7", CColor::BLACK);
-         m_pcDirectionalLEDEquippedEntity->AddLED("led_8", CColor::BLACK);
-         m_pcDirectionalLEDEquippedEntity->AddLED("led_9", CColor::BLACK);
-         m_pcDirectionalLEDEquippedEntity->AddLED("led_10", CColor::BLACK);
-         m_pcDirectionalLEDEquippedEntity->AddLED("led_11", CColor::BLACK);
-         */
-
          /* create and initialize a debugging entity */
          m_pcDebugEntity = new CDebugEntity(this, "debug_0");
          AddComponent(*m_pcDebugEntity);
