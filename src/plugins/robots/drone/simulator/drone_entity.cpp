@@ -14,7 +14,6 @@
 #include <argos3/plugins/simulator/entities/debug_entity.h>
 #include <argos3/plugins/simulator/entities/directional_led_equipped_entity.h>
 #include <argos3/plugins/simulator/entities/radio_equipped_entity.h>
-
 #include <argos3/plugins/simulator/media/directional_led_medium.h>
 #include <argos3/plugins/simulator/media/radio_medium.h>
 
