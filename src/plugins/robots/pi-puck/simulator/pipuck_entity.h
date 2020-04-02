@@ -44,6 +44,7 @@ namespace argos {
                     const CQuaternion& c_orientation,
                     const std::string& str_wifi_medium = "wifi",
                     const std::string& str_tag_medium = "tags",
+                    const std::string& str_led_medium = "directional_leds",
                     bool b_debug = false);
 
       virtual ~CPiPuckEntity() {}
