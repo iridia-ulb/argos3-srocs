@@ -73,10 +73,13 @@ namespace argos {
                                     CRadians::PI_OVER_THREE,
                                     TAG_SIDE_LENGTH,
                                     GetId());
-      CTagMedium& cTagMedium = 
-         CSimulator::GetInstance().GetMedium<CTagMedium>(str_tag_medium);
-      m_pcTagEquippedEntity->SetMedium(cTagMedium);
-      m_pcTagEquippedEntity->Enable();
+      try {
+         CTagMedium& cTagMedium =
+            CSimulator::GetInstance().GetMedium<CTagMedium>(str_tag_medium);
+         m_pcTagEquippedEntity->SetMedium(cTagMedium);
+         m_pcTagEquippedEntity->Enable();
+      }
+      catch(CARGoSException& ex) {}
       AddComponent(*m_pcTagEquippedEntity);
       /* get wifi medium */
       CRadioMedium& cWifiRadioMedium =
@@ -205,10 +208,13 @@ namespace argos {
                                        GetId());
          std::string strTagMedium("tags");
          GetNodeAttributeOrDefault(t_tree, "tag_medium", strTagMedium, strTagMedium);
-         CTagMedium& cTagMedium = 
-            CSimulator::GetInstance().GetMedium<CTagMedium>(strTagMedium);
-         m_pcTagEquippedEntity->SetMedium(cTagMedium);
-         m_pcTagEquippedEntity->Enable();
+         try {
+            CTagMedium& cTagMedium =
+               CSimulator::GetInstance().GetMedium<CTagMedium>(strTagMedium);
+            m_pcTagEquippedEntity->SetMedium(cTagMedium);
+            m_pcTagEquippedEntity->Enable();
+         }
+         catch(CARGoSException& ex) {}
          AddComponent(*m_pcTagEquippedEntity);
          /* get wifi medium */
          std::string strWifiMedium("wifi");
@@ -286,9 +292,9 @@ namespace argos {
                                                   sOriginAnchor,
                                                   CRadians::PI_OVER_THREE,
                                                   CColor::BLACK);
+         std::string strLedMedium("directional_leds");
+         GetNodeAttributeOrDefault(t_tree, "led_medium", strLedMedium, strLedMedium);
          try {
-            std::string strLedMedium("directional_leds");
-            GetNodeAttributeOrDefault(t_tree, "led_medium", strLedMedium, strLedMedium);
             CDirectionalLEDMedium& cDirectionalLedMedium =
                CSimulator::GetInstance().GetMedium<CDirectionalLEDMedium>(strLedMedium);
             m_pcDirectionalLEDEquippedEntity->SetMedium(cDirectionalLedMedium);
