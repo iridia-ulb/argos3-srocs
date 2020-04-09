@@ -54,7 +54,7 @@ namespace argos {
          m_cBodyGeometricOffset,
          cBodyInertia,
          m_fBodyMass,
-         GetEngine().GetDefaultFriction());
+         m_fBodyFriction);
       CAbstractBody::SData sLeftWheelData(
          cStartTransform * m_cLeftWheelOffset,
          m_cWheelGeometricOffset,
@@ -121,11 +121,13 @@ namespace argos {
                                                  m_ptrLeftWheel->GetIndex(),
                                                  0.0,
                                                  m_fWheelMotorMaxImpulse);
+      m_ptrLeftMotor->setRhsClamp(m_fWheelMotorClamp);
       m_ptrRightMotor = 
          std::make_unique<btMultiBodyJointMotor>(&m_cMultiBody,
                                                  m_ptrRightWheel->GetIndex(),
                                                  0.0,
                                                  m_fWheelMotorMaxImpulse);
+      m_ptrRightMotor->setRhsClamp(m_fWheelMotorClamp);
       /* Allocate memory and prepare the btMultiBody */
       m_cMultiBody.finalizeMultiDof();
       /* Synchronize with the entity in the space */
@@ -162,8 +164,10 @@ namespace argos {
       /* run the base class's implementation of this method */
       CDynamics3DMultiBodyObjectModel::UpdateFromEntityStatus();
       /* update joint velocities */
-      m_ptrLeftMotor->setVelocityTarget(m_cDifferentialDriveEntity.GetTargetVelocityLeft() / m_cWheelHalfExtents.getX());
-      m_ptrRightMotor->setVelocityTarget(m_cDifferentialDriveEntity.GetTargetVelocityRight() / m_cWheelHalfExtents.getX());
+      m_ptrLeftMotor->setVelocityTarget(m_cDifferentialDriveEntity.GetTargetVelocityLeft() / m_cWheelHalfExtents.getX(),
+                                        m_fWheelMotorKdCoefficient);
+      m_ptrRightMotor->setVelocityTarget(m_cDifferentialDriveEntity.GetTargetVelocityRight() / m_cWheelHalfExtents.getX(),
+                                         m_fWheelMotorKdCoefficient);
    }
 
    /****************************************/
@@ -212,8 +216,11 @@ namespace argos {
    const btVector3    CDynamics3DPiPuckModel::m_cLeftWheelToBodyJointOffset(0.0, 0.0015, -0.0);
    const btQuaternion CDynamics3DPiPuckModel::m_cBodyToLeftWheelJointRotation(btVector3(1,0,0), SIMD_HALF_PI);
    /* TODO calibrate these values */
-   const btScalar     CDynamics3DPiPuckModel::m_fWheelMotorMaxImpulse(0.15);
-   const btScalar     CDynamics3DPiPuckModel::m_fWheelFriction(5.0);
+   const btScalar     CDynamics3DPiPuckModel::m_fBodyFriction(0.0);
+   const btScalar     CDynamics3DPiPuckModel::m_fWheelMotorMaxImpulse(0.05);
+   const btScalar     CDynamics3DPiPuckModel::m_fWheelFriction(0.75);
+   const btScalar     CDynamics3DPiPuckModel::m_fWheelMotorClamp(2.0);
+   const btScalar     CDynamics3DPiPuckModel::m_fWheelMotorKdCoefficient(0.9);
 
    /****************************************/
    /****************************************/
