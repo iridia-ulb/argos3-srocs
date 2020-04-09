@@ -41,10 +41,10 @@ namespace argos {
                                 const std::string& str_controller_id,
                                 const CVector3& c_position,
                                 const CQuaternion& c_orientation,
+                                bool b_debug,
                                 const std::string& str_wifi_medium,
                                 const std::string& str_tag_medium,
-                                const std::string& str_led_medium,
-                                bool b_debug) :
+                                const std::string& str_led_medium) :
       CComposableEntity(nullptr, str_id),
       m_pcControllableEntity(nullptr),
       m_pcDebugEntity(nullptr),
@@ -73,26 +73,26 @@ namespace argos {
                                     CRadians::PI_OVER_THREE,
                                     TAG_SIDE_LENGTH,
                                     GetId());
-      try {
+      if(!str_tag_medium.empty()) {
          CTagMedium& cTagMedium =
             CSimulator::GetInstance().GetMedium<CTagMedium>(str_tag_medium);
          m_pcTagEquippedEntity->SetMedium(cTagMedium);
          m_pcTagEquippedEntity->Enable();
       }
-      catch(CARGoSException& ex) {}
       AddComponent(*m_pcTagEquippedEntity);
-      /* get wifi medium */
-      CRadioMedium& cWifiRadioMedium =
-         CSimulator::GetInstance().GetMedium<CRadioMedium>(str_wifi_medium);
       /* create and initialize a radio equipped entity for WiFi */
       m_pcWifiRadioEquippedEntity = new CRadioEquippedEntity(this, "radios_0");
-      AddComponent(*m_pcWifiRadioEquippedEntity);
       m_pcWifiRadioEquippedEntity->AddRadio("wifi",
          WIFI_OFFSET_POSITION,
          m_pcEmbodiedEntity->GetOriginAnchor(),
          WIFI_TRANSMISSION_RANGE);
-      m_pcWifiRadioEquippedEntity->SetMedium(cWifiRadioMedium);
-      m_pcWifiRadioEquippedEntity->Enable();
+      if(!str_wifi_medium.empty()) {
+         CRadioMedium& cWifiRadioMedium =
+            CSimulator::GetInstance().GetMedium<CRadioMedium>(str_wifi_medium);
+         m_pcWifiRadioEquippedEntity->SetMedium(cWifiRadioMedium);
+         m_pcWifiRadioEquippedEntity->Enable();
+      }
+      AddComponent(*m_pcWifiRadioEquippedEntity);     
       /* create and initialize the directional LED equipped entity */
       m_pcDirectionalLEDEquippedEntity = new CDirectionalLEDEquippedEntity(this, "leds_0");
       m_pcDirectionalLEDEquippedEntity->AddLED("ring_led_0",
@@ -155,13 +155,12 @@ namespace argos {
                                                sOriginAnchor,
                                                CRadians::PI_OVER_THREE,
                                                CColor::BLACK);
-      try {
+      if(!str_led_medium.empty()) {
          CDirectionalLEDMedium& cDirectionalLEDMedium = 
             CSimulator::GetInstance().GetMedium<CDirectionalLEDMedium>(str_led_medium);
          m_pcDirectionalLEDEquippedEntity->SetMedium(cDirectionalLEDMedium);
          m_pcDirectionalLEDEquippedEntity->Enable();
       }
-      catch(CARGoSException& ex) {}
       AddComponent(*m_pcDirectionalLEDEquippedEntity);
       /* create and initialize a debugging entity */
       m_pcDebugEntity = new CDebugEntity(this, "debug_0");
@@ -206,30 +205,30 @@ namespace argos {
                                        CRadians::PI_OVER_THREE,
                                        TAG_SIDE_LENGTH,
                                        GetId());
-         std::string strTagMedium("tags");
+         std::string strTagMedium;
          GetNodeAttributeOrDefault(t_tree, "tag_medium", strTagMedium, strTagMedium);
-         try {
+         if(!strTagMedium.empty()) {
             CTagMedium& cTagMedium =
                CSimulator::GetInstance().GetMedium<CTagMedium>(strTagMedium);
             m_pcTagEquippedEntity->SetMedium(cTagMedium);
             m_pcTagEquippedEntity->Enable();
          }
-         catch(CARGoSException& ex) {}
          AddComponent(*m_pcTagEquippedEntity);
-         /* get wifi medium */
-         std::string strWifiMedium("wifi");
-         GetNodeAttributeOrDefault(t_tree, "wifi_medium", strWifiMedium, strWifiMedium);
-         CRadioMedium& cWifiRadioMedium =
-            CSimulator::GetInstance().GetMedium<CRadioMedium>(strWifiMedium);
-         /* create and initialize a radio equipped entity for WiFi */
+         /* create and initialize a radio equipped entity for the wifi */
          m_pcWifiRadioEquippedEntity = new CRadioEquippedEntity(this, "radios_0");
-         AddComponent(*m_pcWifiRadioEquippedEntity);
          m_pcWifiRadioEquippedEntity->AddRadio("wifi",
             WIFI_OFFSET_POSITION,
             m_pcEmbodiedEntity->GetOriginAnchor(),
             WIFI_TRANSMISSION_RANGE);
-         m_pcWifiRadioEquippedEntity->SetMedium(cWifiRadioMedium);
-         m_pcWifiRadioEquippedEntity->Enable();
+         std::string strWifiMedium;
+         GetNodeAttributeOrDefault(t_tree, "wifi_medium", strWifiMedium, strWifiMedium);
+         if(!strWifiMedium.empty()) {
+            CRadioMedium& cWifiRadioMedium =
+               CSimulator::GetInstance().GetMedium<CRadioMedium>(strWifiMedium);
+            m_pcWifiRadioEquippedEntity->SetMedium(cWifiRadioMedium);
+            m_pcWifiRadioEquippedEntity->Enable();
+         }
+         AddComponent(*m_pcWifiRadioEquippedEntity);
          /* create and initialize the directional LED equipped entity */
          m_pcDirectionalLEDEquippedEntity = new CDirectionalLEDEquippedEntity(this, "leds_0");
          m_pcDirectionalLEDEquippedEntity->AddLED("ring_led_0",
@@ -292,15 +291,14 @@ namespace argos {
                                                   sOriginAnchor,
                                                   CRadians::PI_OVER_THREE,
                                                   CColor::BLACK);
-         std::string strLedMedium("directional_leds");
+         std::string strLedMedium;
          GetNodeAttributeOrDefault(t_tree, "led_medium", strLedMedium, strLedMedium);
-         try {
+         if(!strLedMedium.empty()) {
             CDirectionalLEDMedium& cDirectionalLedMedium =
                CSimulator::GetInstance().GetMedium<CDirectionalLEDMedium>(strLedMedium);
             m_pcDirectionalLEDEquippedEntity->SetMedium(cDirectionalLedMedium);
             m_pcDirectionalLEDEquippedEntity->Enable();
          }
-         catch(CARGoSException& ex) {}
          AddComponent(*m_pcDirectionalLEDEquippedEntity);
          /* create and initialize a debugging entity */
          m_pcDebugEntity = new CDebugEntity(this, "debug_0");

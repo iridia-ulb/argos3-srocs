@@ -42,10 +42,10 @@ namespace argos {
                     const std::string& str_controller_id,
                     const CVector3& c_position,
                     const CQuaternion& c_orientation,
-                    const std::string& str_wifi_medium = "wifi",
-                    const std::string& str_tag_medium = "tags",
-                    const std::string& str_led_medium = "directional_leds",
-                    bool b_debug = false);
+                    bool b_debug = false,
+                    const std::string& str_wifi_medium = "",
+                    const std::string& str_tag_medium = "",
+                    const std::string& str_led_medium = "");
 
       virtual ~CPiPuckEntity() {}
 

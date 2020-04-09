@@ -21,7 +21,7 @@ namespace argos {
    /****************************************/
 
    CPiPuckDifferentialDriveEntity::CPiPuckDifferentialDriveEntity(CComposableEntity* pc_parent,
-                                                                          const std::string& str_id) :
+                                                                  const std::string& str_id) :
       CEntity(pc_parent, str_id),
       m_fTargetVelocityLeft(0.0f),
       m_fTargetVelocityRight(0.0f),
