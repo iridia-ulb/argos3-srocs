@@ -11,6 +11,7 @@
 #include <argos3/core/simulator/entity/embodied_entity.h>
 
 #include <argos3/plugins/simulator/entities/directional_led_equipped_entity.h>
+#include <argos3/plugins/simulator/entities/debug_entity.h>
 #include <argos3/plugins/simulator/entities/radio_equipped_entity.h>
 #include <argos3/plugins/simulator/entities/tag_equipped_entity.h>
 #include <argos3/plugins/simulator/media/directional_led_medium.h>
@@ -149,6 +150,9 @@ namespace argos {
          m_pcDirectionalLEDEquippedEntity->SetMedium(cDirectionalLEDMedium);
          m_pcDirectionalLEDEquippedEntity->Enable();
          AddComponent(*m_pcDirectionalLEDEquippedEntity);
+         /* create and initialize a debugging entity */
+         m_pcDebugEntity = new CDebugEntity(this, "debug_0");
+         AddComponent(*m_pcDebugEntity);
          /* create and initialize the controllable entity */
          m_pcControllableEntity = new CControllableEntity(this);
          AddComponent(*m_pcControllableEntity);

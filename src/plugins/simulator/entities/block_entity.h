@@ -10,6 +10,7 @@
 namespace argos {
    class CControllableEntity;
    class CEmbodiedEntity;
+   class CDebugEntity;
    class CDirectionalLEDEquippedEntity;
    class CRadioEquippedEntity;
    class CTagEquippedEntity;
@@ -45,6 +46,14 @@ namespace argos {
          return *m_pcEmbodiedEntity;
       }
 
+      inline CDebugEntity& GetDebugEntity() {
+         return *m_pcDebugEntity;
+      }
+
+      inline const CDebugEntity& GetDebugEntity() const {
+         return *m_pcDebugEntity;
+      }
+
       inline CDirectionalLEDEquippedEntity& GetDirectionalLEDEquippedEntity() {
          return *m_pcDirectionalLEDEquippedEntity;
       }
@@ -75,6 +84,7 @@ namespace argos {
 
       CControllableEntity*              m_pcControllableEntity;
       CDirectionalLEDEquippedEntity*    m_pcDirectionalLEDEquippedEntity;
+      CDebugEntity*                     m_pcDebugEntity;
       CEmbodiedEntity*                  m_pcEmbodiedEntity;
       CTagEquippedEntity*               m_pcTagEquippedEntity;
       CRadioEquippedEntity*             m_pcRadioEquippedEntity;
