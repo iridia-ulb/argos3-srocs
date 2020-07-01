@@ -66,7 +66,7 @@ argos3 -c path/to/build/testing/builderbot/test_builderbot.argos
 ### Drone ###
 The following experiment runs a very simple controller which allows the drone to be flown around the arena.
 ```bash
-argos3 -c path/to/build/testing/builderbot/test_builderbot.argos
+argos3 -c path/to/build/testing/drone/test_drone.argos
 ```
 
 
