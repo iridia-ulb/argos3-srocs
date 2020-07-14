@@ -67,16 +67,6 @@ namespace argos {
          cWheelInertia,
          m_fWheelMass,
          m_fWheelFriction);
-      /*
-       *   Can the lower base or another body be used directly with the origin anchor?
-       *
-       *   No, the origin anchor is designed to represent the origin and should have 
-       *   SAnchor::OffsetPosition and SAnchor::OffsetOrientation set to zero. Even
-       *   if this could be hacked to work now, it may break things in the future. It
-       *   is also not possible to use the geometric offset to place a body at the
-       *   origin, since this would change the location of that body inside of ARGoS
-       *   and mess with sensing, actuating, and drawing. It's just a bad idea.
-       */
       SAnchor* psBodyAnchor = &c_pipuck.GetEmbodiedEntity().GetAnchor("body");
       SAnchor* psLeftWheelAnchor = &c_pipuck.GetEmbodiedEntity().GetAnchor("left_wheel");
       SAnchor* psRightWheelAnchor = &c_pipuck.GetEmbodiedEntity().GetAnchor("right_wheel");
