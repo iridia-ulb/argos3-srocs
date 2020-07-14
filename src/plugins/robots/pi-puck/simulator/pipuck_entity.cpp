@@ -55,10 +55,18 @@ namespace argos {
       m_pcEmbodiedEntity = new CEmbodiedEntity(this, "body_0", c_position, c_orientation);
       AddComponent(*m_pcEmbodiedEntity);
       SAnchor& sOriginAnchor = m_pcEmbodiedEntity->GetOriginAnchor();
-      /* create additional anchors */
-      m_pcEmbodiedEntity->AddAnchor("body", {0.0, 0.0, 0.00125});
-      m_pcEmbodiedEntity->AddAnchor("left_wheel");
-      m_pcEmbodiedEntity->AddAnchor("right_wheel");
+      /* create and enable additional anchors */
+      m_pcEmbodiedEntity->AddAnchor("body",
+                                    CVector3(0.0, 0.0, 0.00125),
+                                    CQuaternion()).Enable();
+      m_pcEmbodiedEntity->AddAnchor("left_wheel",
+                                    CVector3(0.0, -0.0255, 0.02125),
+                                    CQuaternion(CRadians::PI_OVER_TWO,
+                                                CVector3::X)).Enable();
+      m_pcEmbodiedEntity->AddAnchor("right_wheel",
+                                    CVector3(0.0, 0.0255, 0.02125),
+                                    CQuaternion(-CRadians::PI_OVER_TWO,
+                                                CVector3::X)).Enable();
       /* create and initialize the differential drive entity */
       m_pcDifferentialDriveEntity
          = new CPiPuckDifferentialDriveEntity(this, "differential_drive_0");
@@ -187,10 +195,18 @@ namespace argos {
          AddComponent(*m_pcEmbodiedEntity);
          m_pcEmbodiedEntity->Init(GetNode(t_tree, "body"));
          SAnchor& sOriginAnchor = m_pcEmbodiedEntity->GetOriginAnchor();
-         /* create additional anchors */
-         m_pcEmbodiedEntity->AddAnchor("body", {0.0, 0.0, 0.00125});
-         m_pcEmbodiedEntity->AddAnchor("left_wheel");
-         m_pcEmbodiedEntity->AddAnchor("right_wheel");
+         /* create and enable additional anchors */
+         m_pcEmbodiedEntity->AddAnchor("body",
+                                       CVector3(0.0, 0.0, 0.00125),
+                                       CQuaternion()).Enable();
+         m_pcEmbodiedEntity->AddAnchor("left_wheel",
+                                       CVector3(0.0, -0.0255, 0.02125),
+                                       CQuaternion(CRadians::PI_OVER_TWO,
+                                                   CVector3::X)).Enable();
+         m_pcEmbodiedEntity->AddAnchor("right_wheel",
+                                       CVector3(0.0, 0.0255, 0.02125),
+                                       CQuaternion(-CRadians::PI_OVER_TWO,
+                                                   CVector3::X)).Enable();
          /* create and initialize the differential drive entity */
          m_pcDifferentialDriveEntity
             = new CPiPuckDifferentialDriveEntity(this, "differential_drive_0");
