@@ -73,10 +73,6 @@ namespace argos {
       static const std::array<btVector3, 4> m_arrElectromagnetOffsets;
 
       bool m_bDisableBlockMagnetsDuringManipulation = false;
-
-      
-
-
    };
    
    /****************************************/

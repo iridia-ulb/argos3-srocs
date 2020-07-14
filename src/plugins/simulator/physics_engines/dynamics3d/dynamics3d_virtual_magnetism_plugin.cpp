@@ -155,15 +155,15 @@ namespace argos {
       for(std::vector<SBlock>::iterator itBlock0 = std::begin(m_vecBlocks);
           itBlock0 != (std::end(m_vecBlocks) - 1);
           ++itBlock0) {
-         if(itBlock0->InteractingWithEndEffector && 
-            m_bDisableBlockMagnetsDuringManipulation) {
+         if(m_bDisableBlockMagnetsDuringManipulation &&
+            itBlock0->InteractingWithEndEffector) {
             continue;
          }
          for(std::vector<SBlock>::iterator itBlock1 = std::next(itBlock0, 1);
              itBlock1 != std::end(m_vecBlocks);
              ++itBlock1) {
-            if(itBlock1->InteractingWithEndEffector &&
-               m_bDisableBlockMagnetsDuringManipulation) {
+            if(m_bDisableBlockMagnetsDuringManipulation &&
+               itBlock1->InteractingWithEndEffector) {
                continue;
             }
             /* if a box is not movable, its mass is zero by default, 
