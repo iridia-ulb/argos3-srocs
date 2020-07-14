@@ -59,7 +59,7 @@
   <!-- * Visualization * -->
   <!-- ****************** -->
   <visualization>
-    <qt-opengl lua_editor="false">
+    <qt-opengl lua_editor="false" show_boundary="false">
       <camera>
         <placement idx="0" position=" 0,  -7.5, 2" look_at="0,0,0.05" lens_focal_length="78" />
         <placement idx="1" position=" 7.5,-7.5, 2" look_at="0,0,0.05" lens_focal_length="92" />
