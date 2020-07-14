@@ -27,7 +27,7 @@ namespace argos {
       
       ~CDynamics3DVirtualMagnetismPlugin() {}
       
-      virtual void Init(TConfigurationNode& t_tree) {}
+      virtual void Init(TConfigurationNode& t_tree);
       
       virtual void Reset() {}
       
@@ -51,6 +51,7 @@ namespace argos {
 
          std::shared_ptr<CDynamics3DSingleBodyObjectModel::CBody> Body;
          std::array<SMagnet, 8> Magnets;
+         bool InteractingWithEndEffector = false;
       };
 
       struct SEndEffector {
@@ -70,6 +71,12 @@ namespace argos {
 
       static const std::array<btVector3, 8> m_arrMagnetOffsets;
       static const std::array<btVector3, 4> m_arrElectromagnetOffsets;
+
+      bool m_bDisableBlockMagnetsDuringManipulation = false;
+
+      
+
+
    };
    
    /****************************************/
