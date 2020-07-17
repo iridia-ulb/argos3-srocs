@@ -125,6 +125,8 @@ if(ARGOS_WITH_LUA)
   set(ARGOS3_HEADERS_PLUGINS_ROBOTS_BUILDERBOT_LUALIBRARY
     lua_library/init.lua
     lua_library/api/move.lua
+    lua_library/api/constants.lua
+    lua_library/api/parameters.lua
     lua_library/api/process_obstacles.lua
     lua_library/api/process_leds.lua
     lua_library/api/process_structures.lua

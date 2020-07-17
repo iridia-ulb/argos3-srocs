@@ -2,12 +2,15 @@ robot.logger:register_module("utils.draw")
 
 package.loaded['utils.draw'] = {
    arrow = function(color, from, to)
-      print("1")
-      if robot.debug and robot.api.parameters.draw_switch == true then
-            print("2")
+      if robot.debug then
+         if robot.debug.draw then
             robot.debug.draw('arrow(' .. color .. ')(' .. from:__tostring() .. ')(' .. to:__tostring() .. ')')
+         else
+            robot.logger:log_warn("debug draw interface missing")
+         end
+      else
+         robot.logger:log_warn("debug actuator missing")
       end
-      print("3")
    end,
 
    block_axes = function(block_position, block_orientation, color)

@@ -13,5 +13,4 @@ package.loaded['api.parameters'] = {
     lift_system_position_tolerance = tonumber(robot.params.lift_system_position_tolerance or 0.001),
     obstacle_avoidance_backup = tonumber(robot.params.obstacle_avoidance_backup or 0.08),
     obstacle_avoidance_turn = tonumber(robot.params.obstacle_avoidance_turn or 60),
-    draw_switch = (robot.params.draw_switch == "true")
- },
+ }
