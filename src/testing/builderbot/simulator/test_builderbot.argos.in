@@ -20,6 +20,9 @@
         <builderbot_lift_system implementation="default" />
         <builderbot_nfc implementation="default" />
         <wifi implementation="default" />
+        <debug implementation="default">
+          <interface id="draw" />
+        </debug>
       </actuators>
       <sensors>
         <builderbot_camera_system implementation="default"
@@ -29,6 +32,7 @@
         <builderbot_electromagnet_system implementation="default" />
         <builderbot_lift_system implementation="default" />
         <builderbot_nfc implementation="default" show_rays="false" />
+        <builderbot_system implementation="default" />
         <wifi implementation="default" />
       </sensors>
       <params script="@CMAKE_BINARY_DIR@/testing/builderbot/test_builderbot.lua" />
@@ -49,31 +53,63 @@
   <!-- *********************** -->
   <!-- * Arena configuration * -->
   <!-- *********************** -->
-  <arena size="1, 1, 2" center="0, 0, 0.5">
-    <block id="block_debug1">
-      <body position="0.095,0,0" orientation="0,0,0"/>
-      <controller config="block"/>
-    </block>
+  <arena size="1.5, 1.5, 2" center="0, 0, 0.5">
+      <box id="bn" size="0.025,1,0.055" movable="false" mass="10">
+      <body position="0.5,0.0125,0" orientation="0,0,0" />
+    </box>
+    <box id="be" size="1,0.025,0.055" movable="false" mass="10">
+      <body position="0.0125,-0.5,0" orientation="0,0,0" />
+    </box>
+    <box id="bs" size="0.025,1,0.055" movable="false" mass="10">
+      <body position="-0.5,-0.0125,0" orientation="0,0,0" />
+    </box>
+    <box id="bw" size="1,0.025,0.055" movable="false" mass="10">
+      <body position="-0.0125,0.5,0" orientation="0,0,0" />
+    </box>
 
-    <block id="block_debug2">
-      <body position="0.195,0,0" orientation="0,0,0"/>
-      <controller config="block"/>
-    </block>
-
-    <builderbot id="builderbot">
-      <body position="0,0,0" orientation="0,0,0"/>
+    <builderbot id="builderbot1">
+      <body position="-0.15,0,0" orientation="0,0,0"/>
       <controller config="builderbot"/>
     </builderbot>
-   
+
+    <block id="block1" movable="false">
+      <body position="-0.35,0.2,0" orientation="-5,0,0"/>
+      <controller config="block"/>
+    </block>
+
+    <block id="block2">
+      <body position="0.35,-0.2,0" orientation="0,0,0"/>
+      <controller config="block"/>
+    </block>
+
+    <block id="block3">
+      <body position="0.20,0,0.055" orientation="0,0,0"/>
+      <controller config="block"/>
+    </block>
+
+    <block id="block6">
+      <body position="0.20,0,0.0" orientation="0,0,0"/>
+      <controller config="block"/>
+    </block>
+
+    <block id="block4">
+      <body position="0.35,0.15,0" orientation="0,0,0"/>
+      <controller config="block"/>
+    </block>
+
+    <block id="block5">
+      <body position="0.35,0.3,0" orientation="0,0,0"/>
+      <controller config="block"/>
+    </block>
   </arena>
 
   <!-- ******************* -->
   <!-- * Physics engines * -->
   <!-- ******************* -->
   <physics_engines>
-    <dynamics3d id="dyn3d" iterations="25" default_friction="10">
+    <dynamics3d id="dyn3d" iterations="25" default_friction="1">
       <gravity g="9.8" />
-      <floor friction="10" />
+      <floor friction="1"/>
       <virtual_magnetism />
     </dynamics3d>
   </physics_engines>
@@ -108,6 +144,5 @@
       </camera>
     </qt-opengl>
   </visualization>
-
-
 </argos-configuration>
+

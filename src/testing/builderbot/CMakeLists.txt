@@ -16,9 +16,12 @@ if(ARGOS_BUILD_FOR_SIMULATOR)
     ${CMAKE_SOURCE_DIR}/testing/builderbot/simulator/test_builderbot.argos.in
     ${CMAKE_BINARY_DIR}/testing/builderbot/test_builderbot.argos)
   configure_file(
-    ${CMAKE_SOURCE_DIR}/testing/builderbot/simulator/test_builderbot.lua
-    ${CMAKE_BINARY_DIR}/testing/builderbot/test_builderbot.lua
-    COPYONLY)
+    ${CMAKE_SOURCE_DIR}/testing/builderbot/simulator/test_builderbot.lua.in
+    ${CMAKE_BINARY_DIR}/testing/builderbot/test_builderbot.lua)
+  configure_file(
+    ${CMAKE_SOURCE_DIR}/testing/builderbot/simulator/sample_rules.lua
+    ${CMAKE_BINARY_DIR}/testing/builderbot/sample_rules.lua
+    COPYONLY)   
   configure_file(
     ${CMAKE_SOURCE_DIR}/testing/builderbot/simulator/test_block.lua
     ${CMAKE_BINARY_DIR}/testing/builderbot/test_block.lua
