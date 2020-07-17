@@ -138,8 +138,6 @@ local function generate_aligned_visual_structures(structures)
 end
 
 local function generate_new_rule_by_rotating_90(rule)
-   -- TODO replace shallow copy with code that copies what needs to be copied
-   --local new_rule = robot.utils.shallow_copy(rule)
    local new_rule = {
       rule_type = rule.rule_type,
       generate_orientations = rule.generate_orientations,
