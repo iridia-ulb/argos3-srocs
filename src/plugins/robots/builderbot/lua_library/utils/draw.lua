@@ -1,7 +1,8 @@
-robot.logger:register_module("utils.draw")
+package.preload['utils_draw'] = function()
+   -- register module with logger
+   robot.logger:register_module('utils_draw')
 
-package.loaded['utils.draw'] = {
-   arrow = function(color, from, to)
+   local function arrow(color, from, to)
       if robot.debug then
          if robot.debug.draw then
             robot.debug.draw('arrow(' .. color .. ')(' .. from:__tostring() .. ')(' .. to:__tostring() .. ')')
@@ -11,14 +12,14 @@ package.loaded['utils.draw'] = {
       else
          robot.logger:log_warn("debug actuator missing")
       end
-   end,
+   end
 
-   block_axes = function(block_position, block_orientation, color)
+   local function block_axes(block_position, block_orientation, color)
       local z = vector3(0, 0, 1)
-      robot.utils.draw.arrow(color, block_position, block_position + 0.1 * vector3(z):rotate(block_orientation))
-   end,
+      arrow(color, block_position, block_position + 0.1 * vector3(z):rotate(block_orientation))
+   end
 
-   line = function(color, from, to)
+   local function line(color, from, to)
       function range(from, to, step)
          step = step or 1
          return function(_, lastvalue)
@@ -37,8 +38,11 @@ package.loaded['utils.draw'] = {
          y_ = p0.y + lambda * vdr.y
          z_ = p0.z + lambda * vdr.z
          current_subpoint = vector3(x_, y_, z_)
-         robot.utils.draw.arrow(color, last_subpoint, current_subpoint)
+         arrow(color, last_subpoint, current_subpoint)
          last_subpoint = current_subpoint
       end
-   end,
-}
+   end
+
+   -- return the module table
+   return { arrow = arrow, block_axes = block_axes, line = line }
+end

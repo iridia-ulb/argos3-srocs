@@ -123,7 +123,6 @@ endif(ARGOS_BUILD_FOR_SIMULATOR)
 #
 if(ARGOS_WITH_LUA)
   set(ARGOS3_HEADERS_PLUGINS_ROBOTS_BUILDERBOT_LUALIBRARY
-    lua_library/init.lua
     lua_library/api/move.lua
     lua_library/api/constants.lua
     lua_library/api/parameters.lua
@@ -151,7 +150,10 @@ if(ARGOS_WITH_LUA)
     lua_library/utils/hungarian.lua
     lua_library/utils/draw.lua
     lua_library/utils/queue.lua
-    lua_library/utils/behavior_tree.lua)
+    lua_library/utils/print.lua
+    lua_library/utils/behavior_tree.lua
+    # init.lua must come last
+    lua_library/init.lua)
   add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/lua_library.luac
   	COMMAND luac -o ${CMAKE_CURRENT_BINARY_DIR}/lua_library.luac ${ARGOS3_HEADERS_PLUGINS_ROBOTS_BUILDERBOT_LUALIBRARY}
   	DEPENDS ${ARGOS3_HEADERS_PLUGINS_ROBOTS_BUILDERBOT_LUALIBRARY}

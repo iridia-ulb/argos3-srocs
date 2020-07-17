@@ -1,31 +1,20 @@
-local library_path = "@CMAKE_INSTALL_PREFIX@" .. 
-   "/include/argos3/plugins/robots/builderbot/lua_library.luac"
-assert(loadfile(library_path))()
-init_lua_library()
-robot.logger:register_module("controller")
-robot.logger:set_verbosity(2)
+assert(loadfile("@CMAKE_INSTALL_PREFIX@/include/argos3/plugins/robots/builderbot/lua_library.luac"))()
 
---local data
-local data = {}
-
-local rules = require("sample_rules")
-
-function init()
-   robot.logger:log_info("init")   
+function init()  
+   robot.logger:register_module("controller")
+   robot.logger:set_verbosity(2) 
+   -- enable the robot's camera system  
+   robot.camera_system.enable()
+   reset()
 end
 
 function reset()
-end
-
-
-function reset()
-   robot.logger:log_info('reset')
+   rules = require("sample_rules")
    data = {
       target = {},
       blocks = {},
       obstacles = {},
    }
-
    behavior = robot.utils.behavior_tree.create {
       type = "sequence*",
       children = {
@@ -55,19 +44,18 @@ local function custom_block_type(block)
 end
 
 function step()
-   robot.logger:log_info('step (' .. robot.system.time .. ')')   
+   -- preprocessing
    robot.api.process_blocks(data.blocks)
    robot.api.process_leds(data.blocks, custom_block_type)
    robot.api.process_obstacles(data.obstacles, data.blocks)
-
+   -- tick behavior tree
    behavior()
-
+   -- debug
    --robot.utils.draw.arrow("green", vector3(0,0,0), vector3(1,0,0.05))
    --robot.debug.draw("arrow(blue)(0,0,0)(1,0,0)")
 end
 
 function destroy()
-   robot.logger:log_info('destroy')
    -- disable the robot's camera system
    robot.camera_system.disable()
 end

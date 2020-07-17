@@ -1,7 +1,8 @@
-robot.logger:register_module("utils.queue")
+package.preload['utils_queue'] = function()
+   -- register module with logger
+   robot.logger:register_module('utils_queue')
 
-package.loaded['utils.queue'] = {
-   create = function()
+   local function create()
       local instance = {
          first = 1,
          last = 0,
@@ -24,7 +25,10 @@ package.loaded['utils.queue'] = {
       }
       return instance
    end
-}
+
+   -- return module table
+   return { create = create }
+end
    
    
 

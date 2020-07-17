@@ -53,18 +53,19 @@
   <!-- *********************** -->
   <!-- * Arena configuration * -->
   <!-- *********************** -->
-  <arena size="1.5, 1.5, 2" center="0, 0, 0.5">
-      <box id="bn" size="0.025,1,0.055" movable="false" mass="10">
-      <body position="0.5,0.0125,0" orientation="0,0,0" />
+  <arena size="3, 3, 1" center="0, 0, 0">
+    <!-- add the arena walls -->
+    <box id="north" size="0.025,2.975,0.075" movable="false">
+      <body position="1.4875,0.0125,0" orientation="0,0,0" />
     </box>
-    <box id="be" size="1,0.025,0.055" movable="false" mass="10">
-      <body position="0.0125,-0.5,0" orientation="0,0,0" />
+    <box id="east" size="2.975,0.025,0.075" movable="false">
+      <body position="0.0125,-1.4875,0" orientation="0,0,0" />
     </box>
-    <box id="bs" size="0.025,1,0.055" movable="false" mass="10">
-      <body position="-0.5,-0.0125,0" orientation="0,0,0" />
+    <box id="south" size="0.025,2.975,0.075" movable="false">
+      <body position="-1.4875,-0.0125,0" orientation="0,0,0" />
     </box>
-    <box id="bw" size="1,0.025,0.055" movable="false" mass="10">
-      <body position="-0.0125,0.5,0" orientation="0,0,0" />
+    <box id="west" size="2.975,0.025,0.075" movable="false">
+      <body position="-0.0125,1.4875,0" orientation="0,0,0" />
     </box>
 
     <builderbot id="builderbot1">
@@ -132,14 +133,14 @@
       <user_functions library="@CMAKE_BINARY_DIR@/testing/builderbot/libbuilderbot_qtopengl_user_functions"
                       label="builderbot_qtopengl_user_functions" />
       <camera>
-        <placement idx="0" position=" 0,  -2.5,1" look_at="0,0,0.05" lens_focal_length="78" />
-        <placement idx="1" position=" 2.5,-2.5,1" look_at="0,0,0.05" lens_focal_length="92" />
-        <placement idx="2" position=" 2.5, 0,  1" look_at="0,0,0.05" lens_focal_length="78" />
-        <placement idx="3" position=" 2.5, 2.5,1" look_at="0,0,0.05" lens_focal_length="92" />
-        <placement idx="4" position=" 0,   2.5,1" look_at="0,0,0.05" lens_focal_length="78" />
-        <placement idx="5" position="-2.5, 2.5,1" look_at="0,0,0.05" lens_focal_length="92" />
-        <placement idx="6" position="-2.5, 0,  1" look_at="0,0,0.05" lens_focal_length="78" />
-        <placement idx="7" position="-2.5,-2.5,1" look_at="0,0,0.05" lens_focal_length="92" />
+        <placement idx="0" position=" 0,-3,1" look_at="0,0,0.05" lens_focal_length="78" />
+        <placement idx="1" position=" 3,-3,1" look_at="0,0,0.05" lens_focal_length="92" />
+        <placement idx="2" position=" 3, 0,1" look_at="0,0,0.05" lens_focal_length="78" />
+        <placement idx="3" position=" 3, 3,1" look_at="0,0,0.05" lens_focal_length="92" />
+        <placement idx="4" position=" 0, 3,1" look_at="0,0,0.05" lens_focal_length="78" />
+        <placement idx="5" position="-3, 3,1" look_at="0,0,0.05" lens_focal_length="92" />
+        <placement idx="6" position="-3, 0,1" look_at="0,0,0.05" lens_focal_length="78" />
+        <placement idx="7" position="-3,-3,1" look_at="0,0,0.05" lens_focal_length="92" />
         <placement idx="8" position="0,0,0.5" look_at="0.0,0.0,0.125" up="1,0,0" lens_focal_length="40" />
       </camera>
     </qt-opengl>

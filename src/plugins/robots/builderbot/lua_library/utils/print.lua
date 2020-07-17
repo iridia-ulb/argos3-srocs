@@ -1,7 +1,8 @@
-robot.logger:register_module("utils.display")
+package.preload['utils_print'] = function()
+   -- register module with logger
+   robot.logger:register_module('utils_print')
 
-package.loaded['utils.display'] = {
-   table = function(table, indentation, skipindex)
+   local function table(table, indentation, skipindex)
       if indentation == nil then indentation = 0 end
       if type(table) ~= "table" then return nil end
       for i, v in pairs(table) do
@@ -16,7 +17,7 @@ package.loaded['utils.display'] = {
          else
             if type(v) == "table" then
                print("logger:\t", str)
-               robot.utils.display.table(v, number + 1, skipindex)
+               table(v, number + 1, skipindex)
             else
                str = str .. tostring(v)
                print("logger:\t", str)
@@ -24,4 +25,7 @@ package.loaded['utils.display'] = {
          end
       end
    end
-}
+   
+   -- return module table
+   return { table = table }
+end
