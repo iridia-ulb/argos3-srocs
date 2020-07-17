@@ -243,33 +243,6 @@ package.loaded['utils.hungarian'] = {
       -- Set cost_matrix and size N
       local n,m = get_nm_from_mat(cost_matrix_in)
       
-      -- TODO check whether this was/is/will be correct
-      -- was this even correct, shallow copy => just copy the rows but no elements?
-      -- instance.cost_matrix = robot.utils.shallow_copy(cost_matrix_in)
-      
-      -- replace shallow copy
-      -- potential issue with ipairs, are there "nil"'s in the penalty matrix?
-      for row_index, row in ipairs(cost_matrix_in) do
-         cost_matrix[row_index] = {}
-         for col_index, element in ipairs(row) do
-            cost_matrix[row_index][col_index] = element
-         end
-      end
-   
-      --Asserts
-         -- to be filled
-         -- check in the following body
-         -- maybe not square
-   
-      -- nil check
-      for i = 1, n do
-         for j = 1, m do
-            if instance.cost_matrix[i][j] == nil then
-               instance.cost_matrix[i][j] = 0
-            end
-         end
-      end
-   
       -- check and get N
       if n == -1 or m == -1 then
          robot.logger:log_err("invalid cost matrix")
@@ -282,6 +255,13 @@ package.loaded['utils.hungarian'] = {
             -- temporarily
       end
       instance.N = n
+
+      for i = 1, n do
+         instance.cost_matrix[i] = {}
+         for j = 1, m do
+            instance.cost_matrix[i][j] = cost_matrix_in[i][j] or 0
+         end
+      end
    
       ---------------- min or max problem ----------------
       if is_it_max_problem == false then
