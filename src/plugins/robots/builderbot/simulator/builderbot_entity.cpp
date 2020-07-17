@@ -9,12 +9,6 @@
 #include <argos3/core/simulator/simulator.h>
 #include <argos3/core/simulator/entity/controllable_entity.h>
 #include <argos3/core/simulator/entity/embodied_entity.h>
-
-#ifdef ARGOS_WITH_LUA
-   #include <argos3/core/wrappers/lua/lua_controller.h>
-   #include <argos3/core/wrappers/lua/lua_utility.h>
-#endif
-
 #include <argos3/plugins/simulator/entities/debug_entity.h>
 #include <argos3/plugins/simulator/entities/radio_equipped_entity.h>
 #include <argos3/plugins/simulator/entities/tag_equipped_entity.h>
@@ -141,7 +135,6 @@ namespace argos {
          m_pcDirectionalLEDEquippedEntity->AddLED("led_10", CColor::BLACK);
          m_pcDirectionalLEDEquippedEntity->AddLED("led_11", CColor::BLACK);
          */
-
          /* create and initialize a debugging entity */
          m_pcDebugEntity = new CDebugEntity(this, "debug_0");
          AddComponent(*m_pcDebugEntity);
@@ -149,21 +142,6 @@ namespace argos {
          m_pcControllableEntity = new CControllableEntity(this);
          AddComponent(*m_pcControllableEntity);
          m_pcControllableEntity->Init(GetNode(t_tree, "controller"));
-#ifdef ARGOS_WITH_LUA
-         /* Load the lua library */
-         CLuaController* pcLuaController = 
-            dynamic_cast<CLuaController*>(&m_pcControllableEntity->GetController());
-         if(pcLuaController != nullptr) {
-            std::string strLibraryPath(CSimulator::GetInstance().GetInstallationDirectory());
-            strLibraryPath += "/include/argos3/plugins/robots/builderbot/lua_library.luac";
-            if(!CLuaUtility::LoadScript(pcLuaController->GetLuaState(), strLibraryPath)) {
-               THROW_ARGOSEXCEPTION("Failed to load: " << strLibraryPath);
-            }
-            if(!CLuaUtility::CallLuaFunction(pcLuaController->GetLuaState(), "init_lua_library")) {
-               THROW_ARGOSEXCEPTION("Failed to initialize the lua library");
-            }
-         }
-#endif
          /* Update components */
          UpdateComponents();
       }
