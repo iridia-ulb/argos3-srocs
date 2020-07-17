@@ -139,12 +139,18 @@ end
 
 local function generate_new_rule_by_rotating_90(rule)
    -- TODO replace shallow copy with code that copies what needs to be copied
-   local new_rule = robot.utils.shallow_copy(rule)
-   -- note that shallow_copy doesn't work for vector3 and quaternions, so generate new structure 
-   -- and new target based on the old rule.
+   --local new_rule = robot.utils.shallow_copy(rule)
+   local new_rule = {
+      rule_type = rule.rule_type,
+      generate_orientations = rule.generate_orientations,
+      safe_zone = rule.safe_zone,
+      -- structure and target are filled below
+   }
+   -- generate new structure and new target based on the old rule.
    new_rule.structure = generate_uniform_structure(rule.structure, 
                            {orientation = quaternion(-math.pi/2, vector3(0,0,1))}
                         )
+   new_rule.target = {}
    new_rule.target.reference_index = 
       new_rule.structure[1].index + 
       vector3(rule.target.reference_index - rule.structure[1].index):rotate(
@@ -238,11 +244,10 @@ local function select_target(blocks, possible_targets, selection_method)
 
    for i, target in ipairs(possible_targets) do
       local reference_block = blocks[target.reference_id]
-      local target_position = reference_block.position_robot +
+      local target_position = reference_block.position +
                               vector3(target.offset * robot.api.constants.block_side_length):rotate(
-                                 reference_block.orientation_robot
+                                 reference_block.orientation
                               )
-      target_position.z = 0
       local distance = target_position:length()
 
       if distance < nearest_distance then
