@@ -59,7 +59,7 @@ package.loaded['nodes.search_block'] = function(data, rule_node)
                   },
                },
                function()
-                  robot.log_info("rule node matched, target acquired")
+                  robot.logger:log_info("rule node matched, target acquired")
                   return false, true
                end
             },
