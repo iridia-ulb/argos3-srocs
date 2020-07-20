@@ -234,7 +234,6 @@ package.preload['api_match_rules'] = function()
             reference_block.position +
             vector3(target.offset * robot.api.constants.block_side_length) :
                rotate(reference_block.orientation)
-         target_position.z = 0
          local distance = target_position:length()
          if distance < nearest_distance then
             nearest_distance = distance

@@ -36,7 +36,8 @@ package.preload['nodes_obstacle_avoidance'] = function()
                if flag == true then
                   return false, false
                else
-                  return false, true
+                  -- no obstacle, return true and leave
+                  return false, true 
                end
             end,
             -- avoid
@@ -52,7 +53,7 @@ package.preload['nodes_obstacle_avoidance'] = function()
                   robot.nodes.create_timer_node(
                      function()
                         robot.api.move.with_velocity(-robot.api.parameters.default_speed, 
-                                                   -robot.api.parameters.default_speed)
+                                                     -robot.api.parameters.default_speed)
                         return robot.api.parameters.obstacle_avoidance_backup / robot.api.parameters.default_speed
                      end
                   ),
@@ -70,7 +71,7 @@ package.preload['nodes_obstacle_avoidance'] = function()
                   ),
                   function()
                      robot.camera_system.enable()
-                     return false, true
+                     return false, false -- return false to break what happens before
                   end,
                }
             }
