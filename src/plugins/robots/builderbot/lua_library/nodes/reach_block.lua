@@ -199,6 +199,7 @@ package.preload['nodes_reach_block'] = function()
                         )
                      },
                   },
+                  function() robot.logger:log_info("no reach method for offset, abort reach") return false, false end,
                }, -- end of children of step forward
             }, -- end of step forward
             -- stop

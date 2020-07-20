@@ -18,7 +18,7 @@ package.preload['nodes_curved_approach_block'] = function()
             function()
                if data.target.id == nil or
                   data.blocks[data.target.id] == nil then
-                  robot.logger:log_warn("target block is nil")
+                  robot.logger:log_warn("target block is nil, abort approach")
                   robot.api.move.with_velocity(0,0)
                   return false, false
                else
