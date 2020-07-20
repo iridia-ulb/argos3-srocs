@@ -18,7 +18,7 @@ package.preload['nodes_move_to_location'] = function()
    --              |   \th|
    --              | th2\ |
    --              | <---\
-   local function create_get_time_function(location)
+   local function create_get_time_function(data, location)
       local th, dis, th2
       local backup_mode = false
       local get_th = function() -- get th time
@@ -66,12 +66,42 @@ package.preload['nodes_move_to_location'] = function()
          end
          return math.abs(th2) / robot.api.parameters.default_turn_speed
       end
-      return get_th, get_dis, get_th2
+      local check_obstacle = function()
+         local flag = false
+         for i, v in ipairs(data.obstacles) do
+            if v.position.x < 0.19 and v.position.x > 0.06 then
+               if v.source == 'camera' then
+                  flag = true
+                  break
+               elseif v.source == 'left' or v.source == 'right' then
+                  if robot.rangefinders['underneath'].proximity > robot.api.parameters.proximity_touch_tolerance then
+                     if robot.lift_system.position < robot.api.parameters.lift_system_rf_cover_threshold then
+                        flag = true
+                        break
+                     end
+                  end
+               elseif v.source == '1' or v.source == '12' then
+                  if robot.lift_system.position >= robot.api.parameters.lift_system_rf_cover_threshold then
+                     flag = true
+                     break
+                  end
+               elseif v.source == '2' or v.source == '11' then
+                  flag = true
+                  break
+               end
+            end
+         end
+         if flag == true then
+            robot.logger:log_info("obstacle obstacle encountered, abort blind approach")
+            return false, false
+         end
+      end
+      return get_th, get_dis, get_th2, check_obstacle
    end
 
    -- return node generator
-   return function(location)
-      local get_th, get_dis, get_th2 = create_get_time_function(location)
+   return function(data, location)
+      local get_th, get_dis, get_th2, check_obstacle = create_get_time_function(data, location)
       return {
          type = "sequence*",
          children = {
@@ -81,15 +111,14 @@ package.preload['nodes_move_to_location'] = function()
                return false, true
             end,
             -- turn th
-            robot.nodes.create_timer_node(get_th),
+            robot.nodes.create_timer_node(get_th, check_obstacle),
             -- move dis
-            robot.nodes.create_timer_node(get_dis),
+            robot.nodes.create_timer_node(get_dis, check_obstacle),
             -- turn th2
-            robot.nodes.create_timer_node(get_th2),
+            robot.nodes.create_timer_node(get_th2, check_obstacle),
             -- stop moving
             function() 
                robot.api.move.with_velocity(0,0)
-               -- TODO I am not convinced this is the right place to be enabling/disabling the camera...
                robot.camera_system.enable()
                return false, true 
             end,

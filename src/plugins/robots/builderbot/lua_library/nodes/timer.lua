@@ -12,9 +12,10 @@ package.preload['nodes_timer'] = function()
          children = {
             function()
                if type(time) == 'function' then
-                  time = time()
+                  end_time = robot.system.time + time()
+               else
+                  end_time = robot.system.time + time
                end
-               end_time = robot.system.time + time
                return false, true
             end,
             function()
@@ -22,7 +23,10 @@ package.preload['nodes_timer'] = function()
                   return false, true
                else
                   if type(method) == 'function' then
-                     method()
+                     local running, result = method()
+                     if running ~= nil then
+                        return running, result
+                     end
                   end
                   return true
                end
