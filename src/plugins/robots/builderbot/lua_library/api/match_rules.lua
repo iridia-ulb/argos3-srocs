@@ -170,7 +170,7 @@ package.preload['api_match_rules'] = function()
          local block_matched = false
          for j, visual_block in ipairs(visual_structure) do
             if visual_block.index == rule_block.index + offset then --found required index
-               if (visual_block.type == rule_block.type) or (rule_block.type == 'X') then -- found the same required type
+               if (visual_block.type == rule_block.type) or (rule_block.type == nil) then -- found the same required type
                   block_matched = true
                   break
                end
@@ -212,7 +212,7 @@ package.preload['api_match_rules'] = function()
                      visual_structure.index_to_position.orientation
                   )
                local offset = reference_block_in_visual.index - rule.target.reference_index
-               if rule.sensor_condition == sensor_condition_value and
+               if (rule.sensor_condition == nil or rule.sensor_condition == sensor_condition_value) and
                   rule.rule_type == rule_type and
                   check_position_in_safe_zone(reference_position, rule.safe_zone) and
                   match_structures(visual_structure, rule.structure, offset) then
