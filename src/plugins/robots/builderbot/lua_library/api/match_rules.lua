@@ -194,12 +194,6 @@ package.preload['api_match_rules'] = function()
    end
 
    local function generate_possible_targets(visual_structures, rule_list, rule_type, sensor_condition)
-      -- generate sensor condition value
-      local sensor_condition_value = sensor_condition
-      if type(sensor_condition) == "function" then
-         sensor_condition_value = sensor_condition()
-      end
-
       -- generate possible targets
       local possible_targets = {}
       for i, visual_structure in ipairs(visual_structures) do
@@ -212,7 +206,7 @@ package.preload['api_match_rules'] = function()
                      visual_structure.index_to_position.orientation
                   )
                local offset = reference_block_in_visual.index - rule.target.reference_index
-               if (rule.sensor_condition == nil or rule.sensor_condition == sensor_condition_value) and
+               if (rule.sensor_condition == nil or rule.sensor_condition == sensor_condition) and
                   rule.rule_type == rule_type and
                   check_position_in_safe_zone(reference_position, rule.safe_zone) and
                   match_structures(visual_structure, rule.structure, offset) then
