@@ -26,6 +26,16 @@ if(ARGOS_BUILD_FOR_SIMULATOR)
     ${CMAKE_SOURCE_DIR}/testing/builderbot/simulator/test_block.lua
     ${CMAKE_BINARY_DIR}/testing/builderbot/test_block.lua
     COPYONLY)
+  configure_file(
+    ${CMAKE_SOURCE_DIR}/testing/builderbot/simulator/example_builderbot_basic.argos.in
+    ${CMAKE_BINARY_DIR}/testing/builderbot/example_builderbot_basic.argos)
+  configure_file(
+    ${CMAKE_SOURCE_DIR}/testing/builderbot/simulator/example_builderbot_basic.lua.in
+    ${CMAKE_BINARY_DIR}/testing/builderbot/example_builderbot_basic.lua)
+  configure_file(
+    ${CMAKE_SOURCE_DIR}/testing/builderbot/simulator/example_block_basic.lua
+    ${CMAKE_BINARY_DIR}/testing/builderbot/example_block_basic.lua
+    COPYONLY)
 elseif(ARGOS_BUILD_FOR STREQUAL "builderbot")
    message("No tests added for the builderbot configuration")
 endif(ARGOS_BUILD_FOR_SIMULATOR)
