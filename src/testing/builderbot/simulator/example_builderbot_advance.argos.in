@@ -131,7 +131,7 @@
   <!-- * Visualization * -->
   <!-- ****************** -->
   <visualization>
-    <qt-opengl lua_editor="false" show_boundary="false">
+    <qt-opengl lua_editor="true" show_boundary="false">
       <user_functions library="@CMAKE_BINARY_DIR@/testing/builderbot/libbuilderbot_qtopengl_user_functions"
                       label="builderbot_qtopengl_user_functions" />
       <camera>
