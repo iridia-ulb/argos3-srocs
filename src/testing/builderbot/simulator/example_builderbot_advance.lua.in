@@ -1,6 +1,6 @@
 assert(loadfile("@CMAKE_INSTALL_PREFIX@/include/argos3/plugins/robots/builderbot/lua_library.luac"))()
 
---local data -- make data global so that it can be seen in lua_editor
+local data -- make data global for debug so that it can be seen in lua_editor
 local behavior
 
 local rules = {
