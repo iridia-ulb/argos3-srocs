@@ -131,8 +131,9 @@ package.preload['api_match_rules'] = function()
    local function generate_new_rule_by_rotating_90(rule)
       local new_rule = {
          rule_type = rule.rule_type,
-         generate_orientations = rule.generate_orientations,
-         safe_zone = rule.safe_zone,
+         sensor_condition = rule.sensor_condition,
+         generate_orientations = rule.generate_orientations, -- TODO: unused
+         safe_zone = rule.safe_zone,                         -- TODO: unused
          structure = generate_uniform_structure(rule.structure, {
             orientation = quaternion(-math.pi/2, vector3(0,0,1))
          }),
@@ -169,7 +170,7 @@ package.preload['api_match_rules'] = function()
          local block_matched = false
          for j, visual_block in ipairs(visual_structure) do
             if visual_block.index == rule_block.index + offset then --found required index
-               if (visual_block.type == rule_block.type) or (rule_block.type == 'X') then -- found the same required type
+               if (visual_block.type == rule_block.type) or (rule_block.type == nil) then -- found the same required type
                   block_matched = true
                   break
                end
@@ -192,7 +193,8 @@ package.preload['api_match_rules'] = function()
       return nil
    end
 
-   local function generate_possible_targets(visual_structures, rule_list, rule_type)
+   local function generate_possible_targets(visual_structures, rule_list, rule_type, sensor_condition)
+      -- generate possible targets
       local possible_targets = {}
       for i, visual_structure in ipairs(visual_structures) do
          for j, rule in ipairs(rule_list) do
@@ -204,7 +206,8 @@ package.preload['api_match_rules'] = function()
                      visual_structure.index_to_position.orientation
                   )
                local offset = reference_block_in_visual.index - rule.target.reference_index
-               if rule.rule_type == rule_type and
+               if (rule.sensor_condition == nil or rule.sensor_condition == sensor_condition) and
+                  rule.rule_type == rule_type and
                   check_position_in_safe_zone(reference_position, rule.safe_zone) and
                   match_structures(visual_structure, rule.structure, offset) then
 
@@ -252,7 +255,7 @@ package.preload['api_match_rules'] = function()
    end
 
    -- return the module function
-   return function(blocks, rules, rule_type)
+   return function(blocks, rules, rule_type, sensor_condition)
       local structures = {}
       robot.api.process_structures(structures, blocks)
       if #structures == 0 then
@@ -269,7 +272,7 @@ package.preload['api_match_rules'] = function()
       end
       -- match rules
       local possible_targets = 
-         generate_possible_targets(structures_in_index_frame, rules.list, rule_type)
+         generate_possible_targets(structures_in_index_frame, rules.list, rule_type, sensor_condition)
       local target = 
          select_target(blocks, possible_targets, rules.selection_method)
       return target

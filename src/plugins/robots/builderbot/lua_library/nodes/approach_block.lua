@@ -20,10 +20,10 @@ package.preload['nodes_approach_block'] = function()
                         vector3(-target_block.position_robot):
                         rotate(target_block.orientation_robot:inverse())
                      local angle = math.atan(robot_to_block.y / robot_to_block.x) * (180 / math.pi)
-                     local blind_tolerance = 20
+                     local blind_tolerance = robot.api.parameters.z_approach_range_angle
                      if angle < blind_tolerance and 
                         angle > -blind_tolerance and
-                        robot_to_block:length() < 0.27 then 
+                        robot_to_block:length() < robot.api.parameters.z_approach_range_distance then 
                         return false, true
                      else
                         return false, false
@@ -33,7 +33,7 @@ package.preload['nodes_approach_block'] = function()
                   {
                      type = "sequence*",
                      children = {
-                        robot.nodes.create_z_approach_block_node(data, distance + 0.10),
+                        robot.nodes.create_z_approach_block_node(data, distance + robot.api.parameters.z_approach_block_distance_increment),
                         search_node,
                      },
                   }, 

@@ -15,5 +15,8 @@ package.preload['api_parameters'] = function()
         lift_system_position_tolerance = tonumber(robot.params.lift_system_position_tolerance or 0.001),
         obstacle_avoidance_backup = tonumber(robot.params.obstacle_avoidance_backup or 0.08),
         obstacle_avoidance_turn = tonumber(robot.params.obstacle_avoidance_turn or 60),
+        z_approach_range_angle = tonumber(robot.params.z_approach_range_angle or 20),
+        z_approach_range_distance = tonumber(robot.params.z_approach_range_distance or 0.27),
+        z_approach_block_distance_increment = tonumber(robot.params.z_approach_block_distance_increment or 0.10),
     }
 end

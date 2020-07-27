@@ -32,7 +32,7 @@ package.preload['utils_hungarian'] = function()
       local N = self.N
       local slack = self.slack
       local slackx = self.slackx
-      local delta = slack[1] + 99999999  -- for max set as INF
+      local delta = math.huge  -- for max set as INF
       -- find the min delta among slack
       for y = 1,N do
          if self.T[y] ~= true and slack[y] < delta then  
