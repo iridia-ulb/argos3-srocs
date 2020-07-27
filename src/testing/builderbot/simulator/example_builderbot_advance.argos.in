@@ -35,10 +35,8 @@
         <builderbot_system implementation="default" />
         <wifi implementation="default" />
       </sensors>
-      <params script="@CMAKE_BINARY_DIR@/testing/builderbot/example_builderbot_basic.lua" 
+      <params script="@CMAKE_BINARY_DIR@/testing/builderbot/example_builderbot_advance.lua" 
               search_random_range="0"
-              obstacle_avoidance_turn="180"
-              obstacle_avoidance_backup="0.05"
       />
     </lua_controller>
 
@@ -72,28 +70,38 @@
       <body position="-0.0125,1.4875,0" orientation="0,0,0" />
     </box>
 
+    <block id="block11">
+      <body position="0.10,0,0" orientation="0,0,0"/>
+      <controller config="block"/>
+    </block>
+
+    <block id="block12">
+      <body position="0.10,0.3,0" orientation="0,0,0"/>
+      <controller config="block"/>
+    </block>
+
     <builderbot id="builderbot1">
       <body position="-0.25,0,0" orientation="0,0,0"/>
       <controller config="builderbot"/>
     </builderbot>
 
-    <block id="block6" movable="false">
-      <body position="-0.45,0,0" orientation="0,0,0"/>
-      <controller config="block"/>
-    </block>
+    <builderbot id="builderbot2">
+      <body position="-0.25,0.3,0" orientation="0,0,0"/>
+      <controller config="builderbot"/>
+    </builderbot>
 
     <block id="block1">
-      <body position="0,0,0" orientation="0,0,0"/>
+      <body position="-0.255,-0.1,0" orientation="0,0,0"/>
       <controller config="block"/>
     </block>
 
     <block id="block2">
-      <body position="0.08,0,0" orientation="0,0,0"/>
+      <body position="-0.2,-0.1,0" orientation="0,0,0"/>
       <controller config="block"/>
     </block>
 
-    <block id="block7">
-      <body position="0.16,0,0" orientation="0,0,0"/>
+    <block id="block3">
+      <body position="-0.145.,-0.1,0" orientation="0,0,0"/>
       <controller config="block"/>
     </block>
   </arena>

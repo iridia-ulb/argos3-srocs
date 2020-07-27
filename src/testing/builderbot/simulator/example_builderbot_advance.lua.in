@@ -1,44 +1,44 @@
 assert(loadfile("@CMAKE_INSTALL_PREFIX@/include/argos3/plugins/robots/builderbot/lua_library.luac"))()
 
-local data, behavior
+--local data
+local behavior
 
 local rules = {
    selection_method = 'nearest_win',
    list = {
-      -- pickup a type 0 (black) block
-      -- turn the block type 4 (blue) when picking up it
+      -- pickup a type 5 block when the builderbot senses a wall behind itself
       {
          rule_type = 'pickup',
+         sensor_condition = "wall_side",
          structure = {
             {
                index = vector3(0, 0, 0),
-               type = 0
+               type = 5
             },
          },
          target = {
             reference_index = vector3(0, 0, 0),
             offset_from_reference = vector3(0, 0, 0),
-            type = 4,
-         },
-      },
-      -- place a block in front of a type 1 (pink) block
-      -- turn the block type 1 (pink) when placing it
-      {
-         rule_type = 'place',
-         structure = {
-            {
-               index = vector3(0, 0, 0),
-               type = 1,
-            },
-         },
-         target = {
-            reference_index = vector3(0, 0, 0),
-            offset_from_reference = vector3(1, 0, 0),
-            type = 1
          },
       },
    }, -- end of rule.list
 } -- end of rules
+
+local function customize_block_type(block)
+   -- define type 5 as a block with a pink up face and an orange front face
+   if block.tags.up ~= nil and block.tags.up.type == 1 and 
+      block.tags.front ~= nil and block.tags.front.type == 2 then
+      return 5
+   end
+end
+
+local function customize_sensor_condition()
+   -- defind a "wall_side" condition if the the robot senses something on the back
+   if robot.rangefinders["3"].proximity < robot.api.parameters.proximity_detect_tolerance and
+      robot.rangefinders["4"].proximity < robot.api.parameters.proximity_detect_tolerance then
+      return "wall_side"
+   end
+end
 
 function init()  
    robot.logger:register_module("controller")
@@ -66,10 +66,18 @@ end
 function step()
    -- preprocessing
    robot.api.process_blocks(data.blocks)
-   robot.api.process_leds(data.blocks)
+   robot.api.process_leds(data.blocks, customize_block_type)
    robot.api.process_obstacles(data.obstacles, data.blocks)
+   data.sensor_condition = customize_sensor_condition()
    -- tick behavior tree
    behavior()
+   -- debug
+   if data.blocks[data.target.id] ~= nil then
+      robot.utils.draw.arrow("green", 
+                             vector3(0,0,robot.api.constants.block_side_length / 2), 
+                             data.blocks[data.target.id].position_robot
+                            )
+   end
 end
 
 function destroy()

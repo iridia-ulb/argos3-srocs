@@ -9,7 +9,7 @@ function init()
 end
 
 function reset()
-   rules = require("sample_rules")
+   rules = require("test_sample_rules")
    data = {
       target = {},
       blocks = {},
