@@ -9,7 +9,7 @@ local rules = {
       -- pickup a type 5 block when the builderbot senses a wall behind itself
       {
          rule_type = 'pickup',
-         sensor_condition = "wall_side",
+         external_condition = "wall_side",
          structure = {
             {
                index = vector3(0, 0, 0),
@@ -32,7 +32,7 @@ local function customize_block_type(block)
    end
 end
 
-local function customize_sensor_condition()
+local function customize_external_condition()
    -- defind a "wall_side" condition if the the robot senses something on the back
    if robot.rangefinders["3"].proximity < robot.api.parameters.proximity_detect_tolerance and
       robot.rangefinders["4"].proximity < robot.api.parameters.proximity_detect_tolerance then
@@ -68,7 +68,7 @@ function step()
    robot.api.process_blocks(data.blocks)
    robot.api.process_leds(data.blocks, customize_block_type)
    robot.api.process_obstacles(data.obstacles, data.blocks)
-   data.sensor_condition = customize_sensor_condition()
+   data.external_condition = customize_external_condition()
    -- tick behavior tree
    behavior()
    -- debug
