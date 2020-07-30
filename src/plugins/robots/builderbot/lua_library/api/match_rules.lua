@@ -4,13 +4,13 @@ package.preload['api_match_rules'] = function()
 
    local function check_position_in_safe_zone(position, safe_zone)
       if safe_zone == nil or safe_zone == 1 then return true end
-      -- x down, y right
+      -- x right, y down
       local horizontal_fov = math.pi/3 -- TODO: ask argos to provide
       local vertical_fov = math.pi/3
-      local x_max = math.tan(horizontal_fov / 2)
-      local x_min = -math.tan(horizontal_fov / 2)
-      local y_max = math.tan(vertical_fov / 2)
-      local y_min = -math.tan(vertical_fov / 2)
+      local y_max = math.tan(horizontal_fov / 2)
+      local y_min = -math.tan(horizontal_fov / 2)
+      local x_max = math.tan(vertical_fov / 2)
+      local x_min = -math.tan(vertical_fov / 2)
       if type(safe_zone) == "number" then
          x_max = x_max * safe_zone
          x_min = x_min * safe_zone
@@ -18,16 +18,16 @@ package.preload['api_match_rules'] = function()
          y_min = y_min * safe_zone
       elseif type(safe_zone) == "table" then
          if safe_zone.up_margin ~= nil then
-            x_min = x_min * (1 - safe_zone.up_margin * 2)
+            y_min = y_min * (1 - safe_zone.up_margin * 2)
          end
          if safe_zone.down_margin ~= nil then
-            x_max = x_max * (1 - safe_zone.down_margin * 2)
+            y_max = y_max * (1 - safe_zone.down_margin * 2)
          end
          if safe_zone.left_margin ~= nil then
-            y_min = y_min * (1 - safe_zone.left_margin * 2)
+            x_min = x_min * (1 - safe_zone.left_margin * 2)
          end
          if safe_zone.right_margin ~= nil then
-            y_max = y_max * (1 - safe_zone.right_margin * 2)
+            x_max = x_max * (1 - safe_zone.right_margin * 2)
          end
       end
       local x = position.x / position.z
