@@ -15,6 +15,7 @@ package.preload['api_constants'] = function()
         lift_system_upper_limit = 0.135,
         lift_system_lower_limit = 0,
         end_effector_position_offset = vector3(0.09800875, 0, 0.055),
+        end_effector_position_pickup_bias = 0.002, -- move less when picking up a block
         end_effector_nose_length = 0.005,
     }
 end

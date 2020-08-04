@@ -44,7 +44,10 @@ package.preload['nodes_reach_block'] = function()
                         end,
                         -- forward to block
                         robot.nodes.create_timer_node(
-                           (distance - robot.api.constants.end_effector_position_offset.x) /
+                           (distance 
+                            - robot.api.constants.end_effector_position_offset.x 
+                            - robot.api.constants.end_effector_position_pickup_bias
+                           ) /
                               robot.api.parameters.default_speed,
                            function()
                               robot.api.move.with_velocity(robot.api.parameters.default_speed, 
