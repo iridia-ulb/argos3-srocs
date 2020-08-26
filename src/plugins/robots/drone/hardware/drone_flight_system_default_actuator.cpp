@@ -1,5 +1,5 @@
 /**
- * @file <argos3/plugins/robots/drone/simulator/drone_flight_system_default_actuator.cpp>
+ * @file <argos3/plugins/robots/drone/hardware/drone_flight_system_default_actuator.cpp>
  *
  * @author Michael Allwright - <allsey87@gmail.com>
  */
@@ -9,7 +9,7 @@
 #include <argos3/core/utility/logging/argos_log.h>
 
 #include <argos3/plugins/robots/drone/simulator/drone_flight_system_entity.h>
-#include <argos3/plugins/robots/drone/simulator/drone_entity.h>
+#include <argos3/plugins/robots/generic/hardware/robot.h>
 
 namespace argos {
 
@@ -17,7 +17,7 @@ namespace argos {
    /****************************************/
 
    CDroneFlightSystemDefaultActuator::CDroneFlightSystemDefaultActuator() :
-      m_pcFlightSystemEntity(nullptr) {}
+      m_pcMAVLinkConnection(nullptr) {}
 
    /****************************************/
    /****************************************/
@@ -27,9 +27,14 @@ namespace argos {
    /****************************************/
    /****************************************/
 
-   void CDroneFlightSystemDefaultActuator::SetRobot(CComposableEntity& c_entity) {
-      m_pcFlightSystemEntity = 
-         &(c_entity.GetComponent<CDroneFlightSystemEntity>("flight_system"));
+   void CDroneFlightSystemDefaultActuator::SetRobot(CRobot& c_robot) {
+      CDrone* pcDrone = dynamic_cast<CDrone*>(&c_robot);
+      if(pcDrone == nullptr) {
+         THROW_ARGOSEXCEPTION("The drone flight system sensor only works with the drone")
+      }
+      else {
+         m_pcMAVLinkConnection = &pcDrone->GetMAVLinkConnection();
+      }
    }
 
    /****************************************/
@@ -48,8 +53,8 @@ namespace argos {
    /****************************************/
 
    void CDroneFlightSystemDefaultActuator::Update() {
-      m_pcFlightSystemEntity->SetTargetPosition(m_cTargetPosition);
-      m_pcFlightSystemEntity->SetTargetYawAngle(m_fTargetYawAngle);
+      // m_cTargetPosition
+      // m_fTargetYawAngle
    }
 
    /****************************************/
@@ -60,7 +65,7 @@ namespace argos {
                      "Michael Allwright [allsey87@gmail.com]",
                      "1.0",
                      "The drone flight system actuator.",
-                     "This actuator simulates the interface to a PX4 flight controller.",
+                     "This actuator writes data to a PX4 flight controller.",
                      "Usable"
    );
 
