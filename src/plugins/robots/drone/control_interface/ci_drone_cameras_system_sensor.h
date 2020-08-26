@@ -59,20 +59,22 @@ namespace argos {
 
       struct SInterface {
          /* constructor */
-         SInterface(const UInt8& un_label) :
-            Label(un_label),
-            Configuration(SENSOR_CONFIGURATION.at(un_label)),
+         SInterface(const std::string& str_label,
+                    const TConfiguration& t_configuration) :
+            Label(str_label),
+            Configuration(t_configuration),
             Enabled(false) {}
          /* methods */
          virtual void Enable();
          virtual void Disable();
          virtual ELedState DetectLed(const CVector3& c_position) = 0;
          /* configuration data */
-         const UInt8& Label;
+         const std::string& Label;
          const TConfiguration& Configuration;
          /* state */
          bool Enabled;
          STag::TVector Tags;
+         Real Timestamp;
       };
 
    public:
@@ -91,10 +93,6 @@ namespace argos {
 
    protected:
 
-      Real m_fTimestamp;
-
-   protected:
-
       static const UInt32 CAMERA_RESOLUTION_X;
       static const UInt32 CAMERA_RESOLUTION_Y;
       static const Real CAMERA_FOCAL_LENGTH_X;
@@ -104,7 +102,7 @@ namespace argos {
       static const Real CAMERA_XY_OFFSET;
       static const Real CAMERA_Z_OFFSET;
       static const CDegrees CAMERA_ANGLE;
-      static const std::map<UInt8, TConfiguration> SENSOR_CONFIGURATION;
+      static const std::map<std::string, TConfiguration> SENSOR_CONFIGURATION;
 
    };
 

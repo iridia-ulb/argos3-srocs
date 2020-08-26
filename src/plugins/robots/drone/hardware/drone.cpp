@@ -6,6 +6,8 @@
 
 #include "drone.h"
 
+#include <fcntl.h>
+#include <termios.h>
 #include <unistd.h>
 
 #include <chrono>
@@ -25,7 +27,7 @@
 #include <argos3/plugins/robots/generic/hardware/actuator.h>
 
 namespace argos {
-  
+
    /****************************************/
    /****************************************/
 
@@ -41,8 +43,8 @@ namespace argos {
          if(m_pcController == nullptr) {
             THROW_ARGOSEXCEPTION("ERROR: controller \"" << t_controller.Value() << "\" is not a Lua controller");
          }        
-         /* connect to the router to emulate the wifi */
          try {
+            /* connect to the router to emulate robot-to-robot wifi */
             std::string strRouterConfig;
             TConfigurationNode& tEnvironment = GetNode(t_controller, "environment");
             GetNodeAttribute(tEnvironment, "router", strRouterConfig);
@@ -55,6 +57,16 @@ namespace argos {
          }
          catch(CARGoSException& ex) {
             LOGERR << "[WARNING] Could not connect to router" << std::endl;
+         }
+         try {
+            /* open the connection to the MAVLink device */
+            std::string strPixhawkDevice;
+            TConfigurationNode& tEnvironment = GetNode(t_controller, "environment");
+            GetNodeAttribute(tEnvironment, "pixhawk", strPixhawkDevice);
+            m_cMAVLinkConnection.Open(strPixhawkDevice);
+         }
+         catch(CARGoSException& ex) {
+            LOGERR << "[WARNING] Could not connect to Pixhawk" << std::endl;
          }
          /* go through the actuators */
          std::string strImpl;
@@ -183,6 +195,64 @@ namespace argos {
       for(CPhysicalSensor* pc_sensor : m_vecSensors)
          delete pc_sensor;
       LOG << "[INFO] Controller terminated" << std::endl;
+   }
+
+   /****************************************/
+   /****************************************/
+
+   CDrone::CMAVLinkConnection::CMAVLinkConnection() :
+      m_nFileDescriptor(-1) {}
+
+   void CDrone::CMAVLinkConnection::Open(const std::string& str_device) {
+      try {
+         m_nFileDescriptor = 
+            ::open(str_device.c_str(), O_RDWR | O_NOCTTY | O_NDELAY);
+         if (m_nFileDescriptor < 0)
+            THROW_ARGOSEXCEPTION("Could not open " << str_device);
+         ::fcntl(m_nFileDescriptor, F_SETFL, 0);
+         if(!::isatty(m_nFileDescriptor)) {
+            THROW_ARGOSEXCEPTION(str_device << " is not a serial port");
+         }
+         struct termios sPortConfiguration;
+         if(::tcgetattr(m_nFileDescriptor, &sPortConfiguration) < 0) {
+            THROW_ARGOSEXCEPTION("Could not read port configuration");
+         }
+         sPortConfiguration.c_iflag &= ~(IGNBRK | BRKINT | ICRNL | INLCR | PARMRK | INPCK | ISTRIP | IXON);
+         sPortConfiguration.c_oflag &= ~(OCRNL | ONLCR | ONLRET | ONOCR | OFILL | OPOST);
+#ifdef OLCUC
+         sPortConfiguration.c_oflag &= ~OLCUC;
+#endif
+#ifdef ONOEOT
+         sPortConfiguration.c_oflag &= ~ONOEOT;
+#endif
+         sPortConfiguration.c_lflag &= ~(ECHO | ECHONL | ICANON | IEXTEN | ISIG);
+         sPortConfiguration.c_cflag &= ~(CSIZE | PARENB);
+         sPortConfiguration.c_cflag |= CS8;
+         /* always return immediately regardless of whether a character was available or not */
+         sPortConfiguration.c_cc[VMIN]  = 0;
+         sPortConfiguration.c_cc[VTIME] = 0;
+         /* apply baudrate */
+         if (::cfsetispeed(&sPortConfiguration, B115200) < 0 || ::cfsetospeed(&sPortConfiguration, B115200) < 0) {
+            THROW_ARGOSEXCEPTION("Could not set baudrate to 115200");
+         }
+         if(::tcsetattr(m_nFileDescriptor, TCSAFLUSH, &sPortConfiguration) < 0) {
+            THROW_ARGOSEXCEPTION("Could not write port configuration");
+         }
+      }
+      catch(CARGoSException &ex) {
+         THROW_ARGOSEXCEPTION_NESTED("Could not open the MAVLink channel", ex);
+      }
+   }
+
+   void CDrone::CMAVLinkConnection::Close() {
+      if(m_nFileDescriptor != -1) {
+         ::close(m_nFileDescriptor);
+         m_nFileDescriptor = -1;
+      }
+   }
+
+   int CDrone::CMAVLinkConnection::GetFileDescriptor() {
+      return m_nFileDescriptor;
    }
 
    /****************************************/

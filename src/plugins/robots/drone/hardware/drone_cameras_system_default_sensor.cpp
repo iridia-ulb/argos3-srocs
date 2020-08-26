@@ -32,17 +32,7 @@
 #include <algorithm>
 #include <execution>
 
-// TODO remove these and require them to be
-// provided by the calibration data??
-#define DEFAULT_FOCAL_LENGTH_X 315.0f
-#define DEFAULT_FOCAL_LENGTH_Y 315.0f
-#define DEFAULT_PRINCIPAL_POINT_X 160.0f
-#define DEFAULT_PRINCIPAL_POINT_Y 120.0f
-
 #define IMAGE_BYTES_PER_PIXEL 2u
-#define IMAGE_WIDTH 800u
-#define IMAGE_HEIGHT 600u
-
 #define TAG_SIDE_LENGTH 0.0235f
 
 #define DETECT_LED_WIDTH 6u
@@ -61,32 +51,113 @@
 
 namespace argos {
 
-   CDroneCamerasSystemDefaultSensor::CDroneCamera::SCalibration::SCalibration(TConfigurationNode& t_calibration) {
-      CVector2 cFocalLength;
-      CVector2 cPrincipalPoint;
-      /* parse the calibration data */
+   /****************************************/
+   /****************************************/
+   
+   CDroneCamerasSystemDefaultSensor::CDroneCamerasSystemDefaultSensor() {}
+
+   /****************************************/
+   /****************************************/
+
+   CDroneCamerasSystemDefaultSensor::~CDroneCamerasSystemDefaultSensor() {}
+   
+   /****************************************/
+   /****************************************/
+
+   void CDroneCamerasSystemDefaultSensor::Init(TConfigurationNode& t_tree) {
+      /* expect four cameras */
+      m_vecPhysicalInterfaces.reserve(SENSOR_CONFIGURATION.size());
       try {
-         GetNodeAttribute(t_calibration, "focal_length", cFocalLength);
-         GetNodeAttribute(t_calibration, "principal_point", cPrincipalPoint);
-         GetNodeAttribute(t_calibration, "position_error", PositionError);
-         GetNodeAttribute(t_calibration, "orientation_error", OrientationError);
-         /* set the camera matrix */
-         CameraMatrix.SetIdentityMatrix();
-         CameraMatrix(0,0) = cFocalLength.GetX();
-         CameraMatrix(1,1) = cFocalLength.GetY();
-         CameraMatrix(0,2) = cPrincipalPoint.GetX();
-         CameraMatrix(1,2) = cPrincipalPoint.GetY();
+         CCI_DroneCamerasSystemSensor::Init(t_tree);
+         TConfigurationNodeIterator itInterface("camera");
+         for(itInterface = itInterface.begin(&t_tree);
+             itInterface != itInterface.end();
+             ++itInterface) {
+            std::string strId;
+            GetNodeAttribute(*itInterface, "id", strId);
+            std::map<std::string, TConfiguration>::const_iterator itConfig =
+               SENSOR_CONFIGURATION.find(strId);
+            if(itConfig == std::end(SENSOR_CONFIGURATION)) {
+               THROW_ARGOSEXCEPTION("No configuration found for interface with id \"" << strId << "\"")
+            }
+            else {
+               m_vecPhysicalInterfaces.emplace_back(itConfig->first,
+                                                    itConfig->second,
+                                                    *itInterface);
+            }
+         }
+         for(SPhysicalInterface& s_physical_interface : m_vecPhysicalInterfaces) {
+            /* open the device */
+            s_physical_interface.Open();
+         }
       }
       catch(CARGoSException& ex) {
-         LOGERR << "[WARNING] Failed to parse calibration data" << std::endl; 
+         THROW_ARGOSEXCEPTION_NESTED("Error initializing camera sensor", ex);
       }
    }
 
    /****************************************/
    /****************************************/
 
-   CDroneCamerasSystemDefaultSensor::CDroneCamera::CDroneCamera(TConfigurationNode& t_calibration) :
-      m_sCalibration(t_calibration) {
+   void CDroneCamerasSystemDefaultSensor::Destroy() {
+      for(SPhysicalInterface& s_physical_interface : m_vecPhysicalInterfaces) {
+            s_physical_interface.Close();
+      }
+   }
+
+   /****************************************/
+   /****************************************/
+
+   void CDroneCamerasSystemDefaultSensor::Update() {
+      /* update the cameras in parallel */
+      std::for_each(std::execution::par,
+                    std::begin(m_vecPhysicalInterfaces),
+                    std::end(m_vecPhysicalInterfaces),
+                    [] (SPhysicalInterface& s_physical_interface) {
+         s_physical_interface.Update();
+      });
+   }
+
+   /****************************************/
+   /****************************************/
+
+   void CDroneCamerasSystemDefaultSensor::ForEachInterface(std::function<void(SInterface&)> fn) {
+      for(SPhysicalInterface& s_interface : m_vecPhysicalInterfaces) {
+         fn(s_interface);
+      }
+   }
+
+   /****************************************/
+   /****************************************/
+
+   CDroneCamerasSystemDefaultSensor::SPhysicalInterface::
+      SPhysicalInterface(const std::string& str_label,
+                         const TConfiguration& t_configuration,
+                         TConfigurationNode& t_interface):
+      SInterface(str_label, t_configuration) {
+      /* parse calibration data if provided */
+      CVector2 cFocalLength;
+      CVector2 cPrincipalPoint;
+      try {
+         TConfigurationNode& t_calibration = GetNode(t_interface, "calibration");
+         GetNodeAttribute(t_calibration, "focal_length", cFocalLength);
+         GetNodeAttribute(t_calibration, "principal_point", cPrincipalPoint);
+         GetNodeAttribute(t_calibration, "position_error", m_sCalibration.PositionError);
+         GetNodeAttribute(t_calibration, "orientation_error", m_sCalibration.OrientationError);
+      }
+      catch(CARGoSException& ex) {
+         LOGERR << "[WARNING] Failed to parse calibration (using default calibration)." << std::endl;
+         cFocalLength.Set(CAMERA_PRINCIPAL_POINT_X, CAMERA_PRINCIPAL_POINT_Y);
+         cPrincipalPoint.Set(CAMERA_FOCAL_LENGTH_X, CAMERA_FOCAL_LENGTH_Y);
+         m_sCalibration.PositionError = CVector3();
+         m_sCalibration.OrientationError = CQuaternion();
+      }
+      CSquareMatrix<3>& cCameraMatrix = m_sCalibration.CameraMatrix;
+      cCameraMatrix.SetIdentityMatrix();
+      cCameraMatrix(0,0) = cFocalLength.GetX();
+      cCameraMatrix(1,1) = cFocalLength.GetY();
+      cCameraMatrix(0,2) = cPrincipalPoint.GetX();
+      cCameraMatrix(1,2) = cPrincipalPoint.GetY();
       /* initialize the apriltag components */
       m_ptTagFamily = ::tag36h11_create();
       /* create the tag detector */
@@ -98,46 +169,46 @@ namespace argos {
       m_ptTagDetector->quad_sigma = 0.0f;
       m_ptTagDetector->refine_edges = 1;
       m_ptTagDetector->decode_sharpening = 0.25;
-      int nThreads;
-      GetNodeAttribute(t_calibration, "threads", nThreads);
-      m_ptTagDetector->nthreads = nThreads;
-      // BEGIN TEST CODE
+      m_ptTagDetector->nthreads = 1;
+      GetNodeAttribute(t_interface, "device", m_strDevice);
       std::string strCaptureResolution;
       std::string strProcessingResolution;
-      std::string strProcessingOffset;
-      GetNodeAttribute(t_calibration, "capture_resolution", strCaptureResolution);
-      GetNodeAttribute(t_calibration, "processing_resolution", strProcessingResolution);
-      GetNodeAttribute(t_calibration, "processing_offset", strProcessingOffset);
+      std::string strProcessingOffset;     
+      GetNodeAttribute(t_interface, "capture_resolution", strCaptureResolution);
+      GetNodeAttribute(t_interface, "processing_resolution", strProcessingResolution);
+      GetNodeAttribute(t_interface, "processing_offset", strProcessingOffset);
       ParseValues<UInt32>(strCaptureResolution, 2, m_arrCaptureResolution.data(), ',');
       ParseValues<UInt32>(strProcessingResolution, 2, m_arrProcessingResolution.data(), ',');
       ParseValues<UInt32>(strProcessingOffset, 2, m_arrProcessingOffset.data(), ',');
-      LOG << "[INFO] Camera system using " << nThreads
-          << " threads: processing "
-          << static_cast<int>(m_arrProcessingResolution[0])
-          << "x"
-          << static_cast<int>(m_arrProcessingResolution[1])
-          << " from "
+      LOG << "[INFO] Added camera sensor: capture resolution = "
           << static_cast<int>(m_arrCaptureResolution[0])
           << "x"
           << static_cast<int>(m_arrCaptureResolution[1])
+          << ", processing resolution = "
+          << static_cast<int>(m_arrProcessingResolution[0])
+          << "x"
+          << static_cast<int>(m_arrProcessingResolution[1])
+          << " [+"
+          << static_cast<int>(m_arrProcessingOffset[0])
+          << ",+"
+          << static_cast<int>(m_arrProcessingOffset[1])
+          << "]"
           << std::endl;
-
-      // END TEST CODE
       /* allocate image memory */
       m_ptImage =
          ::image_u8_create_alignment(m_arrProcessingResolution[0], m_arrProcessingResolution[1], 96);
       /* update the tag detection info structure */
-      m_tTagDetectionInfo.fx = 315; // m_sCalibration.CameraMatrix(0,0);
-      m_tTagDetectionInfo.fy = 315; // m_sCalibration.CameraMatrix(1,1);
-      m_tTagDetectionInfo.cx = m_arrProcessingResolution[0] / 2; //m_sCalibration.CameraMatrix(0,2);
-      m_tTagDetectionInfo.cy = m_arrProcessingResolution[1] / 2; //m_sCalibration.CameraMatrix(1,2);
+      m_tTagDetectionInfo.fx = m_sCalibration.CameraMatrix(0,0);
+      m_tTagDetectionInfo.fy = m_sCalibration.CameraMatrix(1,1);
+      m_tTagDetectionInfo.cx = m_sCalibration.CameraMatrix(0,2);
+      m_tTagDetectionInfo.cy = m_sCalibration.CameraMatrix(1,2);
       m_tTagDetectionInfo.tagsize = TAG_SIDE_LENGTH;
    }
 
    /****************************************/
    /****************************************/
 
-   CDroneCamerasSystemDefaultSensor::CDroneCamera::~CDroneCamera() {
+   CDroneCamerasSystemDefaultSensor::SPhysicalInterface::~SPhysicalInterface() {
       /* deallocate image memory */
       ::image_u8_destroy(m_ptImage);
       /* uninitialize the apriltag components */
@@ -151,12 +222,12 @@ namespace argos {
    /****************************************/
    /****************************************/
 
-   void CDroneCamerasSystemDefaultSensor::CDroneCamera::Open(const std::string& str_device) {
-      if ((m_nCameraHandle = ::open(str_device.c_str(), O_RDWR, 0)) < 0)
-         THROW_ARGOSEXCEPTION("Could not open " << str_device);
+   void CDroneCamerasSystemDefaultSensor::SPhysicalInterface::Open() {
+      if ((m_nCameraHandle = ::open(m_strDevice.c_str(), O_RDWR, 0)) < 0)
+         THROW_ARGOSEXCEPTION("Could not open " << m_strDevice);
       int nInput = 0;
       if (::ioctl(m_nCameraHandle, VIDIOC_S_INPUT, &nInput) < 0)
-         THROW_ARGOSEXCEPTION("Could not set " << str_device << " as an input");
+         THROW_ARGOSEXCEPTION("Could not set " << m_strDevice << " as an input");
       /* set camera format*/
       v4l2_format sFormat;
       sFormat.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
@@ -213,8 +284,8 @@ namespace argos {
    /****************************************/
    /****************************************/
 
-   void CDroneCamerasSystemDefaultSensor::CDroneCamera::Enable() {
-      if(m_bEnabled == false) {
+   void CDroneCamerasSystemDefaultSensor::SPhysicalInterface::Enable() {
+      if(Enabled == false) {
          /* enqueue the first buffer */
          ::v4l2_buffer sBuffer;
          ::memset(&sBuffer, 0, sizeof(::v4l2_buffer));
@@ -225,17 +296,17 @@ namespace argos {
             THROW_ARGOSEXCEPTION("Could not enqueue used buffer");
          }
          /* call base class method */
-         CCI_DroneCamera::Enable();
+         SInterface::Enable();
       }
    }
 
    /****************************************/
    /****************************************/
 
-   void CDroneCamerasSystemDefaultSensor::CDroneCamera::Disable() {
-      if(m_bEnabled == true) {
+   void CDroneCamerasSystemDefaultSensor::SPhysicalInterface::Disable() {
+      if(Enabled == true) {
          /* call base class method */
-         CCI_DroneCamera::Disable();
+         SInterface::Disable();
          /* dequeue the next buffer */
          ::v4l2_buffer sBuffer;
          memset(&sBuffer, 0, sizeof(v4l2_buffer));
@@ -251,7 +322,7 @@ namespace argos {
    /****************************************/
    /****************************************/
 
-   void CDroneCamerasSystemDefaultSensor::CDroneCamera::Close() {
+   void CDroneCamerasSystemDefaultSensor::SPhysicalInterface::Close() {
       /* disable the sensor */
       Disable();
       /* stop the stream */
@@ -265,77 +336,12 @@ namespace argos {
 
    /****************************************/
    /****************************************/
-   
-   CDroneCamerasSystemDefaultSensor::CDroneCamerasSystemDefaultSensor() {}
 
-   /****************************************/
-   /****************************************/
-
-   CDroneCamerasSystemDefaultSensor::~CDroneCamerasSystemDefaultSensor() {}
-   
-   /****************************************/
-   /****************************************/
-
-   void CDroneCamerasSystemDefaultSensor::Init(TConfigurationNode& t_tree) {
-      try {
-         CCI_DroneCamerasSystemSensor::Init(t_tree);
-         
-         m_vecCameras.reserve(4);
-
-
-         m_vecCameras.push_back(new CDroneCamera(t_tree));
-         m_vecCameras.push_back(new CDroneCamera(t_tree));
-         m_vecCameras.push_back(new CDroneCamera(t_tree));
-         m_vecCameras.push_back(new CDroneCamera(t_tree));
-
-         m_vecCameras[0]->Open("/dev/video6");
-         m_vecCameras[1]->Open("/dev/video7");
-         m_vecCameras[2]->Open("/dev/video8");
-         m_vecCameras[3]->Open("/dev/video9");
-
-         for(CDroneCamera* pc_camera : m_vecCameras) {
-            pc_camera->Enable();
-            m_vecCameraInterfaces.push_back(pc_camera);
-         }
-      }
-      catch(CARGoSException& ex) {
-         THROW_ARGOSEXCEPTION_NESTED("Error initializing camera sensor", ex);
-      }
-   }
-
-   /****************************************/
-   /****************************************/
-
-   void CDroneCamerasSystemDefaultSensor::Destroy() {
-      for(CDroneCamera* pc_camera : m_vecCameras) {
-            pc_camera->Close();
-      }
-   }
-
-   /****************************************/
-   /****************************************/
-
-   void CDroneCamerasSystemDefaultSensor::Update() {
-      /* update the timestamp in the control interface */
-      using namespace std::chrono;
-      m_fTimestamp = duration_cast<duration<Real> >(steady_clock::now() - m_tpInit).count();
-      /* update the cameras in parallel */
-      std::for_each(std::execution::par,
-                    std::begin(m_vecCameras),
-                    std::end(m_vecCameras),
-                    [] (CDroneCamera* pc_camera) {
-         pc_camera->Update();
-      });
-   }
-
-   /****************************************/
-   /****************************************/
-
-   void CDroneCamerasSystemDefaultSensor::CDroneCamera::Update() {
+   void CDroneCamerasSystemDefaultSensor::SPhysicalInterface::Update() {
       /* clear out previous readings */
-      m_vecTags.clear();
+      Tags.clear();
       /* if enabled, process the next buffer */
-      if(m_bEnabled == true) {
+      if(Enabled == true) {
          try {
             /* update the buffer iterators */
             m_itCurrentBuffer = m_itNextBuffer;
@@ -352,6 +358,8 @@ namespace argos {
             if(::ioctl(m_nCameraHandle, VIDIOC_DQBUF, &sBuffer) < 0) {
                THROW_ARGOSEXCEPTION("Could not dequeue buffer");
             }
+            /* update the timestamp in the control interface */
+            Timestamp = sBuffer.timestamp.tv_sec + (10e-6 * sBuffer.timestamp.tv_usec);
             /* get a pointer to the image data */
             uint8_t* punImageData = static_cast<uint8_t*>(m_itCurrentBuffer->second);
             /* create the gray scale image based on the luminance data */
@@ -391,7 +399,7 @@ namespace argos {
             /* get the detected tags count */
             size_t unTagCount = static_cast<size_t>(::zarray_size(ptDetectionArray));
             /* reserve space for the tags */
-            m_vecTags.reserve(unTagCount);
+            Tags.reserve(unTagCount);
             /* copy detection data to the control interface */
             for(size_t un_index = 0; un_index < unTagCount; un_index++) {
                ::apriltag_detection_t *ptDetection;
@@ -410,7 +418,7 @@ namespace argos {
                CRotationMatrix3 cTagOrientation(tPose.R->data);
                CVector3 cTagPosition(tPose.t->data[0], tPose.t->data[1], tPose.t->data[2]);
                 /* copy readings */
-               m_vecTags.emplace_back(ptDetection->id, cTagPosition, cTagOrientation, cCenterPixel, arrCornerPixels);
+               Tags.emplace_back(ptDetection->id, cTagPosition, cTagOrientation, cCenterPixel, arrCornerPixels);
             }
             /* destroy the readings array */
             ::apriltag_detections_destroy(ptDetectionArray);
@@ -433,7 +441,7 @@ namespace argos {
    /****************************************/
 
    CDroneCamerasSystemDefaultSensor::ELedState
-      CDroneCamerasSystemDefaultSensor::CDroneCamera::DetectLed(const CVector3& c_position) {
+      CDroneCamerasSystemDefaultSensor::SPhysicalInterface::DetectLed(const CVector3& c_position) {
       /* project the LED position onto the sensor array */
       CMatrix<3,1> cLedPosition;
       cLedPosition(0) = c_position.GetX();
@@ -444,8 +452,8 @@ namespace argos {
                        cProjection(1,0) / cProjection(2,0));
       CVector2 cSize(DETECT_LED_WIDTH, DETECT_LED_HEIGHT);
       /* declare ranges for truncation */
-      static const CRange<Real> m_cColumnRange(0.0f, IMAGE_WIDTH - 1.0f);
-      static const CRange<Real> m_cRowRange(0.0f, IMAGE_HEIGHT - 1.0f);
+      static const CRange<Real> m_cColumnRange(0.0f, m_arrProcessingResolution[0] - 1.0f);
+      static const CRange<Real> m_cRowRange(0.0f, m_arrProcessingResolution[1] - 1.0f);
       /* calculate the corners of the region of interest */
       CVector2 cMinCorner(cCenter - 0.5f * cSize);
       CVector2 cMaxCorner(cCenter + 0.5f * cSize);
@@ -482,7 +490,7 @@ namespace argos {
       UInt8* punImageData = static_cast<UInt8*>(m_itCurrentBuffer->second);
       /* extract the data */    
       for(UInt32 un_row = unRowStart; un_row < unRowEnd; un_row += 1) {
-         UInt32 unRowIndex = un_row * IMAGE_WIDTH * IMAGE_BYTES_PER_PIXEL;
+         UInt32 unRowIndex = un_row * m_arrProcessingResolution[0] * IMAGE_BYTES_PER_PIXEL;
          for(UInt32 un_column = unColumnStart * IMAGE_BYTES_PER_PIXEL;
              un_column < unColumnEnd * IMAGE_BYTES_PER_PIXEL;
              un_column += (2 * IMAGE_BYTES_PER_PIXEL)) {

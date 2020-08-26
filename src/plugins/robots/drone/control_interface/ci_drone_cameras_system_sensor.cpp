@@ -73,7 +73,7 @@ namespace argos {
       /* check parameters */
       if(lua_gettop(pt_lua_state) != 1) {
          std::string strErrorMessage("robot.cameras_system[");
-         strErrorMessage += std::to_string(static_cast<int>(ps_interface->Label));
+         strErrorMessage += ps_interface->Label;
          strErrorMessage += "].detect_led() expects a single argument";
          return luaL_error(pt_lua_state, strErrorMessage.c_str());
       }
@@ -94,7 +94,6 @@ namespace argos {
 #ifdef ARGOS_WITH_LUA
    void CCI_DroneCamerasSystemSensor::CreateLuaState(lua_State* pt_lua_state) {
       CLuaUtility::OpenRobotStateTable(pt_lua_state, "cameras_system");
-      CLuaUtility::AddToTable(pt_lua_state, "timestamp", 0.0f);
       ForEachInterface([pt_lua_state] (SInterface& s_interface) {
          /* create a table for the camera */
          CLuaUtility::StartTable(pt_lua_state, s_interface.Label);
@@ -119,6 +118,8 @@ namespace argos {
          lua_pushlightuserdata(pt_lua_state, &s_interface);
          lua_pushcclosure(pt_lua_state, &LuaDroneCamerasSystemSensorDetectLed, 1);
          lua_settable(pt_lua_state, -3);
+         /* add a zero value for the current timestamp */
+         CLuaUtility::AddToTable(pt_lua_state, "timestamp", 0.0f);
          /* add an empty table for the detected tags */
          CLuaUtility::StartTable(pt_lua_state, "tags");
          CLuaUtility::EndTable(pt_lua_state);
@@ -135,11 +136,13 @@ namespace argos {
 #ifdef ARGOS_WITH_LUA
    void CCI_DroneCamerasSystemSensor::ReadingsToLuaState(lua_State* pt_lua_state) {
       lua_getfield(pt_lua_state, -1, "cameras_system");
-      CLuaUtility::AddToTable(pt_lua_state, "timestamp", m_fTimestamp);
       ForEachInterface([pt_lua_state] (SInterface& s_interface) {
          /* update the table for the camera */
-         lua_pushnumber(pt_lua_state, s_interface.Label);
+         lua_pushstring(pt_lua_state, s_interface.Label.c_str());
          lua_gettable(pt_lua_state, -2);
+         /* update the timestamp */
+         CLuaUtility::AddToTable(pt_lua_state, "timestamp", s_interface.Timestamp);
+         /* update the tag readings */
          lua_getfield(pt_lua_state, -1, "tags");
          /* get the tag count from last time */
          size_t unLastTagCount = lua_rawlen(pt_lua_state, -1);     
@@ -192,21 +195,26 @@ namespace argos {
    /****************************************/
 
    /* sensor configuration map */
-   const std::map<UInt8, CCI_DroneCamerasSystemSensor::TConfiguration> CCI_DroneCamerasSystemSensor::SENSOR_CONFIGURATION = {
-      std::make_pair(1, std::make_tuple("origin",
-                                        CVector3( CAMERA_XY_OFFSET,  CAMERA_XY_OFFSET, CAMERA_Z_OFFSET),
-                                        CQuaternion(ToRadians(CAMERA_ANGLE), CVector3(-1,1,0).Normalize())
-                                          * CQuaternion(CRadians::PI, CVector3::Z))),
-      std::make_pair(2, std::make_tuple("origin",
-                                        CVector3(-CAMERA_XY_OFFSET,  CAMERA_XY_OFFSET, CAMERA_Z_OFFSET),
-                                        CQuaternion(ToRadians(CAMERA_ANGLE), CVector3(-1,-1,0).Normalize()))),
-      std::make_pair(3, std::make_tuple("origin",
-                                        CVector3(-CAMERA_XY_OFFSET, -CAMERA_XY_OFFSET, CAMERA_Z_OFFSET),
-                                        CQuaternion(ToRadians(CAMERA_ANGLE), CVector3(1,-1,0).Normalize())
-                                          * CQuaternion(CRadians::PI, CVector3::Z))),
-      std::make_pair(4, std::make_tuple("origin",
-                                        CVector3( CAMERA_XY_OFFSET, -CAMERA_XY_OFFSET, CAMERA_Z_OFFSET),
-                                        CQuaternion(ToRadians(CAMERA_ANGLE), CVector3(1,1,0).Normalize()))),
+   const std::map<std::string, CCI_DroneCamerasSystemSensor::TConfiguration>
+      CCI_DroneCamerasSystemSensor::SENSOR_CONFIGURATION = {
+      std::make_pair("arm0",
+                     std::make_tuple("origin",
+                                     CVector3( CAMERA_XY_OFFSET,  CAMERA_XY_OFFSET, CAMERA_Z_OFFSET),
+                                     CQuaternion(ToRadians(CAMERA_ANGLE), CVector3(-1,1,0).Normalize())
+                                        * CQuaternion(CRadians::PI, CVector3::Z))),
+      std::make_pair("arm1",
+                     std::make_tuple("origin",
+                                     CVector3(-CAMERA_XY_OFFSET,  CAMERA_XY_OFFSET, CAMERA_Z_OFFSET),
+                                     CQuaternion(ToRadians(CAMERA_ANGLE), CVector3(-1,-1,0).Normalize()))),
+      std::make_pair("arm2",
+                     std::make_tuple("origin",
+                                     CVector3(-CAMERA_XY_OFFSET, -CAMERA_XY_OFFSET, CAMERA_Z_OFFSET),
+                                     CQuaternion(ToRadians(CAMERA_ANGLE), CVector3(1,-1,0).Normalize())
+                                        * CQuaternion(CRadians::PI, CVector3::Z))),
+      std::make_pair("arm3",
+                     std::make_tuple("origin",
+                                     CVector3( CAMERA_XY_OFFSET, -CAMERA_XY_OFFSET, CAMERA_Z_OFFSET),
+                                     CQuaternion(ToRadians(CAMERA_ANGLE), CVector3(1,1,0).Normalize()))),
    };
 
    /****************************************/

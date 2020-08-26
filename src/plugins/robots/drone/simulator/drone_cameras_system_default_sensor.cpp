@@ -47,7 +47,7 @@ namespace argos {
          /* allocate memory for the sensor interfaces */
          m_vecSimulatedInterfaces.reserve(SENSOR_CONFIGURATION.size());
          /* get the anchors for the sensor interfaces from m_mapSensorConfig */
-         for(const std::pair<const UInt8, TConfiguration>& t_config : SENSOR_CONFIGURATION) {
+         for(const std::pair<const std::string, TConfiguration>& t_config : SENSOR_CONFIGURATION) {
             const char* pchAnchor = std::get<const char*>(t_config.second);
             SAnchor& sAnchor =
                c_entity.GetComponent<CEmbodiedEntity>("body").GetAnchor(pchAnchor);
@@ -118,10 +118,11 @@ namespace argos {
    /****************************************/
    /****************************************/
 
-   CDroneCamerasSystemDefaultSensor::SSimulatedInterface::SSimulatedInterface(const UInt8& un_label,
-                                                                              const SAnchor& s_anchor,
-                                                                              CDroneCamerasSystemDefaultSensor& c_parent) :
-      SInterface(un_label),
+   CDroneCamerasSystemDefaultSensor::
+      SSimulatedInterface::SSimulatedInterface(const std::string& str_label,
+                                               const SAnchor& s_anchor,
+                                               CDroneCamerasSystemDefaultSensor& c_parent) :
+      SInterface(str_label),
       Anchor(s_anchor),
       m_cParent(c_parent) {
       /* set up the project matrix */
@@ -145,7 +146,8 @@ namespace argos {
    /****************************************/
    /****************************************/
 
-   void CDroneCamerasSystemDefaultSensor::SSimulatedInterface::Reset() {
+   void CDroneCamerasSystemDefaultSensor::
+      SSimulatedInterface::Reset() {
       Tags.clear();
       m_vecLedCache.clear();
    }
@@ -153,7 +155,8 @@ namespace argos {
    /****************************************/
    /****************************************/
 
-   void CDroneCamerasSystemDefaultSensor::SSimulatedInterface::Update() {
+   void CDroneCamerasSystemDefaultSensor::
+      SSimulatedInterface::Update() {
       /* clear out the readings from the last update */
       Tags.clear();
       m_vecLedCache.clear();
@@ -258,7 +261,8 @@ namespace argos {
    /****************************************/
    /****************************************/
 
-   bool CDroneCamerasSystemDefaultSensor::SSimulatedInterface::operator()(CTagEntity& c_tag) {
+   bool CDroneCamerasSystemDefaultSensor::
+      SSimulatedInterface::operator()(CTagEntity& c_tag) {
       if(GetAngleWithCamera(c_tag) > c_tag.GetObservableAngle()) {
          return true;
       }
@@ -333,7 +337,8 @@ namespace argos {
    /****************************************/
    /****************************************/
 
-   bool CDroneCamerasSystemDefaultSensor::SSimulatedInterface::operator()(CDirectionalLEDEntity& c_led) {
+   bool CDroneCamerasSystemDefaultSensor::
+      SSimulatedInterface::operator()(CDirectionalLEDEntity& c_led) {
       if(c_led.GetColor() == CColor::BLACK) {
          return true;
       }
@@ -424,7 +429,8 @@ namespace argos {
    /****************************************/
    /****************************************/
 
-   CRadians CDroneCamerasSystemDefaultSensor::SSimulatedInterface::GetAngleWithCamera(const CPositionalEntity& c_entity) const {
+   CRadians CDroneCamerasSystemDefaultSensor::
+      SSimulatedInterface::GetAngleWithCamera(const CPositionalEntity& c_entity) const {
       CVector3 cEntityToCamera(m_cCameraPosition - c_entity.GetPosition());
       CVector3 cEntityDirection(CVector3::Z);
       cEntityDirection.Rotate(c_entity.GetOrientation());
@@ -435,7 +441,8 @@ namespace argos {
    /****************************************/
    /****************************************/
 
-   CVector2 CDroneCamerasSystemDefaultSensor::SSimulatedInterface::ProjectOntoSensor(const CVector3& c_point) const {
+   CVector2 CDroneCamerasSystemDefaultSensor::
+      SSimulatedInterface::ProjectOntoSensor(const CVector3& c_point) const {
       CVector3 cCameraToEntityTranslation(m_cCameraToWorldTransform * c_point);
       /* this could be avoided if CVector3 inherited from CMatrix<3,1> */
       CMatrix<3,1> cCameraToEntityTranslationMatrix;
@@ -453,7 +460,8 @@ namespace argos {
    /****************************************/
    /****************************************/
 
-   bool CDroneCamerasSystemDefaultSensor::SSimulatedInterface::IsInsideFrustum(const CVector3& c_point) const {
+   bool CDroneCamerasSystemDefaultSensor::
+      SSimulatedInterface::IsInsideFrustum(const CVector3& c_point) const {
       for(const CPlane& c_plane : m_arrFrustumPlanes) {
          if(c_plane.GetNormal().DotProduct(c_point - c_plane.GetPosition()) < 0.0) {
             return false;

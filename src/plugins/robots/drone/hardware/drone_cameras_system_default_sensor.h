@@ -48,18 +48,24 @@ namespace argos {
 
       virtual void Update();
 
+      virtual void ForEachInterface(std::function<void(SInterface&)>);
+
    private:
 
-      class CDroneCamera : public CCI_DroneCamera {
+      class SPhysicalInterface : public SInterface {
       public:
-         CDroneCamera(TConfigurationNode& t_calibration);
-         ~CDroneCamera();
+         SPhysicalInterface(const std::string& str_label,
+                            const TConfiguration& t_configuration,
+                            TConfigurationNode& t_interface);
+         ~SPhysicalInterface();
 
-         void Open(const std::string& str_device);
+         void Open();
+
          void Close();
 
-         virtual void Enable();
-         virtual void Disable();
+         virtual void Enable() override;
+
+         virtual void Disable() override;
 
          virtual void Update();
 
@@ -68,9 +74,6 @@ namespace argos {
       private:
          /* calibration data */
          struct SCalibration {
-            /* constructor */
-            SCalibration(TConfigurationNode& t_calibration);
-            /* members */
             CVector3 PositionError;
             CQuaternion OrientationError;
             CSquareMatrix<3> CameraMatrix;
@@ -85,6 +88,7 @@ namespace argos {
          ::apriltag_detector* m_ptTagDetector;
          ::apriltag_detection_info_t m_tTagDetectionInfo;
          /* camera device handle */
+         std::string m_strDevice;
          int m_nCameraHandle;
          /* buffers for capture */
          std::array<std::pair<UInt32, void*>, 2> m_arrBuffers;
@@ -97,8 +101,8 @@ namespace argos {
       /* time at initialization */
       std::chrono::steady_clock::time_point m_tpInit;
 
-      /* vector of cameras */
-      std::vector<CDroneCamera*> m_vecCameras;
+      /* vector of interfaces */
+      std::vector<SPhysicalInterface> m_vecPhysicalInterfaces;
 
       /****************************************/
       /****************************************/

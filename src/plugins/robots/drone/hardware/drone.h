@@ -24,6 +24,18 @@ namespace argos {
 
    public:
 
+      class CMAVLinkConnection {
+      public:
+         CMAVLinkConnection();
+         void Open(const std::string& str_device);
+         void Close();
+         int GetFileDescriptor();
+      private:
+         int m_nFileDescriptor;
+      };
+
+   public:
+
       static CDrone& GetInstance() {
          static CDrone cDrone;
          return cDrone;
@@ -44,6 +56,12 @@ namespace argos {
 
       UInt32 GetTicksPerSec() {
          return m_unTicksPerSec;
+      }
+
+      class CMAVLinkConnection;
+
+      CMAVLinkConnection& GetMAVLinkConnection() {
+         return m_cMAVLinkConnection;
       }
 
    private:
@@ -76,6 +94,9 @@ namespace argos {
 
       /* the vector of sensors */
       std::vector<CPhysicalSensor*> m_vecSensors;
+
+      CMAVLinkConnection m_cMAVLinkConnection;
+
    };
 
 }
