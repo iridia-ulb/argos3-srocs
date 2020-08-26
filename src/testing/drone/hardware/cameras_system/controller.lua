@@ -1,6 +1,6 @@
 --[[ This function is executed every time you press the 'execute' button ]]
 function init()
-   for i, camera in ipairs(robot.cameras_system) do    
+   for id, camera in pairs(robot.cameras_system) do    
       camera.enable()
    end
 end
@@ -14,8 +14,8 @@ function step()
       str = str .. tostring(temp) .. " "
    end
    print(str)
-   for i, camera in ipairs(robot.cameras_system) do 
-      print("camera " .. i)
+   for id, camera in pairs(robot.cameras_system) do 
+      print("camera " .. id .. ", timestamp = " .. camera.timestamp)
       for j, tag in ipairs(camera.tags) do
          print("  tag " .. j .. ": " .. tostring(tag.center))
       end
