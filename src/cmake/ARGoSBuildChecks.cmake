@@ -59,7 +59,7 @@ endif(ARGOS_BUILD_FOR STREQUAL "builderbot" OR ARGOS_BUILD_FOR STREQUAL "drone")
 
 #
 # Check for Analog Device's IIO library
-# It is required only when compiling for the hardware
+# It is required only when compiling for the builderbot hardware
 #
 if(ARGOS_BUILD_FOR STREQUAL "builderbot")
   find_package(IIO)
@@ -68,6 +68,19 @@ if(ARGOS_BUILD_FOR STREQUAL "builderbot")
   endif(NOT IIO_FOUND)
   include_directories(${IIO_INCLUDE_DIR})
 endif(ARGOS_BUILD_FOR STREQUAL "builderbot")
+
+#
+# Check for the MAVLink library
+# It is required only when compiling for the drone hardware
+#
+if(ARGOS_BUILD_FOR STREQUAL "drone")
+  find_package(MAVLink)
+  if(NOT MAVLINK_FOUND)
+    message(FATAL_ERROR "Required library MAVLink not found.")
+  endif(NOT MAVLINK_FOUND)
+  include_directories(${MAVLINK_INCLUDE_DIR})
+endif(ARGOS_BUILD_FOR STREQUAL "drone")
+
 
 #
 # Check for V4L2 Sub-device library
