@@ -16,7 +16,10 @@ namespace argos {
 #include <argos3/plugins/robots/drone/hardware/drone.h>
 #include <argos3/plugins/robots/drone/control_interface/ci_drone_flight_system_sensor.h>
 
-#include <mavlink/common/mavlink.h>
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Waddress-of-packed-member"
+#include <argos3/plugins/robots/drone/hardware/mavlink/common/mavlink.h>
+#pragma GCC diagnostic pop
 
 #include <optional>
 
