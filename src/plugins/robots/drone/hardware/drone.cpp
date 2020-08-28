@@ -232,7 +232,8 @@ namespace argos {
          sPortConfiguration.c_cc[VMIN]  = 0;
          sPortConfiguration.c_cc[VTIME] = 0;
          /* apply baudrate */
-         if (::cfsetispeed(&sPortConfiguration, B115200) < 0 || ::cfsetospeed(&sPortConfiguration, B115200) < 0) {
+         if (::cfsetispeed(&sPortConfiguration, B57600) < 0 || ::cfsetospeed(&sPortConfiguration, B57600) < 0) {
+         //if (::cfsetispeed(&sPortConfiguration, B115200) < 0 || ::cfsetospeed(&sPortConfiguration, B115200) < 0) {
             THROW_ARGOSEXCEPTION("Could not set baudrate to 115200");
          }
          if(::tcsetattr(m_nFileDescriptor, TCSAFLUSH, &sPortConfiguration) < 0) {

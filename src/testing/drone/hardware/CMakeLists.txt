@@ -7,3 +7,10 @@ configure_file(
   ${CMAKE_SOURCE_DIR}/testing/drone/hardware/cameras_system/controller.lua
   ${CMAKE_BINARY_DIR}/testing/drone/cameras_system/controller.lua
   COPYONLY)
+configure_file(
+  ${CMAKE_SOURCE_DIR}/testing/drone/hardware/flight_system/configuration.argos.in
+  ${CMAKE_BINARY_DIR}/testing/drone/flight_system/configuration.argos)
+configure_file(
+  ${CMAKE_SOURCE_DIR}/testing/drone/hardware/flight_system/controller.lua
+  ${CMAKE_BINARY_DIR}/testing/drone/flight_system/controller.lua
+  COPYONLY)

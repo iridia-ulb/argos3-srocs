@@ -8,7 +8,6 @@
 
 #include <argos3/core/utility/logging/argos_log.h>
 
-#include <argos3/plugins/robots/drone/simulator/drone_flight_system_entity.h>
 #include <argos3/plugins/robots/generic/hardware/robot.h>
 
 namespace argos {
@@ -53,8 +52,9 @@ namespace argos {
    /****************************************/
 
    void CDroneFlightSystemDefaultActuator::Update() {
+      
       // m_cTargetPosition
-      // m_fTargetYawAngle
+      // m_cTargetYawAngle
    }
 
    /****************************************/

@@ -22,34 +22,34 @@ namespace argos {
    public:
 
       CCI_DroneFlightSystemSensor() :
-         m_cPositionReading(CVector3::ZERO),
-         m_cOrientationReading(CVector3::ZERO),
-         m_cVelocityReading(CVector3::ZERO),
-         m_cAngularVelocityReading(CVector3::ZERO) {}
+         m_cPosition(CVector3::ZERO),
+         m_cOrientation(CVector3::ZERO),
+         m_cVelocity(CVector3::ZERO),
+         m_cAngularVelocity(CVector3::ZERO) {}
       
       virtual ~CCI_DroneFlightSystemSensor() {}
       
       virtual void Reset() {
-         m_cPositionReading = CVector3::ZERO;
-         m_cOrientationReading = CVector3::ZERO;
-         m_cVelocityReading = CVector3::ZERO;
-         m_cAngularVelocityReading = CVector3::ZERO;
+         m_cPosition = CVector3::ZERO;
+         m_cOrientation = CVector3::ZERO;
+         m_cVelocity = CVector3::ZERO;
+         m_cAngularVelocity = CVector3::ZERO;
       }
 
-      const CVector3& GetPositionReading() const {
-         return m_cPositionReading;
+      const CVector3& GetPosition() const {
+         return m_cPosition;
       }
 
-      const CVector3& GetOrientationReading() const {
-         return m_cOrientationReading;
+      const CVector3& GetOrientation() const {
+         return m_cOrientation;
       }
 
-      const CVector3& GetVelocityReading() const {
-         return m_cVelocityReading;
+      const CVector3& GetVelocity() const {
+         return m_cVelocity;
       }
 
-      const CVector3& GetAngularVelocityReading() const {
-         return m_cAngularVelocityReading;
+      const CVector3& GetAngularVelocity() const {
+         return m_cAngularVelocity;
       }
 
 #ifdef ARGOS_WITH_LUA
@@ -59,10 +59,16 @@ namespace argos {
 #endif
 
    protected:
-      CVector3 m_cPositionReading;
-      CVector3 m_cOrientationReading;
-      CVector3 m_cVelocityReading;
-      CVector3 m_cAngularVelocityReading;    
+      CVector3 m_cPosition;
+      CVector3 m_cOrientation;
+      CVector3 m_cVelocity;
+      CVector3 m_cAngularVelocity; 
+      CVector3 m_cAccelerometer;
+      CVector3 m_cMagnetometer;
+      CVector3 m_cGyroscope;
+      Real m_fTemperature;
+      Real m_fBatteryVoltage;
+
    };
 }
 

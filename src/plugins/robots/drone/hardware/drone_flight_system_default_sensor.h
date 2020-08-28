@@ -16,6 +16,10 @@ namespace argos {
 #include <argos3/plugins/robots/drone/hardware/drone.h>
 #include <argos3/plugins/robots/drone/control_interface/ci_drone_flight_system_sensor.h>
 
+#include <mavlink/common/mavlink.h>
+
+#include <optional>
+
 namespace argos {
 
    class CDroneFlightSystemDefaultSensor : public CPhysicalSensor,
@@ -40,8 +44,28 @@ namespace argos {
       virtual void Update();
 
    private:
-
       CDrone::CMAVLinkConnection* m_pcMAVLinkConnection;
+
+      SInt32 m_nSystemId;
+      SInt32 m_nAutopilotId;
+
+      std::optional<mavlink_message_t> Read();
+      void Decode(const mavlink_message_t& t_message);
+
+      std::optional<mavlink_heartbeat_t> m_tHeartbeat;
+      std::optional<mavlink_sys_status_t> m_tSystemStatus;
+      std::optional<mavlink_battery_status_t> m_tBatteryStatus;
+      std::optional<mavlink_radio_status_t> m_tRadioStatus;
+      std::optional<mavlink_local_position_ned_t> m_tLocalPositionNed;
+      std::optional<mavlink_global_position_int_t> m_tGlobalPositonInt;
+      std::optional<mavlink_position_target_local_ned_t> m_tPositionTargetLocalNed;
+      std::optional<mavlink_position_target_global_int_t> m_tPostionTargetGlobalInt;
+      std::optional<mavlink_highres_imu_t> m_tHighResImu;
+      std::optional<mavlink_attitude_t> m_tAttitude;
+
+	   mavlink_set_position_target_local_ned_t initial_position;
+	
+	   
 
    };
 }

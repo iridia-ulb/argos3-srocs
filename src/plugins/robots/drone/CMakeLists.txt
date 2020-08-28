@@ -66,8 +66,8 @@ elseif(ARGOS_BUILD_FOR STREQUAL "drone")
     ${ARGOS3_HEADERS_PLUGINS_ROBOTS_DRONE_HARDWARE}
     hardware/drone.cpp
     hardware/drone_cameras_system_default_sensor.cpp
-    hardware/drone_flight_system_default_actuator.h
-    hardware/drone_flight_system_default_sensor.h
+    hardware/drone_flight_system_default_actuator.cpp
+    hardware/drone_flight_system_default_sensor.cpp
     hardware/drone_system_default_sensor.cpp
     hardware/main.cpp)
 endif(ARGOS_BUILD_FOR_SIMULATOR)
