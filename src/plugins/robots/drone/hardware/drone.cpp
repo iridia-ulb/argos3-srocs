@@ -63,7 +63,7 @@ namespace argos {
             std::string strPixhawkDevice;
             TConfigurationNode& tEnvironment = GetNode(t_controller, "environment");
             GetNodeAttribute(tEnvironment, "pixhawk", strPixhawkDevice);
-            m_cMAVLinkConnection.Open(strPixhawkDevice);
+            m_cPixhawk.Open(strPixhawkDevice);
          }
          catch(CARGoSException& ex) {
             LOGERR << "[WARNING] Could not connect to Pixhawk" << std::endl;
@@ -200,10 +200,10 @@ namespace argos {
    /****************************************/
    /****************************************/
 
-   CDrone::CMAVLinkConnection::CMAVLinkConnection() :
+   CDrone::CPixhawk::CPixhawk() :
       m_nFileDescriptor(-1) {}
 
-   void CDrone::CMAVLinkConnection::Open(const std::string& str_device) {
+   void CDrone::CPixhawk::Open(const std::string& str_device) {
       try {
          m_nFileDescriptor = 
             ::open(str_device.c_str(), O_RDWR | O_NOCTTY | O_NDELAY);
@@ -245,15 +245,40 @@ namespace argos {
       }
    }
 
-   void CDrone::CMAVLinkConnection::Close() {
+   void CDrone::CPixhawk::Close() {
       if(m_nFileDescriptor != -1) {
          ::close(m_nFileDescriptor);
          m_nFileDescriptor = -1;
       }
    }
 
-   int CDrone::CMAVLinkConnection::GetFileDescriptor() {
+   int CDrone::CPixhawk::GetFileDescriptor() {
       return m_nFileDescriptor;
+   }
+
+   std::optional<CVector3>& CDrone::CPixhawk::GetInitialPosition() {
+      return m_optInitialPosition;
+   }
+
+   std::optional<CVector3>& CDrone::CPixhawk::GetInitialOrientation() {
+      return m_optInitialOrientation;
+   }
+
+   std::optional<uint8_t>& CDrone::CPixhawk::GetTargetSystem() {
+      return m_optTargetSystem;
+
+   }
+
+   std::optional<uint8_t>& CDrone::CPixhawk::GetTargetComponent() {
+      return m_optTargetComponent;
+   }
+
+   bool CDrone::CPixhawk::Ready() {
+      return (m_nFileDescriptor != -1) &&
+             m_optInitialPosition &&
+             m_optInitialOrientation &&
+             m_optTargetSystem &&
+             m_optTargetComponent;
    }
 
    /****************************************/

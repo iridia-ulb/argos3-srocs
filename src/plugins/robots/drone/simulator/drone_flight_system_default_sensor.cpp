@@ -49,10 +49,10 @@ namespace argos {
    /****************************************/
    
    void CDroneFlightSystemDefaultSensor::Update() {
-      m_cPositionReading = m_pcFlightSystemEntity->GetPositionReading();
-      m_cOrientationReading = m_pcFlightSystemEntity->GetOrientationReading();
-      m_cVelocityReading = m_pcFlightSystemEntity->GetVelocityReading();
-      m_cAngularVelocityReading = m_pcFlightSystemEntity->GetAngularVelocityReading();
+      m_cPosition = m_pcFlightSystemEntity->GetPositionReading();
+      m_cOrientation = m_pcFlightSystemEntity->GetOrientationReading();
+      m_cVelocity = m_pcFlightSystemEntity->GetVelocityReading();
+      m_cAngularVelocity = m_pcFlightSystemEntity->GetAngularVelocityReading();
    }
 
    /****************************************/

@@ -14,6 +14,7 @@ namespace argos {
 }
 
 #include <argos3/core/utility/math/rng.h>
+#include <argos3/core/utility/math/vector3.h>
 #include <argos3/core/utility/networking/tcp_socket.h>
 #include <argos3/core/utility/configuration/argos_configuration.h>
 #include <argos3/plugins/robots/generic/hardware/robot.h>
@@ -24,14 +25,25 @@ namespace argos {
 
    public:
 
-      class CMAVLinkConnection {
+      class CPixhawk {
       public:
-         CMAVLinkConnection();
+         CPixhawk();
          void Open(const std::string& str_device);
          void Close();
          int GetFileDescriptor();
+         std::optional<CVector3>& GetInitialPosition();
+         std::optional<CVector3>& GetInitialOrientation();
+         std::optional<uint8_t>& GetTargetSystem();
+         std::optional<uint8_t>& GetTargetComponent();
+         /* indicates that the sensor side is up and running
+            and has initialized what is necessary for flight */
+         bool Ready();
       private:
          int m_nFileDescriptor;
+         std::optional<uint8_t> m_optTargetSystem;
+         std::optional<uint8_t> m_optTargetComponent;
+         std::optional<CVector3> m_optInitialPosition;
+         std::optional<CVector3> m_optInitialOrientation;
       };
 
    public:
@@ -58,10 +70,8 @@ namespace argos {
          return m_unTicksPerSec;
       }
 
-      class CMAVLinkConnection;
-
-      CMAVLinkConnection& GetMAVLinkConnection() {
-         return m_cMAVLinkConnection;
+      CPixhawk& GetPixhawk() {
+         return m_cPixhawk;
       }
 
    private:
@@ -95,7 +105,7 @@ namespace argos {
       /* the vector of sensors */
       std::vector<CPhysicalSensor*> m_vecSensors;
 
-      CMAVLinkConnection m_cMAVLinkConnection;
+      CPixhawk m_cPixhawk;
 
    };
 

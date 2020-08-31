@@ -30,14 +30,8 @@ namespace argos {
 
    public:
 
-      /**
-       * @brief Constructor.
-       */
       CDroneFlightSystemDefaultSensor();
 
-      /**
-       * @brief Destructor.
-       */
       virtual ~CDroneFlightSystemDefaultSensor();
 
       virtual void SetRobot(CRobot& c_robot);
@@ -47,10 +41,7 @@ namespace argos {
       virtual void Update();
 
    private:
-      CDrone::CMAVLinkConnection* m_pcMAVLinkConnection;
-
-      SInt32 m_nSystemId;
-      SInt32 m_nAutopilotId;
+      CDrone::CPixhawk* m_pcPixhawk;
 
       std::optional<mavlink_message_t> Read();
       void Decode(const mavlink_message_t& t_message);

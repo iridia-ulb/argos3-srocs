@@ -44,9 +44,15 @@ namespace argos {
 
       virtual void Update();
 
+      virtual void SetOffboardMode(bool b_offboard_mode) override;
+
+      virtual void Arm(bool b_arm, bool b_bypass_safety_checks) override;
+
    private:
 
-      CDrone::CMAVLinkConnection* m_pcMAVLinkConnection;
+      void Write(const mavlink_message_t& t_message);
+
+      CDrone::CPixhawk* m_pcPixhawk;
 
    };
 }

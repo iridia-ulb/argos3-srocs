@@ -36,10 +36,14 @@ namespace argos {
       }
 
       void SetTargetYawAngle(Real f_yaw_angle) {
-
          m_cTargetYawAngle.SetValue(f_yaw_angle);
          m_cTargetYawAngle.SignedNormalize();
-      }   
+      }
+
+      virtual void Arm(bool b_arm, bool b_bypass_safety_checks) {}
+
+      virtual void SetOffboardMode(bool b_offboard_mode) {}
+      
 #ifdef ARGOS_WITH_LUA
       virtual void CreateLuaState(lua_State* pt_lua_state);
 #endif

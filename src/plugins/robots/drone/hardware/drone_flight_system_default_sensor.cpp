@@ -17,7 +17,7 @@ namespace argos {
    /****************************************/
 
    CDroneFlightSystemDefaultSensor::CDroneFlightSystemDefaultSensor() :
-      m_pcMAVLinkConnection(nullptr) {}
+      m_pcPixhawk(nullptr) {}
  
    /****************************************/
    /****************************************/
@@ -33,7 +33,7 @@ namespace argos {
          THROW_ARGOSEXCEPTION("The drone flight system sensor only works with the drone")
       }
       else {
-         m_pcMAVLinkConnection = &pcDrone->GetMAVLinkConnection();
+         m_pcPixhawk = &pcDrone->GetPixhawk();
       }
    }
 
@@ -53,6 +53,9 @@ namespace argos {
    /****************************************/
    
    void CDroneFlightSystemDefaultSensor::Update() {
+      // TODO write back initial postion, system id, component id for use in the actuator half
+      // TODO handle timestamp messages?
+
       /* read and decode all messages */
       while(std::optional<mavlink_message_t> tMessage = Read()) {
          Decode(tMessage.value());
@@ -115,30 +118,15 @@ namespace argos {
          ::mavlink_msg_battery_status_decode(
             &t_message, &m_tBatteryStatus.value());
          break;
-      case MAVLINK_MSG_ID_RADIO_STATUS:
-         m_tRadioStatus.emplace();
-         ::mavlink_msg_radio_status_decode(
-            &t_message, &m_tRadioStatus.value());
-         break;
       case MAVLINK_MSG_ID_LOCAL_POSITION_NED:
          m_tLocalPositionNed.emplace();
          ::mavlink_msg_local_position_ned_decode(
             &t_message,	&m_tLocalPositionNed.value());
          break;
-      case MAVLINK_MSG_ID_GLOBAL_POSITION_INT:
-         m_tGlobalPositonInt.emplace();
-         ::mavlink_msg_global_position_int_decode(
-            &t_message, &m_tGlobalPositonInt.value());
-         break;
       case MAVLINK_MSG_ID_POSITION_TARGET_LOCAL_NED:
          m_tPositionTargetLocalNed.emplace();
          ::mavlink_msg_position_target_local_ned_decode(
             &t_message, &m_tPositionTargetLocalNed.value());
-         break;
-      case MAVLINK_MSG_ID_POSITION_TARGET_GLOBAL_INT:
-         m_tPostionTargetGlobalInt.emplace();
-         ::mavlink_msg_position_target_global_int_decode(
-            &t_message, &m_tPostionTargetGlobalInt.value());
          break;
       case MAVLINK_MSG_ID_HIGHRES_IMU:
          m_tHighResImu.emplace();
@@ -161,11 +149,11 @@ namespace argos {
 
    std::optional<mavlink_message_t> CDroneFlightSystemDefaultSensor::Read() {
       /* only attempt to read if the connect is open */
-      if(m_pcMAVLinkConnection->GetFileDescriptor() >= 0) {
+      if(m_pcPixhawk->GetFileDescriptor() >= 0) {
          mavlink_message_t tMessage;
          mavlink_status_t tStatus;
          uint8_t unRxChar;
-         while(::read(m_pcMAVLinkConnection->GetFileDescriptor(), &unRxChar, 1)) {
+         while(::read(m_pcPixhawk->GetFileDescriptor(), &unRxChar, 1)) {
             switch(::mavlink_parse_char(::MAVLINK_COMM_1, unRxChar, &tMessage, &tStatus)) {
             case ::MAVLINK_FRAMING_INCOMPLETE:
                break;
