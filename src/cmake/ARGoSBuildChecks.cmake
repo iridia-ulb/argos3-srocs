@@ -61,13 +61,13 @@ endif(ARGOS_BUILD_FOR STREQUAL "builderbot" OR ARGOS_BUILD_FOR STREQUAL "drone")
 # Check for Analog Device's IIO library
 # It is required only when compiling for the builderbot hardware
 #
-if(ARGOS_BUILD_FOR STREQUAL "builderbot")
+if(ARGOS_BUILD_FOR STREQUAL "builderbot" OR ARGOS_BUILD_FOR STREQUAL "drone")
   find_package(IIO)
   if(NOT IIO_FOUND)
     message(FATAL_ERROR "Required library IIO not found.")
   endif(NOT IIO_FOUND)
   include_directories(${IIO_INCLUDE_DIR})
-endif(ARGOS_BUILD_FOR STREQUAL "builderbot")
+endif(ARGOS_BUILD_FOR STREQUAL "builderbot" OR ARGOS_BUILD_FOR STREQUAL "drone")
 
 #
 # Check for V4L2 Sub-device library

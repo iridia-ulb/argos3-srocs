@@ -13,6 +13,9 @@ namespace argos {
    class CPhysicalActuator;
 }
 
+struct iio_context;
+struct iio_device;
+
 #include <argos3/core/utility/math/rng.h>
 #include <argos3/core/utility/math/vector3.h>
 #include <argos3/core/utility/networking/tcp_socket.h>
@@ -66,6 +69,14 @@ namespace argos {
          m_strSignal = ::strsignal(n_signal);
       }
 
+      iio_context* GetContext() {
+         return m_psContext;
+      }
+
+      iio_device* GetSensorUpdateTrigger() {
+         return m_psSensorUpdateTrigger;
+      }
+
       UInt32 GetTicksPerSec() {
          return m_unTicksPerSec;
       }
@@ -107,6 +118,8 @@ namespace argos {
 
       CPixhawk m_cPixhawk;
 
+      iio_context* m_psContext;
+      iio_device* m_psSensorUpdateTrigger;
    };
 
 }

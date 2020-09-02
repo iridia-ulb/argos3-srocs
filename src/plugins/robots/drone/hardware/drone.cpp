@@ -6,6 +6,7 @@
 
 #include "drone.h"
 
+#include <iio.h>
 #include <fcntl.h>
 #include <termios.h>
 #include <unistd.h>
@@ -25,6 +26,12 @@
 
 #include <argos3/plugins/robots/generic/hardware/sensor.h>
 #include <argos3/plugins/robots/generic/hardware/actuator.h>
+
+#define ADD_TRIGGER_PATH "/sys/bus/iio/devices/iio_sysfs_trigger/add_trigger"
+#define REMOVE_TRIGGER_PATH "/sys/bus/iio/devices/iio_sysfs_trigger/remove_trigger"
+
+#define SENSOR_TRIGGER_IDX 0
+#define ACTUATOR_TRIGGER_IDX 1
 
 namespace argos {
 
@@ -67,6 +74,23 @@ namespace argos {
          }
          catch(CARGoSException& ex) {
             LOGERR << "[WARNING] Could not connect to Pixhawk" << std::endl;
+         }
+         /* Create the triggers */
+         std::ofstream cAddTrigger;
+         cAddTrigger.open(ADD_TRIGGER_PATH);
+         cAddTrigger << std::to_string(SENSOR_TRIGGER_IDX) << std::flush;
+         cAddTrigger.close();
+         /* Create a local context for the IIO library */
+         m_psContext = iio_create_local_context();
+         /* validate the sensor update trigger */
+         std::string strSensorUpdateTrigger("sysfstrig" + std::to_string(SENSOR_TRIGGER_IDX));
+         m_psSensorUpdateTrigger = 
+            ::iio_context_find_device(m_psContext, strSensorUpdateTrigger.c_str());
+         if(m_psSensorUpdateTrigger == nullptr) { 
+            THROW_ARGOSEXCEPTION("Could not find IIO trigger \"" << strSensorUpdateTrigger << "\"");
+         }
+         if(!::iio_device_is_trigger(m_psSensorUpdateTrigger)) {
+            THROW_ARGOSEXCEPTION("IIO device \"" << strSensorUpdateTrigger << "\" is not a trigger");
          }
          /* go through the actuators */
          std::string strImpl;
@@ -194,6 +218,13 @@ namespace argos {
       /* delete sensors */
       for(CPhysicalSensor* pc_sensor : m_vecSensors)
          delete pc_sensor;
+      /* delete the IIO library's context */
+      iio_context_destroy(m_psContext);
+      /* remove triggers */
+      std::ofstream cRemoveTrigger;
+      cRemoveTrigger.open(REMOVE_TRIGGER_PATH);
+      cRemoveTrigger << std::to_string(SENSOR_TRIGGER_IDX) << std::flush;
+      cRemoveTrigger.close();
       LOG << "[INFO] Controller terminated" << std::endl;
    }
 
