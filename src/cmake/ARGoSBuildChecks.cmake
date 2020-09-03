@@ -47,7 +47,7 @@ include_directories(${ARGOS_INCLUDE_DIR})
 
 #
 # Check for the AprilTag library
-# It is required only when compiling for the hardware
+# It is required only when compiling for the builderbot and drone hardware
 #
 if(ARGOS_BUILD_FOR STREQUAL "builderbot" OR ARGOS_BUILD_FOR STREQUAL "drone")
   find_package(AprilTag)
@@ -71,7 +71,7 @@ endif(ARGOS_BUILD_FOR STREQUAL "builderbot" OR ARGOS_BUILD_FOR STREQUAL "drone")
 
 #
 # Check for V4L2 Sub-device library
-# It is required only when compiling for the hardware
+# It is required only when compiling for the builderbot hardware
 #
 if(ARGOS_BUILD_FOR STREQUAL "builderbot")
   find_package(V4L2Subdev)
@@ -81,8 +81,22 @@ if(ARGOS_BUILD_FOR STREQUAL "builderbot")
 endif(ARGOS_BUILD_FOR STREQUAL "builderbot")
 
 #
+# Check for Turbo JPEG library
+# It is required only when compiling for the drone hardware
+#
+if(ARGOS_BUILD_FOR STREQUAL "drone")
+  find_package(TurboJPEG)
+  if(NOT TURBOJPEG_FOUND)
+    message(FATAL_ERROR "Required Turbo JPEG library not found.")
+  endif(NOT TURBOJPEG_FOUND)
+  message("JPEG_LIBRARIES = ${TURBOJPEG_LIBRARY}")
+  include_directories(${TURBOJPEG_INCLUDE_DIR})  
+endif(ARGOS_BUILD_FOR STREQUAL "drone")
+
+
+#
 # Check for Mediactl library
-# It is required only when compiling for the hardware
+# It is required only when compiling for the builderbot hardware
 #
 if(ARGOS_BUILD_FOR STREQUAL "builderbot")
   find_package(Mediactl)

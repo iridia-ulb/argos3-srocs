@@ -17,15 +17,20 @@
 #include <apriltag/tag36h11.h>
 #include <apriltag/common/image_u8.h>
 #include <apriltag/common/zarray.h>
+#include <turbojpeg.h>
+
+/*
+root@up-core:~# find /usr -name "*jpeg*"
+/usr/lib/libjpeg.so.62
+/usr/lib/libjpeg.so.62.3.0
+*/
 
 #include <fcntl.h>
-#include <sys/ioctl.h>
-#include <unistd.h>
-#include <string.h>
-#include <sys/mman.h>
-
-#include <linux/videodev2.h>
 #include <libv4l2.h>
+#include <linux/videodev2.h>
+#include <sys/ioctl.h>
+#include <sys/mman.h>
+#include <unistd.h>
 
 #include <array>
 #include <chrono>
@@ -170,10 +175,13 @@ namespace argos {
       m_ptTagDetector->refine_edges = 1;
       m_ptTagDetector->decode_sharpening = 0.25;
       m_ptTagDetector->nthreads = 1;
+      /* initialize the jpeg decoder */
+      m_ptTurboJpegInstance = ::tjInitDecompress();
+      /* parse the video device */
       GetNodeAttribute(t_interface, "device", m_strDevice);
       std::string strCaptureResolution;
       std::string strProcessingResolution;
-      std::string strProcessingOffset;     
+      std::string strProcessingOffset;
       GetNodeAttribute(t_interface, "capture_resolution", strCaptureResolution);
       GetNodeAttribute(t_interface, "processing_resolution", strProcessingResolution);
       GetNodeAttribute(t_interface, "processing_offset", strProcessingOffset);
@@ -217,6 +225,8 @@ namespace argos {
       ::apriltag_detector_destroy(m_ptTagDetector);
       /* destroy the tag family */
       ::tag36h11_destroy(m_ptTagFamily);
+      /* destroy the jpeg decoder */
+      ::tjDestroy(m_ptTurboJpegInstance);
    }
 
    /****************************************/
@@ -233,9 +243,8 @@ namespace argos {
       sFormat.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
       sFormat.fmt.pix.width = m_arrCaptureResolution[0];
       sFormat.fmt.pix.height = m_arrCaptureResolution[1];
-      sFormat.fmt.pix.sizeimage = m_arrCaptureResolution[0] * m_arrCaptureResolution[1] * IMAGE_BYTES_PER_PIXEL;
-      sFormat.fmt.pix.bytesperline = m_arrCaptureResolution[0] * IMAGE_BYTES_PER_PIXEL;
-      sFormat.fmt.pix.pixelformat = V4L2_PIX_FMT_YUYV;
+      sFormat.fmt.pix.bytesperline = 0;
+      sFormat.fmt.pix.pixelformat = V4L2_PIX_FMT_MJPEG;
       sFormat.fmt.pix.field = V4L2_FIELD_NONE;
       if (::ioctl(m_nCameraHandle, VIDIOC_S_FMT, &sFormat) < 0)
          THROW_ARGOSEXCEPTION("Could not set the camera format");
@@ -360,36 +369,16 @@ namespace argos {
             }
             /* update the timestamp in the control interface */
             Timestamp = sBuffer.timestamp.tv_sec + (10e-6 * sBuffer.timestamp.tv_usec);
-            /* get a pointer to the image data */
-            uint8_t* punImageData = static_cast<uint8_t*>(m_itCurrentBuffer->second);
-            /* create the gray scale image based on the luminance data */
-            const UInt32 unImageStride = m_ptImage->stride;
-            const UInt32 unImageWidth = m_ptImage->width;
-            const UInt32 unImageHeight = m_ptImage->height;
-            /* copy requested pixels from V4L2 buffer to m_ptImage */
-            UInt32 unSourceIndex =
-               IMAGE_BYTES_PER_PIXEL * (m_arrCaptureResolution[0] * m_arrProcessingOffset[1] + m_arrProcessingOffset[0]);
-            UInt32 unDestinationIndex = 0;
-            /* extract the luminance from the data (assumes V4L2_PIX_FMT_YUYV) */
-            for (UInt32 un_height_index = 0; un_height_index < unImageHeight; un_height_index++) {
-               for (UInt32 un_width_index = 0; un_width_index < unImageWidth; un_width_index++) {
-                  /* copy data */
-                  m_ptImage->buf[unDestinationIndex++] = punImageData[unSourceIndex];
-                  /* move to the next pixel */
-                  unSourceIndex += 2;
-               }
-               unSourceIndex += (2 * (m_arrCaptureResolution[0] - m_arrProcessingResolution[0]));
-               unDestinationIndex += (unImageStride - unImageWidth);
-            }
-            /*
-            std::string strTest = "output/camera";
-            strTest += std::to_string(m_nCameraHandle);
-            strTest += "_";
-            strTest += std::to_string(static_cast<int>(unFrameId));
-            strTest += ".pnm";
-            ::image_u8_write_pnm(m_ptImage, strTest.c_str());
-            */
-            unFrameId += 1;
+            /* decompress the JPEG data directly into the Apriltag image */
+            ::tjDecompress2(m_ptTurboJpegInstance, 
+                            static_cast<const unsigned char*>(m_itCurrentBuffer->second),
+                            sBuffer.length,
+                            m_ptImage->buf,
+                            m_ptImage->width,
+                            m_ptImage->stride,
+                            m_ptImage->height,
+                            ::TJPF_GRAY,
+                            TJFLAG_FASTDCT);
             /* detect the tags */
             CVector2 cCenterPixel;
             std::array<CVector2, 4> arrCornerPixels;

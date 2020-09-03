@@ -22,6 +22,7 @@ struct v4l2_buffer;
 
 #include <apriltag/apriltag_pose.h>
 #include <apriltag/common/image_u8.h>
+#include <turbojpeg.h>
 
 #include <argos3/core/utility/math/quaternion.h>
 #include <argos3/core/utility/math/rng.h>
@@ -87,6 +88,8 @@ namespace argos {
          ::apriltag_family* m_ptTagFamily;
          ::apriltag_detector* m_ptTagDetector;
          ::apriltag_detection_info_t m_tTagDetectionInfo;
+         /* jpeg decoder */
+         ::tjhandle m_ptTurboJpegInstance;
          /* camera device handle */
          std::string m_strDevice;
          int m_nCameraHandle;
