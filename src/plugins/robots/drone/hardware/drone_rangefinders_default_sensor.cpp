@@ -30,7 +30,7 @@ namespace argos {
          ::iio_buffer_destroy(s_physical_interface.Buffer);
          ::iio_device_set_trigger(s_physical_interface.Device, nullptr);
          ::iio_channel_disable(s_physical_interface.ProximityChannel);
-         ::iio_channel_disable(s_physical_interface.IlluminanceChannel);
+         //::iio_channel_disable(s_physical_interface.IlluminanceChannel);
       }
    }
 
@@ -44,7 +44,7 @@ namespace argos {
          iio_context* psContext = CDrone::GetInstance().GetContext();
          iio_device* psUpdateTrigger = CDrone::GetInstance().GetSensorUpdateTrigger();
          /* Parse the device name and channel names */
-         std::string strDevice, strLeft, strRight;
+         std::string strDevice;
          GetNodeAttribute(t_tree, "device", strDevice);
          /* loop over the devices */
          UInt32 unNumDevices = ::iio_context_get_devices_count(psContext);
@@ -56,28 +56,31 @@ namespace argos {
                if(ret < 0) {
                   THROW_ARGOSEXCEPTION("Could not read the IIO attribute \"label\" for device \"" << strDevice << "\"");
                }
-               iio_channel* psProximity = ::iio_device_find_channel(psDevice, "proximity", false);
+               iio_channel* psProximity = ::iio_device_find_channel(psDevice, "distance", false);
                if(psProximity == nullptr) {
-                  THROW_ARGOSEXCEPTION("Could not find IIO channel \"proximity\" for device \"" << strDevice << "\"");
+                  THROW_ARGOSEXCEPTION("Could not find IIO channel \"distance\" for device \"" << strDevice << "\"");
                }
+               /*
                iio_channel* psIlluminance = ::iio_device_find_channel(psDevice, "illuminance", false);
                if(psIlluminance == nullptr) {
                   THROW_ARGOSEXCEPTION("Could not find IIO channel \"illuminance\" for device \"" << strDevice << "\"");
                }
+               */
                /* enable channels */
                ::iio_channel_enable(psProximity);
-               ::iio_channel_enable(psIlluminance);
+               //::iio_channel_enable(psIlluminance);
                /* set trigger */
                ::iio_device_set_trigger(psDevice, psUpdateTrigger);
                /* create buffer */
                iio_buffer* psBuffer = ::iio_device_create_buffer(psDevice, 1, false);
                if(psBuffer == nullptr) {
-                  ::iio_channel_disable(psIlluminance);
+                  //::iio_channel_disable(psIlluminance);
                   ::iio_channel_disable(psProximity);
                   ::iio_device_set_trigger(psDevice, nullptr);
                   THROW_ARGOSEXCEPTION("Could not create IIO buffer: " << ::strerror(errno));
                }
-               m_vecPhysicalInterfaces.emplace_back(pchBuffer, psDevice, psProximity, psIlluminance, psBuffer);
+               //m_vecPhysicalInterfaces.emplace_back(pchBuffer, psDevice, psProximity, psIlluminance, psBuffer);
+               m_vecPhysicalInterfaces.emplace_back(std::string(pchBuffer), psDevice, psProximity, psBuffer);
             }
          }
          /* retrieve the calibraton data */
@@ -134,21 +137,26 @@ namespace argos {
    /****************************************/
    
    void CDroneRangefindersDefaultSensor::Update() {
-      UInt16 unProximityRaw, unIlluminanceRaw;
+      UInt16 unProximityRaw; //, unIlluminanceRaw;
       for(SPhysicalInterface& s_physical_interface : m_vecPhysicalInterfaces) {
          ::iio_buffer_refill(s_physical_interface.Buffer);
          ::iio_channel_read(s_physical_interface.ProximityChannel,
                             s_physical_interface.Buffer,
                             &unProximityRaw, 2);
+         /*
          ::iio_channel_read(s_physical_interface.IlluminanceChannel,
                             s_physical_interface.Buffer,
                             &unIlluminanceRaw, 2);
+         */
          /* calibrate proximity samples and convert to metric units */
+         /*
          s_physical_interface.Proximity = 
             std::pow(s_physical_interface.Calibration[1] / static_cast<Real>(unProximityRaw),
                      s_physical_interface.Calibration[0]);
+         */
+         s_physical_interface.Proximity = unProximityRaw;
          /* calibrate illuminance samples and convert to metric units */
-         s_physical_interface.Illuminance = ConvertToLux(unIlluminanceRaw);
+         //s_physical_interface.Illuminance = ConvertToLux(unIlluminanceRaw);
       }
    }
 
@@ -158,7 +166,7 @@ namespace argos {
    void CDroneRangefindersDefaultSensor::Reset() {
       for(SPhysicalInterface& s_physical_interface : m_vecPhysicalInterfaces) {
          s_physical_interface.Proximity = Real(0);
-         s_physical_interface.Illuminance = Real(0);
+         //s_physical_interface.Illuminance = Real(0);
       }
    }
 

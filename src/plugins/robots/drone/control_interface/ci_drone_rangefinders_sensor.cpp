@@ -61,18 +61,18 @@ namespace argos {
 
    const std::map<std::string, std::tuple<std::string, CVector3, CQuaternion> >
       CCI_DroneRangefindersSensor::m_mapSensorConfig = {
-         std::make_pair("1",          std::make_tuple("origin", CVector3( 0.0440, -0.0175, 0.0515), CQuaternion(0.5 * CRadians::PI, CVector3( 0.0000,  1.0000, 0)))),
-         std::make_pair("2",          std::make_tuple("origin", CVector3( 0.0323, -0.0522, 0.0515), CQuaternion(0.5 * CRadians::PI, CVector3( 0.7071,  0.7071, 0)))),
-         std::make_pair("3",          std::make_tuple("origin", CVector3(-0.0025, -0.0640, 0.0515), CQuaternion(0.5 * CRadians::PI, CVector3( 1.0000,  0.0000, 0)))),
-         std::make_pair("4",          std::make_tuple("origin", CVector3(-0.0375, -0.0640, 0.0515), CQuaternion(0.5 * CRadians::PI, CVector3( 1.0000,  0.0000, 0)))),
-         std::make_pair("5",          std::make_tuple("origin", CVector3(-0.0722, -0.0523, 0.0515), CQuaternion(0.5 * CRadians::PI, CVector3( 0.7071, -0.7071, 0)))),
-         std::make_pair("6",          std::make_tuple("origin", CVector3(-0.0840, -0.0175, 0.0515), CQuaternion(0.5 * CRadians::PI, CVector3( 0.0000, -1.0000, 0)))),
-         std::make_pair("7",          std::make_tuple("origin", CVector3(-0.0840,  0.0175, 0.0515), CQuaternion(0.5 * CRadians::PI, CVector3( 0.0000, -1.0000, 0)))),
-         std::make_pair("8",          std::make_tuple("origin", CVector3(-0.0722,  0.0523, 0.0515), CQuaternion(0.5 * CRadians::PI, CVector3(-0.7071, -0.7071, 0)))),
-         std::make_pair("9",          std::make_tuple("origin", CVector3(-0.0375,  0.0640, 0.0515), CQuaternion(0.5 * CRadians::PI, CVector3(-1.0000,  0.0000, 0)))),
-         std::make_pair("10",         std::make_tuple("origin", CVector3(-0.0025,  0.0640, 0.0515), CQuaternion(0.5 * CRadians::PI, CVector3(-1.0000,  0.0000, 0)))),
-         std::make_pair("11",         std::make_tuple("origin", CVector3( 0.0323,  0.0522, 0.0515), CQuaternion(0.5 * CRadians::PI, CVector3(-0.7071,  0.7071, 0)))),
-         std::make_pair("12",         std::make_tuple("origin", CVector3( 0.0440,  0.0175, 0.0515), CQuaternion(0.5 * CRadians::PI, CVector3( 0.0000,  1.0000, 0)))),
+         std::make_pair("1",  std::make_tuple("origin", CVector3( 0.0440, -0.0175, 0.0515), CQuaternion(0.5 * CRadians::PI, CVector3( 0.0000,  1.0000, 0)))),
+         std::make_pair("2",  std::make_tuple("origin", CVector3( 0.0323, -0.0522, 0.0515), CQuaternion(0.5 * CRadians::PI, CVector3( 0.7071,  0.7071, 0)))),
+         std::make_pair("3",  std::make_tuple("origin", CVector3(-0.0025, -0.0640, 0.0515), CQuaternion(0.5 * CRadians::PI, CVector3( 1.0000,  0.0000, 0)))),
+         std::make_pair("4",  std::make_tuple("origin", CVector3(-0.0375, -0.0640, 0.0515), CQuaternion(0.5 * CRadians::PI, CVector3( 1.0000,  0.0000, 0)))),
+         std::make_pair("5",  std::make_tuple("origin", CVector3(-0.0722, -0.0523, 0.0515), CQuaternion(0.5 * CRadians::PI, CVector3( 0.7071, -0.7071, 0)))),
+         std::make_pair("6",  std::make_tuple("origin", CVector3(-0.0840, -0.0175, 0.0515), CQuaternion(0.5 * CRadians::PI, CVector3( 0.0000, -1.0000, 0)))),
+         std::make_pair("7",  std::make_tuple("origin", CVector3(-0.0840,  0.0175, 0.0515), CQuaternion(0.5 * CRadians::PI, CVector3( 0.0000, -1.0000, 0)))),
+         std::make_pair("8",  std::make_tuple("origin", CVector3(-0.0722,  0.0523, 0.0515), CQuaternion(0.5 * CRadians::PI, CVector3(-0.7071, -0.7071, 0)))),
+         std::make_pair("9",  std::make_tuple("origin", CVector3(-0.0375,  0.0640, 0.0515), CQuaternion(0.5 * CRadians::PI, CVector3(-1.0000,  0.0000, 0)))),
+         std::make_pair("10", std::make_tuple("origin", CVector3(-0.0025,  0.0640, 0.0515), CQuaternion(0.5 * CRadians::PI, CVector3(-1.0000,  0.0000, 0)))),
+         std::make_pair("11", std::make_tuple("origin", CVector3( 0.0323,  0.0522, 0.0515), CQuaternion(0.5 * CRadians::PI, CVector3(-0.7071,  0.7071, 0)))),
+         std::make_pair("12", std::make_tuple("origin", CVector3( 0.0440,  0.0175, 0.0515), CQuaternion(0.5 * CRadians::PI, CVector3( 0.0000,  1.0000, 0)))),
    };
 
    /****************************************/

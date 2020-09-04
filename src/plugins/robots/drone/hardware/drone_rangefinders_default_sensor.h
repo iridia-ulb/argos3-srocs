@@ -34,18 +34,18 @@ namespace argos {
          SPhysicalInterface(const std::string& str_label,
                             iio_device* ps_device,
                             iio_channel* ps_proximity_channel,
-                            iio_channel* ps_illuminance_channel,
+                            //iio_channel* ps_illuminance_channel,
                             iio_buffer* ps_buffer) :
             SInterface(str_label),
             Device(ps_device),
             ProximityChannel(ps_proximity_channel),
-            IlluminanceChannel(ps_illuminance_channel),
+            //IlluminanceChannel(ps_illuminance_channel),
             Buffer(ps_buffer),
             Calibration({0.0, 0.0}) {}
          /* members */
          iio_device* Device;
          iio_channel* ProximityChannel;
-         iio_channel* IlluminanceChannel;
+         //iio_channel* IlluminanceChannel;
          iio_buffer* Buffer;
          std::array<Real, 2> Calibration;
       };
