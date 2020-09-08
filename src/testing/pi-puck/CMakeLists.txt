@@ -24,5 +24,6 @@ if(ARGOS_BUILD_FOR_SIMULATOR)
     ${CMAKE_BINARY_DIR}/testing/pi-puck/calibrate_pipuck.png
     COPYONLY)
 elseif(ARGOS_BUILD_FOR STREQUAL "pipuck")
+   set(ARGOS_TEST_DIR $ENV{HOME}/testing)
    message("No tests added for the pipuck configuration")
 endif(ARGOS_BUILD_FOR_SIMULATOR)

@@ -6,8 +6,6 @@
   <!-- ************************* -->
   <framework>
     <experiment length="100" ticks_per_second="5" />
-    <!--script path="@CMAKE_BINARY_DIR@/testing/drone/cameras_system/start_stream.sh" arguments="6 4" event="pre_init"/-->
-    <!--script path="@CMAKE_BINARY_DIR@/testing/drone/cameras_system/stop_stream.sh" event="post_destroy"/-->
   </framework>
   
   <!-- *************** -->
@@ -15,16 +13,14 @@
   <!-- *************** -->
   <controllers>
     <lua_controller id="drone">
-      <environment router="localhost:4950" pixhawk="/dev/ttyACM0"/>
-      <actuators>
-        <wifi implementation="default" />
-      </actuators>
+      <environment pixhawk="/dev/ttyACM0"/>
+      <actuators />
       <sensors>
+        <!--wifi implementation="default" /-->
         <drone_flight_system implementation="default"/>
         <drone_system implementation="default" />
-        <wifi implementation="default" />
       </sensors>
-      <params script="@CMAKE_BINARY_DIR@/testing/drone/flight_system/controller.lua" />
+      <params script="@ARGOS_TEST_DIR@/flight/sensor.lua" />
     </lua_controller>
   </controllers>
 

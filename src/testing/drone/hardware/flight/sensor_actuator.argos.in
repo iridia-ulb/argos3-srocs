@@ -1,0 +1,30 @@
+<?xml version="1.0" ?>
+<argos-configuration>
+
+  <!-- ************************* -->
+  <!-- * General configuration * -->
+  <!-- ************************* -->
+  <framework>
+    <experiment length="100" ticks_per_second="5" />
+  </framework>
+  
+  <!-- *************** -->
+  <!-- * Controllers * -->
+  <!-- *************** -->
+  <controllers>
+    <lua_controller id="drone">
+      <environment pixhawk="/dev/ttyACM0"/>
+      <actuators>
+        <!--wifi implementation="default" /-->
+        <drone_flight_system implementation="default"/>
+      </actuators>
+      <sensors>
+        <!--wifi implementation="default" /-->
+        <drone_flight_system implementation="default"/>
+        <drone_system implementation="default" />
+      </sensors>
+      <params script="@ARGOS_TEST_DIR@/flight/sensor_actuator.lua" />
+    </lua_controller>
+  </controllers>
+
+</argos-configuration>

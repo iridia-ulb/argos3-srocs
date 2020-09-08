@@ -43,5 +43,6 @@ if(ARGOS_BUILD_FOR_SIMULATOR)
     ${CMAKE_BINARY_DIR}/testing/builderbot/example_block.lua
     COPYONLY)
 elseif(ARGOS_BUILD_FOR STREQUAL "builderbot")
+   set(ARGOS_TEST_DIR $ENV{HOME}/testing)
    message("No tests added for the builderbot configuration")
 endif(ARGOS_BUILD_FOR_SIMULATOR)

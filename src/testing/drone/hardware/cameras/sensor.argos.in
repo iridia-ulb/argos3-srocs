@@ -45,7 +45,7 @@
         <drone_system implementation="default" />
         <wifi implementation="default" />
       </sensors>
-      <params script="@CMAKE_BINARY_DIR@/testing/drone/cameras_system/controller.lua" />
+      <params script="@ARGOS_TEST_DIR@/cameras/sensor.lua" />
     </lua_controller>
   </controllers>
 

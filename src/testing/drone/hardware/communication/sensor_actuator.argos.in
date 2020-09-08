@@ -16,15 +16,12 @@
     <lua_controller id="drone">
       <environment router="localhost:4950"/>
       <actuators>
-        <drone_wifi implementation="default" />
+        <wifi implementation="default" />
       </actuators>
       <sensors>
-        <drone_camera_system implementation="default"
-          calibration="src/calibration/drone_camera_system.xml"
-          devices="2,3,4,5"/>
-        <drone_wifi implementation="default" />
+        <wifi implementation="default" />
       </sensors>
-      <params script="src/testing/test_comms.lua" />
+      <params script="@ARGOS_TEST_DIR@/communication/sensor_actuator.lua" />
     </lua_controller>
   </controllers>
 
