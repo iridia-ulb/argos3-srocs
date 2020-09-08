@@ -89,7 +89,6 @@ if(ARGOS_BUILD_FOR STREQUAL "drone")
   if(NOT TURBOJPEG_FOUND)
     message(FATAL_ERROR "Required Turbo JPEG library not found.")
   endif(NOT TURBOJPEG_FOUND)
-  message("JPEG_LIBRARIES = ${TURBOJPEG_LIBRARY}")
   include_directories(${TURBOJPEG_INCLUDE_DIR})  
 endif(ARGOS_BUILD_FOR STREQUAL "drone")
 
