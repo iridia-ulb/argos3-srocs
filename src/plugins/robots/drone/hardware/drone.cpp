@@ -49,31 +49,35 @@ namespace argos {
          m_pcController = dynamic_cast<CLuaController*>(pcController);
          if(m_pcController == nullptr) {
             THROW_ARGOSEXCEPTION("ERROR: controller \"" << t_controller.Value() << "\" is not a Lua controller");
-         }        
-         try {
-            /* connect to the router to emulate robot-to-robot wifi */
-            std::string strRouterConfig;
+         }
+         if(NodeExists(t_controller, "environment")) {
             TConfigurationNode& tEnvironment = GetNode(t_controller, "environment");
-            GetNodeAttribute(tEnvironment, "router", strRouterConfig);
-            size_t unHostnamePortPos = strRouterConfig.find_last_of(':');
-            if(unHostnamePortPos == std::string::npos) {
-               THROW_ARGOSEXCEPTION("The address of the router must be provided as \"hostname:port\"");
+            if(NodeAttributeExists(tEnvironment, "router")) {
+               /* connect to the router to emulate robot-to-robot wifi */
+               std::string strRouterConfig;
+               GetNodeAttribute(tEnvironment, "router", strRouterConfig);
+               size_t unHostnamePortPos = strRouterConfig.find_last_of(':');
+               try {
+                  if(unHostnamePortPos == std::string::npos) {
+                     THROW_ARGOSEXCEPTION("The address of the router must be provided as \"hostname:port\"");
+                  }
+                  SInt32 nPort = std::stoi(strRouterConfig.substr(unHostnamePortPos + 1), nullptr, 0);
+                  m_cSocket.Connect(strRouterConfig.substr(0, unHostnamePortPos), nPort);
+               }
+               catch(CARGoSException& ex) {
+                  THROW_ARGOSEXCEPTION_NESTED("Could not connect to router", ex);
+               }
             }
-            SInt32 nPort = std::stoi(strRouterConfig.substr(unHostnamePortPos + 1), nullptr, 0);
-            m_cSocket.Connect(strRouterConfig.substr(0, unHostnamePortPos), nPort);
-         }
-         catch(CARGoSException& ex) {
-            LOGERR << "[WARNING] Could not connect to router" << std::endl;
-         }
-         try {
-            /* open the connection to the MAVLink device */
-            std::string strPixhawkDevice;
-            TConfigurationNode& tEnvironment = GetNode(t_controller, "environment");
-            GetNodeAttribute(tEnvironment, "pixhawk", strPixhawkDevice);
-            m_cPixhawk.Open(strPixhawkDevice);
-         }
-         catch(CARGoSException& ex) {
-            LOGERR << "[WARNING] Could not connect to Pixhawk" << std::endl;
+            if(NodeAttributeExists(tEnvironment, "pixhawk")) {
+               std::string strPixhawkDevice;
+               GetNodeAttribute(tEnvironment, "pixhawk", strPixhawkDevice);
+               try {
+                  m_cPixhawk.Open(strPixhawkDevice);
+               }
+               catch(CARGoSException& ex) {
+                  THROW_ARGOSEXCEPTION_NESTED("Could not connect to Pixhawk",ex)
+               }
+            }
          }
          /* Create the triggers */
          std::ofstream cAddTrigger;
