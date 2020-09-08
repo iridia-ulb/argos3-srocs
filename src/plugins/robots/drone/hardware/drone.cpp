@@ -80,13 +80,16 @@ namespace argos {
             }
          }
          /* Create the triggers */
+         /*
          std::ofstream cAddTrigger;
          cAddTrigger.open(ADD_TRIGGER_PATH);
          cAddTrigger << std::to_string(SENSOR_TRIGGER_IDX) << std::flush;
          cAddTrigger.close();
+         */
          /* Create a local context for the IIO library */
          m_psContext = iio_create_local_context();
          /* validate the sensor update trigger */
+         /*
          std::string strSensorUpdateTrigger("sysfstrig" + std::to_string(SENSOR_TRIGGER_IDX));
          m_psSensorUpdateTrigger = 
             ::iio_context_find_device(m_psContext, strSensorUpdateTrigger.c_str());
@@ -96,6 +99,7 @@ namespace argos {
          if(!::iio_device_is_trigger(m_psSensorUpdateTrigger)) {
             THROW_ARGOSEXCEPTION("IIO device \"" << strSensorUpdateTrigger << "\" is not a trigger");
          }
+         */
          /* go through the actuators */
          std::string strImpl;
          /* Go through actuators */
@@ -216,6 +220,8 @@ namespace argos {
    /****************************************/
 
    void CDrone::Destroy() {
+      /* disable the controller */
+      m_pcController->Destroy();
       /* delete actuators */
       for(CPhysicalActuator* pc_actuator : m_vecActuators)
          delete pc_actuator;

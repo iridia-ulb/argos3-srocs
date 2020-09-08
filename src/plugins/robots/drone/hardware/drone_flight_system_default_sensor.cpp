@@ -58,6 +58,13 @@ namespace argos {
 
       /* read and decode all messages */
       while(std::optional<mavlink_message_t> tMessage = Read()) {
+         /* initialize the target system and component identifiers if not already done */
+         if(!m_pcPixhawk->GetTargetSystem()) {
+            m_pcPixhawk->GetTargetSystem().emplace(tMessage.value().sysid);
+         }
+         if(!m_pcPixhawk->GetTargetComponent()) {
+            m_pcPixhawk->GetTargetComponent().emplace(tMessage.value().compid);
+         }
          Decode(tMessage.value());
       }
       /* update readings with the latest data */
@@ -76,6 +83,10 @@ namespace argos {
             m_tLocalPositionNed.value();
          m_cPosition.Set(tReading.x, tReading.y, tReading.z);
          m_cVelocity.Set(tReading.vx, tReading.vy, tReading.vz);
+         /* set the initial position if not already set */
+         if(!m_pcPixhawk->GetInitialPosition()) {
+            m_pcPixhawk->GetInitialPosition().emplace(m_cPosition);
+         }
          /* clear out the read data */
          m_tLocalPositionNed.reset();
       }
@@ -86,6 +97,10 @@ namespace argos {
          m_cAngularVelocity.Set(tReading.rollspeed,
                                 tReading.pitchspeed,
                                 tReading.yawspeed);
+         /* set the initial orientation if not already set */
+         if(!m_pcPixhawk->GetInitialOrientation()) {
+            m_pcPixhawk->GetInitialOrientation().emplace(m_cOrientation);
+         }
          /* clear out the read data */
          m_tAttitude.reset();
       }

@@ -19,14 +19,61 @@ namespace argos {
 #ifdef ARGOS_WITH_LUA
    /*
     * The stack must have two values in this order:
+    * 1. arm (true) or disarm (false) (boolean)
+    * 2. bypass safety checks (boolean)
+    */
+   int LuaSetDroneFlightSystemArmed(lua_State* pt_lua_state) {
+      /* Check parameters */
+      if(lua_gettop(pt_lua_state) != 2) {
+         return luaL_error(pt_lua_state, "robot.flight_system.set_armed() expects 2 arguments");
+      }
+      luaL_checktype(pt_lua_state, 1, LUA_TBOOLEAN);
+      luaL_checktype(pt_lua_state, 2, LUA_TBOOLEAN);
+      /* Get actuator instance */
+      CCI_DroneFlightSystemActuator* pcFlightSystemActuator =
+         CLuaUtility::GetDeviceInstance<CCI_DroneFlightSystemActuator>(pt_lua_state, "flight_system");
+      /* Update actuator */
+      pcFlightSystemActuator->Arm(lua_toboolean(pt_lua_state, 1), lua_toboolean(pt_lua_state, 2));
+      return 0;
+   }
+#endif
+
+   /****************************************/
+   /****************************************/
+
+#ifdef ARGOS_WITH_LUA
+   /*
+    * The stack must have two values in this order:
+    * 1. off-board mode enabled (true) or disabled (false) (boolean)
+    */
+   int LuaSetDroneFlightSystemOffboardMode(lua_State* pt_lua_state) {
+      /* Check parameters */
+      if(lua_gettop(pt_lua_state) != 1) {
+         return luaL_error(pt_lua_state, "robot.flight_system.set_offboard_mode() expects 1 arguments");
+      }
+      luaL_checktype(pt_lua_state, 1, LUA_TBOOLEAN);
+      /* Get actuator instance */
+      CCI_DroneFlightSystemActuator* pcFlightSystemActuator =
+         CLuaUtility::GetDeviceInstance<CCI_DroneFlightSystemActuator>(pt_lua_state, "flight_system");
+      /* Update actuator */
+      pcFlightSystemActuator->SetOffboardMode(lua_toboolean(pt_lua_state, 1));
+      return 0;
+   }
+#endif
+
+   /****************************************/
+   /****************************************/
+
+#ifdef ARGOS_WITH_LUA
+   /*
+    * The stack must have two values in this order:
     * 1. target position (vector3)
     * 2. target yaw angle (number)
     */
-
-   int LuaSetDroneFlightSystemTargets(lua_State* pt_lua_state) {
+   int LuaSetDroneFlightSystemTargetPose(lua_State* pt_lua_state) {
       /* Check parameters */
       if(lua_gettop(pt_lua_state) != 2) {
-         return luaL_error(pt_lua_state, "robot.flight_system.set_targets() expects 2 arguments");
+         return luaL_error(pt_lua_state, "robot.flight_system.set_target_pose() expects 2 arguments");
       }
       luaL_checktype(pt_lua_state, 1, LUA_TUSERDATA);
       luaL_checktype(pt_lua_state, 2, LUA_TNUMBER);
@@ -36,12 +83,32 @@ namespace argos {
       /* Update actuator */
       const CVector3& cTargetPosition = CLuaVector3::ToVector3(pt_lua_state, 1);     
       pcFlightSystemActuator->SetTargetPosition(cTargetPosition);
-      pcFlightSystemActuator->SetTargetYawAngle(lua_tonumber(pt_lua_state, 2));
-      
+      pcFlightSystemActuator->SetTargetYawAngle(lua_tonumber(pt_lua_state, 2));     
       return 0;
    }
 #endif
-   
+
+   /****************************************/
+   /****************************************/
+
+#ifdef ARGOS_WITH_LUA
+   /*
+    * The stack must have zero values
+    */
+   int LuaIsDroneFlightSystemReady(lua_State* pt_lua_state) {
+      /* Check parameters */
+      if(lua_gettop(pt_lua_state) != 0) {
+         return luaL_error(pt_lua_state, "robot.flight_system.ready() expects 0 arguments");
+      }
+      /* Get actuator instance */
+      CCI_DroneFlightSystemActuator* pcFlightSystemActuator =
+         CLuaUtility::GetDeviceInstance<CCI_DroneFlightSystemActuator>(pt_lua_state, "flight_system");
+      /* Read actuator */
+      lua_pushboolean(pt_lua_state, pcFlightSystemActuator->Ready());
+      return 1;
+   }
+#endif
+
    /****************************************/
    /****************************************/
 
@@ -50,12 +117,20 @@ namespace argos {
       CLuaUtility::OpenRobotStateTable(pt_lua_state, "flight_system");
       CLuaUtility::AddToTable(pt_lua_state, "_instance", this);
       CLuaUtility::AddToTable(pt_lua_state,
-                              "set_targets",
-                              &LuaSetDroneFlightSystemTargets);
+                              "ready",
+                              &LuaIsDroneFlightSystemReady);
+      CLuaUtility::AddToTable(pt_lua_state,
+                              "set_armed",
+                              &LuaSetDroneFlightSystemArmed);
+      CLuaUtility::AddToTable(pt_lua_state,
+                              "set_offboard_mode",
+                              &LuaSetDroneFlightSystemOffboardMode);
+      CLuaUtility::AddToTable(pt_lua_state,
+                              "set_target_pose",
+                              &LuaSetDroneFlightSystemTargetPose);
       CLuaUtility::CloseRobotStateTable(pt_lua_state);
    }
 #endif
-
 
    /****************************************/
    /****************************************/

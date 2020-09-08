@@ -40,9 +40,11 @@ namespace argos {
          m_cTargetYawAngle.SignedNormalize();
       }
 
-      virtual void Arm(bool b_arm, bool b_bypass_safety_checks) {}
+      virtual bool Ready() = 0;
 
-      virtual void SetOffboardMode(bool b_offboard_mode) {}
+      virtual void Arm(bool b_arm, bool b_bypass_safety_checks) = 0;
+
+      virtual void SetOffboardMode(bool b_offboard_mode) = 0;
       
 #ifdef ARGOS_WITH_LUA
       virtual void CreateLuaState(lua_State* pt_lua_state);

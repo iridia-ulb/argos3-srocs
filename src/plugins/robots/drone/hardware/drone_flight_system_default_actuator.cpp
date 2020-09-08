@@ -84,55 +84,23 @@ namespace argos {
             Write(tMessage);
          }
          catch(CARGoSException& ex) {
-            LOGERR << "[ERROR] Could not write setpoint: " << ex.what();
+            LOGERR << "[ERROR] Could not write setpoint: " 
+                   << ex.what()
+                   << std::endl;
          }
       }
       else {
          LOGERR << "[WARNING] "
-                << "Attempt to write setpoint before Pixhawk was ready";
+                << "Attempt to write setpoint before Pixhawk was ready"
+                << std::endl;
       }
    }
 
    /****************************************/
    /****************************************/
 
-   void CDroneFlightSystemDefaultActuator::SetOffboardMode(bool b_offboard_mode) {
-      if(m_pcPixhawk->Ready()) {
-         /* build commmand for entering/exiting off-board mode */
-         mavlink_command_long_t tCommand = {0};
-         tCommand.target_system    = m_pcPixhawk->GetTargetSystem().value();
-         tCommand.target_component = m_pcPixhawk->GetTargetComponent().value();
-         tCommand.command          = MAV_CMD_NAV_GUIDED_ENABLE;
-         tCommand.confirmation     = 1;
-         tCommand.param1           = b_offboard_mode ? 1.0f : 0.0f;
-         /* encode the message */
-         mavlink_message_t tMessage;
-         mavlink_msg_command_long_encode(m_pcPixhawk->GetTargetSystem().value(),
-                                         0,
-                                         &tMessage,
-                                         &tCommand);
-         /* send the message */
-         try {
-            Write(tMessage);
-         }
-         catch(CARGoSException& ex) {
-            std::string strError("Could not ");
-            strError += b_offboard_mode ? "enter" : "exit";
-            strError += " off-board mode";
-            if(b_offboard_mode) {
-               /* abort the program */
-               THROW_ARGOSEXCEPTION_NESTED(strError, ex);
-            }
-            else {
-               LOGERR << "[ERROR] " << strError << std::endl;
-               LOGERR << "[ERROR] " << ex.what() << std::endl;
-            }
-         }
-      }
-      else {
-         LOGERR << "[WARNING] "
-                << "Attempt to enter/exit off-board mode before Pixhawk was ready";
-      }
+   bool CDroneFlightSystemDefaultActuator::Ready() {
+      return m_pcPixhawk->Ready();
    }
 
    /****************************************/
@@ -174,7 +142,51 @@ namespace argos {
       }
       else {
          LOGERR << "[WARNING] "
-                << "Attempt to arm/disarm drone before Pixhawk was ready";
+                << "Attempt to arm/disarm drone before Pixhawk was ready"
+                << std::endl;
+      }
+   }
+
+   /****************************************/
+   /****************************************/
+
+   void CDroneFlightSystemDefaultActuator::SetOffboardMode(bool b_offboard_mode) {
+      if(m_pcPixhawk->Ready()) {
+         /* build commmand for entering/exiting off-board mode */
+         mavlink_command_long_t tCommand = {0};
+         tCommand.target_system    = m_pcPixhawk->GetTargetSystem().value();
+         tCommand.target_component = m_pcPixhawk->GetTargetComponent().value();
+         tCommand.command          = MAV_CMD_NAV_GUIDED_ENABLE;
+         tCommand.confirmation     = 1;
+         tCommand.param1           = b_offboard_mode ? 1.0f : 0.0f;
+         /* encode the message */
+         mavlink_message_t tMessage;
+         mavlink_msg_command_long_encode(m_pcPixhawk->GetTargetSystem().value(),
+                                         0,
+                                         &tMessage,
+                                         &tCommand);
+         /* send the message */
+         try {
+            Write(tMessage);
+         }
+         catch(CARGoSException& ex) {
+            std::string strError("Could not ");
+            strError += b_offboard_mode ? "enter" : "exit";
+            strError += " off-board mode";
+            if(b_offboard_mode) {
+               /* abort the program */
+               THROW_ARGOSEXCEPTION_NESTED(strError, ex);
+            }
+            else {
+               LOGERR << "[ERROR] " << strError << std::endl;
+               LOGERR << "[ERROR] " << ex.what() << std::endl;
+            }
+         }
+      }
+      else {
+         LOGERR << "[WARNING] "
+                << "Attempt to enter/exit off-board mode before Pixhawk was ready"
+                << std::endl;
       }
    }
 
