@@ -53,9 +53,11 @@ namespace argos {
       struct SSimulatedInterface : SInterface,
                                    CPositionalIndex<CTagEntity>::COperation,
                                    CPositionalIndex<CDirectionalLEDEntity>::COperation {
-         SSimulatedInterface(const UInt8& un_label,
+         SSimulatedInterface(const std::string& str_label,
+                             const CCI_DroneCamerasSystemSensor::TConfiguration& t_configuration,
                              const SAnchor& s_anchor,
                              CDroneCamerasSystemDefaultSensor& c_parent);
+                             
          ~SSimulatedInterface() {}
 
          virtual void Reset();

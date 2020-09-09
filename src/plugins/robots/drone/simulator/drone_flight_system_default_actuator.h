@@ -38,6 +38,14 @@ namespace argos {
 
       virtual void Update();
 
+      virtual bool Ready() override {
+         return true;
+      };
+
+      virtual void Arm(bool b_arm, bool b_bypass_safety_checks) override {}
+      
+      virtual void SetOffboardMode(bool b_offboard_mode) override {}
+
    private:
 
       CDroneFlightSystemEntity* m_pcFlightSystemEntity;

@@ -49,9 +49,9 @@ namespace argos {
          /* get the anchors for the sensor interfaces from m_mapSensorConfig */
          for(const std::pair<const std::string, TConfiguration>& t_config : SENSOR_CONFIGURATION) {
             const char* pchAnchor = std::get<const char*>(t_config.second);
-            SAnchor& sAnchor =
+            const SAnchor& sAnchor =
                c_entity.GetComponent<CEmbodiedEntity>("body").GetAnchor(pchAnchor);
-            m_vecSimulatedInterfaces.emplace_back(t_config.first, sAnchor, *this);
+            m_vecSimulatedInterfaces.emplace_back(t_config.first, t_config.second, sAnchor, *this);
          }
       }
       catch(CARGoSException& ex) {
@@ -86,11 +86,9 @@ namespace argos {
    /****************************************/
 
    void CDroneCamerasSystemDefaultSensor::Update() {
-      /* increment the timestamp */
-      m_fTimestamp += CPhysicsEngine::GetSimulationClockTick();
       /* update each camera */
       for(SSimulatedInterface& s_simulated_interface : m_vecSimulatedInterfaces) {
-         s_simulated_interface.Update();
+         s_simulated_interface.Update();        
       }
    }
 
@@ -118,11 +116,12 @@ namespace argos {
    /****************************************/
    /****************************************/
 
-   CDroneCamerasSystemDefaultSensor::
-      SSimulatedInterface::SSimulatedInterface(const std::string& str_label,
-                                               const SAnchor& s_anchor,
-                                               CDroneCamerasSystemDefaultSensor& c_parent) :
-      SInterface(str_label),
+   CDroneCamerasSystemDefaultSensor::SSimulatedInterface::
+      SSimulatedInterface(const std::string& str_label,
+                          const CCI_DroneCamerasSystemSensor::TConfiguration& t_configuration,
+                          const SAnchor& s_anchor,
+                          CDroneCamerasSystemDefaultSensor& c_parent) :
+      SInterface(str_label, t_configuration),
       Anchor(s_anchor),
       m_cParent(c_parent) {
       /* set up the project matrix */
@@ -157,6 +156,8 @@ namespace argos {
 
    void CDroneCamerasSystemDefaultSensor::
       SSimulatedInterface::Update() {
+      /* increment the interface timestamp */
+      Timestamp += CPhysicsEngine::GetSimulationClockTick();
       /* clear out the readings from the last update */
       Tags.clear();
       m_vecLedCache.clear();

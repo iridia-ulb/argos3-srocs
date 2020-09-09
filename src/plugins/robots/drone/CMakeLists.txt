@@ -16,7 +16,7 @@ if(ARGOS_BUILD_FOR_SIMULATOR)
     simulator/drone_flight_system_default_actuator.h
     simulator/drone_flight_system_default_sensor.h
     simulator/drone_flight_system_entity.h
-    simulator/drone_rangefinders_default_sensor.h
+#    simulator/drone_rangefinders_default_sensor.h
     simulator/drone_system_default_sensor.h
     simulator/pointmass3d_drone_model.h)
   if(ARGOS_COMPILE_QTOPENGL)
@@ -56,7 +56,7 @@ if(ARGOS_BUILD_FOR_SIMULATOR)
     simulator/drone_flight_system_default_actuator.cpp
     simulator/drone_flight_system_default_sensor.cpp
     simulator/drone_flight_system_entity.cpp
-    simulator/drone_rangefinders_default_sensor.cpp
+#    simulator/drone_rangefinders_default_sensor.cpp
     simulator/drone_system_default_sensor.cpp
     simulator/pointmass3d_drone_model.cpp)
   if(ARGOS_COMPILE_QTOPENGL)
