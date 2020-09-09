@@ -9,6 +9,13 @@ if(ARGOS_BUILD_FOR_SIMULATOR)
     ${CMAKE_BINARY_DIR}/testing/pi-puck/test_pipuck.lua
     COPYONLY)
   configure_file(
+    ${CMAKE_SOURCE_DIR}/testing/pi-puck/simulator/test_pipuck_imu.argos.in
+    ${CMAKE_BINARY_DIR}/testing/pi-puck/test_pipuck_imu.argos)
+  configure_file(
+    ${CMAKE_SOURCE_DIR}/testing/pi-puck/simulator/test_pipuck_imu.lua
+    ${CMAKE_BINARY_DIR}/testing/pi-puck/test_pipuck_imu.lua
+    COPYONLY)   
+  configure_file(
     ${CMAKE_SOURCE_DIR}/testing/pi-puck/simulator/test_pipuck.png
     ${CMAKE_BINARY_DIR}/testing/pi-puck/test_pipuck.png
     COPYONLY)
