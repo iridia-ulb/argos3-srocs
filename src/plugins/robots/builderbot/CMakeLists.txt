@@ -202,7 +202,7 @@ endif(ARGOS_BUILD_FOR_SIMULATOR)
 install(FILES ${ARGOS3_HEADERS_PLUGINS_ROBOTS_BUILDERBOT_CONTROLINTERFACE} DESTINATION include/argos3/plugins/robots/builderbot/control_interface)
 
 if(ARGOS_WITH_LUA)
-	install(FILES ${CMAKE_CURRENT_BINARY_DIR}/lua_library.luac DESTINATION include/argos3/plugins/robots/builderbot)
+	install(FILES ${CMAKE_CURRENT_BINARY_DIR}/lua_library.luac DESTINATION share/argos3/plugins/robots/builderbot)
 endif(ARGOS_WITH_LUA)
 
 if(ARGOS_BUILD_FOR_SIMULATOR)
