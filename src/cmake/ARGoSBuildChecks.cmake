@@ -25,7 +25,7 @@ elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
     # For the drone it must be >= 9.1.0
     check_gcc(9.1.0)
   else(ARGOS_BUILD_FOR STREQUAL "drone")
-    # For the simulator and other robots, it must be at least 6.1.0
+    # For the simulator and other robots, it must be >= 6.1.0
     check_gcc(6.1.0)
   endif(ARGOS_BUILD_FOR STREQUAL "drone")
 endif()
