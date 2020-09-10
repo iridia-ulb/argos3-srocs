@@ -45,6 +45,18 @@ endif(NOT ARGOS_FOUND)
 include_directories(${ARGOS_INCLUDE_DIR})
 
 #
+# Check for Lua 5.3
+#
+FIND_PACKAGE(Lua "5.3" EXACT REQUIRED)
+if(LUA_FOUND)
+  set(ARGOS_WITH_LUA ON)
+  include_directories(${LUA_INCLUDE_DIR})
+else(LUA_FOUND)
+  message(FATAL_ERROR "Lua 5.3 not found")
+endif(LUA_FOUND)
+
+
+#
 # Check for the AprilTag library
 # It is required only when compiling for the builderbot and drone hardware
 #
@@ -103,15 +115,4 @@ if(ARGOS_BUILD_FOR STREQUAL "builderbot")
   endif(NOT MEDIACTL_FOUND)
   include_directories(${MEDIACTL_INCLUDE_DIR})
 endif(ARGOS_BUILD_FOR STREQUAL "builderbot")
-
-#
-# Check for Lua 5.3
-#
-FIND_PACKAGE(Lua "5.3" EXACT REQUIRED)
-if(LUA_FOUND)
-  set(ARGOS_WITH_LUA ON)
-  include_directories(${LUA_INCLUDE_DIR})
-else(LUA_FOUND)
-  message(FATAL_ERROR "Lua 5.3 not found")
-endif(LUA_FOUND)
 

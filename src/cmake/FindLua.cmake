@@ -217,7 +217,7 @@ if (LUA_VERSION_STRING)
 endif ()
 
 find_program(LUA_COMPILER
-  NAMES ${_lua_compiler_names}
+  NAMES ${_lua_compiler_names} luac
   NAMES_PER_DIR
   HINTS
     ENV LUA_DIR
