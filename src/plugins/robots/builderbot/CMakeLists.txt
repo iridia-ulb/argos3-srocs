@@ -118,49 +118,6 @@ elseif(ARGOS_BUILD_FOR STREQUAL "builderbot")
     hardware/main.cpp)
 endif(ARGOS_BUILD_FOR_SIMULATOR)
 
-#
-# BuilderBot lua library
-#
-if(ARGOS_WITH_LUA)
-  set(ARGOS3_HEADERS_PLUGINS_ROBOTS_BUILDERBOT_LUALIBRARY
-    lua_library/api/move.lua
-    lua_library/api/constants.lua
-    lua_library/api/parameters.lua
-    lua_library/api/process_obstacles.lua
-    lua_library/api/process_leds.lua
-    lua_library/api/process_structures.lua
-    lua_library/api/process_blocks.lua
-    lua_library/api/match_rules.lua
-    lua_library/api/track_blocks.lua
-    lua_library/nodes/obstacle_avoidance.lua
-    lua_library/nodes/move_to_location.lua
-    lua_library/nodes/place_block.lua
-    lua_library/nodes/pick_up_block.lua
-    lua_library/nodes/pick_up_behavior.lua
-    lua_library/nodes/z_approach_block.lua
-    lua_library/nodes/random_walk.lua
-    lua_library/nodes/timer.lua
-    lua_library/nodes/curved_approach_block.lua
-    lua_library/nodes/approach_block.lua
-    lua_library/nodes/place_behavior.lua
-    lua_library/nodes/search_block.lua
-    lua_library/nodes/reach_block.lua
-    lua_library/nodes/process_rules.lua
-    lua_library/nodes/aim_block.lua
-    lua_library/utils/hungarian.lua
-    lua_library/utils/draw.lua
-    lua_library/utils/queue.lua
-    lua_library/utils/print.lua
-    lua_library/utils/behavior_tree.lua
-    # init.lua must come last
-    lua_library/init.lua)
-  add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/lua_library.luac
-  	 COMMAND ${LUA_COMPILER} -o ${CMAKE_CURRENT_BINARY_DIR}/lua_library.luac ${ARGOS3_HEADERS_PLUGINS_ROBOTS_BUILDERBOT_LUALIBRARY}
-  	 DEPENDS ${ARGOS3_HEADERS_PLUGINS_ROBOTS_BUILDERBOT_LUALIBRARY}
-  	 WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
-  add_custom_target(lualibrary ALL DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/lua_library.luac)
-endif(ARGOS_WITH_LUA)
-
 if(ARGOS_BUILD_FOR_SIMULATOR)
   # Create a plug-in for the simulator
   add_library(argos3srocs_${ARGOS_BUILD_FOR}_builderbot SHARED ${ARGOS3_SOURCES_PLUGINS_ROBOTS_BUILDERBOT})
@@ -202,7 +159,16 @@ endif(ARGOS_BUILD_FOR_SIMULATOR)
 install(FILES ${ARGOS3_HEADERS_PLUGINS_ROBOTS_BUILDERBOT_CONTROLINTERFACE} DESTINATION include/argos3/plugins/robots/builderbot/control_interface)
 
 if(ARGOS_WITH_LUA)
-	install(FILES ${CMAKE_CURRENT_BINARY_DIR}/lua_library.luac DESTINATION share/argos3/plugins/robots/builderbot)
+  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/control_interface/lua/init.lua
+                 ${CMAKE_CURRENT_BINARY_DIR}/control_interface/lua/init.lua)
+  install(FILES ${CMAKE_CURRENT_BINARY_DIR}/control_interface/lua/init.lua
+          DESTINATION share/argos3/plugins/robots/builderbot/control_interface/lua)
+  install(DIRECTORY control_interface/lua/api
+          DESTINATION share/argos3/plugins/robots/builderbot/control_interface/lua)
+  install(DIRECTORY control_interface/lua/nodes
+          DESTINATION share/argos3/plugins/robots/builderbot/control_interface/lua)
+  install(DIRECTORY control_interface/lua/utils
+          DESTINATION share/argos3/plugins/robots/builderbot/control_interface/lua)
 endif(ARGOS_WITH_LUA)
 
 if(ARGOS_BUILD_FOR_SIMULATOR)
