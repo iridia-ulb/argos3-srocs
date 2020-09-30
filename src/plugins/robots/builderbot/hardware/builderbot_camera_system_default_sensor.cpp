@@ -120,6 +120,16 @@ namespace argos {
             GetNodeAttribute(tSensorNode, "position", m_cPositionOffset);
             GetNodeAttribute(tSensorNode, "orientation", m_cOrientationOffset);
          }
+         /* update lua interface value*/
+         m_cResolution.Set(IMAGE_WIDTH, IMAGE_HEIGHT);
+         m_cOffsetPosition.Set(m_cPositionOffset.GetX(),
+                               m_cPositionOffset.GetY(),
+                               m_cPositionOffset.GetZ());
+         m_cOffsetOrientation.Set(m_cOrientationOffset.GetW(),
+                                  m_cOrientationOffset.GetX(),
+                                  m_cOrientationOffset.GetY(),
+                                  m_cOrientationOffset.GetZ());
+         m_strAnchor.assign("end_effector");
          /* update the camera matrix */
          m_cCameraMatrix.SetIdentityMatrix();
          m_cCameraMatrix(0,0) = m_cFocalLength.GetX();

@@ -61,13 +61,16 @@ return function(data, aim_point)
       else
          local tolerence = robot.api.parameters.aim_block_angle_tolerance 
          local angle = math.atan(target_block.position_robot.y / target_block.position_robot.x) * 180 / math.pi  -- x should always be positive
+         local err
          if angle < -tolerence then
             turn = "right"
             err = -angle / 10
+            if err < -1 then err = -1 end
             flag_orientation = false
          elseif angle > tolerence then
             turn = "left"
             err = angle / 10
+            if err > 1 then err = 1 end
             flag_orientation = false
          else
             turn = "no"
@@ -75,16 +78,10 @@ return function(data, aim_point)
          end
       end
       if turn == "left" then
-         robot.api.move.with_velocity(-robot.api.parameters.default_speed * err -
-                                       robot.api.parameters.default_speed / 2, 
-                                    robot.api.parameters.default_speed * err +
-                                       robot.api.parameters.default_speed / 2)
+         robot.api.move.with_bearing(robot.api.parameters.default_speed / 2, robot.api.parameters.default_turn_speed * err)
          flag_orientation = false
       elseif turn == "right" then
-         robot.api.move.with_velocity(robot.api.parameters.default_speed * err +
-                                       robot.api.parameters.default_speed / 2,
-                                    -robot.api.parameters.default_speed * err -
-                                       robot.api.parameters.default_speed / 2)
+         robot.api.move.with_bearing(robot.api.parameters.default_speed / 2, robot.api.parameters.default_turn_speed * err)
          flag_orientation = false
       elseif turn == "no" then
          robot.api.move.with_velocity(0, 0)

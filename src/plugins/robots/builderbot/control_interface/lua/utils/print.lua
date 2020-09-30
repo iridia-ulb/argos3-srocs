@@ -1,10 +1,10 @@
 -- register module with logger
 robot.logger:register_module('utils_print')
 
-local function table(table, indentation, skipindex)
+local function table(_table, indentation, skipindex)
    if indentation == nil then indentation = 0 end
-   if type(table) ~= "table" then return nil end
-   for i, v in pairs(table) do
+   if type(_table) ~= "table" then return nil end
+   for i, v in pairs(_table) do
       local str = ""
       for j = 1, indentation do
          str = str .. "\t"
@@ -16,7 +16,7 @@ local function table(table, indentation, skipindex)
       else
          if type(v) == "table" then
             print("logger:\t", str)
-            table(v, number + 1, skipindex)
+            table(v, indentation + 1, skipindex)
          else
             str = str .. tostring(v)
             print("logger:\t", str)

@@ -68,26 +68,25 @@ local function create_get_time_function(data, location)
    local check_obstacle = function()
       local flag = false
       for i, v in ipairs(data.obstacles) do
-         if v.position.x < 0.19 and v.position.x > 0.06 then
-            if v.source == 'camera' then
-               flag = true
-               break
-            elseif v.source == 'left' or v.source == 'right' then
-               if robot.rangefinders['underneath'].proximity > robot.api.parameters.proximity_touch_tolerance then
-                  if robot.lift_system.position < robot.api.parameters.lift_system_rf_cover_threshold then
-                     flag = true
-                     break
-                  end
-               end
-            elseif v.source == '1' or v.source == '12' then
-               if robot.lift_system.position >= robot.api.parameters.lift_system_rf_cover_threshold then
+         if v.source == 'camera' and
+            v.position.z < 0.11 and v.position.z > 0.06 then
+            --flag = true
+            break
+         elseif v.source == 'left' or v.source == 'right' then
+            if robot.rangefinders['underneath'].proximity > robot.api.parameters.proximity_touch_tolerance then
+               if robot.lift_system.position < robot.api.parameters.lift_system_rf_cover_threshold then
                   flag = true
                   break
                end
-            elseif v.source == '2' or v.source == '11' then
+            end
+         elseif v.source == '6' or v.source == '7' then
+            if robot.lift_system.position >= robot.api.parameters.lift_system_rf_cover_threshold then
                flag = true
                break
             end
+         elseif v.source == '5' or v.source == '8' then
+            flag = true
+            break
          end
       end
       if flag == true then
