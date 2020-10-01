@@ -49,7 +49,7 @@ namespace argos {
 
       virtual void Update();
 
-      virtual void ForEachInterface(std::function<void(SInterface&)>);
+      virtual void Visit(std::function<void(SInterface&)>) override;
 
    private:
 

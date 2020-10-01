@@ -94,7 +94,7 @@ namespace argos {
 #ifdef ARGOS_WITH_LUA
    void CCI_DroneCamerasSystemSensor::CreateLuaState(lua_State* pt_lua_state) {
       CLuaUtility::OpenRobotStateTable(pt_lua_state, "cameras_system");
-      ForEachInterface([pt_lua_state] (SInterface& s_interface) {
+      Visit([pt_lua_state] (SInterface& s_interface) {
          /* create a table for the camera */
          CLuaUtility::StartTable(pt_lua_state, s_interface.Label);
          /* add data about this interfaces transform */
@@ -136,7 +136,7 @@ namespace argos {
 #ifdef ARGOS_WITH_LUA
    void CCI_DroneCamerasSystemSensor::ReadingsToLuaState(lua_State* pt_lua_state) {
       lua_getfield(pt_lua_state, -1, "cameras_system");
-      ForEachInterface([pt_lua_state] (SInterface& s_interface) {
+      Visit([pt_lua_state] (SInterface& s_interface) {
          /* update the table for the camera */
          lua_pushstring(pt_lua_state, s_interface.Label.c_str());
          lua_gettable(pt_lua_state, -2);

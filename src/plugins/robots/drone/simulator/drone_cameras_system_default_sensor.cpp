@@ -107,9 +107,9 @@ namespace argos {
    /****************************************/
    /****************************************/
 
-   void CDroneCamerasSystemDefaultSensor::ForEachInterface(std::function<void(SInterface&)> fn) {
+   void CDroneCamerasSystemDefaultSensor::Visit(std::function<void(SInterface&)> fn_visitor) {
       for(SSimulatedInterface& s_interface : m_vecSimulatedInterfaces) {
-         fn(s_interface);
+         fn_visitor(s_interface);
       }
    }
 

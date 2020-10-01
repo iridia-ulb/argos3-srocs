@@ -83,7 +83,7 @@ namespace argos {
 
       virtual ~CCI_DroneCamerasSystemSensor() {}
 
-      virtual void ForEachInterface(std::function<void(SInterface&)>) = 0;
+      virtual void Visit(std::function<void(SInterface&)>) = 0;
 
 #ifdef ARGOS_WITH_LUA
       virtual void CreateLuaState(lua_State* pt_lua_state);

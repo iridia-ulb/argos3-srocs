@@ -46,7 +46,7 @@ namespace argos {
 
       virtual void Reset();
 
-      virtual void ForEachInterface(std::function<void(SInterface&)> fn);
+      virtual void Visit(std::function<void(SInterface&)>) override;
 
    private:
 
