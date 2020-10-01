@@ -33,9 +33,7 @@ namespace argos {
        */
       virtual ~CPiPuckDifferentialDriveEntity() {}
 
-      virtual void Update() {}
-
-      virtual void Reset();
+      void Reset() final;
 
       void SetTargetVelocityLeft(Real f_left) {
          m_fTargetVelocityLeft = f_left;
@@ -69,7 +67,7 @@ namespace argos {
          return m_fVelocityRight;
       }
 
-      virtual std::string GetTypeDescription() const {
+      std::string GetTypeDescription() const override {
          return "differential_drive";
       }
 

@@ -50,29 +50,31 @@ namespace argos {
          CVector2 Center;
       };
 
-      const std::vector<SLed>& GetLedCache() const {
-         return m_vecLedCache;
-      }
+   public:
 
       CPiPuckCameraSystemDefaultSensor();
 
       virtual ~CPiPuckCameraSystemDefaultSensor() {}
 
-      virtual void SetRobot(CComposableEntity& c_entity);
+      void SetRobot(CComposableEntity& c_entity) override;
 
-      virtual void Init(TConfigurationNode& t_tree);
+      void Init(TConfigurationNode& t_tree) override;
 
-      virtual void Update();
+      void Update() override;
 
-      virtual void Reset();
+      void Reset() override;
 
-      virtual bool operator()(CTagEntity& c_tag);
+      bool operator()(CTagEntity& c_tag) override;
 
-      virtual bool operator()(CDirectionalLEDEntity& c_led);
+      bool operator()(CDirectionalLEDEntity& c_led) override;
 
-      virtual ELedState DetectLed(const CVector3& c_position);
+      ELedState DetectLed(const CVector3& c_position) override;
 
       CVector2 GetResolution() const;
+
+      const std::vector<SLed>& GetLedCache() const {
+         return m_vecLedCache;
+      }
 
    private:
 

@@ -49,9 +49,9 @@ namespace argos {
 
       virtual ~CPiPuckEntity() {}
 
-      virtual void Init(TConfigurationNode& t_tree);
+      void Init(TConfigurationNode& t_tree) override;
 
-      virtual std::string GetTypeDescription() const {
+      std::string GetTypeDescription() const override {
          return "pipuck";
       }
 

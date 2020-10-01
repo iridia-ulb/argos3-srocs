@@ -31,15 +31,18 @@ namespace argos {
          SInterface(const UInt8& un_label) :
             Label(un_label),
             Configuration(m_mapSensorConfig.at(un_label)),
-            Reading(0.0f) {}
+            Reading({0.0, 0.0}) {}
          const UInt8& Label;
          const TConfiguration& Configuration;
-         Real Reading;
+         struct {
+            Real Illuminance;
+            Real Proximity;
+         } Reading;
       };
 
       virtual ~CCI_PiPuckRangefindersSensor() {}
 
-      virtual void ForEachInterface(std::function<void(const SInterface&)>) = 0;
+      virtual void Visit(std::function<void(const SInterface&)>) = 0;
 
 #ifdef ARGOS_WITH_LUA
       virtual void CreateLuaState(lua_State* pt_lua_state);

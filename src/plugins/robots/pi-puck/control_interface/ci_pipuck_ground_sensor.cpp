@@ -18,7 +18,7 @@ namespace argos {
 #ifdef ARGOS_WITH_LUA
    void CCI_PiPuckGroundSensor::CreateLuaState(lua_State* pt_lua_state) {
       CLuaUtility::StartTable(pt_lua_state, "ground");
-      ForEachInterface([pt_lua_state] (const SInterface& s_interface) {
+      Visit([pt_lua_state] (const SInterface& s_interface) {
          CLuaUtility::StartTable(pt_lua_state, s_interface.Label);
          CLuaUtility::AddToTable(pt_lua_state, "reading", s_interface.Reading);
          CLuaUtility::StartTable(pt_lua_state, "transform");
@@ -38,7 +38,7 @@ namespace argos {
 #ifdef ARGOS_WITH_LUA
    void CCI_PiPuckGroundSensor::ReadingsToLuaState(lua_State* pt_lua_state) {
       lua_getfield(pt_lua_state, -1, "ground");
-      ForEachInterface([pt_lua_state] (const SInterface& s_interface) {
+      Visit([pt_lua_state] (const SInterface& s_interface) {
          lua_getfield(pt_lua_state, -1, s_interface.Label.c_str());
          lua_pushstring(pt_lua_state, "reading");
          lua_pushnumber(pt_lua_state, s_interface.Reading);

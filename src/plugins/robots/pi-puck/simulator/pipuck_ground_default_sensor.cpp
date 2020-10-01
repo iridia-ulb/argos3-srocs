@@ -96,9 +96,9 @@ namespace argos {
    /****************************************/
    /****************************************/
 
-   void CPiPuckGroundDefaultSensor::ForEachInterface(std::function<void(const SInterface&)> fn) {
+   void CPiPuckGroundDefaultSensor::Visit(std::function<void(const SInterface&)> fn_visitor) {
       for(const SSimulatedInterface& s_interface : m_vecSimulatedInterfaces) {
-         fn(s_interface);
+         fn_visitor(s_interface);
       }
    }
 

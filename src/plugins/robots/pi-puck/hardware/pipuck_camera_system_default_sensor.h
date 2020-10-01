@@ -45,19 +45,19 @@ namespace argos {
 
       virtual ~CPiPuckCameraSystemDefaultSensor();
 
-      virtual void Init(TConfigurationNode& t_tree);
+      void Init(TConfigurationNode& t_tree) override;
 
-      virtual void Destroy();
+      void Destroy() override;
 
-      virtual void Enable();
+      void Update() override;
 
-      virtual void Disable();
+      void Enable() override;
 
-      virtual void Update();
+      void Disable() override;
 
    private:
 
-      ELedState DetectLed(const CVector3& c_position);
+      ELedState DetectLed(const CVector3& c_position) override;
 
       /* calibration data */
       CVector2 m_cFocalLength;

@@ -32,17 +32,17 @@ namespace argos {
        */
       virtual ~CPiPuckDifferentialDriveDefaultActuator();
 
-      virtual void SetRobot(CComposableEntity& c_entity);
+      void SetRobot(CComposableEntity& c_entity) override;
 
-      virtual void Init(TConfigurationNode& t_tree);
+      void Init(TConfigurationNode& t_tree) override;
 
-      virtual void Update();
+      void Update() override;
 
-      virtual void Reset();
+      void Reset() override;
 
-      virtual void SetTargetVelocityLeft(Real f_target_velocity_left);
+      void SetTargetVelocityLeft(Real f_target_velocity_left) override;
 
-      virtual void SetTargetVelocityRight(Real f_target_velocity_right);
+      void SetTargetVelocityRight(Real f_target_velocity_right) override;
 
    private:
 

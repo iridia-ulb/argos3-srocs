@@ -16,16 +16,6 @@ namespace argos {
    /****************************************/
    /****************************************/
 
-   CPiPuckSystemDefaultSensor::CPiPuckSystemDefaultSensor() {}
- 
-   /****************************************/
-   /****************************************/
-
-   CPiPuckSystemDefaultSensor::~CPiPuckSystemDefaultSensor() {}
-   
-   /****************************************/
-   /****************************************/
-
    void CPiPuckSystemDefaultSensor::SetRobot(CComposableEntity& c_entity) {}
 
    /****************************************/

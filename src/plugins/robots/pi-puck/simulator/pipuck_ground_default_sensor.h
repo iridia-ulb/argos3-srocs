@@ -38,15 +38,15 @@ namespace argos {
 
       virtual ~CPiPuckGroundDefaultSensor() {}
 
-      virtual void SetRobot(CComposableEntity& c_entity);
+      void SetRobot(CComposableEntity& c_entity) override;
 
-      virtual void Init(TConfigurationNode& t_tree);
+      void Init(TConfigurationNode& t_tree) override;
 
-      virtual void Update();
+      void Update() override;
 
-      virtual void Reset();
+      void Reset() override;
 
-      virtual void ForEachInterface(std::function<void(const SInterface&)> fn);
+      void Visit(std::function<void(const SInterface&)> fn_visitor) override;
 
    private:
 

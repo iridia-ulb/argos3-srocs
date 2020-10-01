@@ -18,9 +18,12 @@ namespace argos {
 #ifdef ARGOS_WITH_LUA
    void CCI_PiPuckRangefindersSensor::CreateLuaState(lua_State* pt_lua_state) {
       CLuaUtility::StartTable(pt_lua_state, "rangefinders");
-      ForEachInterface([pt_lua_state] (const SInterface& s_interface) {
+      Visit([pt_lua_state] (const SInterface& s_interface) {
          CLuaUtility::StartTable(pt_lua_state, s_interface.Label);
-         CLuaUtility::AddToTable(pt_lua_state, "reading", s_interface.Reading);
+         CLuaUtility::StartTable(pt_lua_state, "reading");
+         CLuaUtility::AddToTable(pt_lua_state, "proximity", s_interface.Reading.Proximity);
+         CLuaUtility::AddToTable(pt_lua_state, "illuminance", s_interface.Reading.Illuminance);
+         CLuaUtility::EndTable(pt_lua_state);
          CLuaUtility::StartTable(pt_lua_state, "transform");
          CLuaUtility::AddToTable(pt_lua_state, "position", std::get<CVector3>(s_interface.Configuration));
          CLuaUtility::AddToTable(pt_lua_state, "orientation", std::get<CQuaternion>(s_interface.Configuration));
@@ -38,13 +41,18 @@ namespace argos {
 #ifdef ARGOS_WITH_LUA
    void CCI_PiPuckRangefindersSensor::ReadingsToLuaState(lua_State* pt_lua_state) {
       lua_getfield(pt_lua_state, -1, "rangefinders");
-      ForEachInterface([pt_lua_state] (const SInterface& s_interface) {
+      Visit([pt_lua_state] (const SInterface& s_interface) {
          lua_pushnumber(pt_lua_state, s_interface.Label);
          lua_gettable(pt_lua_state, -2);
-         lua_pushstring(pt_lua_state, "reading");
-         lua_pushnumber(pt_lua_state, s_interface.Reading);
+         lua_getfield(pt_lua_state, -1, "reading");
+         lua_pushstring(pt_lua_state, "proximity");
+         lua_pushnumber(pt_lua_state, s_interface.Reading.Proximity);
          lua_settable(pt_lua_state, -3);
-         lua_pop(pt_lua_state, 1);
+         lua_pushstring(pt_lua_state, "illuminance");
+         lua_pushnumber(pt_lua_state, s_interface.Reading.Illuminance);
+         lua_settable(pt_lua_state, -3);
+         lua_pop(pt_lua_state, 1); // reading
+         lua_pop(pt_lua_state, 1); // label
       });
       lua_pop(pt_lua_state, 1);
    }

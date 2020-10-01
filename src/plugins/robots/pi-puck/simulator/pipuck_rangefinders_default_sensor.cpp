@@ -17,13 +17,6 @@ namespace argos {
    /****************************************/
    /****************************************/
 
-   CPiPuckRangefindersDefaultSensor::CPiPuckRangefindersDefaultSensor() :
-      m_bShowRays(false),
-      m_pcControllableEntity(nullptr) {}
-
-   /****************************************/
-   /****************************************/
-
    void CPiPuckRangefindersDefaultSensor::SetRobot(CComposableEntity& c_entity) {
       m_pcControllableEntity = &(c_entity.GetComponent<CControllableEntity>("controller"));
       /* allocate memory for the sensor interfaces */
@@ -75,16 +68,18 @@ namespace argos {
                m_pcControllableEntity->AddIntersectionPoint(cSensorRay, sIntersection.TOnRay);
                m_pcControllableEntity->AddCheckedRay(true, cSensorRay);
             }
-            s_interface.Reading = 
+            s_interface.Reading.Proximity = 
                ConvertToMeters(cSensorRay.GetDistance(sIntersection.TOnRay));
          }
          else {
             /* No intersection */
-            s_interface.Reading = std::get<Real>(s_interface.Configuration);
+            s_interface.Reading.Proximity = std::get<Real>(s_interface.Configuration);
             if(m_bShowRays) {
                m_pcControllableEntity->AddCheckedRay(false, cSensorRay);
             }
          }
+         /* not implemented for the moment */
+         s_interface.Reading.Illuminance = 0.0;
       }
    }
 
@@ -93,16 +88,17 @@ namespace argos {
    
    void CPiPuckRangefindersDefaultSensor::Reset() {
       for(SSimulatedInterface& s_interface : m_vecSimulatedInterfaces) {
-         s_interface.Reading = std::get<Real>(s_interface.Configuration);
+         s_interface.Reading.Proximity = std::get<Real>(s_interface.Configuration);
+         s_interface.Reading.Illuminance = 0.0;
       }
    }
    
    /****************************************/
    /****************************************/
 
-   void CPiPuckRangefindersDefaultSensor::ForEachInterface(std::function<void(const SInterface&)> fn) {
+   void CPiPuckRangefindersDefaultSensor::Visit(std::function<void(const SInterface&)> fn_visitor) {
       for(const SSimulatedInterface& s_interface : m_vecSimulatedInterfaces) {
-         fn(s_interface);
+         fn_visitor(s_interface);
       }
    }
 
@@ -113,7 +109,7 @@ namespace argos {
                   "pipuck_rangefinders", "default",
                   "Michael Allwright [allsey87@gmail.com]",
                   "1.0",
-                  "The pipuck rangefinders sensor.",
+                  "The Pi-Puck rangefinders sensor.",
                   "This sensor measures the distance to nearby obstacles.",
                   "Usable"
    );

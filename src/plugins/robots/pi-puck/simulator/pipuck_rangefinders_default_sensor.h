@@ -36,19 +36,21 @@ namespace argos {
          const SAnchor& Anchor;
       };
 
-      CPiPuckRangefindersDefaultSensor();
+      CPiPuckRangefindersDefaultSensor():
+         m_bShowRays(false),
+         m_pcControllableEntity(nullptr) {}
 
       virtual ~CPiPuckRangefindersDefaultSensor() {}
 
-      virtual void SetRobot(CComposableEntity& c_entity);
+      void SetRobot(CComposableEntity& c_entity) override;
 
-      virtual void Init(TConfigurationNode& t_tree);
+      void Init(TConfigurationNode& t_tree) override;
 
-      virtual void Update();
+      void Update() override;
 
-      virtual void Reset();
+      void Reset() override;
 
-      virtual void ForEachInterface(std::function<void(const SInterface&)> fn);
+      void Visit(std::function<void(const SInterface&)>) override;
 
    private:
 

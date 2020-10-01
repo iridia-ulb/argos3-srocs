@@ -29,38 +29,42 @@ namespace argos {
 
    public:
 
+      CPiPuckRangefindersDefaultSensor() {}
+
+      virtual ~CPiPuckRangefindersDefaultSensor() {}
+
+      void Init(TConfigurationNode& t_tree) override;
+
+      void Destroy() override;
+
+      void Update() override;
+
+      void Reset() override;
+
+      void Visit(std::function<void(const SInterface&)> fn_visitor) override;
+
+   private:
+
       struct SPhysicalInterface : SInterface {
          /* constructor */
-         SPhysicalInterface(const std::string& str_label,
-                            iio_device* ps_device,
+         SPhysicalInterface(const UInt8& un_label,
                             iio_channel* ps_proximity_channel,
-                            iio_channel* ps_illuminance_channel,
-                            iio_buffer* ps_buffer) :
-            SInterface(str_label),
-            Device(ps_device),
-            ProximityChannel(ps_proximity_channel),
-            IlluminanceChannel(ps_illuminance_channel),
-            Buffer(ps_buffer),
-            Calibration({0.0, 0.0}) {}
+                            iio_channel* ps_illuminance_channel) :
+            SInterface(un_label),
+            Channel { ps_proximity_channel, ps_illuminance_channel },
+            Calibration { 0.0, 0.0 } {}
          /* members */
-         iio_device* Device;
-         iio_channel* ProximityChannel;
-         iio_channel* IlluminanceChannel;
-         iio_buffer* Buffer;
+         struct {
+            iio_channel* Proximity;
+            iio_channel* Illuminance;
+         } Channel;
          std::array<Real, 2> Calibration;
       };
 
-      CPiPuckRangefindersDefaultSensor();
-
-      virtual ~CPiPuckRangefindersDefaultSensor();
-
-      virtual void Init(TConfigurationNode& t_tree);
-
-      virtual void Update();
-
-      virtual void Reset();
-
    private:
+
+      ::iio_device* m_psDevice;
+      ::iio_buffer* m_psBuffer;
 
       Real ConvertToLux(UInt16 un_raw) {
          static const Real fConversionFactor = Real(1.0);
@@ -68,8 +72,6 @@ namespace argos {
       }
 
       std::vector<SPhysicalInterface> m_vecPhysicalInterfaces;
-
-      
    };
 
 }

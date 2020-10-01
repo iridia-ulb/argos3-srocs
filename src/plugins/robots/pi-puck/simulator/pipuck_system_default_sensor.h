@@ -24,20 +24,20 @@ namespace argos {
       /**
        * @brief Constructor.
        */
-      CPiPuckSystemDefaultSensor();
+      CPiPuckSystemDefaultSensor() {}
 
       /**
        * @brief Destructor.
        */
-      virtual ~CPiPuckSystemDefaultSensor();
+      virtual ~CPiPuckSystemDefaultSensor() {}
 
-      virtual void SetRobot(CComposableEntity& c_entity);
+      void SetRobot(CComposableEntity& c_entity) override;
 
-      virtual void Init(TConfigurationNode& t_tree);
+      void Init(TConfigurationNode& t_tree) override;
 
-      virtual void Reset();
+      void Reset() override;
 
-      virtual void Update();
+      void Update() override;
 
    };   
 }

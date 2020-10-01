@@ -12,16 +12,6 @@ namespace argos {
 
    /****************************************/
    /****************************************/
-
-   CPiPuckSystemDefaultSensor::CPiPuckSystemDefaultSensor() {}
- 
-   /****************************************/
-   /****************************************/
-
-   CPiPuckSystemDefaultSensor::~CPiPuckSystemDefaultSensor() {}
-   
-   /****************************************/
-   /****************************************/
    
    void CPiPuckSystemDefaultSensor::Init(TConfigurationNode& t_tree) {
       try {
@@ -32,9 +22,10 @@ namespace argos {
       }
       m_tpInit = std::chrono::steady_clock::now();
    }
-  
+
    /****************************************/
    /****************************************/
+ 
    
    void CPiPuckSystemDefaultSensor::Reset() {
       m_tpInit = std::chrono::steady_clock::now();

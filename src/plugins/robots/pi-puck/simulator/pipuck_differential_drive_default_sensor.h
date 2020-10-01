@@ -32,19 +32,19 @@ namespace argos {
        */
       virtual ~CPiPuckDifferentialDriveDefaultSensor();
 
-      virtual void SetRobot(CComposableEntity& c_entity);
+      void SetRobot(CComposableEntity& c_entity) override;
 
-      virtual void Init(TConfigurationNode& t_tree);
+      void Init(TConfigurationNode& t_tree) override;
 
-      virtual void Update();
+      void Update() override;
 
-      virtual void Reset();
+      void Reset() override;
 
-      virtual Real GetLeftVelocity() {
+      Real GetLeftVelocity() override {
          return m_fVelocityLeft;
       }
 
-      virtual Real GetRightVelocity() {
+      Real GetRightVelocity() override {
          return m_fVelocityRight;
       }
 

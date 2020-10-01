@@ -12,7 +12,7 @@ namespace argos {
 }
 
 #include <argos3/plugins/robots/generic/hardware/sensor.h>
-#include <argos3/plugins/robots/builderbot/control_interface/ci_pipuck_system_sensor.h>
+#include <argos3/plugins/robots/pi-puck/control_interface/ci_pipuck_system_sensor.h>
 
 #include <chrono>
 
@@ -26,18 +26,18 @@ namespace argos {
       /**
        * @brief Constructor.
        */
-      CPiPuckSystemDefaultSensor();
+      CPiPuckSystemDefaultSensor() {}
 
       /**
        * @brief Destructor.
        */
-      virtual ~CPiPuckSystemDefaultSensor();
+      virtual ~CPiPuckSystemDefaultSensor() {}
 
-      virtual void Init(TConfigurationNode& t_tree);
+      virtual void Init(TConfigurationNode& t_tree) override;
 
-      virtual void Reset();
+      virtual void Reset() override;
 
-      virtual void Update();
+      virtual void Update() override;
 
    private:
 

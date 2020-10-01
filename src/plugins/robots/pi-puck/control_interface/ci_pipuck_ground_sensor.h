@@ -43,7 +43,7 @@ namespace argos {
 
       virtual ~CCI_PiPuckGroundSensor() {}
 
-      virtual void ForEachInterface(std::function<void(const SInterface&)>) = 0;
+      virtual void Visit(std::function<void(const SInterface&)>) = 0;
 
 #ifdef ARGOS_WITH_LUA
       virtual void CreateLuaState(lua_State* pt_lua_state);

@@ -19,39 +19,6 @@ namespace argos {
    /****************************************/
    /****************************************/
 
-   CPiPuckDifferentialDriveDefaultActuator::CPiPuckDifferentialDriveDefaultActuator() :
-      m_psDevice(nullptr),
-      m_psBuffer(nullptr),
-      m_psLeft(nullptr),
-      m_psRight(nullptr),
-      m_fTargetVelocityLeft(0.0f),
-      m_fTargetVelocityRight(0.0f),
-      m_bUpdateReq(false) {}
-
-   /****************************************/
-   /****************************************/
-
-   CPiPuckDifferentialDriveDefaultActuator::~CPiPuckDifferentialDriveDefaultActuator() {
-      /* destroy buffer */
-      if(m_psBuffer != nullptr) {
-         ::iio_buffer_destroy(m_psBuffer);
-      }
-      /* unset trigger */
-      if(m_psDevice != nullptr) {
-         ::iio_device_set_trigger(m_psDevice, nullptr);
-      }
-      /* disable channels */
-      if(m_psLeft != nullptr) {
-         ::iio_channel_disable(m_psLeft);
-      }
-      if(m_psRight != nullptr) {
-         ::iio_channel_disable(m_psRight);
-      }
-   }
-   
-   /****************************************/
-   /****************************************/
-   
    void CPiPuckDifferentialDriveDefaultActuator::Init(TConfigurationNode& t_tree) {
       try {
          CCI_PiPuckDifferentialDriveActuator::Init(t_tree);
@@ -97,6 +64,27 @@ namespace argos {
       }
    }
   
+   /****************************************/
+   /****************************************/
+
+   void CPiPuckDifferentialDriveDefaultActuator::Destroy() {
+         /* destroy buffer */
+      if(m_psBuffer != nullptr) {
+         ::iio_buffer_destroy(m_psBuffer);
+      }
+      /* unset trigger */
+      if(m_psDevice != nullptr) {
+         ::iio_device_set_trigger(m_psDevice, nullptr);
+      }
+      /* disable channels */
+      if(m_psLeft != nullptr) {
+         ::iio_channel_disable(m_psLeft);
+      }
+      if(m_psRight != nullptr) {
+         ::iio_channel_disable(m_psRight);
+      }
+   }
+
    /****************************************/
    /****************************************/
 

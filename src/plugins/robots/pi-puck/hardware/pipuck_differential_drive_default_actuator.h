@@ -30,27 +30,34 @@ namespace argos {
       /**
        * @brief Constructor.
        */
-      CPiPuckDifferentialDriveDefaultActuator();
+      CPiPuckDifferentialDriveDefaultActuator():
+         m_psDevice(nullptr),
+         m_psBuffer(nullptr),
+         m_psLeft(nullptr),
+         m_psRight(nullptr),
+         m_fTargetVelocityLeft(0.0f),
+         m_fTargetVelocityRight(0.0f),
+         m_bUpdateReq(false) {}
 
       /**
        * @brief Destructor.
        */
-      virtual ~CPiPuckDifferentialDriveDefaultActuator();
+      virtual ~CPiPuckDifferentialDriveDefaultActuator() {}
 
-      virtual void Init(TConfigurationNode& t_tree);
+      void Init(TConfigurationNode& t_tree) override;
 
-      virtual void Update();
+      void Update() override;
 
-      virtual void Reset();
+      void Reset() override;
 
-      virtual void SetTargetVelocityLeft(Real f_target_velocity_left);
+      void SetTargetVelocityLeft(Real f_target_velocity_left) override;
 
-      virtual void SetTargetVelocityRight(Real f_target_velocity_right);
+      void SetTargetVelocityRight(Real f_target_velocity_right) override;
 
    private:
 
       SInt16 ConvertToRaw(Real f_metres_per_second) {
-         static const Real fConversionFactor = 776.66922486569;
+         static const Real fConversionFactor = 1.0;
          return std::round(f_metres_per_second * fConversionFactor);
       }
 

@@ -37,20 +37,20 @@ namespace argos {
        */
       virtual ~CPiPuckDifferentialDriveDefaultSensor();
 
-      virtual void Init(TConfigurationNode& t_tree);
+      void Init(TConfigurationNode& t_tree) override;
 
-      virtual void Update();
+      void Update() override;
 
-      virtual void Reset();
+      void Reset() override;
 
-      virtual Real GetLeftVelocity();
+      Real GetLeftVelocity() override;
 
-      virtual Real GetRightVelocity();
+      Real GetRightVelocity() override;
 
    private:
 
       Real ConvertToMetersPerSecond(SInt16 n_raw) {
-         static const Real fConversionFactor = 0.0012875494071146;
+         static const Real fConversionFactor = 1.0;
          return (fConversionFactor * n_raw);
       }
 
