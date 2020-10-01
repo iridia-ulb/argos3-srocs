@@ -35,7 +35,7 @@ robot.logger = {
    -- writes a message to the log
    log = function(self, prefix, first, ...)
       if type(first) == 'table' then
-         robot.utils.display.table(first)
+         robot.utils.print.table(first)
       else
          print(string.format('%40s %s', prefix, first), ...)
       end     

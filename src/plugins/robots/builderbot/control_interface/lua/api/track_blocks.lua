@@ -198,7 +198,7 @@ end
 return function(_blocks, _tags)
    local blocks = {}
    -- cluster tags into blocks
-   local p = vector3(0, 0, -robot.api.constants.block_side_length/2)
+   local p = vector3(0, 0, robot.api.constants.block_side_length/2)
    for i, tag in ipairs(_tags) do
       local middle_point_v3 = vector3(p):rotate(tag.orientation) + tag.position
       -- find which block it belongs

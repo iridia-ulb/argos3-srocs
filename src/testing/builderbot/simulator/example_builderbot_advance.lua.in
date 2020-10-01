@@ -34,8 +34,8 @@ end
 
 local function customize_external_condition()
    -- defind a "wall_side" condition if the the robot senses something on the back
-   if robot.rangefinders["3"].proximity < robot.api.parameters.proximity_detect_tolerance and
-      robot.rangefinders["4"].proximity < robot.api.parameters.proximity_detect_tolerance then
+   if robot.rangefinders["9"].proximity < robot.api.parameters.proximity_detect_tolerance and
+      robot.rangefinders["10"].proximity < robot.api.parameters.proximity_detect_tolerance then
       return "wall_side"
    end
 end
