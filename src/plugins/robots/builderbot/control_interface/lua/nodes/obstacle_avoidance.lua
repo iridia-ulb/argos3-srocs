@@ -20,12 +20,12 @@ return function(data)
                            break
                         end
                      end
-                  elseif v.source == '1' or v.source == '12' then
+                  elseif v.source == '6' or v.source == '7' then
                      if robot.lift_system.position >= robot.api.parameters.lift_system_rf_cover_threshold then
                         flag = true
                         break
                      end
-                  elseif v.source == '2' or v.source == '11' then
+                  elseif v.source == '5' or v.source == '8' then
                      flag = true
                      break
    
