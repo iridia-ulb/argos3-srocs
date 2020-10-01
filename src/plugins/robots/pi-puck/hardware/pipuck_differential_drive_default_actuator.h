@@ -48,6 +48,8 @@ namespace argos {
 
       void Update() override;
 
+      void Destroy() override;
+
       void Reset() override;
 
       void SetTargetVelocityLeft(Real f_target_velocity_left) override;
