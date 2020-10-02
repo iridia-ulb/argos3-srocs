@@ -115,6 +115,7 @@ return function(data, target_distance)
                   else
                      -- close enough, but wrong angle, switch to backup
                      case.forward_backup_case = -1
+                     aim.forwad_backup = "backup"
                      return true
                   end
                end
@@ -129,6 +130,7 @@ return function(data, target_distance)
                else
                   -- far enough, forward again
                   case.forward_backup_case = 1
+                     aim.forwad_backup = "forward"
                   return true
                end
             end

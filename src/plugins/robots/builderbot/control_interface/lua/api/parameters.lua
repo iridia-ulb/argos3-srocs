@@ -11,7 +11,7 @@ return {
     proximity_detect_tolerance = tonumber(robot.params.proximity_detect_tolerance or 0.03),
     proximity_maximum_distance = tonumber(robot.params.proximity_maximum_distance or 0.045),
     lift_system_rf_cover_threshold = tonumber(robot.params.lift_system_rf_cover_threshold or 0.06),
-    lift_system_position_tolerance = tonumber(robot.params.lift_system_position_tolerance or 0.001),
+    lift_system_position_tolerance = tonumber(robot.params.lift_system_position_tolerance or 0.0015),
     obstacle_avoidance_backup = tonumber(robot.params.obstacle_avoidance_backup or 0.08),
     obstacle_avoidance_turn = tonumber(robot.params.obstacle_avoidance_turn or 60),
     z_approach_range_angle = tonumber(robot.params.z_approach_range_angle or 20),
