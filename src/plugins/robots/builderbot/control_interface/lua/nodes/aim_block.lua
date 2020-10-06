@@ -70,12 +70,12 @@ return function(data, aim_point)
 
       local base_speed = 0
       if aim_point.forward_backup == "forward" then
-         base_speed = robot.api.parameters.default_speed 
+         base_speed = robot.api.parameters.approach_block_speed 
       elseif aim_point.forward_backup == "backup" then
-         base_speed = -robot.api.parameters.default_speed 
+         base_speed = -robot.api.parameters.approach_block_speed 
       end
 
-      robot.api.move.with_bearing(base_speed, robot.api.parameters.default_turn_speed * err)
+      robot.api.move.with_bearing(base_speed, robot.api.parameters.approach_block_turn_speed * err)
 
       if current_pixel < target_pixel - pixel_tolerance or
          current_pixel > target_pixel + pixel_tolerance then

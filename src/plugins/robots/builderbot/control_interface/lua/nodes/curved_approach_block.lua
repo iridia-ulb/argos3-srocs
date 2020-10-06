@@ -98,7 +98,7 @@ return function(data, target_distance)
          function()
             local target_block = data.blocks[data.target.id]
             local tolerence = robot.api.parameters.block_position_tolerance
-            local default_speed = robot.api.parameters.default_speed
+            local default_speed = robot.api.parameters.approach_block_speed
             if case.forward_backup_case == 1 then
                -- forward case
                --if target_block.position_robot.x > target_distance - tolerence then
