@@ -32,8 +32,9 @@ namespace argos {
       CCI_PiPuckLEDsActuator* pcLEDsActuator =
          CLuaUtility::GetDeviceInstance<CCI_PiPuckLEDsActuator>(pt_lua_state, "leds");
       /* Update actuator */
-      pcLEDsActuator->SetRingLEDIndex(lua_tonumber(pt_lua_state, 1),
-                                      lua_toboolean(pt_lua_state, 2));
+      UInt32 unIndex = lua_tonumber(pt_lua_state, 1) - 1;
+      bool bOn = lua_toboolean(pt_lua_state, 2);
+      pcLEDsActuator->SetRingLEDIndex(unIndex, bOn);
       return 0;
    }
 #endif

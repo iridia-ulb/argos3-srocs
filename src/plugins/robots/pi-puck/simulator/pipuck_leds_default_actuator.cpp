@@ -18,7 +18,7 @@ namespace argos {
 
    void CPiPuckLEDsDefaultActuator::SetRobot(CComposableEntity& c_entity) {
       CDirectionalLEDEquippedEntity* pcLEDEquippedEntity = 
-         &(c_entity.GetComponent<CDirectionalLEDEquippedEntity>("leds"));
+         &(c_entity.GetComponent<CDirectionalLEDEquippedEntity>("directional_leds"));
       pcLEDEquippedEntity->Enable();
       CDirectionalLEDEquippedEntity::SInstance::TVector& sInstances =
          pcLEDEquippedEntity->GetInstances();
