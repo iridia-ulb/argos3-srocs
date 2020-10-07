@@ -6,13 +6,14 @@
 
 #include "builderbot_differential_drive_default_sensor.h"
 
+#include <argos3/core/utility/logging/argos_log.h>
+#include <argos3/plugins/robots/builderbot/hardware/builderbot.h>
+
 #include <iio.h>
 
 #include <cmath>
 #include <cerrno>
-
-#include <argos3/core/utility/logging/argos_log.h>
-#include <argos3/plugins/robots/builderbot/hardware/builderbot.h>
+#include <cstring>
 
 namespace argos {
 
@@ -86,7 +87,7 @@ namespace argos {
          /* create buffer */
          m_psBuffer = ::iio_device_create_buffer(m_psDevice, 1, false);
          if(m_psBuffer == nullptr) {
-            THROW_ARGOSEXCEPTION("Could not create IIO buffer: " << std::to_string(errno));
+            THROW_ARGOSEXCEPTION("Could not create IIO buffer: " << ::strerror(errno));
          }
       }
       catch(CARGoSException& ex) {

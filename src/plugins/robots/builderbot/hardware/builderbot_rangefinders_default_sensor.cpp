@@ -13,6 +13,9 @@
 
 #include <iio.h>
 
+#include <cerrno>
+#include <cstring>
+
 #include <algorithm>
 
 namespace argos {
@@ -75,7 +78,7 @@ namespace argos {
                   ::iio_channel_disable(psIlluminance);
                   ::iio_channel_disable(psProximity);
                   ::iio_device_set_trigger(psDevice, nullptr);
-                  THROW_ARGOSEXCEPTION("Could not create IIO buffer: " << std::to_string(errno));
+                  THROW_ARGOSEXCEPTION("Could not create IIO buffer: " << ::strerror(errno));
                }
                m_vecPhysicalInterfaces.emplace_back(pchBuffer, psDevice, psProximity, psIlluminance, psBuffer);
             }

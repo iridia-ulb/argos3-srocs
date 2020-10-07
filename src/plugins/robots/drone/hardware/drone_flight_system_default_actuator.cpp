@@ -10,9 +10,10 @@
 
 #include <argos3/plugins/robots/generic/hardware/robot.h>
 
-#include <cerrno>
-
 #include <termios.h>
+
+#include <cerrno>
+#include <cstring>
 
 #define MAVLINK_MSG_SET_POSITION_TARGET_LOCAL_NED_POSITION     0b0000110111111000
 #define MAVLINK_MSG_SET_POSITION_TARGET_LOCAL_NED_VELOCITY     0b0000110111000111

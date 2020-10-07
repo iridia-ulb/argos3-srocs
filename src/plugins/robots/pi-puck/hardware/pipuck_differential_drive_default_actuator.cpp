@@ -6,13 +6,13 @@
 
 #include "pipuck_differential_drive_default_actuator.h"
 
+#include <argos3/core/utility/logging/argos_log.h>
+#include <argos3/plugins/robots/pi-puck/hardware/pipuck.h>
+
 #include <iio.h>
 
 #include <cmath>
 #include <cerrno>
-
-#include <argos3/core/utility/logging/argos_log.h>
-#include <argos3/plugins/robots/pi-puck/hardware/pipuck.h>
 
 namespace argos {
 
@@ -54,7 +54,7 @@ namespace argos {
          /* create buffer */
          m_psBuffer = ::iio_device_create_buffer(m_psDevice, 1, false);
          if(m_psBuffer == nullptr) {
-            THROW_ARGOSEXCEPTION("Could not create IIO buffer: " << std::to_string(errno));
+            THROW_ARGOSEXCEPTION("Could not create IIO buffer: " << ::strerror(errno));
          }
          /* disable blocking mode */
          ::iio_buffer_set_blocking_mode(m_psBuffer, false);

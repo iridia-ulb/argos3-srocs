@@ -13,6 +13,9 @@
 
 #include <iio.h>
 
+#include <cerrno>
+#include <cstring>
+
 #include <algorithm>
 
 namespace argos {
