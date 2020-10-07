@@ -31,6 +31,12 @@ if(ARGOS_BUILD_FOR_SIMULATOR)
     ${CMAKE_BINARY_DIR}/testing/pi-puck/calibrate_pipuck.png
     COPYONLY)
 elseif(ARGOS_BUILD_FOR STREQUAL "pipuck")
-   set(ARGOS_TEST_DIR $ENV{HOME}/testing)
-   message("No tests added for the pipuck configuration")
+  configure_file(
+    ${CMAKE_SOURCE_DIR}/testing/pi-puck/hardware/test_system.argos.in
+    ${CMAKE_BINARY_DIR}/testing/pi-puck/test_system.argos)
+  configure_file(
+    ${CMAKE_SOURCE_DIR}/testing/pi-puck/hardware/test_system.lua
+    ${CMAKE_BINARY_DIR}/testing/pi-puck/test_system.lua)
+   install(FILES ${CMAKE_BINARY_DIR}/testing/pi-puck/test_system.lua DESTINATION share/argos3/testing)
+   install(FILES ${CMAKE_BINARY_DIR}/testing/pi-puck/test_system.argos DESTINATION share/argos3/testing)
 endif(ARGOS_BUILD_FOR_SIMULATOR)
