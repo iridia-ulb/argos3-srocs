@@ -235,8 +235,6 @@ namespace argos {
       cRemoveTrigger.open(REMOVE_TRIGGER_PATH);
       cRemoveTrigger << std::to_string(ACTUATOR_TRIGGER_IDX) << std::flush;
       cRemoveTrigger.close();
-      /* uninitialize the RNG */
-      CRandom::RemoveCategory("argos");
       LOG << "[INFO] Controller terminated" << std::endl;
    }
 
