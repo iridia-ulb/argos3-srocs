@@ -39,4 +39,13 @@ elseif(ARGOS_BUILD_FOR STREQUAL "pipuck")
     ${CMAKE_BINARY_DIR}/testing/pi-puck/test_system.lua)
    install(FILES ${CMAKE_BINARY_DIR}/testing/pi-puck/test_system.lua DESTINATION share/argos3/testing)
    install(FILES ${CMAKE_BINARY_DIR}/testing/pi-puck/test_system.argos DESTINATION share/argos3/testing)
+  configure_file(
+    ${CMAKE_SOURCE_DIR}/testing/pi-puck/hardware/test_leds.argos.in
+    ${CMAKE_BINARY_DIR}/testing/pi-puck/test_leds.argos)
+  configure_file(
+    ${CMAKE_SOURCE_DIR}/testing/pi-puck/hardware/test_leds.lua
+    ${CMAKE_BINARY_DIR}/testing/pi-puck/test_leds.lua)
+   install(FILES ${CMAKE_BINARY_DIR}/testing/pi-puck/test_leds.lua DESTINATION share/argos3/testing)
+   install(FILES ${CMAKE_BINARY_DIR}/testing/pi-puck/test_leds.argos DESTINATION share/argos3/testing)
+
 endif(ARGOS_BUILD_FOR_SIMULATOR)

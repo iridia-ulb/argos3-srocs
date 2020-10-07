@@ -1,12 +1,23 @@
 function step()
-   if count < 10 then
-      count = count + 1
+   -- turn everything off
+   robot.leds.set_body_led(false)
+   robot.leds.set_front_led(false)
+   robot.leds.set_ring_leds(false)
+   -- switch one led on according to the count
+   if count == 1 then
+      robot.leds.set_body_led(true)
+   elseif count == 2 then
+      robot.leds.set_front_led(true)
    else
+      local index = count - 2
+      robot.leds.set_ring_led_index(index, true)
+   end
+   -- increment/wrap the count
+   count = count + 1
+   if count > 10 then
       count = 1
    end
-   robot.directional_leds.set_all_colors('black')
-   robot.directional_leds.set_single_color(count, 'white')   
-   
+
    -- defaults
    local left = 0.005
    local right = 0.005
