@@ -5,6 +5,11 @@ robot.logger:register_module('nodes_aim_block')
 return function(data, aim_point)
    -- aim block, put the block into the center of the image
    return function()
+      -- find the left/right/up/down corners of a tag of the target block
+      if data.target == nil or data.target.id == nil or data.blocks[data.target.id] == nil then
+         robot.logger:log_info("Target block is nil, abort approach")
+         return false, false
+      end
       local target_block = data.blocks[data.target.id]
       local target_tag = 
          target_block.tags.up or
@@ -21,72 +26,65 @@ return function(data, aim_point)
          if v.y < target_tag.corners.up then target_tag.corners.up = v.y end
          if v.y > target_tag.corners.down then target_tag.corners.down = v.y end
       end
+
+      -- adjust manipulator height 
+      local flag_camera
       local tolerance = robot.api.parameters.lift_system_position_tolerance
-      local target_height = robot.lift_system.position - target_tag.position.y 
+      local target_height = robot.lift_system.position - target_tag.position.y
       local upper_limit = robot.api.constants.lift_system_upper_limit
       local lower_limit = robot.api.constants.lift_system_lower_limit + target_block.position_robot.z - 0.02
       if target_height < lower_limit then target_height = lower_limit end
       if target_height > upper_limit then target_height = upper_limit end
       if robot.lift_system.position > target_height - tolerance and 
          robot.lift_system.position < target_height + tolerance then
+         robot.lift_system.set_position(robot.lift_system.position)
          flag_camera = true
       else
          robot.lift_system.set_position(target_height)
          flag_camera = false
       end
-      local turn
-      local err = 1
+
+      -- adjust direction
+      local flag_orientation
+      local err -- err = -1 to 1, positive means turn left, negtive means turn right
+      local left_target_pixel = robot.camera_system.resolution.x * 4 / 32 
+      local right_target_pixel = robot.camera_system.resolution.x * 28 / 32 
+      local middle_target_pixel = robot.camera_system.resolution.x * 16 / 32 
+      local pixel_tolerance = robot.camera_system.resolution.x * 1 / 32
+      local current_pixel, target_pixel
+
       if aim_point ~= nil and aim_point.case == "left" then
-         if target_tag.corners.left < robot.camera_system.resolution.x * 3 / 32 then
-            turn = "left"
-            flag_orientation = false
-         elseif target_tag.corners.left > robot.camera_system.resolution.x * 5 / 32 then
-            turn = "right"
-            flag_orientation = false
-         else
-            turn = "no"
-            flag_orientation = true
-         end
+         current_pixel = target_tag.corners.left
+         target_pixel = left_target_pixel
       elseif aim_point ~= nil and aim_point.case == "right" then
-         if target_tag.corners.right < robot.camera_system.resolution.x * 27 / 32 then
-            turn = "left"
-            flag_orientation = false
-         elseif target_tag.corners.right > robot.camera_system.resolution.x * 29 / 32 then
-            turn = "right"
-            flag_orientation = false
-         else
-            turn = "no"
-            flag_orientation = true
-         end
+         current_pixel = target_tag.corners.right
+         target_pixel = right_target_pixel
       else
-         local tolerence = robot.api.parameters.aim_block_angle_tolerance 
-         local angle = math.atan(target_block.position_robot.y / target_block.position_robot.x) * 180 / math.pi  -- x should always be positive
-         local err
-         if angle < -tolerence then
-            turn = "right"
-            err = -angle / 10
-            if err < -1 then err = -1 end
-            flag_orientation = false
-         elseif angle > tolerence then
-            turn = "left"
-            err = angle / 10
-            if err > 1 then err = 1 end
-            flag_orientation = false
-         else
-            turn = "no"
-            flag_orientation = true
-         end
+         current_pixel = target_tag.center.x
+         target_pixel = middle_target_pixel
       end
-      if turn == "left" then
-         robot.api.move.with_bearing(robot.api.parameters.default_speed / 2, robot.api.parameters.default_turn_speed * err)
+
+      local err = (target_pixel - current_pixel) / pixel_tolerance
+      if err > 1 then err = 1 end
+      if err < -1 then err = -1 end
+
+      local base_speed = 0
+      if aim_point.forward_backup == "forward" then
+         base_speed = robot.api.parameters.approach_block_speed 
+      elseif aim_point.forward_backup == "backup" then
+         base_speed = -robot.api.parameters.approach_block_speed 
+      end
+
+      robot.api.move.with_bearing(base_speed, robot.api.parameters.approach_block_turn_speed * err)
+
+      if current_pixel < target_pixel - pixel_tolerance or
+         current_pixel > target_pixel + pixel_tolerance then
          flag_orientation = false
-      elseif turn == "right" then
-         robot.api.move.with_bearing(robot.api.parameters.default_speed / 2, robot.api.parameters.default_turn_speed * err)
-         flag_orientation = false
-      elseif turn == "no" then
-         robot.api.move.with_velocity(0, 0)
+      else
          flag_orientation = true
       end
+
+      -- return bt node value
       if flag_orientation == true and flag_camera == true then
          return false, true
       else
