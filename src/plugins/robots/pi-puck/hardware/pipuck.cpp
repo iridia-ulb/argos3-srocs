@@ -26,7 +26,6 @@
 #include <argos3/plugins/robots/generic/hardware/sensor.h>
 #include <argos3/plugins/robots/generic/hardware/actuator.h>
 
-
 #define ADD_TRIGGER_PATH "/sys/bus/iio/devices/iio_sysfs_trigger/add_trigger"
 #define REMOVE_TRIGGER_PATH "/sys/bus/iio/devices/iio_sysfs_trigger/remove_trigger"
 
@@ -35,66 +34,37 @@
 
 namespace argos {
 
-   void CPiPuck::Init(TConfigurationNode& t_tree, const std::string& str_controller_id) {
-      /* Initialize the framework */
-      InitFramework(GetNode(t_tree, "framework"));
-      /* Initialize the controller */
-      InitController(GetNode(t_tree, "controllers"), str_controller_id);
-   }
-   
-   /****************************************/
-   /****************************************/
-
-   void CPiPuck::Destroy() {
-      /* delete actuators */
-      for(CPhysicalActuator* pc_actuator : m_vecActuators)
-         delete pc_actuator;
-      /* delete sensors */
-      for(CPhysicalSensor* pc_sensor : m_vecSensors)
-         delete pc_sensor;
-      /* delete the IIO library's context */
-      iio_context_destroy(m_psContext);
-      /* remove triggers */
-      std::ofstream cRemoveTrigger;
-      cRemoveTrigger.open(REMOVE_TRIGGER_PATH);
-      cRemoveTrigger << std::to_string(SENSOR_TRIGGER_IDX) << std::flush;
-      cRemoveTrigger.close();
-      cRemoveTrigger.open(REMOVE_TRIGGER_PATH);
-      cRemoveTrigger << std::to_string(ACTUATOR_TRIGGER_IDX) << std::flush;
-      cRemoveTrigger.close();
-      /* uninitialize the RNG */
-      CRandom::RemoveCategory("argos");
-      LOG << "[INFO] Controller terminated" << std::endl;
-   }
-  
-   /****************************************/
-   /****************************************/
-
-   void CPiPuck::InitFramework(TConfigurationNode& t_tree) {
-      try {
-         /* Get the experiment node */
-         TConfigurationNode tExperiment = GetNode(t_tree, "experiment");
-         /* Parse random seed */
-         UInt32 unRandomSeed;
-         GetNodeAttributeOrDefault(tExperiment,
-                                   "random_seed",
-                                   unRandomSeed,
-                                   static_cast<UInt32>(0));
-         /* If random seed is 0 or is not specified */
-         if(unRandomSeed == 0) {
-            /* Set the random seed based on the current clock time */
-            struct timeval sTimeValue;
-            ::gettimeofday(&sTimeValue, nullptr);
-            unRandomSeed = static_cast<UInt32>(sTimeValue.tv_usec);
+   void CPiPuck::Init(TConfigurationNode& t_controller,
+                      UInt32 un_ticks_per_sec,
+                      UInt32 un_length) {
+      m_unTicksPerSec = un_ticks_per_sec;
+      m_unLength = un_length;
+      try {        
+         /* Create an instance of the controller controller */
+         CCI_Controller* pcController = CFactory<CCI_Controller>::New(t_controller.Value());
+         m_pcController = dynamic_cast<CLuaController*>(pcController);
+         if(m_pcController == nullptr) {
+            THROW_ARGOSEXCEPTION("ERROR: controller \"" << t_controller.Value() << "\" is not a Lua controller");
          }
-         /* Create and initialize the RNG */
-         CRandom::CreateCategory("argos", unRandomSeed);
-         LOG << "[INFO] Using random seed = " << unRandomSeed << std::endl;
-         m_pcRNG = CRandom::CreateRNG("argos");
-         /* Set the target tick length */
-         GetNodeAttribute(tExperiment,
-                          "ticks_per_second",
-                          m_unTicksPerSec);
+         if(NodeExists(t_controller, "environment")) {
+            TConfigurationNode& tEnvironment = GetNode(t_controller, "environment");
+            if(NodeAttributeExists(tEnvironment, "router")) {
+               /* connect to the router to emulate robot-to-robot wifi */
+               std::string strRouterConfig;
+               GetNodeAttribute(tEnvironment, "router", strRouterConfig);
+               size_t unHostnamePortPos = strRouterConfig.find_last_of(':');
+               try {
+                  if(unHostnamePortPos == std::string::npos) {
+                     THROW_ARGOSEXCEPTION("The address of the router must be provided as \"hostname:port\"");
+                  }
+                  SInt32 nPort = std::stoi(strRouterConfig.substr(unHostnamePortPos + 1), nullptr, 0);
+                  m_cSocket.Connect(strRouterConfig.substr(0, unHostnamePortPos), nPort);
+               }
+               catch(CARGoSException& ex) {
+                  THROW_ARGOSEXCEPTION_NESTED("Could not connect to router", ex);
+               }
+            }
+         }
          /* Create the triggers */
          std::ofstream cAddTrigger;
          cAddTrigger.open(ADD_TRIGGER_PATH);
@@ -107,8 +77,6 @@ namespace argos {
          m_psContext = iio_create_local_context();
          /* validate the sensor update trigger */
          std::string strSensorUpdateTrigger("sysfstrig" + std::to_string(SENSOR_TRIGGER_IDX));
-         std::string strActuatorUpdateTrigger("sysfstrig" + std::to_string(ACTUATOR_TRIGGER_IDX));
-
          m_psSensorUpdateTrigger = 
             ::iio_context_find_device(m_psContext, strSensorUpdateTrigger.c_str());
          if(m_psSensorUpdateTrigger == nullptr) { 
@@ -117,7 +85,8 @@ namespace argos {
          if(!::iio_device_is_trigger(m_psSensorUpdateTrigger)) {
             THROW_ARGOSEXCEPTION("IIO device \"" << strSensorUpdateTrigger << "\" is not a trigger");
          }
-         /* validate the sensor update trigger */
+         /* validate the actuator update trigger */
+         std::string strActuatorUpdateTrigger("sysfstrig" + std::to_string(ACTUATOR_TRIGGER_IDX));
          m_psActuatorUpdateTrigger = 
             ::iio_context_find_device(m_psContext, strActuatorUpdateTrigger.c_str());
          if(m_psActuatorUpdateTrigger == nullptr) { 
@@ -126,52 +95,10 @@ namespace argos {
          if(!::iio_device_is_trigger(m_psActuatorUpdateTrigger)) {
             THROW_ARGOSEXCEPTION("IIO device \"" << strActuatorUpdateTrigger << "\" is not a trigger");
          }
-      }
-      catch(CARGoSException& ex) {
-         THROW_ARGOSEXCEPTION_NESTED("Failed to initialize framework", ex);
-      }
-   }
-
-   /****************************************/
-   /****************************************/
-
-   void CPiPuck::InitController(TConfigurationNode& t_tree, const std::string& str_controller_id) {
-      try {
-         std::string strControllerLabel;
-         TConfigurationNodeIterator itController;
-         for(itController = itController.begin(&t_tree);
-             itController != itController.end();
-             ++itController) {
-            std::string strControllerId;
-            GetNodeAttributeOrDefault(*itController, "id", strControllerId, strControllerId);
-            if(str_controller_id.empty() || strControllerId == str_controller_id) {
-               strControllerLabel = itController->Value();
-               break;
-            }
-         }
-         if(strControllerLabel.empty()) {
-            THROW_ARGOSEXCEPTION("could not find controller in the experiment configuration file")
-         }
-         /* Create the controller */
-         CCI_Controller* pcController = CFactory<CCI_Controller>::New(strControllerLabel);
-         m_pcController = dynamic_cast<CLuaController*>(pcController);
-         if(m_pcController == nullptr) {
-            THROW_ARGOSEXCEPTION("ERROR: controller \"" << strControllerLabel << "\" is not a Lua controller");
-         }        
-         /* connect to the router to emulate the wifi */
-         std::string strRouterConfig;
-         TConfigurationNode& tEnvironment = GetNode(*itController, "environment");
-         GetNodeAttribute(tEnvironment, "router", strRouterConfig);
-         size_t unHostnamePortPos = strRouterConfig.find_last_of(':');
-         if(unHostnamePortPos == std::string::npos) {
-            THROW_ARGOSEXCEPTION("the address of the router must be provided as \"hostname:port\"");
-         }
-         SInt32 nPort = std::stoi(strRouterConfig.substr(unHostnamePortPos + 1), nullptr, 0);
-         m_cSocket.Connect(strRouterConfig.substr(0,unHostnamePortPos), nPort);
          /* go through the actuators */
          std::string strImpl;
          /* Go through actuators */
-         TConfigurationNode& tActuators = GetNode(*itController, "actuators");
+         TConfigurationNode& tActuators = GetNode(t_controller, "actuators");
          TConfigurationNodeIterator itAct;
          for(itAct = itAct.begin(&tActuators);
              itAct != itAct.end();
@@ -183,12 +110,13 @@ namespace argos {
             if(pcCIAct == nullptr) {
                THROW_ARGOSEXCEPTION("BUG: actuator \"" << itAct->Value() << "\" does not inherit from CCI_Actuator");
             }
+            pcAct->SetRobot(*this);
             pcCIAct->Init(*itAct);
             m_vecActuators.emplace_back(pcAct);
             m_pcController->AddActuator(itAct->Value(), pcCIAct);
          }
          /* Go through sensors */
-         TConfigurationNode& tSensors = GetNode(*itController, "sensors");
+         TConfigurationNode& tSensors = GetNode(t_controller, "sensors");
          TConfigurationNodeIterator itSens;
          for(itSens = itSens.begin(&tSensors);
              itSens != itSens.end();
@@ -200,13 +128,14 @@ namespace argos {
             if(pcCISens == nullptr) {
                THROW_ARGOSEXCEPTION("BUG: sensor \"" << itSens->Value() << "\" does not inherit from CCI_Sensor");
             }
+            pcSens->SetRobot(*this);
             pcCISens->Init(*itSens);
             m_vecSensors.emplace_back(pcSens);
             m_pcController->AddSensor(itSens->Value(), pcCISens);
          }        
          /* Set the controller id */
-         char pchBuffer[32];
-         if (::gethostname(pchBuffer, 32) == 0) {
+         char pchBuffer[64];
+         if (::gethostname(pchBuffer, 64) == 0) {
             LOG << "[INFO] Setting controller id to hostname \""
                 << pchBuffer << "\""
                 << std::endl;
@@ -214,24 +143,24 @@ namespace argos {
          } 
          else {
             LOGERR << "[WARNING] Failed to get the hostname."
-                   << "Setting controller id to \"pipuck\""
+                   << "Setting controller id to \"pi-puck\""
                    << std::endl;
-            m_pcController->SetId("pipuck");
+            m_pcController->SetId("pi-puck");
          }
          /* If the parameters node doesn't exist, create one */
-         if(!NodeExists(*itController, "params")) {
+         if(!NodeExists(t_controller, "params")) {
             TConfigurationNode tParamsNode("params");
-            AddChildNode(*itController, tParamsNode);
+            AddChildNode(t_controller, tParamsNode);
          }
          /* Init the controller with the parameters */
-         m_pcController->Init(GetNode(*itController, "params"));
+         m_pcController->Init(GetNode(t_controller, "params"));
          /* check for errors */
          if(!m_pcController->IsOK()) {
             THROW_ARGOSEXCEPTION("Controller: " << m_pcController->GetErrorMessage());
          }
       }
       catch(CARGoSException& ex) {
-         THROW_ARGOSEXCEPTION_NESTED("Failed to initialize framework", ex);
+         THROW_ARGOSEXCEPTION_NESTED("Failed to initialize Pi-Puck", ex);
       }
    }
 
@@ -288,5 +217,28 @@ namespace argos {
 
    /****************************************/
    /****************************************/
+
+   void CPiPuck::Destroy() {
+      /* delete actuators */
+      for(CPhysicalActuator* pc_actuator : m_vecActuators)
+         delete pc_actuator;
+      /* delete sensors */
+      for(CPhysicalSensor* pc_sensor : m_vecSensors)
+         delete pc_sensor;
+      /* delete the IIO library's context */
+      iio_context_destroy(m_psContext);
+      /* remove triggers */
+      std::ofstream cRemoveTrigger;
+      cRemoveTrigger.open(REMOVE_TRIGGER_PATH);
+      cRemoveTrigger << std::to_string(SENSOR_TRIGGER_IDX) << std::flush;
+      cRemoveTrigger.close();
+      cRemoveTrigger.open(REMOVE_TRIGGER_PATH);
+      cRemoveTrigger << std::to_string(ACTUATOR_TRIGGER_IDX) << std::flush;
+      cRemoveTrigger.close();
+      /* uninitialize the RNG */
+      CRandom::RemoveCategory("argos");
+      LOG << "[INFO] Controller terminated" << std::endl;
+   }
+
 
 }
