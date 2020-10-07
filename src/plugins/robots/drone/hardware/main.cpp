@@ -53,16 +53,14 @@ int main(int n_argc, char** ppch_argv) {
    });
    /* capture signals */
    std::signal(SIGINT, handler);
-   //std::signal(SIGABRT, handler);
+   std::signal(SIGABRT, handler);
    std::signal(SIGFPE, handler);
    std::signal(SIGILL, handler);
    std::signal(SIGSEGV, handler);
    std::signal(SIGTERM, handler);
    try {
-      /* Parse command line */
       bool bUsageHelp;
       std::string strConfigurationFile;
-      std::string strReqControllerId;
       CCommandLineArgParser cCommandLineArgParser;
       cCommandLineArgParser.AddFlag('h',
                     "help",
@@ -72,10 +70,7 @@ int main(int n_argc, char** ppch_argv) {
                                                      "config",
                                                      "the configuration file [REQUIRED]",
                                                      strConfigurationFile);
-      cCommandLineArgParser.AddArgument<std::string>('i',
-                                                     "controller",
-                                                     "the controller identifier",
-                                                     strReqControllerId);     
+      /* Parse command line */
       cCommandLineArgParser.Parse(n_argc, ppch_argv);
       if(bUsageHelp) {
          cCommandLineArgParser.PrintUsage(LOG);
@@ -95,20 +90,12 @@ int main(int n_argc, char** ppch_argv) {
       /* load the file */
       tConfig.LoadFile();
       TConfigurationNode& tConfiguration = *tConfig.FirstChildElement();
-      /* select the requested controller */
+      /* select the first controller */
       TConfigurationNode& tControllers = GetNode(tConfiguration, "controllers");
       TConfigurationNodeIterator itController;
-      for(itController = itController.begin(&tControllers);
-          itController != itController.end();
-          ++itController) {
-         std::string strControllerId;
-         GetNodeAttributeOrDefault(*itController, "id", strControllerId, strControllerId);
-         if(strReqControllerId.empty() || strControllerId == strReqControllerId) {
-            break;
-         }
-      }
-      if(itController == itController.end()) {
-         THROW_ARGOSEXCEPTION("could not find a controller in the experiment configuration file");
+      itController = itController.begin(&tControllers);
+      if(itController == nullptr) {
+         THROW_ARGOSEXCEPTION("configuration file does not declare a controller");
       }
       /* get the framework node */
       TConfigurationNode& tFramework = GetNode(tConfiguration, "framework");
@@ -151,13 +138,13 @@ int main(int n_argc, char** ppch_argv) {
       /* get the target number of ticks */
       UInt32 unLength = 0;
       GetNodeAttributeOrDefault(tExperiment, "length", unLength, unLength);
-      /* get drone instance */
+      /* get Drone instance */
       CDrone& cDrone = CDrone::GetInstance();
       /* initialize the drone */
       RunScripts(m_vecPreInitScripts);
       cDrone.Init(*itController, unTicksPerSec, unLength);
       RunScripts(m_vecPostInitScripts);
-      /* start the drone's main loop */
+      /* start the Drone's main loop */
       cDrone.Execute();
       /* clean up */
       RunScripts(m_vecPreDestroyScripts);

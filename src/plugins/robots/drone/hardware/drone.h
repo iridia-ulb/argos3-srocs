@@ -81,6 +81,7 @@ namespace argos {
          return m_unTicksPerSec;
       }
 
+
       CPixhawk& GetPixhawk() {
          return m_cPixhawk;
       }
@@ -91,7 +92,9 @@ namespace argos {
          m_bSignalRaised(false),
          m_unTicksPerSec(0),
          m_unLength(0),
-         m_pcController(nullptr) {}
+         m_pcController(nullptr),
+         m_psContext(nullptr),
+         m_psSensorUpdateTrigger(nullptr) {}
 
       virtual ~CDrone() {}
 
@@ -116,10 +119,12 @@ namespace argos {
       /* the vector of sensors */
       std::vector<CPhysicalSensor*> m_vecSensors;
 
-      CPixhawk m_cPixhawk;
-
+      /* triggers for updating the sensors and actuators */
       iio_context* m_psContext;
       iio_device* m_psSensorUpdateTrigger;
+
+      /* the pixhawk state */
+      CPixhawk m_cPixhawk;
    };
 
 }

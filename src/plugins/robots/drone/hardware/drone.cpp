@@ -31,7 +31,6 @@
 #define REMOVE_TRIGGER_PATH "/sys/bus/iio/devices/iio_sysfs_trigger/remove_trigger"
 
 #define SENSOR_TRIGGER_IDX 0
-#define ACTUATOR_TRIGGER_IDX 1
 
 namespace argos {
 
@@ -165,7 +164,7 @@ namespace argos {
          }
       }
       catch(CARGoSException& ex) {
-         THROW_ARGOSEXCEPTION_NESTED("Failed to initialize framework", ex);
+         THROW_ARGOSEXCEPTION_NESTED("Failed to initialize drone", ex);
       }
    }
 
@@ -180,6 +179,8 @@ namespace argos {
          for(UInt32 unControllerTick = 0;
              !m_unLength || unControllerTick < m_unLength;
              ++unControllerTick) {
+            /* request samples from the sensors */
+            ::iio_device_attr_write_bool(m_psSensorUpdateTrigger, "trigger_now", true);
             /* update the sensors on this thread */
             for(CPhysicalSensor* pc_sensor : m_vecSensors) {
                pc_sensor->Update();
