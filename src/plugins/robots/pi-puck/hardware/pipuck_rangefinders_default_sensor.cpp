@@ -55,8 +55,8 @@ namespace argos {
          }
          ::iio_device_set_trigger(m_psDevice, psUpdateTrigger);
          /* create buffer */
-         iio_buffer* psBuffer = ::iio_device_create_buffer(m_psDevice, 1, false);
-         if(psBuffer == nullptr) {
+         m_psBuffer = ::iio_device_create_buffer(m_psDevice, 1, false);
+         if(m_psBuffer == nullptr) {
             ::iio_device_set_trigger(m_psDevice, nullptr);
             THROW_ARGOSEXCEPTION("Could not create IIO buffer: " << ::strerror(errno));
          }
