@@ -31,6 +31,7 @@ if(ARGOS_BUILD_FOR_SIMULATOR)
     ${CMAKE_BINARY_DIR}/testing/pi-puck/calibrate_pipuck.png
     COPYONLY)
 elseif(ARGOS_BUILD_FOR STREQUAL "pipuck")
+  # system test
   configure_file(
     ${CMAKE_SOURCE_DIR}/testing/pi-puck/hardware/test_system.argos.in
     ${CMAKE_BINARY_DIR}/testing/pi-puck/test_system.argos)
@@ -39,6 +40,7 @@ elseif(ARGOS_BUILD_FOR STREQUAL "pipuck")
     ${CMAKE_BINARY_DIR}/testing/pi-puck/test_system.lua)
    install(FILES ${CMAKE_BINARY_DIR}/testing/pi-puck/test_system.lua DESTINATION share/argos3/testing)
    install(FILES ${CMAKE_BINARY_DIR}/testing/pi-puck/test_system.argos DESTINATION share/argos3/testing)
+  # leds test
   configure_file(
     ${CMAKE_SOURCE_DIR}/testing/pi-puck/hardware/test_leds.argos.in
     ${CMAKE_BINARY_DIR}/testing/pi-puck/test_leds.argos)
@@ -47,5 +49,13 @@ elseif(ARGOS_BUILD_FOR STREQUAL "pipuck")
     ${CMAKE_BINARY_DIR}/testing/pi-puck/test_leds.lua)
    install(FILES ${CMAKE_BINARY_DIR}/testing/pi-puck/test_leds.lua DESTINATION share/argos3/testing)
    install(FILES ${CMAKE_BINARY_DIR}/testing/pi-puck/test_leds.argos DESTINATION share/argos3/testing)
-
+  # differential drive test
+  configure_file(
+    ${CMAKE_SOURCE_DIR}/testing/pi-puck/hardware/test_differential_drive.argos.in
+    ${CMAKE_BINARY_DIR}/testing/pi-puck/test_differential_drive.argos)
+  configure_file(
+    ${CMAKE_SOURCE_DIR}/testing/pi-puck/hardware/test_differential_drive.lua
+    ${CMAKE_BINARY_DIR}/testing/pi-puck/test_differential_drive.lua)
+   install(FILES ${CMAKE_BINARY_DIR}/testing/pi-puck/test_differential_drive.lua DESTINATION share/argos3/testing)
+   install(FILES ${CMAKE_BINARY_DIR}/testing/pi-puck/test_differential_drive.argos DESTINATION share/argos3/testing)
 endif(ARGOS_BUILD_FOR_SIMULATOR)

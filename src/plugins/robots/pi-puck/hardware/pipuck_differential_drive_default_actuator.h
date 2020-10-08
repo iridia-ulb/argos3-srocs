@@ -13,7 +13,7 @@ namespace argos {
 
 struct iio_device;
 struct iio_buffer;
-struct iio_channel; 
+struct iio_channel;
 
 #include <cmath>
 

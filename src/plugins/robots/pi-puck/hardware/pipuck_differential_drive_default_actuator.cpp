@@ -25,26 +25,21 @@ namespace argos {
          /* Get context and trigger */
          iio_context* psContext = CPiPuck::GetInstance().GetContext();
          iio_device* psUpdateTrigger = CPiPuck::GetInstance().GetActuatorUpdateTrigger();
-         /* Parse the device name and channel names */
-         std::string strDevice, strLeft, strRight;
-         GetNodeAttribute(t_tree, "device", strDevice);
-         GetNodeAttribute(t_tree, "left", strLeft);
-         GetNodeAttribute(t_tree, "right", strRight);
          /* get a pointer to the device */
-         m_psDevice = ::iio_context_find_device(psContext, strDevice.c_str());
+         m_psDevice = ::iio_context_find_device(psContext, "epuck-motors");
          if(m_psDevice == nullptr) {
-            THROW_ARGOSEXCEPTION("Could not find IIO device \"" << strDevice << "\"");
+            THROW_ARGOSEXCEPTION("Could not find IIO device \"epuck-motors\"");
          }
          /* get the channels */
-         m_psLeft = ::iio_device_find_channel(m_psDevice, strLeft.c_str(), true);
+         m_psLeft = ::iio_device_find_channel(m_psDevice, "anglvel0", true);
          if(m_psLeft == nullptr) {
-            THROW_ARGOSEXCEPTION("Could not find IIO channel \"" << strLeft <<
-                                 "\" for device \"" << strDevice << "\"");
+            THROW_ARGOSEXCEPTION("Could not find IIO channel \"anglvel0\" "
+                                 "for device \"epuck-motors\"");
          }
-         m_psRight = ::iio_device_find_channel(m_psDevice, strRight.c_str(), true);
+         m_psRight = ::iio_device_find_channel(m_psDevice, "anglvel1", true);
          if(m_psRight == nullptr) {
-            THROW_ARGOSEXCEPTION("Could not find IIO channel \"" << strRight <<
-                                 "\" for device \"" << strDevice << "\"");
+            THROW_ARGOSEXCEPTION("Could not find IIO channel \"anglvel1\" "
+                                 "for device \"epuck-motors\"");
          }
          /* enable channels */
          ::iio_channel_enable(m_psLeft);
@@ -60,7 +55,7 @@ namespace argos {
          ::iio_buffer_set_blocking_mode(m_psBuffer, false);
       }
       catch(CARGoSException& ex) {
-         THROW_ARGOSEXCEPTION_NESTED("Initialization error in the PiPuck differential drive actuator.", ex);
+         THROW_ARGOSEXCEPTION_NESTED("Initialization error in the Pi-Puck differential drive actuator.", ex);
       }
    }
   
