@@ -142,9 +142,8 @@ namespace argos {
                             m_psBuffer,
                             &unIlluminanceRaw, 2);
          /* calibrate proximity samples and convert to metric units */
-         s_physical_interface.Reading.Proximity = 
-            std::pow(s_physical_interface.Calibration[1] / static_cast<Real>(unProximityRaw),
-                     s_physical_interface.Calibration[0]);
+         s_physical_interface.Reading.Proximity = static_cast<Real>(unProximityRaw);
+         // std::pow(s_physical_interface.Calibration[1] / XXX, s_physical_interface.Calibration[0]);
          /* calibrate illuminance samples and convert to metric units */
          s_physical_interface.Reading.Illuminance = ConvertToLux(unIlluminanceRaw);
       }
