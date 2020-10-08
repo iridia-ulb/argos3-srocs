@@ -8,11 +8,11 @@ end
 function step()
    for index, device in ipairs(robot.rangefinders) do
       local message = 
-         string.format('%d: distance = %f, illumination = %f', index,
-                       device.reading.proximity, device.reading.illumination)
+         string.format('%d: distance = %.2f, illuminance = %.2f', index,
+                       device.reading.proximity, device.reading.illuminance)
       log(message)
    end
-
+   log('---')
 end
 
 --[[ This function is executed every time you press the 'reset'
@@ -28,3 +28,4 @@ end
 function destroy()
    -- put your code here
 end
+
