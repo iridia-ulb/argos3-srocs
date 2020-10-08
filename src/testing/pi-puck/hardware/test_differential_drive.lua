@@ -22,7 +22,7 @@ function step()
    print(string.format('left:  target_vel = %d, delta_pos = %d', left, robot.differential_drive.encoders.left))
    print(string.format('right: target_vel = %d, delta_pos = %d', right, robot.differential_drive.encoders.right))
    -- increment the config variable
-   if count < 25 then
+   if count < 50 then
       count = count + 1
    end
 end
