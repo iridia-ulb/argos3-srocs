@@ -58,4 +58,13 @@ elseif(ARGOS_BUILD_FOR STREQUAL "pipuck")
     ${CMAKE_BINARY_DIR}/testing/pi-puck/test_differential_drive.lua)
    install(FILES ${CMAKE_BINARY_DIR}/testing/pi-puck/test_differential_drive.lua DESTINATION share/argos3/testing)
    install(FILES ${CMAKE_BINARY_DIR}/testing/pi-puck/test_differential_drive.argos DESTINATION share/argos3/testing)
+  # rangefinders test
+  configure_file(
+    ${CMAKE_SOURCE_DIR}/testing/pi-puck/hardware/test_rangefinders.argos.in
+    ${CMAKE_BINARY_DIR}/testing/pi-puck/test_rangefinders.argos)
+  configure_file(
+    ${CMAKE_SOURCE_DIR}/testing/pi-puck/hardware/test_rangefinders.lua
+    ${CMAKE_BINARY_DIR}/testing/pi-puck/test_rangefinders.lua)
+   install(FILES ${CMAKE_BINARY_DIR}/testing/pi-puck/test_rangefinders.lua DESTINATION share/argos3/testing)
+   install(FILES ${CMAKE_BINARY_DIR}/testing/pi-puck/test_rangefinders.argos DESTINATION share/argos3/testing)
 endif(ARGOS_BUILD_FOR_SIMULATOR)
