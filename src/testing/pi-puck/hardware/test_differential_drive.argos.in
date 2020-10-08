@@ -2,7 +2,7 @@
 <argos-configuration>
 
   <framework>
-    <experiment length="0" ticks_per_second="1" random_seed="0"/>
+    <experiment length="50" ticks_per_second="5" random_seed="0"/>
   </framework>
 
   <controllers>
@@ -10,7 +10,9 @@
       <actuators>
         <pipuck_differential_drive implementation="default" />
       </actuators>
-      <sensors />
+      <sensors>
+        <pipuck_differential_drive implementation="default" />
+      </sensors>
       <params script="@CMAKE_INSTALL_PREFIX@/share/argos3/testing/test_differential_drive.lua" />
     </lua_controller>
   </controllers>

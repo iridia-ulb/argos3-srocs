@@ -57,26 +57,21 @@ namespace argos {
          /* Get context and trigger */
          iio_context* psContext = CPiPuck::GetInstance().GetContext();
          iio_device* psUpdateTrigger = CPiPuck::GetInstance().GetSensorUpdateTrigger();
-         /* Parse the device name and channel names */
-         std::string strDevice, strLeft, strRight;
-         GetNodeAttribute(t_tree, "device", strDevice);
-         GetNodeAttribute(t_tree, "left", strLeft);
-         GetNodeAttribute(t_tree, "right", strRight);
          /* get a pointer to the device */
-         m_psDevice = ::iio_context_find_device(psContext, strDevice.c_str());
+         m_psDevice = ::iio_context_find_device(psContext, "epuck-encoders");
          if(m_psDevice == nullptr) {
-            THROW_ARGOSEXCEPTION("Could not find IIO device \"" << strDevice << "\"");
+            THROW_ARGOSEXCEPTION("Could not find IIO device \"epuck-encoders\"");
          }
          /* get the channels */
-         m_psLeft = ::iio_device_find_channel(m_psDevice, strLeft.c_str(), false);
+         m_psLeft = ::iio_device_find_channel(m_psDevice, "angl0", false);
          if(m_psLeft == nullptr) {
-            THROW_ARGOSEXCEPTION("Could not find IIO channel \"" << strLeft <<
-                                 "\" for device \"" << strDevice << "\"");
+            THROW_ARGOSEXCEPTION("Could not find IIO channel \"angl0\" for device "
+                                 "\"epuck-encoders\"");
          }
-         m_psRight = ::iio_device_find_channel(m_psDevice, strRight.c_str(), false);
+         m_psRight = ::iio_device_find_channel(m_psDevice, "angl1", false);
          if(m_psRight == nullptr) {
-            THROW_ARGOSEXCEPTION("Could not find IIO channel \"" << strRight <<
-                                 "\" for device \"" << strDevice << "\"");
+            THROW_ARGOSEXCEPTION("Could not find IIO channel \"angl1\" for device "
+                                 "\"epuck-encoders\"");
          }
          /* enable channels */
          ::iio_channel_enable(m_psLeft);
@@ -90,7 +85,7 @@ namespace argos {
          }
       }
       catch(CARGoSException& ex) {
-         THROW_ARGOSEXCEPTION_NESTED("Initialization error in the PiPuck differential drive sensor.", ex);
+         THROW_ARGOSEXCEPTION_NESTED("Initialization error in the Pi-Puck differential drive sensor.", ex);
       }
    }
   
@@ -138,7 +133,7 @@ namespace argos {
                    "Michael Allwright [allsey87@gmail.com]",
                    "1.0",
                    "The pipuck differential drive sensor.",
-                   "This sensor monitors the differential drive of the pipuck.",
+                   "This sensor monitors the differential drive of the Pi-Puck.",
                    "Usable"
    );
 
