@@ -38,7 +38,7 @@ elseif(ARGOS_BUILD_FOR STREQUAL "pipuck")
 #   hardware/pipuck_camera_system_default_sensor.h
     hardware/pipuck_differential_drive_default_actuator.h
     hardware/pipuck_differential_drive_default_sensor.h
-#   hardware/pipuck_ground_default_sensor.h
+    hardware/pipuck_ground_default_sensor.h
     hardware/pipuck_leds_default_actuator.h
     hardware/pipuck_system_default_sensor.h
     hardware/pipuck_rangefinders_default_sensor.h)
@@ -90,7 +90,7 @@ elseif(ARGOS_BUILD_FOR STREQUAL "pipuck")
 #   hardware/pipuck_camera_system_default_sensor.cpp
     hardware/pipuck_differential_drive_default_actuator.cpp
     hardware/pipuck_differential_drive_default_sensor.cpp
-#   hardware/pipuck_ground_default_sensor.cpp
+    hardware/pipuck_ground_default_sensor.cpp
     hardware/pipuck_leds_default_actuator.cpp
     hardware/pipuck_system_default_sensor.cpp
     hardware/pipuck_rangefinders_default_sensor.cpp)

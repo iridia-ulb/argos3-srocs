@@ -17,10 +17,11 @@ namespace argos {
 
 #ifdef ARGOS_WITH_LUA
    void CCI_PiPuckGroundSensor::CreateLuaState(lua_State* pt_lua_state) {
-      CLuaUtility::StartTable(pt_lua_state, "ground");
+      CLuaUtility::StartTable(pt_lua_state, "ground_sensors");
       Visit([pt_lua_state] (const SInterface& s_interface) {
-         CLuaUtility::StartTable(pt_lua_state, s_interface.Label);
-         CLuaUtility::AddToTable(pt_lua_state, "reading", s_interface.Reading);
+         CLuaUtility::StartTable(pt_lua_state, s_interface.Label + 1);
+         CLuaUtility::AddToTable(pt_lua_state, "reflected", s_interface.Reflected);
+         CLuaUtility::AddToTable(pt_lua_state, "ambient", s_interface.Ambient);
          CLuaUtility::StartTable(pt_lua_state, "transform");
          CLuaUtility::AddToTable(pt_lua_state, "position", std::get<CVector3>(s_interface.Configuration));
          CLuaUtility::AddToTable(pt_lua_state, "orientation", std::get<CQuaternion>(s_interface.Configuration));
@@ -37,11 +38,15 @@ namespace argos {
 
 #ifdef ARGOS_WITH_LUA
    void CCI_PiPuckGroundSensor::ReadingsToLuaState(lua_State* pt_lua_state) {
-      lua_getfield(pt_lua_state, -1, "ground");
+      lua_getfield(pt_lua_state, -1, "ground_sensors");
       Visit([pt_lua_state] (const SInterface& s_interface) {
-         lua_getfield(pt_lua_state, -1, s_interface.Label.c_str());
-         lua_pushstring(pt_lua_state, "reading");
-         lua_pushnumber(pt_lua_state, s_interface.Reading);
+         lua_pushnumber(pt_lua_state, s_interface.Label + 1);
+         lua_gettable(pt_lua_state, -2);
+         lua_pushstring(pt_lua_state, "reflected");
+         lua_pushnumber(pt_lua_state, s_interface.Reflected);
+         lua_settable(pt_lua_state, -3);
+         lua_pushstring(pt_lua_state, "ambient");
+         lua_pushnumber(pt_lua_state, s_interface.Ambient);
          lua_settable(pt_lua_state, -3);
          lua_pop(pt_lua_state, 1);
       });
@@ -52,10 +57,10 @@ namespace argos {
    /****************************************/
    /****************************************/
 
-   const std::map<std::string, CCI_PiPuckGroundSensor::TConfiguration> CCI_PiPuckGroundSensor::m_mapSensorConfig = {
-      std::make_pair("left",   std::make_tuple("origin", CVector3(0.03,  0.01, 0.002), CQuaternion(CRadians::PI, CVector3::Y), 0.005)),
-      std::make_pair("center", std::make_tuple("origin", CVector3(0.03,  0.0,   0.002), CQuaternion(CRadians::PI, CVector3::Y), 0.005)),
-      std::make_pair("right",  std::make_tuple("origin", CVector3(0.03, -0.01, 0.002), CQuaternion(CRadians::PI, CVector3::Y), 0.005)),
+   const std::map<UInt8, CCI_PiPuckGroundSensor::TConfiguration> CCI_PiPuckGroundSensor::MAP_SENSOR_CONFIG = {
+      std::make_pair(0, std::make_tuple("origin", CVector3(0.03,  0.01, 0.002), CQuaternion(CRadians::PI, CVector3::Y), 0.005)),
+      std::make_pair(1, std::make_tuple("origin", CVector3(0.03,  0.0,  0.002), CQuaternion(CRadians::PI, CVector3::Y), 0.005)),
+      std::make_pair(2, std::make_tuple("origin", CVector3(0.03, -0.01, 0.002), CQuaternion(CRadians::PI, CVector3::Y), 0.005)),
    };
 
    /****************************************/

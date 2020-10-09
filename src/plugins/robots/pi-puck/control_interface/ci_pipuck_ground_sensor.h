@@ -29,14 +29,16 @@ namespace argos {
 
       struct SInterface {
          /* constructor */
-         SInterface(const std::string& str_label) :
-            Label(str_label),
-            Configuration(m_mapSensorConfig.at(str_label)),
-            Reading(0.0) {}
+         SInterface(UInt8 un_label) :
+            Label(un_label),
+            Configuration(MAP_SENSOR_CONFIG.at(un_label)),
+            Reflected(0.0),
+            Ambient(0.0) {}
          /* members */
-         const std::string& Label;
+         const UInt8 Label;
          const TConfiguration& Configuration;
-         Real Reading;
+         Real Reflected;
+         Real Ambient;
       };
 
    public:
@@ -53,7 +55,7 @@ namespace argos {
 
    protected:
 
-      static const std::map<std::string, TConfiguration> m_mapSensorConfig;
+      static const std::map<UInt8, TConfiguration> MAP_SENSOR_CONFIG;
 
    };
 
