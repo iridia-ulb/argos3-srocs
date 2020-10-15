@@ -39,14 +39,12 @@ namespace argos {
          for(const std::pair<const UInt8, TConfiguration>& c_config : MAP_SENSOR_CONFIG) {
             strChannelName = "illuminance";
             strChannelName += std::to_string(c_config.first);
-            strChannelName += "_reflected";
             iio_channel* psReflected = ::iio_device_find_channel(m_psDevice, strChannelName.c_str(), false);
             if(psReflected == nullptr)
                THROW_ARGOSEXCEPTION("Could not find IIO input channel \"" << strChannelName <<
                                     "\" for device \"epuck-groundsensors\"");
             strChannelName = "illuminance";
-            strChannelName += std::to_string(c_config.first);
-            strChannelName += "_background";
+            strChannelName += std::to_string(c_config.first + 3);
             iio_channel* psBackground = ::iio_device_find_channel(m_psDevice, strChannelName.c_str(), false);
             if(psBackground == nullptr)
                THROW_ARGOSEXCEPTION("Could not find IIO input channel \"" << strChannelName <<
