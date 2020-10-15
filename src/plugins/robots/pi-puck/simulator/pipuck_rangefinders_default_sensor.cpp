@@ -20,9 +20,9 @@ namespace argos {
    void CPiPuckRangefindersDefaultSensor::SetRobot(CComposableEntity& c_entity) {
       m_pcControllableEntity = &(c_entity.GetComponent<CControllableEntity>("controller"));
       /* allocate memory for the sensor interfaces */
-      m_vecSimulatedInterfaces.reserve(m_mapSensorConfig.size());
+      m_vecSimulatedInterfaces.reserve(MAP_SENSOR_CONFIG.size());
       /* get the anchors for the sensor interfaces from m_mapSensorConfig */
-      for(const std::pair<const UInt8, TConfiguration>& t_config : m_mapSensorConfig) {
+      for(const std::pair<const UInt8, TConfiguration>& t_config : MAP_SENSOR_CONFIG) {
          const char* pchAnchor = std::get<const char*>(t_config.second);
          SAnchor& sAnchor =
             c_entity.GetComponent<CEmbodiedEntity>("body").GetAnchor(pchAnchor);
@@ -68,18 +68,18 @@ namespace argos {
                m_pcControllableEntity->AddIntersectionPoint(cSensorRay, sIntersection.TOnRay);
                m_pcControllableEntity->AddCheckedRay(true, cSensorRay);
             }
-            s_interface.Reading.Proximity = 
+            s_interface.Proximity = 
                ConvertToMeters(cSensorRay.GetDistance(sIntersection.TOnRay));
          }
          else {
             /* No intersection */
-            s_interface.Reading.Proximity = std::get<Real>(s_interface.Configuration);
+            s_interface.Proximity = std::get<Real>(s_interface.Configuration);
             if(m_bShowRays) {
                m_pcControllableEntity->AddCheckedRay(false, cSensorRay);
             }
          }
          /* not implemented for the moment */
-         s_interface.Reading.Illuminance = 0.0;
+         s_interface.Illuminance = 0.0;
       }
    }
 
@@ -88,8 +88,8 @@ namespace argos {
    
    void CPiPuckRangefindersDefaultSensor::Reset() {
       for(SSimulatedInterface& s_interface : m_vecSimulatedInterfaces) {
-         s_interface.Reading.Proximity = std::get<Real>(s_interface.Configuration);
-         s_interface.Reading.Illuminance = 0.0;
+         s_interface.Proximity = std::get<Real>(s_interface.Configuration);
+         s_interface.Illuminance = 0.0;
       }
    }
    

@@ -28,9 +28,9 @@ namespace argos {
    void CPiPuckGroundDefaultSensor::SetRobot(CComposableEntity& c_entity) {
       m_pcControllableEntity = &(c_entity.GetComponent<CControllableEntity>("controller"));
       /* allocate memory for the sensor interfaces */
-      m_vecSimulatedInterfaces.reserve(m_mapSensorConfig.size());
+      m_vecSimulatedInterfaces.reserve(MAP_SENSOR_CONFIG.size());
       /* get the anchors for the sensor interfaces from m_mapSensorConfig */
-      for(const std::pair<const std::string, TConfiguration>& t_config : m_mapSensorConfig) {
+      for(const std::pair<const UInt8, TConfiguration>& t_config : MAP_SENSOR_CONFIG) {
          const std::string& strAnchor = std::get<std::string>(t_config.second);
          SAnchor& sAnchor =
             c_entity.GetComponent<CEmbodiedEntity>("body").GetAnchor(strAnchor);
@@ -76,10 +76,10 @@ namespace argos {
             const CColor& cColor =
                m_cFloorEntity.GetColorAtPoint(cIntersection.GetX(), cIntersection.GetY());
             /* set reading */
-            s_interface.Reading = cColor.ToGrayScale() / 255.0;
+            s_interface.Reflected = cColor.ToGrayScale() / 255.0;
          }
          else {
-            s_interface.Reading = 1.0;
+            s_interface.Reflected = 1.0;
          }
       }
    }
@@ -89,7 +89,8 @@ namespace argos {
 
    void CPiPuckGroundDefaultSensor::Reset() {
       for(SSimulatedInterface& s_interface : m_vecSimulatedInterfaces) {
-         s_interface.Reading = 0.0;
+         s_interface.Reflected = 0.0;
+         s_interface.Background = 0.0;
       }
    }
 
@@ -115,7 +116,7 @@ namespace argos {
                    "Michael Allwright [allsey87@gmail.com]",
                    "1.0",
                    "The pipuck ground sensor.",
-                   "This sensor measures the color of the ground beneath the pipuck.",
+                   "This sensor measures the brightness of the floor under the Pi-Puck.",
                    "Usable"
    );
 

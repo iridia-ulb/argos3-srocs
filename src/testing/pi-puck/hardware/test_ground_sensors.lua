@@ -8,8 +8,8 @@ end
 function step()
    for index, sensor in ipairs(robot.ground_sensors) do
       local message = 
-         string.format('%d: reflected = %.2f, ambient = %.2f', index,
-                       sensor.reflected, sensor.ambient)
+         string.format('%d: reflected = %.2f, background = %.2f', index,
+                       sensor.reflected, sensor.background)
       log(message)
    end
    log('---')

@@ -35,7 +35,7 @@ namespace argos {
             THROW_ARGOSEXCEPTION("Could not find IIO device \"epuck-rangefinders\"");
          }
          /* initialize the channels */
-         for(const std::pair<const UInt8, TConfiguration>& c_config : m_mapSensorConfig) {
+         for(const std::pair<const UInt8, TConfiguration>& c_config : MAP_SENSOR_CONFIG) {
             std::string strName("illuminance");
             strName += std::to_string(c_config.first);
             iio_channel* psIlluminance = ::iio_device_find_channel(m_psDevice, strName.c_str(), false);
@@ -64,7 +64,7 @@ namespace argos {
          std::string strCalibrationFilePath;
          GetNodeAttributeOrDefault(t_tree, "calibration", strCalibrationFilePath, strCalibrationFilePath);
          if(strCalibrationFilePath.empty()) {
-            LOGERR << "[WARNING] No calibration data provided for the pipuck rangefinders" << std::endl;
+            LOGERR << "[WARNING] No calibration data provided for the Pi-Puck rangefinders" << std::endl;
          }
          else {
             UInt32 unLabel;
@@ -103,7 +103,7 @@ namespace argos {
          }
       }
       catch(CARGoSException& ex) {
-         THROW_ARGOSEXCEPTION_NESTED("Initialization error in the PiPuck rangefinders sensor.", ex);
+         THROW_ARGOSEXCEPTION_NESTED("Initialization error in the Pi-Puck rangefinders sensor.", ex);
       }
    }
 
@@ -142,10 +142,10 @@ namespace argos {
                             m_psBuffer,
                             &unIlluminanceRaw, 2);
          /* calibrate proximity samples and convert to metric units */
-         s_physical_interface.Reading.Proximity = static_cast<Real>(unProximityRaw);
+         s_physical_interface.Proximity = static_cast<Real>(unProximityRaw);
          // std::pow(s_physical_interface.Calibration[1] / XXX, s_physical_interface.Calibration[0]);
          /* calibrate illuminance samples and convert to metric units */
-         s_physical_interface.Reading.Illuminance = ConvertToLux(unIlluminanceRaw);
+         s_physical_interface.Illuminance = ConvertToLux(unIlluminanceRaw);
       }
    }
 
@@ -154,8 +154,8 @@ namespace argos {
 
    void CPiPuckRangefindersDefaultSensor::Reset() {
       for(SPhysicalInterface& s_physical_interface : m_vecPhysicalInterfaces) {
-         s_physical_interface.Reading.Proximity = Real(0);
-         s_physical_interface.Reading.Illuminance = Real(0);
+         s_physical_interface.Proximity = Real(0);
+         s_physical_interface.Illuminance = Real(0);
       }
    }
 

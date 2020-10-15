@@ -46,15 +46,15 @@ namespace argos {
                                     "\" for device \"epuck-groundsensors\"");
             strChannelName = "illuminance";
             strChannelName += std::to_string(c_config.first);
-            strChannelName += "_ambient";
-            iio_channel* psAmbient = ::iio_device_find_channel(m_psDevice, strChannelName.c_str(), false);
-            if(psAmbient == nullptr)
+            strChannelName += "_background";
+            iio_channel* psBackground = ::iio_device_find_channel(m_psDevice, strChannelName.c_str(), false);
+            if(psBackground == nullptr)
                THROW_ARGOSEXCEPTION("Could not find IIO input channel \"" << strChannelName <<
                                     "\" for device \"epuck-groundsensors\"");
             /* enable channels */
-            ::iio_channel_enable(psAmbient);
+            ::iio_channel_enable(psBackground);
             ::iio_channel_enable(psReflected);
-            m_vecPhysicalInterfaces.emplace_back(c_config.first, psAmbient, psReflected);
+            m_vecPhysicalInterfaces.emplace_back(c_config.first, psBackground, psReflected);
          }
          ::iio_device_set_trigger(m_psDevice, psUpdateTrigger);
          /* create buffer */
@@ -125,8 +125,8 @@ namespace argos {
          if(s_physical_interface.Channel.Reflected != nullptr) {
             ::iio_channel_disable(s_physical_interface.Channel.Reflected);
          }
-         if(s_physical_interface.Channel.Ambient != nullptr) {
-            ::iio_channel_disable(s_physical_interface.Channel.Ambient);
+         if(s_physical_interface.Channel.Background != nullptr) {
+            ::iio_channel_disable(s_physical_interface.Channel.Background);
          }
       }
    }
@@ -135,20 +135,20 @@ namespace argos {
    /****************************************/
    
    void CPiPuckGroundDefaultSensor::Update() {
-      UInt16 unReflectedRaw, unAmbientRaw;
+      UInt16 unReflectedRaw, unBackgroundRaw;
       ::iio_buffer_refill(m_psBuffer);
       for(SPhysicalInterface& s_physical_interface : m_vecPhysicalInterfaces) {
          ::iio_channel_read(s_physical_interface.Channel.Reflected,
                             m_psBuffer,
                             &unReflectedRaw, 2);
-         ::iio_channel_read(s_physical_interface.Channel.Ambient,
+         ::iio_channel_read(s_physical_interface.Channel.Background,
                             m_psBuffer,
-                            &unAmbientRaw, 2);
+                            &unBackgroundRaw, 2);
          /* calibrate proximity samples and convert to metric units */
          s_physical_interface.Reflected = static_cast<Real>(unReflectedRaw);
          // std::pow(s_physical_interface.Calibration[1] / XXX, s_physical_interface.Calibration[0]);
          /* calibrate illuminance samples and convert to metric units */
-         s_physical_interface.Ambient = static_cast<Real>(unAmbientRaw);
+         s_physical_interface.Background = static_cast<Real>(unBackgroundRaw);
       }
    }
 
@@ -158,7 +158,7 @@ namespace argos {
    void CPiPuckGroundDefaultSensor::Reset() {
       for(SPhysicalInterface& s_physical_interface : m_vecPhysicalInterfaces) {
          s_physical_interface.Reflected = Real(0);
-         s_physical_interface.Ambient = Real(0);
+         s_physical_interface.Background = Real(0);
       }
    }
 

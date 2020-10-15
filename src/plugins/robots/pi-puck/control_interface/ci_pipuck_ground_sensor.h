@@ -33,12 +33,12 @@ namespace argos {
             Label(un_label),
             Configuration(MAP_SENSOR_CONFIG.at(un_label)),
             Reflected(0.0),
-            Ambient(0.0) {}
+            Background(0.0) {}
          /* members */
          const UInt8 Label;
          const TConfiguration& Configuration;
          Real Reflected;
-         Real Ambient;
+         Real Background;
       };
 
    public:

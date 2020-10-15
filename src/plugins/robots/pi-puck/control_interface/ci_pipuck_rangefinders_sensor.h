@@ -30,14 +30,14 @@ namespace argos {
       struct SInterface {
          SInterface(const UInt8& un_label) :
             Label(un_label),
-            Configuration(m_mapSensorConfig.at(un_label)),
-            Reading({0.0, 0.0}) {}
+            Configuration(MAP_SENSOR_CONFIG.at(un_label)),
+            Proximity(0.0),
+            Illuminance(0.0) {}
          const UInt8& Label;
          const TConfiguration& Configuration;
-         struct {
-            Real Illuminance;
-            Real Proximity;
-         } Reading;
+         Real Proximity;
+         Real Illuminance;
+         
       };
 
       virtual ~CCI_PiPuckRangefindersSensor() {}
@@ -52,7 +52,7 @@ namespace argos {
 
    protected:
 
-      static const std::map<UInt8, TConfiguration> m_mapSensorConfig;
+      static const std::map<UInt8, TConfiguration> MAP_SENSOR_CONFIG;
 
    };
 

@@ -6,10 +6,10 @@ end
 --[[ This function is executed at each time step
      It must contain the logic of your controller ]]
 function step()
-   for index, device in ipairs(robot.rangefinders) do
+   for index, sensor in ipairs(robot.rangefinders) do
       local message = 
-         string.format('%d: distance = %.2f, illuminance = %.2f', index,
-                       device.reading.proximity, device.reading.illuminance)
+         string.format('%d: proximity = %.2f, illuminance = %.2f', index,
+                       sensor.proximity, sensor.illuminance)
       log(message)
    end
    log('---')

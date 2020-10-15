@@ -21,7 +21,7 @@ namespace argos {
       Visit([pt_lua_state] (const SInterface& s_interface) {
          CLuaUtility::StartTable(pt_lua_state, s_interface.Label + 1);
          CLuaUtility::AddToTable(pt_lua_state, "reflected", s_interface.Reflected);
-         CLuaUtility::AddToTable(pt_lua_state, "ambient", s_interface.Ambient);
+         CLuaUtility::AddToTable(pt_lua_state, "background", s_interface.Background);
          CLuaUtility::StartTable(pt_lua_state, "transform");
          CLuaUtility::AddToTable(pt_lua_state, "position", std::get<CVector3>(s_interface.Configuration));
          CLuaUtility::AddToTable(pt_lua_state, "orientation", std::get<CQuaternion>(s_interface.Configuration));
@@ -45,8 +45,8 @@ namespace argos {
          lua_pushstring(pt_lua_state, "reflected");
          lua_pushnumber(pt_lua_state, s_interface.Reflected);
          lua_settable(pt_lua_state, -3);
-         lua_pushstring(pt_lua_state, "ambient");
-         lua_pushnumber(pt_lua_state, s_interface.Ambient);
+         lua_pushstring(pt_lua_state, "background");
+         lua_pushnumber(pt_lua_state, s_interface.Background);
          lua_settable(pt_lua_state, -3);
          lua_pop(pt_lua_state, 1);
       });

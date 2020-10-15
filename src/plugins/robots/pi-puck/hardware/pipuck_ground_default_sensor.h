@@ -49,14 +49,14 @@ namespace argos {
          /* constructor */
          SPhysicalInterface(UInt8 un_label,
                             iio_channel* ps_reflected_channel,
-                            iio_channel* ps_ambient_channel) :
+                            iio_channel* ps_background_channel) :
             SInterface(un_label),
-            Channel { ps_reflected_channel, ps_ambient_channel },
+            Channel { ps_reflected_channel, ps_background_channel },
             Calibration { 0.0, 0.0 } {}
          /* members */
          struct {
             iio_channel* Reflected;
-            iio_channel* Ambient;
+            iio_channel* Background;
          } Channel;
          std::array<Real, 2> Calibration;
       };

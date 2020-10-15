@@ -24,9 +24,9 @@ namespace argos {
 
       struct SSimulatedInterface : SInterface {
          /* constructor */
-         SSimulatedInterface(const std::string& str_label,
+         SSimulatedInterface(UInt8 un_label,
                              const SAnchor& s_anchor) :
-            SInterface(str_label),
+            SInterface(un_label),
             Anchor(s_anchor) {}
          /* members */
          const SAnchor& Anchor;
