@@ -69,7 +69,8 @@ return function(data, distance)
                      end,
                      -- raise lift
                      function()
-                        robot.lift_system.set_position(data.blocks[data.target.id].position_robot.z + robot.api.constants.block_side_length) 
+                        robot.lift_system.set_position(data.blocks[data.target.id].position_robot.z + 
+                                                       robot.api.constants.block_side_length) 
                         return false, true
                      end,
                      -- check whether lift to position
@@ -87,7 +88,21 @@ return function(data, distance)
                            robot.api.move.with_velocity(robot.api.parameters.default_speed, 
                                                       robot.api.parameters.default_speed)
                         end
-                     )
+                     ),
+                     function() robot.api.move.with_velocity(0,0) return false, true end,
+
+                     function()
+                        robot.lift_system.set_position(robot.lift_system.position -
+								                       robot.api.constants.block_side_length / 2)
+                        return false, true
+                     end,
+                     -- wait for 2 sec
+                     robot.nodes.create_timer_node(0.5),
+                     -- check whether lift to position
+                     function()
+                        if robot.lift_system.state == "inactive" then return false, true
+                        else return true end
+                     end
                   },
                },
                -- reach the front of the reference block
@@ -104,9 +119,13 @@ return function(data, distance)
                      end,
                      -- raise lift
                      function()
-                        robot.lift_system.set_position(data.blocks[data.target.id].position_robot.z) 
+                        robot.lift_system.set_position(data.blocks[data.target.id].position_robot.z - 
+                                                       robot.api.constants.block_side_length / 2 +
+                                                       robot.api.constants.end_effector_position_place_bias) 
                         return false, true
                      end,
+                     -- wait for 2 sec
+                     robot.nodes.create_timer_node(0.5),
                      -- check whether lift to position
                      function()
                         if robot.lift_system.state == "inactive" then return false, true
@@ -123,7 +142,8 @@ return function(data, distance)
                            robot.api.move.with_velocity(robot.api.parameters.default_speed, 
                                                       robot.api.parameters.default_speed)
                         end
-                     )
+                     ),
+                     function() robot.api.move.with_velocity(0,0) return false, true end,
                   },
                },
                -- reach the front down of the reference block
