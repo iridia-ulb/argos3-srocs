@@ -16,5 +16,4 @@ return {
     end_effector_position_offset = vector3(0.09800875, 0, 0.055),
     end_effector_position_pickup_bias = 0.002, -- move less when picking up a block
     end_effector_position_place_bias = 0.002, -- secure distance above ground when placing a block
-    end_effector_nose_length = 0.005,
 }

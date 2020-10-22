@@ -19,5 +19,6 @@ return {
     z_approach_range_angle = tonumber(robot.params.z_approach_range_angle or 20),
     z_approach_range_distance = tonumber(robot.params.z_approach_range_distance or 0.27),
     z_approach_block_distance_increment = tonumber(robot.params.z_approach_block_distance_increment or 0.10),
+    end_effector_nose_length = tonumber(robot.params.end_effector_nose_length or 0.005),
 }
 
