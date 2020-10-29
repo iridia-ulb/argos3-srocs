@@ -27,6 +27,12 @@ return function(data, forward_distance)
          end,
          -- wait for 2 sec
          robot.nodes.create_timer_node(2),
+         function()
+            robot.lift_system.set_position(robot.lift_system.position + 0.05)
+            return false, true
+         end,
+         -- wait for 2 sec
+         robot.nodes.create_timer_node(2),
          -- recharge magnet
          function()
             robot.electromagnet_system.set_discharge_mode("disable")
