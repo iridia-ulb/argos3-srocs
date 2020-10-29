@@ -22,8 +22,8 @@ function step()
    local left = 0.005
    local right = 0.005
    -- override defaults if the line was detected
-   if line_detected(robot.ground.right) then
-      if line_detected(robot.ground.center) then
+   if line_detected(robot.ground_sensors[3]) then
+      if line_detected(robot.ground_sensors[2]) then
          left = 0.01
          right = 0.00
          mode = "right"
@@ -32,8 +32,8 @@ function step()
          right = -0.01
          mode = "hard right"
       end
-   elseif line_detected(robot.ground.left) then
-      if line_detected(robot.ground.center) then
+   elseif line_detected(robot.ground_sensors[1]) then
+      if line_detected(robot.ground_sensors[2]) then
          left = 0.00
          right = 0.01
          mode = "left"
@@ -48,7 +48,7 @@ function step()
 end
 
 function line_detected(sensor) 
-   return sensor.reading < 0.6
+   return sensor.reflected < 0.6
 end
 
 function init()
