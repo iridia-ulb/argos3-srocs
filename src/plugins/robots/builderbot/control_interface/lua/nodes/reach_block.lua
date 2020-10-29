@@ -82,7 +82,7 @@ return function(data, distance)
                      robot.nodes.create_timer_node(
                         (distance - 
                         robot.api.constants.end_effector_position_offset.x - 
-                        robot.api.parameters.end_effector_nose_length
+                        robot.api.parameters.end_effector_overhang_length
                         ) / robot.api.parameters.default_speed,
                         function()
                            robot.api.move.with_velocity(robot.api.parameters.default_speed, 
@@ -136,7 +136,7 @@ return function(data, distance)
                         (distance - 
                         robot.api.constants.end_effector_position_offset.x - 
                         robot.api.constants.block_side_length - 
-                        robot.api.parameters.end_effector_nose_length
+                        robot.api.parameters.end_effector_overhang_length
                         ) / robot.api.parameters.default_speed,
                         function()
                            robot.api.move.with_velocity(robot.api.parameters.default_speed, 
@@ -162,7 +162,7 @@ return function(data, distance)
                      function()
                         robot.lift_system.set_position(data.blocks[data.target.id].position_robot.z - 
                                                       robot.api.constants.block_side_length - 
-                                                      robot.api.parameters.end_effector_nose_length) 
+                                                      robot.api.parameters.end_effector_overhang_length) 
                         return false, true
                      end,
                      -- check whether lift to position
@@ -175,7 +175,7 @@ return function(data, distance)
                         (distance - 
                         robot.api.constants.end_effector_position_offset.x - 
                         robot.api.constants.block_side_length - 
-                        robot.api.parameters.end_effector_nose_length
+                        robot.api.parameters.end_effector_overhang_length
                         ) / robot.api.parameters.default_speed,
                         function()
                            robot.api.move.with_velocity(robot.api.parameters.default_speed, 
@@ -212,7 +212,7 @@ return function(data, distance)
                         (distance - 
                         robot.api.constants.end_effector_position_offset.x - 
                         robot.api.constants.block_side_length - 
-                        robot.api.parameters.end_effector_nose_length
+                        robot.api.parameters.end_effector_overhang_length
                         ) / robot.api.parameters.default_speed,
                         function()
                            robot.api.move.with_velocity(robot.api.parameters.default_speed, 
