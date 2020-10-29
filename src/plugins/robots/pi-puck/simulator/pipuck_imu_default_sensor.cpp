@@ -47,14 +47,14 @@ namespace argos {
    /****************************************/
    
    void CPiPuckImuDefaultSensor::Update() {
-      const SAnchor& sOriginAnchor = m_pcBody->GetOriginAnchor();
       /* calculate a reading for the accelerometer */
       // TODO
       /* calculate a reading for the gyroscope */
       // TODO
       /* calculate a reading for the magnetometer */
-      const CQuaternion& cOrientation = sOriginAnchor.Orientation;
-      m_cMagnetometer.Set(1,2,3); // X, Y, Z
+      //const SAnchor& sOriginAnchor = m_pcBody->GetOriginAnchor();
+      //const CQuaternion& cOrientation = sOriginAnchor.Orientation;
+      //m_cMagnetometer.Set(1,2,3); // X, Y, Z
    }
 
    /****************************************/

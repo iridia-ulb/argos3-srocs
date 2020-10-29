@@ -33,13 +33,13 @@ namespace argos {
        */
       virtual ~CPiPuckImuDefaultSensor() {}
 
-      virtual void SetRobot(CComposableEntity& c_entity) override;
+      virtual void SetRobot(CComposableEntity& c_entity);
 
-      virtual void Init(TConfigurationNode& t_tree) override;
+      virtual void Init(TConfigurationNode& t_tree);
 
-      virtual void Reset() override;
+      virtual void Reset();
 
-      virtual void Update() override;
+      virtual void Update();
 
    private:
 

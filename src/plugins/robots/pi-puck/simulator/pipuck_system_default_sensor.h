@@ -31,13 +31,13 @@ namespace argos {
        */
       virtual ~CPiPuckSystemDefaultSensor() {}
 
-      void SetRobot(CComposableEntity& c_entity) override;
+      virtual void SetRobot(CComposableEntity& c_entity);
 
-      void Init(TConfigurationNode& t_tree) override;
+      virtual void Init(TConfigurationNode& t_tree);
 
-      void Reset() override;
+      virtual void Reset();
 
-      void Update() override;
+      virtual void Update();
 
    };   
 }

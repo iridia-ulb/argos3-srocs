@@ -75,7 +75,7 @@ namespace argos {
       const Real fEllipseSize = 7.5f;
       
       /* draw LEDs */
-      for(const CBuilderBotCameraSystemDefaultSensor::SLed s_led : m_pcCameraSystemSensor->GetLedCache()) {
+      for(const CBuilderBotCameraSystemDefaultSensor::SLed& s_led : m_pcCameraSystemSensor->GetLedCache()) {
          const QColor& cColor = QColor::fromRgb(s_led.Color.GetRed(),
                                                 s_led.Color.GetGreen(),
                                                 s_led.Color.GetBlue());

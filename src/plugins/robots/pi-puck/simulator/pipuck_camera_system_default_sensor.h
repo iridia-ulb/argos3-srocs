@@ -56,19 +56,19 @@ namespace argos {
 
       virtual ~CPiPuckCameraSystemDefaultSensor() {}
 
-      void SetRobot(CComposableEntity& c_entity) override;
+      virtual void SetRobot(CComposableEntity& c_entity);
 
-      void Init(TConfigurationNode& t_tree) override;
+      virtual void Init(TConfigurationNode& t_tree);
 
-      void Update() override;
+      virtual void Update();
 
-      void Reset() override;
+      virtual void Reset();
 
-      bool operator()(CTagEntity& c_tag) override;
+      virtual bool operator()(CTagEntity& c_tag);
 
-      bool operator()(CDirectionalLEDEntity& c_led) override;
+      virtual bool operator()(CDirectionalLEDEntity& c_led);
 
-      ELedState DetectLed(const CVector3& c_position) override;
+      virtual ELedState DetectLed(const CVector3& c_position);
 
       CVector2 GetResolution() const;
 

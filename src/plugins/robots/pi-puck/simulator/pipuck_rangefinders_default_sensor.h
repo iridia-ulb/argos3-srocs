@@ -42,15 +42,15 @@ namespace argos {
 
       virtual ~CPiPuckRangefindersDefaultSensor() {}
 
-      void SetRobot(CComposableEntity& c_entity) override;
+      virtual void SetRobot(CComposableEntity& c_entity);
 
-      void Init(TConfigurationNode& t_tree) override;
+      virtual void Init(TConfigurationNode& t_tree);
 
-      void Update() override;
+      virtual void Update();
 
-      void Reset() override;
+      virtual void Reset();
 
-      void Visit(std::function<void(const SInterface&)>) override;
+      virtual void Visit(std::function<void(const SInterface&)>);
 
    private:
 

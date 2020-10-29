@@ -46,7 +46,7 @@ namespace argos {
 
       virtual void Reset();
 
-      virtual void Visit(std::function<void(SInterface&)>) override;
+      virtual void Visit(std::function<void(SInterface&)>);
 
    private:
 

@@ -38,13 +38,13 @@ namespace argos {
 
       virtual void Update();
 
-      virtual bool Ready() override {
+      virtual bool Ready() {
          return true;
       };
 
-      virtual void Arm(bool b_arm, bool b_bypass_safety_checks) override {}
+      virtual void Arm(bool b_arm, bool b_bypass_safety_checks) {}
       
-      virtual void SetOffboardMode(bool b_offboard_mode) override {}
+      virtual void SetOffboardMode(bool b_offboard_mode) {}
 
    private:
 

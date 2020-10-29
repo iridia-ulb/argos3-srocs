@@ -15,6 +15,8 @@ namespace argos {
 #include <argos3/core/simulator/actuator.h>
 #include <argos3/plugins/robots/pi-puck/control_interface/ci_pipuck_leds_actuator.h>
 
+#include <array>
+
 namespace argos {
 
    class CPiPuckLEDsDefaultActuator : public CSimulatedActuator,
@@ -32,21 +34,21 @@ namespace argos {
        */
       virtual ~CPiPuckLEDsDefaultActuator() {}
 
-      void SetRobot(CComposableEntity& c_entity) override;
+      virtual void SetRobot(CComposableEntity& c_entity);
 
-      void Init(TConfigurationNode& t_tree) override;
+      virtual void Init(TConfigurationNode& t_tree);
 
-      void Update() override;
+      virtual void Update();
 
-      void Reset() override;
+      virtual void Reset();
 
-      void SetRingLEDIndex(UInt32 un_index, bool b_on) override;
+      virtual void SetRingLEDIndex(UInt32 un_index, bool b_on);
 
-      void SetRingLEDs(bool b_on) override;
+      virtual void SetRingLEDs(bool b_on);
 
-      void SetFrontLED(bool b_on) override;
+      virtual void SetFrontLED(bool b_on);
 
-      void SetBodyLED(bool b_on) override;
+      virtual void SetBodyLED(bool b_on);
 
    private:
 
