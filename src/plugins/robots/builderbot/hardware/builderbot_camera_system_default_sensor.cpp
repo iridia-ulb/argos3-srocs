@@ -43,6 +43,7 @@ extern "C" {
 #define IMAGE_BYTES_PER_PIXEL 2u
 #define IMAGE_WIDTH 320u
 #define IMAGE_HEIGHT 240u
+#define IMAGE_SIZE_BYTES (IMAGE_BYTES_PER_PIXEL * IMAGE_WIDTH * IMAGE_HEIGHT)
 
 #define TAG_SIDE_LENGTH 0.0235f
 
@@ -64,7 +65,9 @@ namespace argos {
    
    CBuilderBotCameraSystemDefaultSensor::CBuilderBotCameraSystemDefaultSensor() :
       m_cFocalLength(DEFAULT_FOCAL_LENGTH_X, DEFAULT_FOCAL_LENGTH_Y),
-      m_cPrincipalPoint(DEFAULT_PRINCIPAL_POINT_X, DEFAULT_PRINCIPAL_POINT_Y) {
+      m_cPrincipalPoint(DEFAULT_PRINCIPAL_POINT_X, DEFAULT_PRINCIPAL_POINT_Y),
+      m_bSaveRaw(false),
+      m_unSaturationLimit(255) {
       /* initialize the apriltag components */
       m_ptTagFamily = ::tag36h11_create();
       /* create the tag detector */
@@ -101,6 +104,15 @@ namespace argos {
    void CBuilderBotCameraSystemDefaultSensor::Init(TConfigurationNode& t_tree) {
       try {
          CCI_BuilderBotCameraSystemSensor::Init(t_tree);
+         /**********************************/
+         /* retrieve the save image switch */
+         /**********************************/
+         GetNodeAttributeOrDefault(t_tree, "save_as", m_strSavePathBasename, m_strSavePathBasename);
+         GetNodeAttributeOrDefault(t_tree, "save_raw", m_bSaveRaw, m_bSaveRaw);
+         /**********************************/
+         /* retrieve the saturation limit  */
+         /**********************************/
+         GetNodeAttributeOrDefault(t_tree, "saturationLimit", m_unSaturationLimit, m_unSaturationLimit);
          /********************************/
          /* retrieve the calibraton data */
          /********************************/
@@ -321,12 +333,21 @@ namespace argos {
             /* extract the luminance from the data */
             for (UInt32 un_height_index = 0; un_height_index < unImageHeight; un_height_index++) {
                for (UInt32 un_width_index = 0; un_width_index < unImageWidth; un_width_index++) {
-                  /* copy data */
-                  m_ptImage->buf[unDestinationIndex++] = punImageData[unSourceIndex + 1];
+                  /* copy data and saturate pixel values */
+                  m_ptImage->buf[unDestinationIndex++] = 
+                     std::min(punImageData[unSourceIndex + 1], m_unSaturationLimit);
                   /* move to the next pixel */
                   unSourceIndex += 2;
                }
                unDestinationIndex += (unImageStride - unImageWidth);
+            }
+            if(!m_strSavePathBasename.empty()) {
+               if(m_bSaveRaw) {
+                  SaveRaw(punImageData);
+               }
+               else {
+                  SavePNM(m_ptImage);
+               }
             }
             /* detect the tags */
             CVector2 cCenterPixel;
@@ -373,6 +394,33 @@ namespace argos {
             THROW_ARGOSEXCEPTION_NESTED("Error updating the camera sensor", ex);
          }
       }
+   }
+
+   /****************************************/
+   /****************************************/
+
+   void CBuilderBotCameraSystemDefaultSensor::SavePNM(const image_u8_t* ps_image) {
+      /* write to PNM file */
+      static UInt32 unFrame = 0;
+      std::string strFilename(m_strSavePathBasename);
+      strFilename += std::to_string(unFrame);
+      strFilename += ".pnm";
+      image_u8_write_pnm(ps_image, strFilename.c_str());
+      unFrame++;
+   }
+
+   /****************************************/
+   /****************************************/
+   
+   void CBuilderBotCameraSystemDefaultSensor::SaveRaw(const uint8_t* pun_image) {
+      static UInt32 unFrame = 0;
+      std::string strFilename(m_strSavePathBasename);
+      strFilename += std::to_string(unFrame);
+      strFilename += ".uyvy";
+      std::ofstream ofsOutput(strFilename, std::ofstream::binary);
+      const char* pcImageData = reinterpret_cast<const char*>(pun_image);
+      ofsOutput.write(pcImageData, IMAGE_SIZE_BYTES);
+      unFrame++;
    }
 
    /****************************************/
