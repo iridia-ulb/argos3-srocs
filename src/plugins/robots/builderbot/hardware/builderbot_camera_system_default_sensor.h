@@ -84,6 +84,15 @@ namespace argos {
       /* time at initialization */
       std::chrono::steady_clock::time_point m_tpInit;
 
+      /* image save configuration and methods */
+      bool m_bSaveRaw;
+      std::string m_strSavePathBasename;
+      void SavePNM(const image_u8_t* ps_image);
+      void SaveRaw(const uint8_t* pun_image);
+
+      /* saturation limit */
+      UInt8 m_unSaturationLimit;
+
       /****************************************/
       /****************************************/
 
