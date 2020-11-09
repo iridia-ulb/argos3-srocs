@@ -15,15 +15,12 @@
     <lua_controller id="drone">
       <environment pixhawk="/dev/ttyACM0"/>
       <actuators>
-        <!--wifi implementation="default" /-->
         <drone_flight_system implementation="default"/>
       </actuators>
       <sensors>
-        <!--wifi implementation="default" /-->
         <drone_flight_system implementation="default"/>
-        <drone_system implementation="default" />
       </sensors>
-      <params script="@ARGOS_TEST_DIR@/flight/sensor_actuator.lua" />
+      <params script="@CMAKE_INSTALL_PREFIX@/share/argos3/testing/test_flight.lua" />
     </lua_controller>
   </controllers>
 

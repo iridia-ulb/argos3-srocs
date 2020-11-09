@@ -21,7 +21,7 @@
       <sensors>
         <wifi implementation="default" />
       </sensors>
-      <params script="@ARGOS_TEST_DIR@/communication/sensor_actuator.lua" />
+      <params script="@CMAKE_INSTALL_PREFIX@/share/argos3/testing/test_wifi.lua" />
     </lua_controller>
   </controllers>
 
