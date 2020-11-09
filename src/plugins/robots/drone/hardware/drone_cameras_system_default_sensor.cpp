@@ -126,7 +126,7 @@ namespace argos {
    /****************************************/
    /****************************************/
 
-   void CDroneCamerasSystemDefaultSensor::Visit(std::function<void(SInterface&)> fn_visitor {
+   void CDroneCamerasSystemDefaultSensor::Visit(std::function<void(SInterface&)> fn_visitor) {
       for(SPhysicalInterface& s_interface : m_vecPhysicalInterfaces) {
          fn_visitor(s_interface);
       }
