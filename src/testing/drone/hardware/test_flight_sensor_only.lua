@@ -5,7 +5,6 @@ end
 --[[ This function is executed at each time step
      It must contain the logic of your controller ]]
 function step()
-   print("time = " .. tostring(robot.system.time))
    print("position = " .. tostring(robot.flight_system.position))
    print("velocity = " .. tostring(robot.flight_system.velocity))
    print("orientation = " .. tostring(robot.flight_system.orientation))
