@@ -43,6 +43,7 @@ void handler(int n_signal) {
   std::signal(SIGILL, SIG_IGN);
   std::signal(SIGSEGV, SIG_IGN);
   std::signal(SIGTERM, SIG_IGN);
+  std::signal(SIGPIPE, SIG_IGN);
 }
 
 int main(int n_argc, char** ppch_argv) {
@@ -58,6 +59,7 @@ int main(int n_argc, char** ppch_argv) {
    std::signal(SIGILL, handler);
    std::signal(SIGSEGV, handler);
    std::signal(SIGTERM, handler);
+   std::signal(SIGPIPE, handler);
    try {
       bool bUsageHelp;
       std::string strConfigurationFile;
