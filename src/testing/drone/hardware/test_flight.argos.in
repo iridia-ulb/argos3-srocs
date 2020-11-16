@@ -13,7 +13,7 @@
   <!-- *************** -->
   <controllers>
     <lua_controller id="drone">
-      <environment pixhawk="/dev/ttyACM0"/>
+      <environment pixhawk="/dev/ttyS1"/>
       <actuators>
         <drone_flight_system implementation="default"/>
       </actuators>
