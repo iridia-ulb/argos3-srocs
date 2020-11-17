@@ -13,7 +13,7 @@
   <!-- *************** -->
   <controllers>
     <lua_controller id="drone">
-      <environment router="localhost:4950"/>
+      <!--environment router="localhost:4950"/-->
       <actuators />
       <sensors>
         <drone_cameras_system implementation="default">
@@ -38,6 +38,7 @@
                   processing_resolution="1024,768"
                   processing_offset="0,0"/>
         </drone_cameras_system>
+        <drone_system implementation="default" /> 
       </sensors>
       <params script="@CMAKE_INSTALL_PREFIX@/share/argos3/testing/test_cameras.lua" />
     </lua_controller>
