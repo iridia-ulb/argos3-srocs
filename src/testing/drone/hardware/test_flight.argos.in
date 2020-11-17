@@ -18,6 +18,7 @@
         <drone_flight_system implementation="default"/>
       </actuators>
       <sensors>
+        <drone_system implementation="default" />
         <drone_flight_system implementation="default"/>
       </sensors>
       <params script="@CMAKE_INSTALL_PREFIX@/share/argos3/testing/test_flight.lua" />
