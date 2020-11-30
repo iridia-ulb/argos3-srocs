@@ -15,13 +15,11 @@ function step()
          print('enabling off-board mode')
          robot.flight_system.set_offboard_mode(true)
          -- WARNING this should make the drone take off
-         if robot.system.time > 10 then
-            print('arming drone')
-            robot.flight_system.set_armed(true, false)
-            -- fly up one meter
-            robot.flight_system.set_target_pose(vector3(0,0,1), 0)
-            state = 'taking_off'
-         end
+         print('arming drone')
+         robot.flight_system.set_armed(true, false)
+         -- fly up one meter
+         robot.flight_system.set_target_pose(vector3(0,0,1), 0)
+         state = 'taking_off'
       elseif state == 'taking_off' then
          if math.abs(robot.flight_system.position.z + 1) < 0.025 then
             robot.flight_system.set_target_pose(vector3(0,0,0), 0)
