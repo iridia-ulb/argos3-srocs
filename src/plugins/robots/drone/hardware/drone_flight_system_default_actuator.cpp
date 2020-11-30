@@ -9,6 +9,7 @@
 #include <argos3/core/utility/logging/argos_log.h>
 
 #include <argos3/plugins/robots/generic/hardware/robot.h>
+#include <argos3/core/utility/rate.h>
 
 #include <termios.h>
 
