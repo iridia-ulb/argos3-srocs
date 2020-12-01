@@ -85,9 +85,9 @@ namespace argos {
          mavlink_message_t tMessage;
          mavlink_msg_set_position_target_local_ned_encode(unTargetSystem, 0, &tMessage, &tSetpoint);
          Write(tMessage);
-         cRate.Sleep();
 
          try {
+            cRate.Sleep();
             Write(tMessage);
          }
          catch(CARGoSException& ex) {
