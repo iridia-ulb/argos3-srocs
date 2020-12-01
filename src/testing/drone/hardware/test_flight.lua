@@ -18,10 +18,10 @@ function step()
          print('arming drone')
          robot.flight_system.set_armed(true, false)
          -- fly up one meter
-         robot.flight_system.set_target_pose(vector3(0,0,1.5), 0)
+         robot.flight_system.set_target_pose(vector3(0,0,1), 0)
          state = 'taking_off'
       elseif state == 'taking_off' then
-         if math.abs(robot.flight_system.position.z + 1.5) < 0.025 then
+         if math.abs(robot.flight_system.position.z + 1) < 0.025 then
             robot.flight_system.set_target_pose(vector3(0,0,0), 0)
             state = 'landing'
          end
