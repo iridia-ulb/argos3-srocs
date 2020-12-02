@@ -63,7 +63,7 @@ namespace argos {
    /****************************************/
 
    void CDroneFlightSystemDefaultActuator::Update() {
-      CRate cRate(5);
+      CRate cRate(10);
       if(m_pcPixhawk->Ready()) {
          CVector3& cInitialOrientation =
             m_pcPixhawk->GetInitialOrientation().value();
