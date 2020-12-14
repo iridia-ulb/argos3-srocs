@@ -1,10 +1,11 @@
 --[[ This function is executed every time you press the 'execute' button ]]
 function init()
+   local speed = 0.01  -- m
    settings = {
-      {'forward', 100, 100},
-      {'backwards', -100, -100},
-      {'clockwise', 100, -100},
-      {'counter-clockwise', -100, 100},
+      {'forward', speed, speed},
+      {'backwards', -speed, -speed},
+      {'clockwise', speed, -speed},
+      {'counter-clockwise', -speed, speed},
       {'stop', 0, 0}
    }
    count = 1
@@ -19,8 +20,8 @@ function step()
    local desc, left, right = table.unpack(settings[index])
    robot.differential_drive.set_target_velocity(left, right)
    print(string.format('--- step = %d, setting = %s ---', count, desc))
-   print(string.format('left:  target_vel = %d, delta_pos = %d', left, robot.differential_drive.encoders.left))
-   print(string.format('right: target_vel = %d, delta_pos = %d', right, robot.differential_drive.encoders.right))
+   print(string.format('left:  target_vel = %f, delta_pos = %f', left, robot.differential_drive.encoders.left))
+   print(string.format('right: target_vel = %f, delta_pos = %f', right, robot.differential_drive.encoders.right))
    -- increment the config variable
    if count < 50 then
       count = count + 1
