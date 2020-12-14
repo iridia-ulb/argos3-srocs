@@ -60,8 +60,11 @@ return function(data, aim_point)
          current_pixel = target_tag.corners.right
          target_pixel = right_target_pixel
       else
-         current_pixel = target_tag.center.x
-         target_pixel = middle_target_pixel
+         local tag_to_endeffector = vector3(target_tag.position):rotate(robot.camera_system.transform.orientation)
+                                    + robot.camera_system.transform.position
+         current_pixel = -math.atan(tag_to_endeffector.y / tag_to_endeffector.x) * 180 / math.pi
+         target_pixel = 0
+         pixel_tolerance = robot.api.parameters.aim_block_angle_tolerance * 2
       end
 
       local err = (target_pixel - current_pixel) / pixel_tolerance
