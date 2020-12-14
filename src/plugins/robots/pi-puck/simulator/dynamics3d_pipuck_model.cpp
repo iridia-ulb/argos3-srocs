@@ -191,11 +191,11 @@ namespace argos {
    /****************************************/
 
    const btVector3    CDynamics3DPiPuckModel::m_cBodyHalfExtents(0.0362, 0.069, 0.0362);
-   const btScalar     CDynamics3DPiPuckModel::m_fBodyMass(0.242);
+   const btScalar     CDynamics3DPiPuckModel::m_fBodyMass(0.001);
    const btTransform  CDynamics3DPiPuckModel::m_cBodyOffset(btQuaternion(0.0, 0.0, 0.0, 1.0), btVector3(0.0,0.00125,0.0));
    const btTransform  CDynamics3DPiPuckModel::m_cBodyGeometricOffset(btQuaternion(0.0, 0.0, 0.0, 1.0), btVector3(0.0, -0.069, 0.0));
-   const btVector3    CDynamics3DPiPuckModel::m_cWheelHalfExtents(0.02125, 0.0015, 0.02125);
-   const btScalar     CDynamics3DPiPuckModel::m_fWheelMass(0.006);
+   const btVector3    CDynamics3DPiPuckModel::m_cWheelHalfExtents(0.02125, 0.0055, 0.02125);
+   const btScalar     CDynamics3DPiPuckModel::m_fWheelMass(0.1265);
    const btTransform  CDynamics3DPiPuckModel::m_cWheelGeometricOffset(btQuaternion(0.0, 0.0, 0.0, 1.0), btVector3(0.0, -0.0015, 0.0));
    const btTransform  CDynamics3DPiPuckModel::m_cLeftWheelOffset(btQuaternion(btVector3(-1,0,0), SIMD_HALF_PI), btVector3(0.0, 0.02125, -0.0255));
    const btTransform  CDynamics3DPiPuckModel::m_cRightWheelOffset(btQuaternion(btVector3(1,0,0), SIMD_HALF_PI), btVector3(0.0, 0.02125, 0.0255));
@@ -208,9 +208,9 @@ namespace argos {
    /* TODO calibrate these values */
    const btScalar     CDynamics3DPiPuckModel::m_fBodyFriction(0.0);
    const btScalar     CDynamics3DPiPuckModel::m_fWheelMotorMaxImpulse(0.05);
-   const btScalar     CDynamics3DPiPuckModel::m_fWheelFriction(0.75);
-   const btScalar     CDynamics3DPiPuckModel::m_fWheelMotorClamp(2.0);
-   const btScalar     CDynamics3DPiPuckModel::m_fWheelMotorKdCoefficient(0.9);
+   const btScalar     CDynamics3DPiPuckModel::m_fWheelFriction(10);
+   const btScalar     CDynamics3DPiPuckModel::m_fWheelMotorClamp(5.0);
+   const btScalar     CDynamics3DPiPuckModel::m_fWheelMotorKdCoefficient(2.0);
 
    /****************************************/
    /****************************************/
