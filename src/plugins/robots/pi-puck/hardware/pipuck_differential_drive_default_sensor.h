@@ -50,7 +50,7 @@ namespace argos {
    private:
 
       Real ConvertToMetersPerSecond(SInt16 n_raw) {
-         //static const Real fConversionFactor = 1.0;
+         /* receiving 100 means a speed of 0.013m/s */
          static const Real fConversionFactor = 0.013 / 100;
          return (fConversionFactor * n_raw);
       }

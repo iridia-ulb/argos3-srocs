@@ -59,8 +59,8 @@ namespace argos {
    private:
 
       SInt16 ConvertToRaw(Real f_metres_per_second) {
-         //static const Real fConversionFactor = 1.0;
-         static const Real fConversionFactor = 100 / 0.013; // 
+         /* sending 100 produces a speed of 0.013m/s */
+         static const Real fConversionFactor = 100 / 0.013;
          return std::round(f_metres_per_second * fConversionFactor);
       }
 
