@@ -2,7 +2,7 @@
 <argos-configuration>
 
   <framework>
-    <experiment length="50" ticks_per_second="5" random_seed="0"/>
+    <experiment length="201" ticks_per_second="5" random_seed="0"/>
   </framework>
 
   <controllers>
