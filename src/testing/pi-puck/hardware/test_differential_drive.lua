@@ -12,7 +12,6 @@ function init()
    }
 
    count = 1
-   index = 1
 end
 
 
