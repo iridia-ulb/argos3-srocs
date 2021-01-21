@@ -95,7 +95,7 @@ namespace argos {
       }
       if(m_tAltitude) {
          const mavlink_altitude_t& tReading =
-            m_tAttitude.value();
+            m_tAltitude.value();
          /*convert the current distance cm to m*/   
          m_cPosition.SetZ(tReading.current_distance * 0.01);
          /* set the initial position if not already set */
@@ -103,7 +103,7 @@ namespace argos {
             m_pcPixhawk->GetInitialPosition().emplace(m_cPosition);
          }
          /* clear out the read data */
-         m_tAttitude.reset();
+         m_tAltitude.reset();
       }
       if(m_tAttitude) {
          const mavlink_attitude_t& tReading =
