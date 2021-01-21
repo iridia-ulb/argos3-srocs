@@ -81,14 +81,29 @@ namespace argos {
       if(m_tLocalPositionNed) {
          const mavlink_local_position_ned_t& tReading =
             m_tLocalPositionNed.value();
-         m_cPosition.Set(tReading.x, tReading.y, tReading.z);
+         /*m_cPosition.Set(tReading.x, tReading.y, tReading.z);*/
+         m_cPosition.SetX(tReading.X);
+         m_cPosition.SetY(tReading.Y);
+         /*Set(tReading.x, tReading.y, tReading.z)*/
          m_cVelocity.Set(tReading.vx, tReading.vy, tReading.vz);
+         /* set the initial position if not already set */
+        /* if(!m_pcPixhawk->GetInitialPosition()) {
+            m_pcPixhawk->GetInitialPosition().emplace(m_cPosition);
+         } */
+         /* clear out the read data */
+         m_tLocalPositionNed.reset();
+      }
+      if(m_tAltitude) {
+         const mavlink_altitude_t& tReading =
+            m_tAttitude.value();
+         /*convert the current distance cm to m*/   
+         m_cPosition.SetZ(tReading.current_distance * 0.01);
          /* set the initial position if not already set */
          if(!m_pcPixhawk->GetInitialPosition()) {
             m_pcPixhawk->GetInitialPosition().emplace(m_cPosition);
          }
          /* clear out the read data */
-         m_tLocalPositionNed.reset();
+         m_tAttitude.reset();
       }
       if(m_tAttitude) {
          const mavlink_attitude_t& tReading =
@@ -153,6 +168,11 @@ namespace argos {
          ::mavlink_msg_attitude_decode(
             &t_message, &m_tAttitude.value());
          break;
+      case MAVLINK_MSG_ID_DISTANCE_SENSOR:
+         m_tAltitude.emplace();
+         ::mavlink_msg_distance_sensor_decode(
+            &t_message, &m_tAltitude.value());
+         break;   
       default:
          // LOG << "[INFO] Unknown message of type " << t_message.msgid << " received";		
          break;
