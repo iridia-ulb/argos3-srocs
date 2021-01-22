@@ -90,7 +90,8 @@ namespace argos {
             However, because of the sensors' noise and the sensors' quality, initial local position values drift too much. 
             Essepicaly measured z value is terrible at the initial time.
             Thus, it is much more practical to assume the initial positions as below. */
-            m_pcPixhawk->GetInitialPosition().emplace(CVector3::ZERO);
+            m_cPosition.SetZ(0.0f);
+            m_pcPixhawk->GetInitialPosition().emplace(m_cPosition);
          } 
          /* clear out the read data */
          m_tLocalPositionNed.reset();
