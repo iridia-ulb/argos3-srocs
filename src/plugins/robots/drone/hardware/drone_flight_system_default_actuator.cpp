@@ -76,10 +76,10 @@ namespace argos {
          tSetpoint.type_mask = MAVLINK_MSG_SET_POSITION_TARGET_LOCAL_NED_POSITION &
 				   		          MAVLINK_MSG_SET_POSITION_TARGET_LOCAL_NED_YAW_ANGLE;
          tSetpoint.coordinate_frame = MAV_FRAME_LOCAL_NED;
-         tSetpoint.x = m_cTargetPosition.GetX() - cInitialPosition.GetX();
-         tSetpoint.y = m_cTargetPosition.GetY() - cInitialPosition.GetY();
+         tSetpoint.x = m_cTargetPosition.GetX() + cInitialPosition.GetX();
+         tSetpoint.y = m_cTargetPosition.GetY() + cInitialPosition.GetY();
          // TODO check sign here, +Z is down in MAVLink and up in ARGoS
-         tSetpoint.z = -m_cTargetPosition.GetZ() - cInitialPosition.GetZ();
+         tSetpoint.z = -m_cTargetPosition.GetZ() + cInitialPosition.GetZ();
          tSetpoint.yaw = m_cTargetYawAngle.GetValue() - cInitialOrientation.GetZ();
          
          
