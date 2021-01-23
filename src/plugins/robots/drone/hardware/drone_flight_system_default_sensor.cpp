@@ -81,20 +81,22 @@ namespace argos {
       if(m_tLocalPositionNed) {
          const mavlink_local_position_ned_t& tReading =
             m_tLocalPositionNed.value();
-         m_cPosition.Set(tReading.x, tReading.y, tReading.z);
+         m_cPosition.SetX(tReading.x);
+         m_cPosition.SetY(tReading.y);
          m_cVelocity.Set(tReading.vx, tReading.vy, tReading.vz);
+         /* clear out the read data */
+         m_tLocalPositionNed.reset();
+      }
+      if(m_tAltitude) {
+         const mavlink_altitude_t& tReading =
+            m_tAltitude.value();
+         m_cPosition.SetZ(-1 * tReading.current_distance * 0.01);
          /* set the initial position if not already set */
          if(!m_pcPixhawk->GetInitialPosition()) {
-            /*In the ideal case, the drone should be at [flow_sensor_x,flow_sensor_y,distance_sensor_z]
-            after the ARM command. Furthermore, these position values are expected to close to zero as much as possible at the initial time. 
-            However, because of the sensors' noise and the sensors' quality, initial local position values drift too much. 
-            Essepicaly measured z value is terrible at the initial time.
-            Thus, it is much more practical to assume the initial positions as below. */
-            m_cPosition.SetZ(0.0f);
             m_pcPixhawk->GetInitialPosition().emplace(m_cPosition);
          } 
          /* clear out the read data */
-         m_tLocalPositionNed.reset();
+         m_tAltitude.reset();
       }
       if(m_tAttitude) {
          const mavlink_attitude_t& tReading =
@@ -158,7 +160,12 @@ namespace argos {
          m_tAttitude.emplace();
          ::mavlink_msg_attitude_decode(
             &t_message, &m_tAttitude.value());
-         break;  
+         break; 
+      case MAVLINK_MSG_ID_DISTANCE_SENSOR:
+         m_tAltitude.emplace();
+         ::mavlink_msg_distance_sensor_decode(
+            &t_message, &m_tAltitude.value());
+         break; 
       default:
          // LOG << "[INFO] Unknown message of type " << t_message.msgid << " received";		
          break;
