@@ -88,7 +88,7 @@ namespace argos {
          m_tLocalPositionNed.reset();
       }
       if(m_tAltitude) {
-         const mavlink_altitude_t& tReading =
+         const mavlink_distance_sensor_t& tReading =
             m_tAltitude.value();
          m_cPosition.SetZ(-1 * tReading.current_distance * 0.01);
          /* set the initial position if not already set */
