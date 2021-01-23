@@ -81,23 +81,21 @@ namespace argos {
       if(m_tLocalPositionNed) {
          const mavlink_local_position_ned_t& tReading =
             m_tLocalPositionNed.value();
-         m_cPosition.SetX(tReading.x);
-         m_cPosition.SetY(tReading.y);
+         m_cPosition.Set(tReading.x, tReading.y, tReading.z);
          m_cVelocity.Set(tReading.vx, tReading.vy, tReading.vz);
-         /* clear out the read data */
-         m_tLocalPositionNed.reset();
-      }
-      if(m_tAltitude) {
-         const mavlink_distance_sensor_t& tReading =
-            m_tAltitude.value();
-         m_cPosition.SetZ(-1 * tReading.current_distance * 0.01);
          /* set the initial position if not already set */
          if(!m_pcPixhawk->GetInitialPosition()) {
             m_pcPixhawk->GetInitialPosition().emplace(m_cPosition);
          } 
          /* clear out the read data */
-         m_tAltitude.reset();
+         m_tLocalPositionNed.reset();
       }
+    /*  if(m_tAltitude) {
+         const mavlink_distance_sensor_t& tReading =
+            m_tAltitude.value();
+         m_cPosition.SetZ(-1 * tReading.current_distance * 0.01);
+          m_tAltitude.reset();
+      } */
       if(m_tAttitude) {
          const mavlink_attitude_t& tReading =
             m_tAttitude.value();
