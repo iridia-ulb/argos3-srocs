@@ -76,7 +76,8 @@ namespace argos {
          /* initialize a setpoint struct */
          mavlink_set_position_target_local_ned_t tSetpoint;       
          tSetpoint.type_mask = MAVLINK_MSG_SET_POSITION_TARGET_LOCAL_NED_POSITION &
-				   		          MAVLINK_MSG_SET_POSITION_TARGET_LOCAL_NED_YAW_ANGLE | MAVLINK_MSG_SET_POSITION_TARGET_LOCAL_NED_TAKEOFF;
+				   		          MAVLINK_MSG_SET_POSITION_TARGET_LOCAL_NED_YAW_ANGLE;
+         tSetpoint.type_mask |= MAVLINK_MSG_SET_POSITION_TARGET_LOCAL_NED_TAKEOFF;
          tSetpoint.coordinate_frame = MAV_FRAME_LOCAL_NED;
          tSetpoint.x = m_cTargetPosition.GetX() + cInitialPosition.GetX();
          tSetpoint.y = m_cTargetPosition.GetY() + cInitialPosition.GetY();
