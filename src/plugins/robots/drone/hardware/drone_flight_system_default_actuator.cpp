@@ -9,7 +9,6 @@
 #include <argos3/core/utility/logging/argos_log.h>
 
 #include <argos3/plugins/robots/generic/hardware/robot.h>
-// #include <argos3/core/utility/rate.h>
 
 #include <termios.h>
 
@@ -17,7 +16,6 @@
 #include <cstring>
 
 #define MAVLINK_MSG_SET_POSITION_TARGET_LOCAL_NED_POSITION     0b0000110111111000
-// 0b0000110111111000
 #define MAVLINK_MSG_SET_POSITION_TARGET_LOCAL_NED_VELOCITY     0b0000110111000111
 #define MAVLINK_MSG_SET_POSITION_TARGET_LOCAL_NED_YAW_ANGLE    0b0000100111111111
 #define MAVLINK_MSG_SET_POSITION_TARGET_LOCAL_NED_YAW_RATE     0b0000010111111111
@@ -67,7 +65,6 @@ namespace argos {
    /****************************************/
 
    void CDroneFlightSystemDefaultActuator::Update() {
-     // CRate cRate(10);
       if(m_pcPixhawk->Ready()) {
          CVector3& cInitialOrientation =
             m_pcPixhawk->GetInitialOrientation().value();
@@ -80,23 +77,18 @@ namespace argos {
       	// double check some system parameters
 	      tSetpoint.target_system    = m_pcPixhawk->GetTargetSystem().value();
 	      tSetpoint.target_component = m_pcPixhawk->GetTargetComponent().value();
-         tSetpoint.type_mask = MAVLINK_MSG_SET_POSITION_TARGET_LOCAL_NED_TAKEOFF | MAVLINK_MSG_SET_POSITION_TARGET_LOCAL_NED_POSITION;
-				   		          // MAVLINK_MSG_SET_POSITION_TARGET_LOCAL_NED_YAW_ANGLE;
-         // tSetpoint.type_mask |= MAVLINK_MSG_SET_POSITION_TARGET_LOCAL_NED_TAKEOFF;
+         tSetpoint.type_mask = MAVLINK_MSG_SET_POSITION_TARGET_LOCAL_NED_POSITION & MAVLINK_MSG_SET_POSITION_TARGET_LOCAL_NED_YAW_ANGLE;
+         tSetpoint.type_mask |= MAVLINK_MSG_SET_POSITION_TARGET_LOCAL_NED_TAKEOFF;
          tSetpoint.coordinate_frame = MAV_FRAME_LOCAL_NED;
          tSetpoint.x = m_cTargetPosition.GetX() + cInitialPosition.GetX();
          tSetpoint.y = m_cTargetPosition.GetY() + cInitialPosition.GetY();
          // TODO check sign here, +Z is down in MAVLink and up in ARGoS
          tSetpoint.z = -m_cTargetPosition.GetZ() + cInitialPosition.GetZ();
          tSetpoint.yaw = m_cTargetYawAngle.GetValue() + cInitialOrientation.GetZ();
-        // LOGERR << "Burdayin anuga goying: " << tSetpoint.z << std::endl;
          mavlink_message_t tMessage;
          mavlink_msg_set_position_target_local_ned_encode(m_pcPixhawk->GetTargetSystem().value(), 0, &tMessage, &tSetpoint);
-       //  Write(tMessage);
 
          try {
-          //  cRate.Sleep();
-       //   mavlink_msg_set_position_target_local_ned_encode(m_pcPixhawk->GetTargetSystem().value(), 0, &tMessage, &tSetpoint);
           Write(tMessage);
          }
          catch(CARGoSException& ex) {
@@ -211,7 +203,7 @@ namespace argos {
 
    void CDroneFlightSystemDefaultActuator::Write(const mavlink_message_t& t_message) {
       /* write message to buffer */
-      std::array<uint8_t, 256> arrBuffer;
+      std::array<uint8_t, 300> arrBuffer;
       uint16_t unLength = ::mavlink_msg_to_send_buffer(arrBuffer.data(), &t_message);
       /* write message to Pixhawk */
       ssize_t nResult = 
