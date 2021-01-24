@@ -9,7 +9,7 @@
 #include <argos3/core/utility/logging/argos_log.h>
 
 #include <argos3/plugins/robots/generic/hardware/robot.h>
-#include <argos3/core/utility/rate.h>
+// #include <argos3/core/utility/rate.h>
 
 #include <termios.h>
 
@@ -66,7 +66,7 @@ namespace argos {
    /****************************************/
 
    void CDroneFlightSystemDefaultActuator::Update() {
-      CRate cRate(10);
+     // CRate cRate(10);
       if(m_pcPixhawk->Ready()) {
          CVector3& cInitialOrientation =
             m_pcPixhawk->GetInitialOrientation().value();
@@ -85,19 +85,14 @@ namespace argos {
          // TODO check sign here, +Z is down in MAVLink and up in ARGoS
          tSetpoint.z = -m_cTargetPosition.GetZ() + cInitialPosition.GetZ();
          tSetpoint.yaw = m_cTargetYawAngle.GetValue() + cInitialOrientation.GetZ();
-         
-        // ------------------------------------------------------------------------------------------------------------
-        // ------------------------------------------------------------------------------------------------------------
-        // ------------------------------------------------------------------------------------------------------------
-
+         // LOGERR << "Burdayin anuga goying: " << tSetpoint.z << std::endl;
          mavlink_message_t tMessage;
          mavlink_msg_set_position_target_local_ned_encode(unTargetSystem, 0, &tMessage, &tSetpoint);
-         Write(tMessage);
+          // Write(tMessage);
 
          try {
-            cRate.Sleep();
-            mavlink_message_t tMessage;
-            mavlink_msg_set_position_target_local_ned_encode(unTargetSystem, 0, &tMessage, &tSetpoint);
+          //  cRate.Sleep();
+          //  mavlink_msg_set_position_target_local_ned_encode(unTargetSystem, 0, &tMessage, &tSetpoint);
             Write(tMessage);
          }
          catch(CARGoSException& ex) {
