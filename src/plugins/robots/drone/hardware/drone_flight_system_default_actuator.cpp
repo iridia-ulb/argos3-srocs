@@ -92,8 +92,8 @@ namespace argos {
 
          try {
           //  cRate.Sleep();
-          //  mavlink_msg_set_position_target_local_ned_encode(unTargetSystem, 0, &tMessage, &tSetpoint);
-            Write(tMessage);
+          mavlink_msg_set_position_target_local_ned_encode(unTargetSystem, 0, &tMessage, &tSetpoint);
+          Write(tMessage);
          }
          catch(CARGoSException& ex) {
             LOGERR << "[ERROR] Could not write setpoint: " 
