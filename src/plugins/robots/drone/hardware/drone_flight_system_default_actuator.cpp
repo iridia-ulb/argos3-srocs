@@ -15,7 +15,8 @@
 #include <cerrno>
 #include <cstring>
 
-#define MAVLINK_MSG_SET_POSITION_TARGET_LOCAL_NED_POSITION     0b0000110111111000
+#define MAVLINK_MSG_SET_POSITION_TARGET_LOCAL_NED_POSITION     0b0000110111000011
+// 0b0000110111111000  
 #define MAVLINK_MSG_SET_POSITION_TARGET_LOCAL_NED_VELOCITY     0b0000110111000111
 #define MAVLINK_MSG_SET_POSITION_TARGET_LOCAL_NED_YAW_ANGLE    0b0000100111111111
 #define MAVLINK_MSG_SET_POSITION_TARGET_LOCAL_NED_YAW_RATE     0b0000010111111111
@@ -77,7 +78,8 @@ namespace argos {
       	// double check some system parameters
 	      tSetpoint.target_system    = m_pcPixhawk->GetTargetSystem().value();
 	      tSetpoint.target_component = m_pcPixhawk->GetTargetComponent().value();
-         tSetpoint.type_mask = MAVLINK_MSG_SET_POSITION_TARGET_LOCAL_NED_POSITION & MAVLINK_MSG_SET_POSITION_TARGET_LOCAL_NED_YAW_ANGLE;
+         tSetpoint.type_mask = MAVLINK_MSG_SET_POSITION_TARGET_LOCAL_NED_POSITION ;
+         //& MAVLINK_MSG_SET_POSITION_TARGET_LOCAL_NED_YAW_ANGLE;
          tSetpoint.type_mask |= MAVLINK_MSG_SET_POSITION_TARGET_LOCAL_NED_TAKEOFF;
          tSetpoint.coordinate_frame = MAV_FRAME_LOCAL_NED;
          tSetpoint.x = m_cTargetPosition.GetX() + cInitialPosition.GetX();
@@ -203,7 +205,7 @@ namespace argos {
 
    void CDroneFlightSystemDefaultActuator::Write(const mavlink_message_t& t_message) {
       /* write message to buffer */
-      std::array<uint8_t, 300> arrBuffer;
+      std::array<uint8_t, 256> arrBuffer;
       uint16_t unLength = ::mavlink_msg_to_send_buffer(arrBuffer.data(), &t_message);
       /* write message to Pixhawk */
       ssize_t nResult = 
