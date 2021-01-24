@@ -73,9 +73,12 @@ namespace argos {
          CVector3& cInitialPosition =
             m_pcPixhawk->GetInitialPosition().value();
          uint8_t unTargetSystem =
-            m_pcPixhawk->GetTargetSystem().value();
+            m_pcPixhawk->GetTargetSystem().value(); // system_ID
          /* initialize a setpoint struct */
-         mavlink_set_position_target_local_ned_t tSetpoint;       
+         mavlink_set_position_target_local_ned_t tSetpoint;  
+      	// double check some system parameters
+	      tSetpoint.target_system    = m_pcPixhawk->GetTargetSystem().value();
+	      tSetpoint.target_component = m_pcPixhawk->GetTargetComponent().value();
          tSetpoint.type_mask = MAVLINK_MSG_SET_POSITION_TARGET_LOCAL_NED_POSITION &
 				   		          MAVLINK_MSG_SET_POSITION_TARGET_LOCAL_NED_YAW_ANGLE;
          tSetpoint.type_mask |= MAVLINK_MSG_SET_POSITION_TARGET_LOCAL_NED_TAKEOFF;
@@ -85,14 +88,14 @@ namespace argos {
          // TODO check sign here, +Z is down in MAVLink and up in ARGoS
          tSetpoint.z = -m_cTargetPosition.GetZ() + cInitialPosition.GetZ();
          tSetpoint.yaw = m_cTargetYawAngle.GetValue() + cInitialOrientation.GetZ();
-         LOGERR << "Burdayin anuga goying: " << tSetpoint.z << std::endl;
+        // LOGERR << "Burdayin anuga goying: " << tSetpoint.z << std::endl;
          mavlink_message_t tMessage;
-         mavlink_msg_set_position_target_local_ned_encode(unTargetSystem, 0, &tMessage, &tSetpoint);
-         Write(tMessage);
+         mavlink_msg_set_position_target_local_ned_encode(m_pcPixhawk->GetTargetSystem().value(), 0, &tMessage, &tSetpoint);
+       //  Write(tMessage);
 
          try {
           //  cRate.Sleep();
-          mavlink_msg_set_position_target_local_ned_encode(unTargetSystem, 0, &tMessage, &tSetpoint);
+       //   mavlink_msg_set_position_target_local_ned_encode(m_pcPixhawk->GetTargetSystem().value(), 0, &tMessage, &tSetpoint);
           Write(tMessage);
          }
          catch(CARGoSException& ex) {
@@ -122,8 +125,8 @@ namespace argos {
       if(m_pcPixhawk->Ready()) {
          /* build commmand for arming/disarming the drone */
          mavlink_command_long_t tCommand = {0};
-         tCommand.target_system    = m_pcPixhawk->GetTargetSystem().value();
-         tCommand.target_component = m_pcPixhawk->GetTargetComponent().value();
+         tCommand.target_system    = m_pcPixhawk->GetTargetSystem().value(); // system_ID
+         tCommand.target_component = m_pcPixhawk->GetTargetComponent().value(); // autopilot_ID
          tCommand.command          = MAV_CMD_COMPONENT_ARM_DISARM;
          tCommand.confirmation     = 1;
          tCommand.param1           = b_arm ? 1.0f : 0.0f;
