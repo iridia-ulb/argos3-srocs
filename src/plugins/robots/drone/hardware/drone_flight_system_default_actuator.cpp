@@ -78,9 +78,8 @@ namespace argos {
       	// double check some system parameters
 	      tSetpoint.target_system    = m_pcPixhawk->GetTargetSystem().value();
 	      tSetpoint.target_component = m_pcPixhawk->GetTargetComponent().value();
-         tSetpoint.type_mask = MAVLINK_MSG_SET_POSITION_TARGET_LOCAL_NED_POSITION ;
-         //& MAVLINK_MSG_SET_POSITION_TARGET_LOCAL_NED_YAW_ANGLE;
-         tSetpoint.type_mask |= MAVLINK_MSG_SET_POSITION_TARGET_LOCAL_NED_TAKEOFF;
+         tSetpoint.type_mask = MAVLINK_MSG_SET_POSITION_TARGET_LOCAL_NED_POSITION & MAVLINK_MSG_SET_POSITION_TARGET_LOCAL_NED_YAW_ANGLE;
+         // tSetpoint.type_mask |= MAVLINK_MSG_SET_POSITION_TARGET_LOCAL_NED_TAKEOFF;
          tSetpoint.coordinate_frame = MAV_FRAME_LOCAL_NED;
          tSetpoint.x = m_cTargetPosition.GetX() + cInitialPosition.GetX();
          tSetpoint.y = m_cTargetPosition.GetY() + cInitialPosition.GetY();
@@ -89,9 +88,10 @@ namespace argos {
          tSetpoint.yaw = m_cTargetYawAngle.GetValue() + cInitialOrientation.GetZ();
          mavlink_message_t tMessage;
          mavlink_msg_set_position_target_local_ned_encode(m_pcPixhawk->GetTargetSystem().value(), 0, &tMessage, &tSetpoint);
-
+         Write(tMessage);
          try {
-          Write(tMessage);
+            mavlink_msg_set_position_target_local_ned_encode(m_pcPixhawk->GetTargetSystem().value(), 0, &tMessage, &tSetpoint);
+            Write(tMessage);
          }
          catch(CARGoSException& ex) {
             LOGERR << "[ERROR] Could not write setpoint: " 
