@@ -92,11 +92,11 @@ namespace argos {
          tSetpoint.yaw = m_cTargetYawAngle.GetValue() + cInitialOrientation.GetZ();
          mavlink_message_t tMessage;
          mavlink_msg_set_position_target_local_ned_encode(m_pcPixhawk->GetTargetSystem().value(), 0, &tMessage, &tSetpoint);
-         Write(tMessage);
+         //Write(tMessage);
          try {
             //cRate.Sleep();
-            mavlink_message_t tMessage;
-            mavlink_msg_set_position_target_local_ned_encode(m_pcPixhawk->GetTargetSystem().value(), 0, &tMessage, &tSetpoint);
+          //  mavlink_message_t tMessage;
+          //  mavlink_msg_set_position_target_local_ned_encode(m_pcPixhawk->GetTargetSystem().value(), 0, &tMessage, &tSetpoint);
             Write(tMessage);
          }
          catch(CARGoSException& ex) {
