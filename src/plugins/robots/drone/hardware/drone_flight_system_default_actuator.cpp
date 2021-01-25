@@ -9,6 +9,9 @@
 #include <argos3/core/utility/logging/argos_log.h>
 
 #include <argos3/plugins/robots/generic/hardware/robot.h>
+#include <argos3/core/utility/rate.h>
+
+
 
 #include <termios.h>
 
@@ -66,6 +69,7 @@ namespace argos {
    /****************************************/
 
    void CDroneFlightSystemDefaultActuator::Update() {
+      CRate cRate(10);
       if(m_pcPixhawk->Ready()) {
          CVector3& cInitialOrientation =
             m_pcPixhawk->GetInitialOrientation().value();
@@ -90,6 +94,8 @@ namespace argos {
          mavlink_msg_set_position_target_local_ned_encode(m_pcPixhawk->GetTargetSystem().value(), 0, &tMessage, &tSetpoint);
          Write(tMessage);
          try {
+            cRate.Sleep();
+            mavlink_message_t tMessage;
             mavlink_msg_set_position_target_local_ned_encode(m_pcPixhawk->GetTargetSystem().value(), 0, &tMessage, &tSetpoint);
             Write(tMessage);
          }
