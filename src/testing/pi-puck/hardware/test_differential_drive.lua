@@ -1,7 +1,7 @@
 --[[ This function is executed every time you press the 'execute' button ]]
 function init()
    local forward_speed = 0.1 / 10  -- m      0.1m per 10s
-   local rotate_speed = math.pi * 0.0535 / 10  -- a full circle per 10s
+   local rotate_speed = math.pi * 0.0535 / 10  -- a full circle per 10s, 0.0535 is the distance between two wheels
 
    settings = {
       {'clockwise', rotate_speed, rotate_speed},
@@ -26,7 +26,7 @@ function step()
    print(string.format('left:  target_vel = %f, delta_pos = %f', left, robot.differential_drive.encoders.left))
    print(string.format('right: target_vel = %f, delta_pos = %f', right, robot.differential_drive.encoders.right))
    -- increment the config variable
-   if count < 50 * 4 + 1 then
+   if count < 201 then -- 50 ticks per state * 4 states + 1 stop state
       count = count + 1
    end
 end
