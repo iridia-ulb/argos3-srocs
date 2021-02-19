@@ -33,6 +33,8 @@ namespace argos {
       }
 
       void Init(TConfigurationNode& t_controller,
+                const std::string& str_controller_id,
+                const std::string& str_router_addr,
                 UInt32 un_ticks_per_sec,
                 UInt32 un_length);
 

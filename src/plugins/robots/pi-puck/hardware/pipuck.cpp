@@ -35,6 +35,8 @@
 namespace argos {
 
    void CPiPuck::Init(TConfigurationNode& t_controller,
+                      const std::string& str_controller_id,
+                      const std::string& str_router_addr,
                       UInt32 un_ticks_per_sec,
                       UInt32 un_length) {
       m_unTicksPerSec = un_ticks_per_sec;
@@ -46,23 +48,21 @@ namespace argos {
          if(m_pcController == nullptr) {
             THROW_ARGOSEXCEPTION("ERROR: controller \"" << t_controller.Value() << "\" is not a Lua controller");
          }
-         if(NodeExists(t_controller, "environment")) {
-            TConfigurationNode& tEnvironment = GetNode(t_controller, "environment");
-            if(NodeAttributeExists(tEnvironment, "router")) {
-               /* connect to the router to emulate robot-to-robot wifi */
-               std::string strRouterConfig;
-               GetNodeAttribute(tEnvironment, "router", strRouterConfig);
-               size_t unHostnamePortPos = strRouterConfig.find_last_of(':');
-               try {
-                  if(unHostnamePortPos == std::string::npos) {
-                     THROW_ARGOSEXCEPTION("The address of the router must be provided as \"hostname:port\"");
-                  }
-                  SInt32 nPort = std::stoi(strRouterConfig.substr(unHostnamePortPos + 1), nullptr, 0);
-                  m_cSocket.Connect(strRouterConfig.substr(0, unHostnamePortPos), nPort);
+         /* set the controller ID */
+         m_pcController->SetId(str_controller_id);
+         /* connect to the router if address was specified */
+         if(!str_router_addr.empty()) {
+            /* connect to the router */
+            size_t unHostnamePortPos = str_router_addr.find_last_of(':');
+            try {
+               if(unHostnamePortPos == std::string::npos) {
+                  THROW_ARGOSEXCEPTION("The address of the router must be provided as \"hostname:port\"");
                }
-               catch(CARGoSException& ex) {
-                  THROW_ARGOSEXCEPTION_NESTED("Could not connect to router", ex);
-               }
+               SInt32 nPort = std::stoi(str_router_addr.substr(unHostnamePortPos + 1), nullptr, 0);
+               m_cSocket.Connect(str_router_addr.substr(0, unHostnamePortPos), nPort);
+            }
+            catch(CARGoSException& ex) {
+               THROW_ARGOSEXCEPTION_NESTED("Could not connect to router", ex);
             }
          }
          /* Create the triggers */
@@ -133,20 +133,6 @@ namespace argos {
             m_vecSensors.emplace_back(pcSens);
             m_pcController->AddSensor(itSens->Value(), pcCISens);
          }        
-         /* Set the controller id */
-         char pchBuffer[64];
-         if (::gethostname(pchBuffer, 64) == 0) {
-            LOG << "[INFO] Setting controller id to hostname \""
-                << pchBuffer << "\""
-                << std::endl;
-            m_pcController->SetId(pchBuffer);
-         } 
-         else {
-            LOGERR << "[WARNING] Failed to get the hostname."
-                   << "Setting controller id to \"pi-puck\""
-                   << std::endl;
-            m_pcController->SetId("pi-puck");
-         }
          /* If the parameters node doesn't exist, create one */
          if(!NodeExists(t_controller, "params")) {
             TConfigurationNode tParamsNode("params");

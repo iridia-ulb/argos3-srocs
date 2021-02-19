@@ -31,7 +31,7 @@ namespace argos {
       class CPixhawk {
       public:
          CPixhawk();
-         void Open(const std::string& str_device);
+         void Open(const std::string& str_device, SInt32 n_baud);
          void Close();
          int GetFileDescriptor();
          std::optional<CVector3>& GetInitialPosition();
@@ -57,6 +57,9 @@ namespace argos {
       }
       
       void Init(TConfigurationNode& t_controller,
+                const std::string& str_controller_id,
+                const std::string& str_router_addr,
+                const std::string& str_pixhawk_conf,
                 UInt32 un_ticks_per_sec,
                 UInt32 un_length);
 

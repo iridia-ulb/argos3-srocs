@@ -35,6 +35,9 @@
 namespace argos {
 
    void CDrone::Init(TConfigurationNode& t_controller,
+                     const std::string& str_controller_id,
+                     const std::string& str_router_addr,
+                     const std::string& str_pixhawk_conf,
                      UInt32 un_ticks_per_sec,
                      UInt32 un_length) {
       m_unTicksPerSec = un_ticks_per_sec;
@@ -46,33 +49,34 @@ namespace argos {
          if(m_pcController == nullptr) {
             THROW_ARGOSEXCEPTION("ERROR: controller \"" << t_controller.Value() << "\" is not a Lua controller");
          }
-         if(NodeExists(t_controller, "environment")) {
-            TConfigurationNode& tEnvironment = GetNode(t_controller, "environment");
-            if(NodeAttributeExists(tEnvironment, "router")) {
-               /* connect to the router to emulate robot-to-robot wifi */
-               std::string strRouterConfig;
-               GetNodeAttribute(tEnvironment, "router", strRouterConfig);
-               size_t unHostnamePortPos = strRouterConfig.find_last_of(':');
-               try {
-                  if(unHostnamePortPos == std::string::npos) {
-                     THROW_ARGOSEXCEPTION("The address of the router must be provided as \"hostname:port\"");
-                  }
-                  SInt32 nPort = std::stoi(strRouterConfig.substr(unHostnamePortPos + 1), nullptr, 0);
-                  m_cSocket.Connect(strRouterConfig.substr(0, unHostnamePortPos), nPort);
+         /* set the controller ID */
+         m_pcController->SetId(str_controller_id);
+         /* connect to the router if address was specified */
+         if(!str_router_addr.empty()) {
+            size_t unHostnamePortPos = str_router_addr.find_last_of(':');
+            try {
+               if(unHostnamePortPos == std::string::npos) {
+                  THROW_ARGOSEXCEPTION("The address of the router must be provided as \"hostname:port\"");
                }
-               catch(CARGoSException& ex) {
-                  THROW_ARGOSEXCEPTION_NESTED("Could not connect to router", ex);
-               }
+               SInt32 nPort = std::stoi(str_router_addr.substr(unHostnamePortPos + 1), nullptr, 0);
+               m_cSocket.Connect(str_router_addr.substr(0, unHostnamePortPos), nPort);
             }
-            if(NodeAttributeExists(tEnvironment, "pixhawk")) {
-               std::string strPixhawkDevice;
-               GetNodeAttribute(tEnvironment, "pixhawk", strPixhawkDevice);
-               try {
-                  m_cPixhawk.Open(strPixhawkDevice);
+            catch(CARGoSException& ex) {
+               THROW_ARGOSEXCEPTION_NESTED("Could not connect to router", ex);
+            }
+         }
+         /* parse and open the Pixhawk device if configuration was provided */
+         if(!str_pixhawk_conf.empty()) {
+            size_t unDevnameBaudPos = str_pixhawk_conf.find_last_of(':');
+            try {
+               if(unDevnameBaudPos == std::string::npos) {
+                  THROW_ARGOSEXCEPTION("The pixhawk configuration must be provided as \"device:baudrate\"");
                }
-               catch(CARGoSException& ex) {
-                  THROW_ARGOSEXCEPTION_NESTED("Could not connect to Pixhawk",ex)
-               }
+               SInt32 nBaud = std::stoi(str_pixhawk_conf.substr(unDevnameBaudPos + 1), nullptr, 0);
+               m_cPixhawk.Open(str_pixhawk_conf.substr(0, unDevnameBaudPos), nBaud);
+            }
+            catch(CARGoSException& ex) {
+               THROW_ARGOSEXCEPTION_NESTED("Could not open Pixhawk", ex);
             }
          }
          /* Create the triggers */
@@ -240,7 +244,7 @@ namespace argos {
    CDrone::CPixhawk::CPixhawk() :
       m_nFileDescriptor(-1) {}
 
-   void CDrone::CPixhawk::Open(const std::string& str_device) {
+   void CDrone::CPixhawk::Open(const std::string& str_device, SInt32 n_baud) {
       try {
          m_nFileDescriptor = 
             ::open(str_device.c_str(), O_RDWR | O_NOCTTY | O_NDELAY);
@@ -269,9 +273,42 @@ namespace argos {
          sPortConfiguration.c_cc[VMIN]  = 0;
          sPortConfiguration.c_cc[VTIME] = 0;
          /* apply baudrate */
-         if (::cfsetispeed(&sPortConfiguration, B57600) < 0 || ::cfsetospeed(&sPortConfiguration, B57600) < 0) {
-         //if (::cfsetispeed(&sPortConfiguration, B115200) < 0 || ::cfsetospeed(&sPortConfiguration, B115200) < 0) {
-            THROW_ARGOSEXCEPTION("Could not set baudrate to 115200");
+         ::speed_t nBaudRate = B0;
+         switch(n_baud) {
+            case 50: nBaudRate = B50; break;
+            case 75: nBaudRate = B75; break;
+            case 110: nBaudRate = B110; break;
+            case 134: nBaudRate = B134; break;
+            case 150: nBaudRate = B150; break;
+            case 200: nBaudRate = B200; break;
+            case 300: nBaudRate = B300; break;
+            case 600: nBaudRate = B600; break;
+            case 1200: nBaudRate = B1200; break;
+            case 1800: nBaudRate = B1800; break;
+            case 2400: nBaudRate = B2400; break;
+            case 4800: nBaudRate = B4800; break;
+            case 9600: nBaudRate = B9600; break;
+            case 19200: nBaudRate = B19200; break;
+            case 38400: nBaudRate = B38400; break;
+            case 57600: nBaudRate = B57600; break;
+            case 115200: nBaudRate = B115200; break;
+            case 230400: nBaudRate = B230400; break;
+            case 460800: nBaudRate = B460800; break;
+            case 500000: nBaudRate = B500000; break;
+            case 576000: nBaudRate = B576000; break;
+            case 921600: nBaudRate = B921600; break;
+            case 1000000: nBaudRate = B1000000; break;
+            case 1152000: nBaudRate = B1152000; break;
+            case 1500000: nBaudRate = B1500000; break;
+            case 2000000: nBaudRate = B2000000; break;
+            case 2500000: nBaudRate = B2500000; break;
+            case 3000000: nBaudRate = B3000000; break;
+            case 3500000: nBaudRate = B3500000; break;
+            case 4000000: nBaudRate = B4000000; break;
+            default: THROW_ARGOSEXCEPTION(n_baud << " is not a recognized baudrate"); break;
+         }
+         if (::cfsetispeed(&sPortConfiguration, nBaudRate) < 0 || ::cfsetospeed(&sPortConfiguration, nBaudRate) < 0) {
+            THROW_ARGOSEXCEPTION("Could not set baudrate to " << n_baud);
          }
          if(::tcsetattr(m_nFileDescriptor, TCSAFLUSH, &sPortConfiguration) < 0) {
             THROW_ARGOSEXCEPTION("Could not write port configuration");

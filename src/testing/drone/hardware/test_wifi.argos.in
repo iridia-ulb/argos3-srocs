@@ -14,7 +14,6 @@
   <!-- *************** -->
   <controllers>
     <lua_controller id="drone">
-      <environment router="localhost:4950"/>
       <actuators>
         <wifi implementation="default" />
       </actuators>

@@ -63,6 +63,8 @@ int main(int n_argc, char** ppch_argv) {
    try {
       bool bUsageHelp;
       std::string strConfigurationFile;
+      std::string strRouterAddr;
+      std::string strControllerId;
       CCommandLineArgParser cCommandLineArgParser;
       cCommandLineArgParser.AddFlag('h',
                     "help",
@@ -72,6 +74,14 @@ int main(int n_argc, char** ppch_argv) {
                                                      "config",
                                                      "the configuration file [REQUIRED]",
                                                      strConfigurationFile);
+      cCommandLineArgParser.AddArgument<std::string>('i',
+                                                     "id",
+                                                     "the ID to use for the controller (defaults to hostname)",
+                                                     strControllerId);
+      cCommandLineArgParser.AddArgument<std::string>('r',
+                                                     "router",
+                                                     "the address and port of the message router",
+                                                     strRouterAddr);
       /* Parse command line */
       cCommandLineArgParser.Parse(n_argc, ppch_argv);
       if(bUsageHelp) {
@@ -81,6 +91,18 @@ int main(int n_argc, char** ppch_argv) {
       else {
          if (strConfigurationFile.empty()) {
             THROW_ARGOSEXCEPTION("configuration file not provided");
+         }
+         if (strControllerId.empty()) {
+            /* no controller id provided */
+            char pchBuffer[64];
+            if (::gethostname(pchBuffer, 64) == 0) {
+               strControllerId.assign(pchBuffer);
+               LOG << "[INFO] Controller ID not provided, using \""
+                   << strControllerId << "\"" << std::endl;
+            }
+            else {
+               THROW_ARGOSEXCEPTION("Could not get hostname for controller ID");
+            }
          }
       }
       /* initialize the RNG */
@@ -97,7 +119,7 @@ int main(int n_argc, char** ppch_argv) {
       TConfigurationNodeIterator itController;
       itController = itController.begin(&tControllers);
       if(itController == nullptr) {
-         THROW_ARGOSEXCEPTION("configuration file does not declare a controller");
+         THROW_ARGOSEXCEPTION("Configuration file does not declare a controller");
       }
       /* get the framework node */
       TConfigurationNode& tFramework = GetNode(tConfiguration, "framework");
@@ -144,7 +166,11 @@ int main(int n_argc, char** ppch_argv) {
       CPiPuck& cPiPuck = CPiPuck::GetInstance();
       /* initialize the Pi-Puck */
       RunScripts(m_vecPreInitScripts);
-      cPiPuck.Init(*itController, unTicksPerSec, unLength);
+      cPiPuck.Init(*itController,
+                   strControllerId,
+                   strRouterAddr,
+                   unTicksPerSec,
+                   unLength);
       RunScripts(m_vecPostInitScripts);
       /* start the Pi-Puck's main loop */
       cPiPuck.Execute();

@@ -29,6 +29,15 @@ elseif(ARGOS_BUILD_FOR STREQUAL "drone")
     ${CMAKE_BINARY_DIR}/testing/drone/test_flight.lua)
    install(FILES ${CMAKE_BINARY_DIR}/testing/drone/test_flight.lua DESTINATION share/argos3/testing)
    install(FILES ${CMAKE_BINARY_DIR}/testing/drone/test_flight.argos DESTINATION share/argos3/testing)
+  # system test
+  configure_file(
+    ${CMAKE_SOURCE_DIR}/testing/drone/hardware/test_system.argos.in
+    ${CMAKE_BINARY_DIR}/testing/drone/test_system.argos)
+  configure_file(
+    ${CMAKE_SOURCE_DIR}/testing/drone/hardware/test_system.lua
+    ${CMAKE_BINARY_DIR}/testing/drone/test_system.lua)
+   install(FILES ${CMAKE_BINARY_DIR}/testing/drone/test_system.lua DESTINATION share/argos3/testing)
+   install(FILES ${CMAKE_BINARY_DIR}/testing/drone/test_system.argos DESTINATION share/argos3/testing)
   # wifi test
   configure_file(
     ${CMAKE_SOURCE_DIR}/testing/drone/hardware/test_wifi.argos.in
