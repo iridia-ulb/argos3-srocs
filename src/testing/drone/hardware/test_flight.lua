@@ -12,13 +12,14 @@ end
       print('state = ' .. state)
       if robot.flight_system.ready() then
           if state == 'pre_flight' then
-            -- publish the setpoint before entering the offboard mode for (streaming_dur/ticks_per_sec)  secondsif stream_count <= streaming_dur then
-            print('streaming setpoint...')
-            robot.flight_system.set_target_pose(vector3(0,0,1), 0)
-            stream_count = stream_count + 1
-         else
-            state = 'off_board'
-         end
+            -- publish the setpoint before entering the offboard mode for (streaming_dur/ticks_per_sec) seconds
+            if stream_count <= streaming_dur then
+                print('streaming setpoint...')
+                robot.flight_system.set_target_pose(vector3(0,0,1), 0)
+                stream_count = stream_count + 1
+            else
+               state = 'off_board'
+            end
       elseif state == 'off_board' then
          robot.flight_system.set_offboard_mode(true)
          print('off_board mode enabled')
@@ -57,6 +58,7 @@ end
 ]]
       end
    end
+end
 
 --[[ This function is executed every time you press the 'reset'
      button in the GUI. It is supposed to restore the state
