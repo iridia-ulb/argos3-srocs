@@ -9,6 +9,7 @@
 #ifdef ARGOS_WITH_LUA
 #include <argos3/core/wrappers/lua/lua_utility.h>
 #include <argos3/core/wrappers/lua/lua_vector3.h>
+#include <argos3/core/wrappers/lua/lua_vector2.h>
 #endif
 
 namespace argos {
@@ -38,12 +39,15 @@ namespace argos {
    }
 #endif
 
+
+
+
    /****************************************/
    /****************************************/
 
 #ifdef ARGOS_WITH_LUA
    /*
-    * The stack must have two values in this order:
+    * The stack must have one value:
     * 1. off-board mode enabled (true) or disabled (false) (boolean)
     */
    int LuaSetDroneFlightSystemOffboardMode(lua_State* pt_lua_state) {
@@ -60,6 +64,39 @@ namespace argos {
       return 0;
    }
 #endif
+
+
+
+   /****************************************/
+   /****************************************/
+
+#ifdef ARGOS_WITH_LUA
+   /*
+    * The stack must have 4 values in this order:
+    * 1. landing descend rate (number)
+    * 2. landing yaw angle (number)
+    * 3. landing position (vector3)
+    */
+   int LuaSetDroneFlightSystemAutoLand(lua_State* pt_lua_state) {
+      /* Check parameters */
+      if(lua_gettop(pt_lua_state) != 3) {
+         return luaL_error(pt_lua_state, "robot.flight_system.auto_land() expects 3 arguments");
+      }
+      luaL_checktype(pt_lua_state, 1, LUA_TNUMBER);   // descend rate
+      luaL_checktype(pt_lua_state, 2, LUA_TNUMBER); // landing yaw angle
+      luaL_checktype(pt_lua_state, 3, LUA_TUSERDATA );  // landing position   
+        /* Get actuator instance */
+      CCI_DroneFlightSystemActuator* pcFlightSystemActuator =
+         CLuaUtility::GetDeviceInstance<CCI_DroneFlightSystemActuator>(pt_lua_state, "flight_system");
+      /* Update actuator */
+      const CVector3& cLandingPosition = CLuaVector3::ToVector3(pt_lua_state, 4);
+
+      pcFlightSystemActuator->AutoLand(lua_tonumber(pt_lua_state, 2), lua_tonumber(pt_lua_state, 3), cLandingPosition);
+      return 0;
+   }
+#endif
+
+
 
    /****************************************/
    /****************************************/
@@ -121,7 +158,11 @@ namespace argos {
                               &LuaIsDroneFlightSystemReady);
       CLuaUtility::AddToTable(pt_lua_state,
                               "set_armed",
-                              &LuaSetDroneFlightSystemArmed);
+                              &LuaSetDroneFlightSystemArmed);   
+      CLuaUtility::AddToTable(pt_lua_state,
+                              "auto_land",
+                              &LuaSetDroneFlightSystemAutoLand);                                
+
       CLuaUtility::AddToTable(pt_lua_state,
                               "set_offboard_mode",
                               &LuaSetDroneFlightSystemOffboardMode);

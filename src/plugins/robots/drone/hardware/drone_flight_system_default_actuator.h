@@ -48,6 +48,8 @@ namespace argos {
 
       virtual void SetOffboardMode(bool b_offboard_mode) override;
 
+      virtual void AutoLand(Real f_landing_rate,  Real f_yaw_angle, const CVector3& c_landing_position) override;
+
       virtual void Arm(bool b_arm, bool b_bypass_safety_checks) override;
 
    private:

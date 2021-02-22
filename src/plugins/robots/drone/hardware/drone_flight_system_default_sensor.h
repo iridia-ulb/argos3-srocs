@@ -56,6 +56,8 @@ namespace argos {
       std::optional<mavlink_position_target_global_int_t> m_tPostionTargetGlobalInt;
       std::optional<mavlink_highres_imu_t> m_tHighResImu;
       std::optional<mavlink_attitude_t> m_tAttitude;
+      std::optional<mavlink_attitude_target_t> m_tAtitudeTarget;
+      std::optional<mavlink_distance_sensor_t> m_tDistanceSensorData;
 
 	   mavlink_set_position_target_local_ned_t initial_position;
 	
