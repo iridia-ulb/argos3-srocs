@@ -135,20 +135,6 @@ namespace argos {
             pcCISens->Init(*itSens);
             m_vecSensors.emplace_back(pcSens);
             m_pcController->AddSensor(itSens->Value(), pcCISens);
-         }        
-         /* Set the controller id */
-         char pchBuffer[64];
-         if (::gethostname(pchBuffer, 64) == 0) {
-            LOG << "[INFO] Setting controller id to hostname \""
-                << pchBuffer << "\""
-                << std::endl;
-            m_pcController->SetId(pchBuffer);
-         } 
-         else {
-            LOGERR << "[WARNING] Failed to get the hostname."
-                   << "Setting controller id to \"drone\""
-                   << std::endl;
-            m_pcController->SetId("drone");
          }
          /* If the parameters node doesn't exist, create one */
          if(!NodeExists(t_controller, "params")) {
