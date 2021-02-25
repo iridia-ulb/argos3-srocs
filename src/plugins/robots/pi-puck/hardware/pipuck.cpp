@@ -9,6 +9,8 @@
 #include <iio.h>
 #include <sys/time.h>
 #include <unistd.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
 
 #include <chrono>
 #include <functional>
@@ -50,6 +52,7 @@ namespace argos {
          }
          /* set the controller ID */
          m_pcController->SetId(str_controller_id);
+         LOG << "[INFO] Set controller ID to: " << str_controller_id << std::endl;
          /* connect to the router if address was specified */
          if(!str_router_addr.empty()) {
             /* connect to the router */
@@ -60,6 +63,14 @@ namespace argos {
                }
                SInt32 nPort = std::stoi(str_router_addr.substr(unHostnamePortPos + 1), nullptr, 0);
                m_cSocket.Connect(str_router_addr.substr(0, unHostnamePortPos), nPort);
+               ::sockaddr_in tLocalAddress;
+               ::socklen_t tLocalAddressLength = sizeof tLocalAddress;
+               ::getsockname(m_cSocket.GetStream(),
+                            reinterpret_cast<::sockaddr*>(&tLocalAddress),
+                            &tLocalAddressLength);
+               LOG << "[INFO] Connected to message router " << str_router_addr << std::endl;
+               LOG << " from " << inet_ntoa(tLocalAddress.sin_addr)
+                   << ':' << ntohs(tLocalAddress.sin_port) << std::endl;
             }
             catch(CARGoSException& ex) {
                THROW_ARGOSEXCEPTION_NESTED("Could not connect to router", ex);

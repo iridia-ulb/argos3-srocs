@@ -84,7 +84,6 @@ namespace argos {
          return m_unTicksPerSec;
       }
 
-
       CPixhawk& GetPixhawk() {
          return m_cPixhawk;
       }
