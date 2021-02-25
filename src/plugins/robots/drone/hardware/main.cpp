@@ -47,10 +47,12 @@ void handler(int n_signal) {
 }
 
 int main(int n_argc, char** ppch_argv) {
+   LOG.DisableColoredOutput();
+   LOGERR.DisableColoredOutput();
    /* On exit, flush the logs */
    std::atexit([] {
-      LOGERR.Flush();
       LOG.Flush();
+      LOGERR.Flush();
    });
    /* capture signals */
    std::signal(SIGINT, handler);
