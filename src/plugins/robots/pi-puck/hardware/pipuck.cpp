@@ -68,8 +68,8 @@ namespace argos {
                ::getsockname(m_cSocket.GetStream(),
                             reinterpret_cast<::sockaddr*>(&tLocalAddress),
                             &tLocalAddressLength);
-               LOG << "[INFO] Connected to message router " << str_router_addr << std::endl;
-               LOG << " from " << inet_ntoa(tLocalAddress.sin_addr)
+               LOG << "[INFO] Connected to message router " << str_router_addr
+                   << " from " << inet_ntoa(tLocalAddress.sin_addr)
                    << ':' << ntohs(tLocalAddress.sin_port) << std::endl;
             }
             catch(CARGoSException& ex) {

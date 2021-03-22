@@ -68,8 +68,8 @@ namespace argos {
                ::getsockname(m_cSocket.GetStream(),
                             reinterpret_cast<::sockaddr*>(&tLocalAddress),
                             &tLocalAddressLength);
-               LOG << "[INFO] Connected to message router " << str_router_addr << std::endl;
-               LOG << " from " << inet_ntoa(tLocalAddress.sin_addr)
+               LOG << "[INFO] Connected to message router " << str_router_addr
+                   << " from " << inet_ntoa(tLocalAddress.sin_addr)
                    << ':' << ntohs(tLocalAddress.sin_port) << std::endl;
             }
             catch(CARGoSException& ex) {
@@ -98,7 +98,6 @@ namespace argos {
          /* Create a local context for the IIO library */
          m_psContext = iio_create_local_context();
          /* validate the sensor update trigger */
-         /*
          std::string strSensorUpdateTrigger("sysfstrig" + std::to_string(SENSOR_TRIGGER_IDX));
          m_psSensorUpdateTrigger = 
             ::iio_context_find_device(m_psContext, strSensorUpdateTrigger.c_str());
@@ -108,7 +107,6 @@ namespace argos {
          if(!::iio_device_is_trigger(m_psSensorUpdateTrigger)) {
             THROW_ARGOSEXCEPTION("IIO device \"" << strSensorUpdateTrigger << "\" is not a trigger");
          }
-         */
          /* go through the actuators */
          std::string strImpl;
          /* Go through actuators */
@@ -176,7 +174,7 @@ namespace argos {
              !m_unLength || unControllerTick < m_unLength;
              ++unControllerTick) {
             /* request samples from the sensors */
-            //::iio_device_attr_write_bool(m_psSensorUpdateTrigger, "trigger_now", true);
+            ::iio_device_attr_write_bool(m_psSensorUpdateTrigger, "trigger_now", true);
             /* update the sensors on this thread */
             for(CPhysicalSensor* pc_sensor : m_vecSensors) {
                pc_sensor->Update();
