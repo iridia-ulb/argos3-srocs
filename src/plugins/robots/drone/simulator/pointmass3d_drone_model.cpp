@@ -6,11 +6,13 @@
  */
 
 #include "pointmass3d_drone_model.h"
+
 #include <argos3/core/utility/logging/argos_log.h>
 #include <argos3/core/utility/math/cylinder.h>
 #include <argos3/core/utility/math/range.h>
 #include <argos3/core/simulator/simulator.h>
 #include <argos3/core/simulator/space/space.h>
+
 #include <argos3/plugins/simulator/physics_engines/pointmass3d/pointmass3d_engine.h>
 #include <argos3/plugins/robots/drone/simulator/drone_flight_system_entity.h>
 #include <argos3/plugins/robots/drone/simulator/drone_entity.h>
@@ -286,7 +288,6 @@ namespace argos
       m_cPosition += m_cVelocity * GetPM3DEngine().GetPhysicsClockTick();
       m_cVelocityPrev = m_cVelocity;
       /* TODO: position and attitude estimation and accel/gyro sensor fusion */
-
    }
 
    /****************************************/

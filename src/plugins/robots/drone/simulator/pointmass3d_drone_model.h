@@ -15,6 +15,7 @@ namespace argos {
 }
 
 #include <argos3/plugins/simulator/physics_engines/pointmass3d/pointmass3d_model.h>
+
 #include <argos3/core/utility/math/rng.h>
 
 
@@ -147,6 +148,7 @@ namespace argos {
       protected:
       /** Random number generator */
       CRandom::CRNG* m_pcRNG;
+
    };
 
 }

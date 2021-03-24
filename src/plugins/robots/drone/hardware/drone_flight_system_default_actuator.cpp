@@ -2,6 +2,7 @@
  * @file <argos3/plugins/robots/drone/hardware/drone_flight_system_default_actuator.cpp>
  *
  * @author Michael Allwright - <allsey87@gmail.com>
+ * @author Sinan Oguz - <soguz.ankara@gmail.com>
  */
 
 #include "drone_flight_system_default_actuator.h"
@@ -9,7 +10,6 @@
 #include <argos3/core/utility/logging/argos_log.h>
 
 #include <argos3/plugins/robots/generic/hardware/robot.h>
-
 
 #include <termios.h>
 
@@ -20,8 +20,6 @@
 #define MAVLINK_MSG_SET_POSITION_TARGET_LOCAL_NED_VELOCITY     0b0000110111000111
 #define MAVLINK_MSG_SET_POSITION_TARGET_LOCAL_NED_YAW_ANGLE    0b0000100111111111
 #define MAVLINK_MSG_SET_POSITION_TARGET_LOCAL_NED_YAW_RATE     0b0000010111111111
-#define MAVLINK_MSG_SET_POSITION_TARGET_LOCAL_NED_TAKEOFF      0x1000
-#define MAVLINK_MSG_SET_POSITION_TARGET_LOCAL_NED_LAND         0x2000
 
 namespace argos {
 

@@ -2,6 +2,7 @@
  * @file <argos3/plugins/robots/drone/hardware/drone_flight_system_default_actuator.h>
  *
  * @author Michael Allwright - <allsey87@gmail.com>
+ * @author Sinan Oguz - <soguz.ankara@gmail.com>
  */
 
 #ifndef DRONE_FLIGHT_SYSTEM_DEFAULT_ACTUATOR_H

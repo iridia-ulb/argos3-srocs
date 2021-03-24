@@ -2,6 +2,7 @@
  * @file <argos3/plugins/robots/drone/hardware/drone_flight_system_default_sensor.cpp>
  *
  * @author Michael Allwright - <allsey87@gmail.com>
+ * @author Sinan Oguz - <soguz.ankara@gmail.com>
  */
 
 #include "drone_flight_system_default_sensor.h"
@@ -9,7 +10,6 @@
 #include <argos3/core/utility/logging/argos_log.h>
 
 #include <argos3/plugins/robots/generic/hardware/robot.h>
-
 
 namespace argos {
 
@@ -119,9 +119,9 @@ namespace argos {
          /* clear out the read data */
          m_tAttitude.reset();
       }
-      if(m_tAtitudeTarget) {
+      if(m_tAttitudeTarget) {
          const mavlink_attitude_target_t& tReading =
-            m_tAtitudeTarget.value();
+            m_tAttitudeTarget.value();
          CQuaternion cTargetOrientation;
          cTargetOrientation.SetW(tReading.q[0]);
          cTargetOrientation.SetX(tReading.q[1]);
@@ -133,7 +133,7 @@ namespace argos {
          m_cTargetOrientation.SetY(cPitch.GetValue());
          m_cTargetOrientation.SetZ(cYaw.GetValue());
          /* clear out the read data */
-         m_tAtitudeTarget.reset();
+         m_tAttitudeTarget.reset();
       }
       if(m_tBatteryStatus) {
          const mavlink_battery_status_t& tReading =
@@ -185,9 +185,9 @@ namespace argos {
             &t_message, &m_tAttitude.value());
          break; 
       case MAVLINK_MSG_ID_ATTITUDE_TARGET:
-         m_tAtitudeTarget.emplace();
+         m_tAttitudeTarget.emplace();
          ::mavlink_msg_attitude_target_decode(
-            &t_message, &m_tAtitudeTarget.value());
+            &t_message, &m_tAttitudeTarget.value());
          break;    
       case MAVLINK_MSG_ID_DISTANCE_SENSOR:
          m_tDistanceSensorData.emplace();
