@@ -38,12 +38,15 @@ namespace argos {
    }
 #endif
 
+
+
+
    /****************************************/
    /****************************************/
 
 #ifdef ARGOS_WITH_LUA
    /*
-    * The stack must have two values in this order:
+    * The stack must have one value:
     * 1. off-board mode enabled (true) or disabled (false) (boolean)
     */
    int LuaSetDroneFlightSystemOffboardMode(lua_State* pt_lua_state) {
@@ -60,6 +63,7 @@ namespace argos {
       return 0;
    }
 #endif
+
 
    /****************************************/
    /****************************************/
@@ -121,7 +125,11 @@ namespace argos {
                               &LuaIsDroneFlightSystemReady);
       CLuaUtility::AddToTable(pt_lua_state,
                               "set_armed",
-                              &LuaSetDroneFlightSystemArmed);
+                              &LuaSetDroneFlightSystemArmed);   
+      CLuaUtility::AddToTable(pt_lua_state,
+                              "auto_land",
+                              &LuaSetDroneFlightSystemAutoLand);                                
+
       CLuaUtility::AddToTable(pt_lua_state,
                               "set_offboard_mode",
                               &LuaSetDroneFlightSystemOffboardMode);

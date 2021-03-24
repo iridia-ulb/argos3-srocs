@@ -22,7 +22,7 @@ namespace argos {
 
       CCI_DroneFlightSystemActuator() :
          m_cTargetPosition(CVector3::ZERO),
-         m_cTargetYawAngle(0.0 ) {} 
+         m_cTargetYawAngle(0.0) {} 
 
       virtual ~CCI_DroneFlightSystemActuator() {}
 
@@ -53,10 +53,8 @@ namespace argos {
    protected:
       CVector3 m_cTargetPosition;
       CRadians m_cTargetYawAngle;
-      
    };
-
-   
+ 
 
 }
 

@@ -86,9 +86,24 @@ namespace argos {
          /* set the initial position if not already set */
          if(!m_pcPixhawk->GetInitialPosition()) {
             m_pcPixhawk->GetInitialPosition().emplace(m_cPosition);
-         }
+            m_cInitialPosition = m_cPosition;
+         } 
          /* clear out the read data */
          m_tLocalPositionNed.reset();
+      }
+      if(m_tDistanceSensorData) { 
+         const mavlink_distance_sensor_t& tReading =
+            m_tDistanceSensorData.value(); 
+         m_cDistanceSensorData = tReading.current_distance * 0.01; // in meters
+         /* clear out the read data */
+         m_tDistanceSensorData.reset();
+      }
+      if(m_tPositionTargetLocalNed) {
+         const mavlink_position_target_local_ned_t& tReading =
+            m_tPositionTargetLocalNed.value();
+         m_cTargetPosition.Set(tReading.x, tReading.y, tReading.z);
+         /* clear out the read data */
+         m_tPositionTargetLocalNed.reset();
       }
       if(m_tAttitude) {
          const mavlink_attitude_t& tReading =
@@ -103,6 +118,22 @@ namespace argos {
          }
          /* clear out the read data */
          m_tAttitude.reset();
+      }
+      if(m_tAtitudeTarget) {
+         const mavlink_attitude_target_t& tReading =
+            m_tAtitudeTarget.value();
+         CQuaternion cTargetOrientation;
+         cTargetOrientation.SetW(tReading.q[0]);
+         cTargetOrientation.SetX(tReading.q[1]);
+         cTargetOrientation.SetY(tReading.q[2]);
+         cTargetOrientation.SetZ(tReading.q[3]);
+         CRadians cYaw, cPitch, cRoll;
+         cTargetOrientation.ToEulerAngles(cYaw, cPitch, cRoll);
+         m_cTargetOrientation.SetX(cRoll.GetValue());
+         m_cTargetOrientation.SetY(cPitch.GetValue());
+         m_cTargetOrientation.SetZ(cYaw.GetValue());
+         /* clear out the read data */
+         m_tAtitudeTarget.reset();
       }
       if(m_tBatteryStatus) {
          const mavlink_battery_status_t& tReading =
@@ -152,7 +183,17 @@ namespace argos {
          m_tAttitude.emplace();
          ::mavlink_msg_attitude_decode(
             &t_message, &m_tAttitude.value());
-         break;
+         break; 
+      case MAVLINK_MSG_ID_ATTITUDE_TARGET:
+         m_tAtitudeTarget.emplace();
+         ::mavlink_msg_attitude_target_decode(
+            &t_message, &m_tAtitudeTarget.value());
+         break;    
+      case MAVLINK_MSG_ID_DISTANCE_SENSOR:
+         m_tDistanceSensorData.emplace();
+         ::mavlink_msg_distance_sensor_decode(
+            &t_message, &m_tDistanceSensorData.value());
+         break;   
       default:
          // LOG << "[INFO] Unknown message of type " << t_message.msgid << " received";		
          break;
