@@ -411,10 +411,6 @@ namespace argos
    /****************************************/
    /****************************************/
 
-
-
-
-
    REGISTER_STANDARD_POINTMASS3D_OPERATIONS_ON_ENTITY(CDroneEntity, CPointMass3DDroneModel);
 
    /****************************************/

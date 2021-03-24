@@ -59,8 +59,6 @@ namespace argos {
                                        Real  f_k_i,
                                        Real  f_k_d);
 
-      
-      
       /* reference to the flight system entity */ 
       CDroneFlightSystemEntity& m_cFlightSystemEntity;
       /* position and yaw input from the controller */ 
@@ -93,8 +91,6 @@ namespace argos {
       Real m_fAccelBias;
       Real m_fARW;
       Real m_fVRW;
-
-
 
       const static Real ROOT_TWO;
       /* height of the drone's body */ 
