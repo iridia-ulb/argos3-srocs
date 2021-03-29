@@ -79,7 +79,6 @@ namespace argos {
    protected:
       CVector3 m_cPosition;
       CVector3 m_cTargetPosition;
-      CVector3 m_cInitialPosition;
       CVector3 m_cOrientation;
       CVector3 m_cTargetOrientation;
       CVector3 m_cVelocity;
