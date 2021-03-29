@@ -78,14 +78,14 @@ namespace argos {
       CVector3 m_cAngularVelocity;
       CVector3 m_cAngularVelocityPrev;
       /* acceleration of the drone */
-      CVector3 m_cPrevAcceleration;
+      CVector3 m_cAccelerationPrev;
       /* angular acceleration of the drone */
-      CVector3 m_cPrevAngularAcceleration;
+      CVector3 m_cAngularAccelerationPrev;
       /* variables for PID controller */
-      CVector3 m_cPrevOrientationTarget;
-      CVector3 m_cAngularVelCumulativeError;
+      CVector3 m_cOrientationTargetPrev;
+      CVector3 m_cAngularVelocityCumulativeError;
       Real m_fAltitudeCumulativeError;
-      Real m_fPrevTargetAltitude;
+      Real m_fTargetAltitudePrev;
       /* sensor noise parameters */
       Real m_fGyroBias;
       Real m_fAccelBias;

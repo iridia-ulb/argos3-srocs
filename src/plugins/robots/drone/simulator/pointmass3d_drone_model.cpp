@@ -57,12 +57,12 @@ namespace argos
       m_cAngularVelocity.Set(0.0, 0.0, 0.0);
       m_cAngularVelocityPrev.Set(0.0, 0.0, 0.0);
       /* reset the drone's previous acceleration */
-      m_cPrevAcceleration.Set(0.0, 0.0, 0.0);
+      m_cAccelerationPrev.Set(0.0, 0.0, 0.0);
       /* reset the drone's previous angular acceleration */
-      m_cPrevAngularAcceleration.Set(0.0, 0.0, 0.0);
+      m_cAngularAccelerationPrev.Set(0.0, 0.0, 0.0);
       /* reset the variables for PID controller  */
-      m_cPrevOrientationTarget.Set(0.0, 0.0, 0.0);
-      m_cAngularVelCumulativeError.Set(0.0, 0.0, 0.0);
+      m_cOrientationTargetPrev.Set(0.0, 0.0, 0.0);
+      m_cAngularVelocityCumulativeError.Set(0.0, 0.0, 0.0);
       m_fAltitudeCumulativeError = 0.0;
       m_fPrevTargetAltitude = 0.0;
       /* reset the gyro bias */   
@@ -162,18 +162,18 @@ namespace argos
       CVector3 cOrientationError(cOrientationTarget - m_cOrientation);
       /* desired  roll, pitch, yaw rates */
       CVector3 cAngularVelocityTarget =
-         (cOrientationTarget - m_cPrevOrientationTarget) / GetPM3DEngine().GetPhysicsClockTick();
+         (cOrientationTarget - m_cOrientationTargetPrev) / GetPM3DEngine().GetPhysicsClockTick();
       /* previous desired roll, pitch, yaw values for the controllers */
-      m_cPrevOrientationTarget = cOrientationTarget;
+      m_cOrientationTargetPrev = cOrientationTarget;
       /* rotational rate errors */
       CVector3 cAngularVelocityError(cAngularVelocityTarget - m_cAngularVelocity);
       /* accumulated roll, pitch, yaw errors for the controllers */
-      m_cAngularVelCumulativeError +=
+      m_cAngularVelocityCumulativeError +=
          cAngularVelocityError * GetPM3DEngine().GetPhysicsClockTick();
       /* roll controller output signal */
       Real fAttitudeControlSignalX = INERTIA.GetX() *
          CalculatePIDResponse(cOrientationError.GetX(),
-                              m_cAngularVelCumulativeError.GetX(),
+                              m_cAngularVelocityCumulativeError.GetX(),
                               cAngularVelocityError.GetX(),
                               ROLL_PITCH_KP,
                               ROLL_PITCH_KI,
@@ -181,7 +181,7 @@ namespace argos
       /* pitch controller output signal */
       Real fAttitudeControlSignalY = INERTIA.GetY() * 
          CalculatePIDResponse(cOrientationError.GetY(),
-                              m_cAngularVelCumulativeError.GetY(),
+                              m_cAngularVelocityCumulativeError.GetY(),
                               cAngularVelocityError.GetY(),
                               ROLL_PITCH_KP,
                               ROLL_PITCH_KI,
@@ -189,7 +189,7 @@ namespace argos
       /* yaw controller output signal */
       Real fAttitudeControlSignalZ = INERTIA.GetZ() * 
          CalculatePIDResponse(cOrientationError.GetZ(),
-                              m_cAngularVelCumulativeError.GetZ(),
+                              m_cAngularVelocityCumulativeError.GetZ(),
                               cAngularVelocityError.GetZ(),
                               YAW_KP,
                               YAW_KI,
@@ -263,9 +263,9 @@ namespace argos
       /* update the gyro bias angular random walk */
       m_fARW =  m_fARW * std::sqrt(GetPM3DEngine().GetPhysicsClockTick());
       /* update the angular velocity using trapezoid integration */
-      cAngularAcceleration = 0.5 * (m_cPrevAngularAcceleration + cAngularAcceleration);
+      cAngularAcceleration = 0.5 * (m_cAngularAccelerationPrev + cAngularAcceleration);
       m_cAngularVelocity += cAngularAcceleration * GetPM3DEngine().GetPhysicsClockTick();
-      m_cPrevAngularAcceleration = cAngularAcceleration;
+      m_cAngularAccelerationPrev = cAngularAcceleration;
       /* update the orientation using trapezoid integration */
       m_cAngularVelocity = 0.5 * (m_cAngularVelocityPrev + m_cAngularVelocity);
       m_cOrientation += m_cAngularVelocity * GetPM3DEngine().GetPhysicsClockTick();
@@ -280,9 +280,9 @@ namespace argos
       /* update the accel bias velocity random walk */
       m_fVRW =  m_fVRW * std::sqrt(GetPM3DEngine().GetPhysicsClockTick());
       /* update the velocity using trapezoid integration */
-      cAcceleration = 0.5 * (m_cPrevAcceleration + cAcceleration);
+      cAcceleration = 0.5 * (m_cAccelerationPrev + cAcceleration);
       m_cVelocity += cAcceleration * GetPM3DEngine().GetPhysicsClockTick();
-      m_cPrevAcceleration = cAcceleration;
+      m_cAccelerationPrev = cAcceleration;
       /* update the position using trapezoid integration */
       m_cVelocity = 0.5 * (m_cVelocityPrev + m_cVelocity);
       m_cPosition += m_cVelocity * GetPM3DEngine().GetPhysicsClockTick();
@@ -318,7 +318,7 @@ namespace argos
                          cPitch.GetValue(),
                          cYaw.GetValue());
       /* update the previous orientation target */
-      m_cPrevOrientationTarget.SetZ(m_cPrevOrientationTarget.GetZ() + fDeltaYaw);
+      m_cOrientationTargetPrev.SetZ(m_cOrientationTargetPrev.GetZ() + fDeltaYaw);
       /* update the space */
       UpdateEntityStatus();
    }
