@@ -131,18 +131,18 @@ namespace argos {
       const static Real YAW_KI; 
       const static Real YAW_KD; 
       /* sensors noise constants*/
-      const static Real MEAN_SENS;
-      const static Real STD_GYRO_X;
-      const static Real STD_GYRO_Y;
-      const static Real STD_GYRO_Z;
-      const static Real STD_ACCEL_X;
-      const static Real STD_ACCEL_Y;
-      const static Real STD_ACCEL_Z;
-      const static Real STD_BIAS;
+      const static Real SENS_NOISE_MEAN;
+      const static Real SENS_BIAS_STD_DEV;
+      const static Real GYRO_STD_DEV_X;
+      const static Real GYRO_STD_DEV_Y;
+      const static Real GYRO_STD_DEV_Z;
+      const static Real GYRO_RANDOM_WALK;
       const static Real GYRO_BIAS;
+      const static Real ACCEL_STD_DEV_X;
+      const static Real ACCEL_STD_DEV_Y;
+      const static Real ACCEL_STD_DEV_Z;
+      const static Real ACCEL_RANDOM_WALK;
       const static Real ACCEL_BIAS;   
-      const static Real RW_GYRO;
-      const static Real RW_ACCEL;
 
       protected:
       /** Random number generator */

@@ -68,8 +68,8 @@ namespace argos
       /* reset the gyro bias */   
       m_fGyroBias = GYRO_BIAS;
       m_fAccelBias = ACCEL_BIAS;   
-      m_fARW = RW_GYRO;
-      m_fVRW = RW_ACCEL;
+      m_fARW = GYRO_RANDOM_WALK;
+      m_fVRW = ACCEL_RANDOM_WALK;
       m_pcRNG = CRandom::CreateRNG("argos");
       /* update the axis-aligned bounding box, anchors, and entities */
       UpdateEntityStatus();
@@ -254,11 +254,11 @@ namespace argos
       };
       /* gyroscope sensor readings */
       cAngularAcceleration.Set(
-         cAngularAcceleration.GetX() + m_pcRNG->Gaussian(STD_GYRO_X, MEAN_SENS) + m_fGyroBias,
-         cAngularAcceleration.GetY() + m_pcRNG->Gaussian(STD_GYRO_Y, MEAN_SENS) + m_fGyroBias,
-         cAngularAcceleration.GetZ() + m_pcRNG->Gaussian(STD_GYRO_Z, MEAN_SENS) + m_fGyroBias
+         cAngularAcceleration.GetX() + m_pcRNG->Gaussian(GYRO_STD_DEV_X, SENS_NOISE_MEAN) + m_fGyroBias,
+         cAngularAcceleration.GetY() + m_pcRNG->Gaussian(GYRO_STD_DEV_Y, SENS_NOISE_MEAN) + m_fGyroBias,
+         cAngularAcceleration.GetZ() + m_pcRNG->Gaussian(GYRO_STD_DEV_Z, SENS_NOISE_MEAN) + m_fGyroBias
       );
-      m_fGyroBias = m_fGyroBias + m_fARW *  m_pcRNG->Gaussian(STD_BIAS, MEAN_SENS);
+      m_fGyroBias = m_fGyroBias + m_fARW *  m_pcRNG->Gaussian(SENS_BIAS_STD_DEV, SENS_NOISE_MEAN);
       /* update the gyro bias angular random walk */
       m_fARW =  m_fARW * std::sqrt(GetPM3DEngine().GetPhysicsClockTick());
       /* update the angular velocity using trapezoid integration */
@@ -271,11 +271,11 @@ namespace argos
       m_cAngularVelocityPrev = m_cAngularVelocity;
       /* accelerometer sensor readings */
       cAcceleration.Set(
-         cAcceleration.GetX() + m_pcRNG->Gaussian(STD_ACCEL_X, MEAN_SENS) + m_fAccelBias,
-         cAcceleration.GetY() + m_pcRNG->Gaussian(STD_ACCEL_Y, MEAN_SENS) + m_fAccelBias,
-         cAcceleration.GetZ() + m_pcRNG->Gaussian(STD_ACCEL_Z, MEAN_SENS) + m_fAccelBias
+         cAcceleration.GetX() + m_pcRNG->Gaussian(ACCEL_STD_DEV_X, SENS_NOISE_MEAN) + m_fAccelBias,
+         cAcceleration.GetY() + m_pcRNG->Gaussian(ACCEL_STD_DEV_Y, SENS_NOISE_MEAN) + m_fAccelBias,
+         cAcceleration.GetZ() + m_pcRNG->Gaussian(ACCEL_STD_DEV_Z, SENS_NOISE_MEAN) + m_fAccelBias
       );
-      m_fAccelBias = m_fAccelBias + m_fVRW *  m_pcRNG->Gaussian(STD_BIAS, MEAN_SENS);
+      m_fAccelBias = m_fAccelBias + m_fVRW *  m_pcRNG->Gaussian(SENS_BIAS_STD_DEV, SENS_NOISE_MEAN);
       /* update the accel bias velocity random walk */
       m_fVRW =  m_fVRW * std::sqrt(GetPM3DEngine().GetPhysicsClockTick());
       /* update the velocity using trapezoid integration */
@@ -395,18 +395,19 @@ namespace argos
    const Real CPointMass3DDroneModel::ROLL_PITCH_KD = 6;
    const Real CPointMass3DDroneModel::ROOT_TWO = std::sqrt(2.0);
    /* sensor noise coefficents*/
-   const Real CPointMass3DDroneModel::MEAN_SENS = 0;
-   const Real CPointMass3DDroneModel::STD_GYRO_X = 0.67;
-   const Real CPointMass3DDroneModel::STD_GYRO_Y = 0.78;
-   const Real CPointMass3DDroneModel::STD_GYRO_Z = 0.12;
-   const Real CPointMass3DDroneModel::STD_ACCEL_X =  0.1;
-   const Real CPointMass3DDroneModel::STD_ACCEL_Y = 0.1;
-   const Real CPointMass3DDroneModel::STD_ACCEL_Z = 0.12;
-   const Real CPointMass3DDroneModel::STD_BIAS = 1;
+   const Real CPointMass3DDroneModel::SENS_NOISE_MEAN = 0;
+   const Real CPointMass3DDroneModel::SENS_BIAS_STD_DEV = 1;
+   const Real CPointMass3DDroneModel::GYRO_STD_DEV_X = 0.67;
+   const Real CPointMass3DDroneModel::GYRO_STD_DEV_Y = 0.78;
+   const Real CPointMass3DDroneModel::GYRO_STD_DEV_Z = 0.12;
+   const Real CPointMass3DDroneModel::GYRO_RANDOM_WALK = 0.001;
    const Real CPointMass3DDroneModel::GYRO_BIAS = 0.01;
+   const Real CPointMass3DDroneModel::ACCEL_STD_DEV_X =  0.1;
+   const Real CPointMass3DDroneModel::ACCEL_STD_DEV_Y = 0.1;
+   const Real CPointMass3DDroneModel::ACCEL_STD_DEV_Z = 0.12;
+   const Real CPointMass3DDroneModel::ACCEL_RANDOM_WALK = 0.003;
    const Real CPointMass3DDroneModel::ACCEL_BIAS = 0.03;
-   const Real CPointMass3DDroneModel::RW_GYRO = 0.001;
-   const Real CPointMass3DDroneModel::RW_ACCEL = 0.003;
+
 
    /****************************************/
    /****************************************/
