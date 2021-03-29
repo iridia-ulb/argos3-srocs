@@ -93,7 +93,7 @@ namespace argos {
       if(m_tDistanceSensorData) { 
          const mavlink_distance_sensor_t& tReading =
             m_tDistanceSensorData.value(); 
-         m_cDistanceSensorData = tReading.current_distance * 0.01; // in meters
+         m_cDistanceSensorData = tReading.current_distance;
          /* clear out the read data */
          m_tDistanceSensorData.reset();
       }
