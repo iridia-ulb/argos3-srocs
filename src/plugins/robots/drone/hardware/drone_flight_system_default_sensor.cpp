@@ -121,16 +121,10 @@ namespace argos {
       if(m_tAttitudeTarget) {
          const mavlink_attitude_target_t& tReading =
             m_tAttitudeTarget.value();
-         CQuaternion cTargetOrientation;
-         cTargetOrientation.SetW(tReading.q[0]);
-         cTargetOrientation.SetX(tReading.q[1]);
-         cTargetOrientation.SetY(tReading.q[2]);
-         cTargetOrientation.SetZ(tReading.q[3]);
+         CQuaternion cTargetOrientation(tReading.q[0], tReading.q[1], tReading.q[2], tReading.q[3]);
          CRadians cYaw, cPitch, cRoll;
          cTargetOrientation.ToEulerAngles(cYaw, cPitch, cRoll);
-         m_cTargetOrientation.SetX(cRoll.GetValue());
-         m_cTargetOrientation.SetY(cPitch.GetValue());
-         m_cTargetOrientation.SetZ(cYaw.GetValue());
+         m_cTargetOrientation.Set(cRoll.GetValue(), cPitch.GetValue(), cYaw.GetValue());
          /* clear out the read data */
          m_tAttitudeTarget.reset();
       }
