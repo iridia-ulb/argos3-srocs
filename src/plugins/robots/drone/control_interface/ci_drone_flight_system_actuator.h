@@ -55,7 +55,6 @@ namespace argos {
       CRadians m_cTargetYawAngle;
    };
  
-
 }
 
 #endif

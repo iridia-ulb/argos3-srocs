@@ -125,7 +125,6 @@ namespace argos {
       CLuaUtility::AddToTable(pt_lua_state,
                               "auto_land",
                               &LuaSetDroneFlightSystemAutoLand);                                
-
       CLuaUtility::AddToTable(pt_lua_state,
                               "set_offboard_mode",
                               &LuaSetDroneFlightSystemOffboardMode);
