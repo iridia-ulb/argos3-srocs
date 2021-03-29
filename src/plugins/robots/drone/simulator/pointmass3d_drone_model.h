@@ -18,7 +18,6 @@ namespace argos {
 
 #include <argos3/core/utility/math/rng.h>
 
-
 namespace argos {
 
    class CPointMass3DDroneModel : public CPointMass3DModel {
