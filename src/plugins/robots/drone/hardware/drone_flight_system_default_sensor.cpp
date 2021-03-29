@@ -86,7 +86,6 @@ namespace argos {
          /* set the initial position if not already set */
          if(!m_pcPixhawk->GetInitialPosition()) {
             m_pcPixhawk->GetInitialPosition().emplace(m_cPosition);
-            m_cInitialPosition = m_cPosition;
          } 
          /* clear out the read data */
          m_tLocalPositionNed.reset();

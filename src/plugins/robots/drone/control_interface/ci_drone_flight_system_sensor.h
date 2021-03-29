@@ -25,7 +25,6 @@ namespace argos {
          m_cPosition(CVector3::ZERO),
          m_cTargetPosition(CVector3::ZERO),
          m_cTargetOrientation(CVector3::ZERO),
-         m_cInitialPosition(CVector3::ZERO),
          m_cDistanceSensorData(0.0),
          m_cOrientation(CVector3::ZERO),
          m_cVelocity(CVector3::ZERO),
@@ -37,7 +36,6 @@ namespace argos {
          m_cPosition = CVector3::ZERO;
          m_cTargetPosition = CVector3::ZERO;
          m_cTargetOrientation = CVector3::ZERO;
-         m_cInitialPosition = CVector3::ZERO;
          m_cDistanceSensorData = 0.0;
          m_cOrientation = CVector3::ZERO;
          m_cVelocity = CVector3::ZERO;
@@ -50,10 +48,6 @@ namespace argos {
 
       const CVector3& GetTargetPosition() const {
          return m_cTargetPosition;
-      }
-
-      const CVector3& GetInitialPosition() const {
-         return m_cInitialPosition;
       }
 
       const Real& GetDistanceSensorData() const {
