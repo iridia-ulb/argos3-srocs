@@ -74,7 +74,7 @@ namespace argos {
          /* initialize a setpoint struct */
          mavlink_set_position_target_local_ned_t tSetpoint;
          tSetpoint.target_system    = m_pcPixhawk->GetTargetSystem().value();
-	      tSetpoint.target_component = m_pcPixhawk->GetTargetComponent().value();
+         tSetpoint.target_component = m_pcPixhawk->GetTargetComponent().value();
          tSetpoint.type_mask = MAVLINK_MSG_SET_POSITION_TARGET_LOCAL_NED_POSITION &
 				   		          MAVLINK_MSG_SET_POSITION_TARGET_LOCAL_NED_YAW_ANGLE;
          tSetpoint.coordinate_frame = MAV_FRAME_LOCAL_NED;
