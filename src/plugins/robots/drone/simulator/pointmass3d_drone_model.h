@@ -85,7 +85,7 @@ namespace argos {
       CVector3 m_cOrientationTargetPrev;
       CVector3 m_cAngularVelocityCumulativeError;
       Real m_fAltitudeCumulativeError;
-      Real m_fTargetAltitudePrev;
+      Real m_fTargetPositionZPrev;
       /* sensor noise parameters */
       Real m_fGyroBias;
       Real m_fAccelBias;

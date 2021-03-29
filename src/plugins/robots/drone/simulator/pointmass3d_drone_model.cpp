@@ -64,7 +64,7 @@ namespace argos
       m_cOrientationTargetPrev.Set(0.0, 0.0, 0.0);
       m_cAngularVelocityCumulativeError.Set(0.0, 0.0, 0.0);
       m_fAltitudeCumulativeError = 0.0;
-      m_fPrevTargetAltitude = 0.0;
+      m_fTargetPositionZPrev = 0.0;
       /* reset the gyro bias */   
       m_fGyroBias = GYRO_BIAS;
       m_fAccelBias = ACCEL_BIAS;   
@@ -124,13 +124,13 @@ namespace argos
       Real fTargetTransVelY =
          cPositionError.GetY() * XY_POS_KP;
       Real fTargetTransVelZ =
-         (m_cInputPosition.GetZ() - m_fPrevTargetAltitude) / GetPM3DEngine().GetPhysicsClockTick();
+         (m_cInputPosition.GetZ() - m_fTargetPositionZPrev) / GetPM3DEngine().GetPhysicsClockTick();
       /* saturate velocities */
       cVelocityLimitX.TruncValue(fTargetTransVelX);
       cVelocityLimitY.TruncValue(fTargetTransVelY);
       cVelocityLimitZ.TruncValue(fTargetTransVelZ);
       /* store the previous desired altitude for the altitude PID calculation */
-      m_fPrevTargetAltitude = m_cInputPosition.GetZ();
+      m_fTargetPositionZPrev = m_cInputPosition.GetZ();
       /* store XYZ velocity error */
       CVector3 cTransVelocityError(fTargetTransVelX, fTargetTransVelY, fTargetTransVelZ);
       cTransVelocityError -= m_cVelocity;
@@ -254,7 +254,6 @@ namespace argos
       };
       /* gyroscope sensor readings */
       cAngularAcceleration.Set(
-         
          cAngularAcceleration.GetX() + m_pcRNG->Gaussian(STD_GYRO_X,MEAN_SENS) + m_fGyroBias,
          cAngularAcceleration.GetY() + m_pcRNG->Gaussian(STD_GYRO_Y,MEAN_SENS) + m_fGyroBias,
          cAngularAcceleration.GetZ() + m_pcRNG->Gaussian(STD_GYRO_Z,MEAN_SENS) + m_fGyroBias
