@@ -89,8 +89,8 @@ namespace argos {
       /* sensor noise parameters */
       Real m_fGyroBias;
       Real m_fAccelBias;
-      Real m_fARW;
-      Real m_fVRW;
+      Real m_fAngleRandomWalk;
+      Real m_fVelocityRandomWalk;
 
       const static Real ROOT_TWO;
       /* height of the drone's body */ 
@@ -133,16 +133,16 @@ namespace argos {
       /* sensors noise constants*/
       const static Real SENS_NOISE_MEAN;
       const static Real SENS_BIAS_STD_DEV;
-      const static Real GYRO_STD_DEV_X;
-      const static Real GYRO_STD_DEV_Y;
-      const static Real GYRO_STD_DEV_Z;
-      const static Real GYRO_RANDOM_WALK;
-      const static Real GYRO_BIAS;
-      const static Real ACCEL_STD_DEV_X;
-      const static Real ACCEL_STD_DEV_Y;
-      const static Real ACCEL_STD_DEV_Z;
-      const static Real ACCEL_RANDOM_WALK;
-      const static Real ACCEL_BIAS;   
+      const static Real MEMS_GYRO_STD_DEV_X;
+      const static Real MEMS_GYRO_STD_DEV_Y;
+      const static Real MEMS_GYRO_STD_DEV_Z;
+      const static Real MEMS_GYRO_RANDOM_WALK_INIT;
+      const static Real MEMS_GYRO_BIAS_INIT;
+      const static Real MEMS_ACCEL_STD_DEV_X;
+      const static Real MEMS_ACCEL_STD_DEV_Y;
+      const static Real MEMS_ACCEL_STD_DEV_Z;
+      const static Real MEMS_ACCEL_RANDOM_WALK_INIT;
+      const static Real MEMS_ACCEL_BIAS_INIT;   
 
       protected:
       /** Random number generator */
