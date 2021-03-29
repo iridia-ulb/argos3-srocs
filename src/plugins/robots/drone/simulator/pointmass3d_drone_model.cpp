@@ -55,7 +55,7 @@ namespace argos
       m_cVelocityPrev.Set(0.0, 0.0, 0.0);
       /* reset the drone's angular velocity */
       m_cAngularVelocity.Set(0.0, 0.0, 0.0);
-      m_cPrevAngularVelocity.Set(0.0, 0.0, 0.0);
+      m_cAngularVelocityPrev.Set(0.0, 0.0, 0.0);
       /* reset the drone's previous acceleration */
       m_cPrevAcceleration.Set(0.0, 0.0, 0.0);
       /* reset the drone's previous angular acceleration */
@@ -267,9 +267,9 @@ namespace argos
       m_cAngularVelocity += cAngularAcceleration * GetPM3DEngine().GetPhysicsClockTick();
       m_cPrevAngularAcceleration = cAngularAcceleration;
       /* update the orientation using trapezoid integration */
-      m_cAngularVelocity = 0.5 * (m_cPrevAngularVelocity + m_cAngularVelocity);
+      m_cAngularVelocity = 0.5 * (m_cAngularVelocityPrev + m_cAngularVelocity);
       m_cOrientation += m_cAngularVelocity * GetPM3DEngine().GetPhysicsClockTick();
-      m_cPrevAngularVelocity = m_cAngularVelocity;
+      m_cAngularVelocityPrev = m_cAngularVelocity;
       /* accelerometer sensor readings */
       cAcceleration.Set(
          cAcceleration.GetX() + m_pcRNG->Gaussian(STD_ACCEL_X,MEAN_SENS) + m_fAccelBias,

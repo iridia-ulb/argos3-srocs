@@ -76,7 +76,7 @@ namespace argos {
       CVector3 m_cVelocityPrev;
       /* angular velocity of the drone */
       CVector3 m_cAngularVelocity;
-      CVector3 m_cPrevAngularVelocity;
+      CVector3 m_cAngularVelocityPrev;
       /* acceleration of the drone */
       CVector3 m_cPrevAcceleration;
       /* angular acceleration of the drone */
