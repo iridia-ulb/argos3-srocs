@@ -254,9 +254,9 @@ namespace argos
       };
       /* gyroscope sensor readings */
       cAngularAcceleration.Set(
-         cAngularAcceleration.GetX() + m_pcRNG->Gaussian(STD_GYRO_X,MEAN_SENS) + m_fGyroBias,
-         cAngularAcceleration.GetY() + m_pcRNG->Gaussian(STD_GYRO_Y,MEAN_SENS) + m_fGyroBias,
-         cAngularAcceleration.GetZ() + m_pcRNG->Gaussian(STD_GYRO_Z,MEAN_SENS) + m_fGyroBias
+         cAngularAcceleration.GetX() + m_pcRNG->Gaussian(STD_GYRO_X, MEAN_SENS) + m_fGyroBias,
+         cAngularAcceleration.GetY() + m_pcRNG->Gaussian(STD_GYRO_Y, MEAN_SENS) + m_fGyroBias,
+         cAngularAcceleration.GetZ() + m_pcRNG->Gaussian(STD_GYRO_Z, MEAN_SENS) + m_fGyroBias
       );
       m_fGyroBias = m_fGyroBias + m_fARW *  m_pcRNG->Gaussian(STD_BIAS, MEAN_SENS);
       /* update the gyro bias angular random walk */
@@ -271,9 +271,9 @@ namespace argos
       m_cAngularVelocityPrev = m_cAngularVelocity;
       /* accelerometer sensor readings */
       cAcceleration.Set(
-         cAcceleration.GetX() + m_pcRNG->Gaussian(STD_ACCEL_X,MEAN_SENS) + m_fAccelBias,
-         cAcceleration.GetY() + m_pcRNG->Gaussian(STD_ACCEL_Y,MEAN_SENS) + m_fAccelBias,
-         cAcceleration.GetZ() + m_pcRNG->Gaussian(STD_ACCEL_Z,MEAN_SENS) + m_fAccelBias
+         cAcceleration.GetX() + m_pcRNG->Gaussian(STD_ACCEL_X, MEAN_SENS) + m_fAccelBias,
+         cAcceleration.GetY() + m_pcRNG->Gaussian(STD_ACCEL_Y, MEAN_SENS) + m_fAccelBias,
+         cAcceleration.GetZ() + m_pcRNG->Gaussian(STD_ACCEL_Z, MEAN_SENS) + m_fAccelBias
       );
       m_fAccelBias = m_fAccelBias + m_fVRW *  m_pcRNG->Gaussian(STD_BIAS, MEAN_SENS);
       /* update the accel bias velocity random walk */
