@@ -131,19 +131,23 @@ namespace argos {
       const static Real YAW_KI; 
       const static Real YAW_KD; 
       /* sensors noise constants*/
-      const static Real SENS_NOISE_MEAN;
-      const static Real SENS_BIAS_STD_DEV;
-      const static Real MEMS_GYRO_STD_DEV_X;
-      const static Real MEMS_GYRO_STD_DEV_Y;
-      const static Real MEMS_GYRO_STD_DEV_Z;
+      const static Real MEMS_GYRO_NOISE_MEAN;
+      const static Real MEMS_GYRO_BIAS_MEAN;
+      const static Real MEMS_GYRO_BIAS_STD_DEV;
+      const static Real MEMS_GYRO_NOISE_STD_DEV_X;
+      const static Real MEMS_GYRO_NOISE_STD_DEV_Y;
+      const static Real MEMS_GYRO_NOISE_STD_DEV_Z;
       const static Real MEMS_GYRO_RANDOM_WALK_INIT;
       const static Real MEMS_GYRO_BIAS_INIT;
-      const static Real MEMS_ACCEL_STD_DEV_X;
-      const static Real MEMS_ACCEL_STD_DEV_Y;
-      const static Real MEMS_ACCEL_STD_DEV_Z;
+      const static Real MEMS_ACCEL_NOISE_MEAN;
+      const static Real MEMS_ACCEL_BIAS_MEAN;
+      const static Real MEMS_ACCEL_BIAS_STD_DEV;
+      const static Real MEMS_ACCEL_NOISE_STD_DEV_X;
+      const static Real MEMS_ACCEL_NOISE_STD_DEV_Y;
+      const static Real MEMS_ACCEL_NOISE_STD_DEV_Z;
       const static Real MEMS_ACCEL_RANDOM_WALK_INIT;
-      const static Real MEMS_ACCEL_BIAS_INIT;   
-
+      const static Real MEMS_ACCEL_BIAS_INIT;
+      
       protected:
       /** Random number generator */
       CRandom::CRNG* m_pcRNG;
