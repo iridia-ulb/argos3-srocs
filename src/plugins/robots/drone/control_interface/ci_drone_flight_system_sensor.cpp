@@ -25,7 +25,7 @@ namespace argos {
       CLuaUtility::AddToTable(pt_lua_state, "velocity", GetVelocity());
       CLuaUtility::AddToTable(pt_lua_state, "angular_velocity", GetAngularVelocity());
       CLuaUtility::AddToTable(pt_lua_state, "target_position", GetTargetPosition());
-      CLuaUtility::AddToTable(pt_lua_state, "lidar_height_measurment", GetDistanceSensorData());
+      CLuaUtility::AddToTable(pt_lua_state, "height", GetHeight());
       CLuaUtility::CloseRobotStateTable(pt_lua_state);
    }
 #endif
@@ -42,7 +42,7 @@ namespace argos {
       CLuaUtility::AddToTable(pt_lua_state, "velocity", GetVelocity());
       CLuaUtility::AddToTable(pt_lua_state, "angular_velocity", GetAngularVelocity());
       CLuaUtility::AddToTable(pt_lua_state, "target_position", GetTargetPosition());
-      CLuaUtility::AddToTable(pt_lua_state, "lidar_height_measurment", GetDistanceSensorData());
+      CLuaUtility::AddToTable(pt_lua_state, "height", GetHeight());
       lua_pop(pt_lua_state, 1);
    }
 #endif

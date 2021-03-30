@@ -25,7 +25,7 @@ namespace argos {
          m_cPosition(CVector3::ZERO),
          m_cTargetPosition(CVector3::ZERO),
          m_cTargetOrientation(CVector3::ZERO),
-         m_cDistanceSensorData(0.0),
+         m_fHeight(0.0),
          m_cOrientation(CVector3::ZERO),
          m_cVelocity(CVector3::ZERO),
          m_cAngularVelocity(CVector3::ZERO) {}
@@ -36,7 +36,7 @@ namespace argos {
          m_cPosition = CVector3::ZERO;
          m_cTargetPosition = CVector3::ZERO;
          m_cTargetOrientation = CVector3::ZERO;
-         m_cDistanceSensorData = 0.0;
+         m_fHeight = 0.0;
          m_cOrientation = CVector3::ZERO;
          m_cVelocity = CVector3::ZERO;
          m_cAngularVelocity = CVector3::ZERO;
@@ -50,8 +50,8 @@ namespace argos {
          return m_cTargetPosition;
       }
 
-      const Real& GetDistanceSensorData() const {
-         return m_cDistanceSensorData;
+      const Real& GetHeight() const {
+         return m_fHeight;
       }
 
       const CVector3& GetOrientation() const {
@@ -88,8 +88,7 @@ namespace argos {
       CVector3 m_cGyroscope;
       Real m_fTemperature;
       Real m_fBatteryVoltage;
-      Real m_cDistanceSensorData;
-
+      Real m_fHeight;
    };
 }
 
