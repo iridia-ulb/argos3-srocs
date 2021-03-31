@@ -8,7 +8,8 @@ function step()
    print("position = " .. tostring(robot.flight_system.position))
    print("velocity = " .. tostring(robot.flight_system.velocity))
    print("orientation = " .. tostring(robot.flight_system.orientation))
-   print("angular_velocity = " .. tostring(robot.flight_system.angular_velocity))   
+   print("angular_velocity = " .. tostring(robot.flight_system.angular_velocity))  
+   print("battery_remaining = " .. tostring(robot.flight_system.battery_remaining)) 
 end
 
 --[[ This function is executed every time you press the 'reset'

@@ -131,6 +131,7 @@ namespace argos {
       if (m_tBatteryStatus) {
          const mavlink_battery_status_t &tReading =
              m_tBatteryStatus.value();
+         m_fBatteryRemaining =  tReading.battery_remaining;
          m_fBatteryVoltage = tReading.voltages[0];
          /* clear out the read data */
          m_tBatteryStatus.reset();
