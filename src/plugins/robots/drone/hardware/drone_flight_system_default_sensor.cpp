@@ -48,7 +48,7 @@ namespace argos {
          THROW_ARGOSEXCEPTION_NESTED("Initialization error in the drone flight system sensor.", ex);
       }
    }
-   
+
    /****************************************/
    /****************************************/
    
