@@ -44,7 +44,7 @@ namespace argos {
 
 #ifdef ARGOS_WITH_LUA
    /*
-    * The stack must have two values in this order:
+    * The stack must have one value:
     * 1. off-board mode enabled (true) or disabled (false) (boolean)
     */
    int LuaSetDroneFlightSystemOffboardMode(lua_State* pt_lua_state) {
@@ -82,9 +82,9 @@ namespace argos {
       CCI_DroneFlightSystemActuator* pcFlightSystemActuator =
          CLuaUtility::GetDeviceInstance<CCI_DroneFlightSystemActuator>(pt_lua_state, "flight_system");
       /* Update actuator */
-      const CVector3& cTargetPosition = CLuaVector3::ToVector3(pt_lua_state, 1);     
+      const CVector3& cTargetPosition = CLuaVector3::ToVector3(pt_lua_state, 1);
       pcFlightSystemActuator->SetTargetPosition(cTargetPosition);
-      pcFlightSystemActuator->SetTargetYawAngle(lua_tonumber(pt_lua_state, 2));     
+      pcFlightSystemActuator->SetTargetYawAngle(lua_tonumber(pt_lua_state, 2));
       return 0;
    }
 #endif
