@@ -2,6 +2,7 @@
  * @file <argos3/plugins/robots/drone/control_interface/ci_drone_flight_system_sensor.h>
  *
  * @author Michael Allwright - <allsey87@gmail.com>
+ * @author Sinan Oguz - <soguz.ankara@gmail.com>
  */
 
 #ifndef CCI_DRONE_FLIGHT_SYSTEM_SENSOR_H
