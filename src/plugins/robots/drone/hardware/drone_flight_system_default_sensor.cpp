@@ -18,7 +18,7 @@ namespace argos {
 
    CDroneFlightSystemDefaultSensor::CDroneFlightSystemDefaultSensor() :
       m_pcPixhawk(nullptr) {}
- 
+   
    /****************************************/
    /****************************************/
 
@@ -48,7 +48,7 @@ namespace argos {
          THROW_ARGOSEXCEPTION_NESTED("Initialization error in the drone flight system sensor.", ex);
       }
    }
-  
+   
    /****************************************/
    /****************************************/
    
@@ -188,7 +188,7 @@ namespace argos {
              &t_message, &m_tDistanceSensorData.value());
          break;
       default:
-         // LOG << "[INFO] Unknown message of type " << t_message.msgid << " received";		
+         // LOG << "[INFO] Unknown message of type " << t_message.msgid << " received";
          break;
       }
    }
@@ -234,4 +234,3 @@ namespace argos {
    /****************************************/
    
 }
-   
