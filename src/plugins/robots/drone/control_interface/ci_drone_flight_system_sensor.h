@@ -2,6 +2,7 @@
  * @file <argos3/plugins/robots/drone/control_interface/ci_drone_flight_system_sensor.h>
  *
  * @author Michael Allwright - <allsey87@gmail.com>
+ * @author Sinan Oguz - <soguz.ankara@gmail.com>
  */
 
 #ifndef CCI_DRONE_FLIGHT_SYSTEM_SENSOR_H
@@ -26,6 +27,7 @@ namespace argos {
          m_cTargetPosition(CVector3::ZERO),
          m_cTargetOrientation(CVector3::ZERO),
          m_fHeight(0.0),
+         m_fBatteryRemaining(0.0),
          m_cOrientation(CVector3::ZERO),
          m_cVelocity(CVector3::ZERO),
          m_cAngularVelocity(CVector3::ZERO) {}
@@ -37,6 +39,7 @@ namespace argos {
          m_cTargetPosition = CVector3::ZERO;
          m_cTargetOrientation = CVector3::ZERO;
          m_fHeight = 0.0;
+         m_fBatteryRemaining = 0.0;
          m_cOrientation = CVector3::ZERO;
          m_cVelocity = CVector3::ZERO;
          m_cAngularVelocity = CVector3::ZERO;
@@ -70,6 +73,10 @@ namespace argos {
          return m_cAngularVelocity;
       }
 
+      const Real& GetBatteryRemaining() const {
+         return m_fBatteryRemaining;
+      }
+
 #ifdef ARGOS_WITH_LUA
       virtual void CreateLuaState(lua_State* pt_lua_state);
 
@@ -88,6 +95,7 @@ namespace argos {
       CVector3 m_cGyroscope;
       Real m_fTemperature;
       Real m_fBatteryVoltage;
+      Real m_fBatteryRemaining;
       Real m_fHeight;
    };
 }

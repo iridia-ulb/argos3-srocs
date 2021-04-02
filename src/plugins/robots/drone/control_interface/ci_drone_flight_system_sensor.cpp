@@ -26,6 +26,7 @@ namespace argos {
       CLuaUtility::AddToTable(pt_lua_state, "angular_velocity", GetAngularVelocity());
       CLuaUtility::AddToTable(pt_lua_state, "target_position", GetTargetPosition());
       CLuaUtility::AddToTable(pt_lua_state, "height", GetHeight());
+      CLuaUtility::AddToTable(pt_lua_state, "battery_remaining", GetBatteryRemaining());
       CLuaUtility::CloseRobotStateTable(pt_lua_state);
    }
 #endif
@@ -43,6 +44,7 @@ namespace argos {
       CLuaUtility::AddToTable(pt_lua_state, "angular_velocity", GetAngularVelocity());
       CLuaUtility::AddToTable(pt_lua_state, "target_position", GetTargetPosition());
       CLuaUtility::AddToTable(pt_lua_state, "height", GetHeight());
+      CLuaUtility::AddToTable(pt_lua_state, "battery_remaining", GetBatteryRemaining());
       lua_pop(pt_lua_state, 1);
    }
 #endif

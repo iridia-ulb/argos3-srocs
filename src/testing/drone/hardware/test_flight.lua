@@ -38,7 +38,7 @@ end
             robot.flight_system.set_target_pose(vector3(0,0,1), 0)
          end
       elseif state == 'landing' then
-         if math.abs(robot.flight_system.position.z  - robot.flight_system.target_position.z) < 0.025 then
+         if math.abs(robot.flight_system.position.z - robot.flight_system.target_position.z) < 0.025 then
             robot.flight_system.set_armed(false, false)
             robot.flight_system.set_offboard_mode(false)
             state = 'postflight'
