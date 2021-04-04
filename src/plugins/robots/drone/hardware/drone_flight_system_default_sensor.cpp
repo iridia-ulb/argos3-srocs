@@ -160,7 +160,7 @@ namespace argos {
       case MAVLINK_MSG_ID_LOCAL_POSITION_NED:
          m_tLocalPositionNed.emplace();
          ::mavlink_msg_local_position_ned_decode(
-            &t_message,	&m_tLocalPositionNed.value());
+            &t_message, &m_tLocalPositionNed.value());
          break;
       case MAVLINK_MSG_ID_POSITION_TARGET_LOCAL_NED:
          m_tPositionTargetLocalNed.emplace();
@@ -232,5 +232,5 @@ namespace argos {
 
    /****************************************/
    /****************************************/
-   
+
 }
