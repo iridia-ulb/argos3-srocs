@@ -50,7 +50,9 @@ namespace argos {
       virtual void UpdateOriginAnchor(SAnchor& s_anchor);
 
    private:
-
+   
+      /** Random number generator */
+      CRandom::CRNG* m_pcRNG;
       /* pid controller */
       static Real CalculatePIDResponse(Real  f_cur_error,
                                        Real  f_vel_error,
@@ -147,11 +149,7 @@ namespace argos {
       const static Real MEMS_ACCEL_NOISE_STD_DEV_Z;
       const static Real MEMS_ACCEL_RANDOM_WALK_INIT;
       const static Real MEMS_ACCEL_BIAS_INIT;
-      
-      protected:
-      /** Random number generator */
-      CRandom::CRNG* m_pcRNG;
-
+   
    };
 
 }
