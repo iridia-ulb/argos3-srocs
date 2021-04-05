@@ -2,6 +2,7 @@
  * @file <argos3/plugins/robots/drone/hardware/drone_flight_system_default_sensor.cpp>
  *
  * @author Michael Allwright - <allsey87@gmail.com>
+ * @author Sinan Oguz - <soguz.ankara@gmail.com>
  */
 
 #include "drone_flight_system_default_sensor.h"
@@ -10,7 +11,6 @@
 
 #include <argos3/plugins/robots/generic/hardware/robot.h>
 
-
 namespace argos {
 
    /****************************************/
@@ -18,7 +18,7 @@ namespace argos {
 
    CDroneFlightSystemDefaultSensor::CDroneFlightSystemDefaultSensor() :
       m_pcPixhawk(nullptr) {}
- 
+   
    /****************************************/
    /****************************************/
 
@@ -48,7 +48,7 @@ namespace argos {
          THROW_ARGOSEXCEPTION_NESTED("Initialization error in the drone flight system sensor.", ex);
       }
    }
-  
+
    /****************************************/
    /****************************************/
    
@@ -78,6 +78,13 @@ namespace argos {
          /* clear out the read data */
          m_tHighResImu.reset();
       }
+      if (m_tDistanceSensorData) {
+         const mavlink_distance_sensor_t &tReading =
+             m_tDistanceSensorData.value();
+         m_fHeight = tReading.current_distance;
+         /* clear out the read data */
+         m_tDistanceSensorData.reset();
+      }
       if(m_tLocalPositionNed) {
          const mavlink_local_position_ned_t& tReading =
             m_tLocalPositionNed.value();
@@ -89,6 +96,13 @@ namespace argos {
          }
          /* clear out the read data */
          m_tLocalPositionNed.reset();
+      }
+      if (m_tPositionTargetLocalNed) {
+         const mavlink_position_target_local_ned_t &tReading =
+             m_tPositionTargetLocalNed.value();
+         m_cTargetPosition.Set(tReading.x, tReading.y, tReading.z);
+         /* clear out the read data */
+         m_tPositionTargetLocalNed.reset();
       }
       if(m_tAttitude) {
          const mavlink_attitude_t& tReading =
@@ -103,6 +117,16 @@ namespace argos {
          }
          /* clear out the read data */
          m_tAttitude.reset();
+      }
+      if (m_tAttitudeTarget) {
+         const mavlink_attitude_target_t &tReading =
+             m_tAttitudeTarget.value();
+         CQuaternion cTargetOrientation(tReading.q[0], tReading.q[1], tReading.q[2], tReading.q[3]);
+         CRadians cYaw, cPitch, cRoll;
+         cTargetOrientation.ToEulerAngles(cYaw, cPitch, cRoll);
+         m_cTargetOrientation.Set(cRoll.GetValue(), cPitch.GetValue(), cYaw.GetValue());
+         /* clear out the read data */
+         m_tAttitudeTarget.reset();
       }
       if(m_tBatteryStatus) {
          const mavlink_battery_status_t& tReading =
@@ -136,7 +160,7 @@ namespace argos {
       case MAVLINK_MSG_ID_LOCAL_POSITION_NED:
          m_tLocalPositionNed.emplace();
          ::mavlink_msg_local_position_ned_decode(
-            &t_message,	&m_tLocalPositionNed.value());
+            &t_message, &m_tLocalPositionNed.value());
          break;
       case MAVLINK_MSG_ID_POSITION_TARGET_LOCAL_NED:
          m_tPositionTargetLocalNed.emplace();
@@ -153,8 +177,18 @@ namespace argos {
          ::mavlink_msg_attitude_decode(
             &t_message, &m_tAttitude.value());
          break;
+      case MAVLINK_MSG_ID_ATTITUDE_TARGET:
+         m_tAttitudeTarget.emplace();
+         ::mavlink_msg_attitude_target_decode(
+             &t_message, &m_tAttitudeTarget.value());
+         break;
+      case MAVLINK_MSG_ID_DISTANCE_SENSOR:
+         m_tDistanceSensorData.emplace();
+         ::mavlink_msg_distance_sensor_decode(
+             &t_message, &m_tDistanceSensorData.value());
+         break;
       default:
-         // LOG << "[INFO] Unknown message of type " << t_message.msgid << " received";		
+         // LOG << "[INFO] Unknown message of type " << t_message.msgid << " received";
          break;
       }
    }
@@ -198,6 +232,5 @@ namespace argos {
 
    /****************************************/
    /****************************************/
-   
+
 }
-   

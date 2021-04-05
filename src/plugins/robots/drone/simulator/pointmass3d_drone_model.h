@@ -16,6 +16,8 @@ namespace argos {
 
 #include <argos3/plugins/simulator/physics_engines/pointmass3d/pointmass3d_model.h>
 
+#include <argos3/core/utility/math/rng.h>
+
 namespace argos {
 
    class CPointMass3DDroneModel : public CPointMass3DModel {
@@ -48,7 +50,9 @@ namespace argos {
       virtual void UpdateOriginAnchor(SAnchor& s_anchor);
 
    private:
-
+   
+      /* Random number generator */
+      CRandom::CRNG* m_pcRNG;
       /* pid controller */
       static Real CalculatePIDResponse(Real  f_cur_error,
                                        Real  f_vel_error,
@@ -57,8 +61,6 @@ namespace argos {
                                        Real  f_k_i,
                                        Real  f_k_d);
 
-      
-      
       /* reference to the flight system entity */ 
       CDroneFlightSystemEntity& m_cFlightSystemEntity;
       /* position and yaw input from the controller */ 
@@ -81,11 +83,16 @@ namespace argos {
       CVector3 m_cAccelerationPrev;
       /* angular acceleration of the drone */
       CVector3 m_cAngularAccelerationPrev;
-      /* TODO: improve naming of the following variables */
+      /* variables for PID controller */
       CVector3 m_cOrientationTargetPrev;
       CVector3 m_cAngularVelocityCumulativeError;
       Real m_fAltitudeCumulativeError;
       Real m_fTargetPositionZPrev;
+      /* sensor noise parameters */
+      Real m_fGyroBias;
+      Real m_fAccelBias;
+      Real m_fAngleRandomWalk;
+      Real m_fVelocityRandomWalk;
 
       const static Real ROOT_TWO;
       /* height of the drone's body */ 
@@ -125,6 +132,24 @@ namespace argos {
       const static Real YAW_KP; 
       const static Real YAW_KI; 
       const static Real YAW_KD; 
+      /* sensors noise constants*/
+      const static Real MEMS_GYRO_NOISE_MEAN;
+      const static Real MEMS_GYRO_BIAS_MEAN;
+      const static Real MEMS_GYRO_BIAS_STD_DEV;
+      const static Real MEMS_GYRO_NOISE_STD_DEV_X;
+      const static Real MEMS_GYRO_NOISE_STD_DEV_Y;
+      const static Real MEMS_GYRO_NOISE_STD_DEV_Z;
+      const static Real MEMS_GYRO_RANDOM_WALK_INIT;
+      const static Real MEMS_GYRO_BIAS_INIT;
+      const static Real MEMS_ACCEL_NOISE_MEAN;
+      const static Real MEMS_ACCEL_BIAS_MEAN;
+      const static Real MEMS_ACCEL_BIAS_STD_DEV;
+      const static Real MEMS_ACCEL_NOISE_STD_DEV_X;
+      const static Real MEMS_ACCEL_NOISE_STD_DEV_Y;
+      const static Real MEMS_ACCEL_NOISE_STD_DEV_Z;
+      const static Real MEMS_ACCEL_RANDOM_WALK_INIT;
+      const static Real MEMS_ACCEL_BIAS_INIT;
+   
    };
 
 }

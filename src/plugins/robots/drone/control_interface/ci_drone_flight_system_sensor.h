@@ -2,6 +2,7 @@
  * @file <argos3/plugins/robots/drone/control_interface/ci_drone_flight_system_sensor.h>
  *
  * @author Michael Allwright - <allsey87@gmail.com>
+ * @author Sinan Oguz - <soguz.ankara@gmail.com>
  */
 
 #ifndef CCI_DRONE_FLIGHT_SYSTEM_SENSOR_H
@@ -23,6 +24,10 @@ namespace argos {
 
       CCI_DroneFlightSystemSensor() :
          m_cPosition(CVector3::ZERO),
+         m_cTargetPosition(CVector3::ZERO),
+         m_cTargetOrientation(CVector3::ZERO),
+         m_fHeight(0.0),
+         m_fBatteryRemaining(0.0),
          m_cOrientation(CVector3::ZERO),
          m_cVelocity(CVector3::ZERO),
          m_cAngularVelocity(CVector3::ZERO) {}
@@ -31,6 +36,10 @@ namespace argos {
       
       virtual void Reset() {
          m_cPosition = CVector3::ZERO;
+         m_cTargetPosition = CVector3::ZERO;
+         m_cTargetOrientation = CVector3::ZERO;
+         m_fHeight = 0.0;
+         m_fBatteryRemaining = 0.0;
          m_cOrientation = CVector3::ZERO;
          m_cVelocity = CVector3::ZERO;
          m_cAngularVelocity = CVector3::ZERO;
@@ -40,8 +49,20 @@ namespace argos {
          return m_cPosition;
       }
 
+      const CVector3& GetTargetPosition() const {
+         return m_cTargetPosition;
+      }
+
+      const Real& GetHeight() const {
+         return m_fHeight;
+      }
+
       const CVector3& GetOrientation() const {
          return m_cOrientation;
+      }
+
+      const CVector3& GetTargetOrientation() const {
+         return m_cTargetOrientation;
       }
 
       const CVector3& GetVelocity() const {
@@ -52,6 +73,10 @@ namespace argos {
          return m_cAngularVelocity;
       }
 
+      const Real& GetBatteryRemaining() const {
+         return m_fBatteryRemaining;
+      }
+
 #ifdef ARGOS_WITH_LUA
       virtual void CreateLuaState(lua_State* pt_lua_state);
 
@@ -60,7 +85,9 @@ namespace argos {
 
    protected:
       CVector3 m_cPosition;
+      CVector3 m_cTargetPosition;
       CVector3 m_cOrientation;
+      CVector3 m_cTargetOrientation;
       CVector3 m_cVelocity;
       CVector3 m_cAngularVelocity; 
       CVector3 m_cAccelerometer;
@@ -68,7 +95,8 @@ namespace argos {
       CVector3 m_cGyroscope;
       Real m_fTemperature;
       Real m_fBatteryVoltage;
-
+      Real m_fBatteryRemaining;
+      Real m_fHeight;
    };
 }
 

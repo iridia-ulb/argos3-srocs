@@ -6,11 +6,13 @@
  */
 
 #include "pointmass3d_drone_model.h"
+
 #include <argos3/core/utility/logging/argos_log.h>
 #include <argos3/core/utility/math/cylinder.h>
 #include <argos3/core/utility/math/range.h>
 #include <argos3/core/simulator/simulator.h>
 #include <argos3/core/simulator/space/space.h>
+
 #include <argos3/plugins/simulator/physics_engines/pointmass3d/pointmass3d_engine.h>
 #include <argos3/plugins/robots/drone/simulator/drone_flight_system_entity.h>
 #include <argos3/plugins/robots/drone/simulator/drone_entity.h>
@@ -58,11 +60,17 @@ namespace argos
       m_cAccelerationPrev.Set(0.0, 0.0, 0.0);
       /* reset the drone's previous angular acceleration */
       m_cAngularAccelerationPrev.Set(0.0, 0.0, 0.0);
-      /* TODO verify if the following variables are necessary */
+      /* reset the variables for PID controller  */
       m_cOrientationTargetPrev.Set(0.0, 0.0, 0.0);
       m_cAngularVelocityCumulativeError.Set(0.0, 0.0, 0.0);
       m_fAltitudeCumulativeError = 0.0;
       m_fTargetPositionZPrev = 0.0;
+      /* reset the gyro bias */   
+      m_fGyroBias = MEMS_GYRO_BIAS_INIT;
+      m_fAccelBias = MEMS_ACCEL_BIAS_INIT;   
+      m_fAngleRandomWalk = MEMS_GYRO_RANDOM_WALK_INIT;
+      m_fVelocityRandomWalk = MEMS_ACCEL_RANDOM_WALK_INIT;
+      m_pcRNG = CRandom::CreateRNG("argos");
       /* update the axis-aligned bounding box, anchors, and entities */
       UpdateEntityStatus();
    }
@@ -242,24 +250,43 @@ namespace argos
          (JR * m_cAngularVelocity.GetX() * fOmegaR / INERTIA.GetY()) +
          (m_cAngularVelocity.GetZ() * m_cAngularVelocity.GetX() * (INERTIA.GetZ() - INERTIA.GetX()) / INERTIA.GetY()),
          (fTorqueZ / INERTIA.GetZ()) +
-         (m_cAngularVelocity.GetY() * m_cAngularVelocity.GetX() * (INERTIA.GetX() - INERTIA.GetY()) / INERTIA.GetZ()),
+         (m_cAngularVelocity.GetY() * m_cAngularVelocity.GetX() * (INERTIA.GetX() - INERTIA.GetY()) / INERTIA.GetZ())
       };
-      /* update the velocity using trapezoid integration */
-      cAcceleration = 0.5 * (m_cAccelerationPrev + cAcceleration);
-      m_cVelocity += cAcceleration * GetPM3DEngine().GetPhysicsClockTick();
-      m_cAccelerationPrev = cAcceleration;
+      /* gyroscope sensor readings */
+      cAngularAcceleration.Set(
+         cAngularAcceleration.GetX() + m_pcRNG->Gaussian(MEMS_GYRO_NOISE_STD_DEV_X, MEMS_GYRO_NOISE_MEAN) + m_fGyroBias,
+         cAngularAcceleration.GetY() + m_pcRNG->Gaussian(MEMS_GYRO_NOISE_STD_DEV_Y, MEMS_GYRO_NOISE_MEAN) + m_fGyroBias,
+         cAngularAcceleration.GetZ() + m_pcRNG->Gaussian(MEMS_GYRO_NOISE_STD_DEV_Z, MEMS_GYRO_NOISE_MEAN) + m_fGyroBias
+      );
+      m_fGyroBias = m_fGyroBias + m_fAngleRandomWalk *  m_pcRNG->Gaussian(MEMS_GYRO_BIAS_STD_DEV, MEMS_GYRO_BIAS_MEAN);
+      /* update the gyro bias angular random walk */
+      m_fAngleRandomWalk =  m_fAngleRandomWalk * std::sqrt(GetPM3DEngine().GetPhysicsClockTick());
       /* update the angular velocity using trapezoid integration */
       cAngularAcceleration = 0.5 * (m_cAngularAccelerationPrev + cAngularAcceleration);
       m_cAngularVelocity += cAngularAcceleration * GetPM3DEngine().GetPhysicsClockTick();
       m_cAngularAccelerationPrev = cAngularAcceleration;
-      /* update the position using trapezoid integration */
-      m_cVelocity = 0.5 * (m_cVelocityPrev + m_cVelocity);
-      m_cPosition += m_cVelocity * GetPM3DEngine().GetPhysicsClockTick();
-      m_cVelocityPrev = m_cVelocity;
       /* update the orientation using trapezoid integration */
       m_cAngularVelocity = 0.5 * (m_cAngularVelocityPrev + m_cAngularVelocity);
       m_cOrientation += m_cAngularVelocity * GetPM3DEngine().GetPhysicsClockTick();
       m_cAngularVelocityPrev = m_cAngularVelocity;
+      /* accelerometer sensor readings */
+      cAcceleration.Set(
+         cAcceleration.GetX() + m_pcRNG->Gaussian(MEMS_ACCEL_NOISE_STD_DEV_X, MEMS_ACCEL_NOISE_MEAN) + m_fAccelBias,
+         cAcceleration.GetY() + m_pcRNG->Gaussian(MEMS_ACCEL_NOISE_STD_DEV_Y, MEMS_ACCEL_NOISE_MEAN) + m_fAccelBias,
+         cAcceleration.GetZ() + m_pcRNG->Gaussian(MEMS_ACCEL_NOISE_STD_DEV_Z, MEMS_ACCEL_NOISE_MEAN) + m_fAccelBias
+      );
+      m_fAccelBias = m_fAccelBias + m_fVelocityRandomWalk *  m_pcRNG->Gaussian(MEMS_ACCEL_BIAS_STD_DEV, MEMS_ACCEL_BIAS_MEAN);
+      /* update the accel bias velocity random walk */
+      m_fVelocityRandomWalk =  m_fVelocityRandomWalk * std::sqrt(GetPM3DEngine().GetPhysicsClockTick());
+      /* update the velocity using trapezoid integration */
+      cAcceleration = 0.5 * (m_cAccelerationPrev + cAcceleration);
+      m_cVelocity += cAcceleration * GetPM3DEngine().GetPhysicsClockTick();
+      m_cAccelerationPrev = cAcceleration;
+      /* update the position using trapezoid integration */
+      m_cVelocity = 0.5 * (m_cVelocityPrev + m_cVelocity);
+      m_cPosition += m_cVelocity * GetPM3DEngine().GetPhysicsClockTick();
+      m_cVelocityPrev = m_cVelocity;
+      /* TODO: position and attitude estimation and accel/gyro sensor fusion */
    }
 
    /****************************************/
@@ -353,20 +380,38 @@ namespace argos
    const CRange<Real> CPointMass3DDroneModel::THRUST_LIMIT = CRange<Real>(-15, 15);
    const CRange<Real> CPointMass3DDroneModel::ROLL_PITCH_LIMIT = CRange<Real>(-0.5, 0.5);
    const Real CPointMass3DDroneModel::XY_VEL_MAX = 1;
-   const Real CPointMass3DDroneModel::Z_VEL_MAX = 1;
+   const Real CPointMass3DDroneModel::Z_VEL_MAX = 0.05;
    /* PID coefficients */
    const Real CPointMass3DDroneModel::XY_POS_KP = 1;
    const Real CPointMass3DDroneModel::XY_VEL_KP = 3;
    const Real CPointMass3DDroneModel::YAW_KP = 13;
    const Real CPointMass3DDroneModel::YAW_KI = 0;
    const Real CPointMass3DDroneModel::YAW_KD = 8;
-   const Real CPointMass3DDroneModel::ALTITUDE_KP = 10;
+   const Real CPointMass3DDroneModel::ALTITUDE_KP = 5;
    const Real CPointMass3DDroneModel::ALTITUDE_KI = 0;
    const Real CPointMass3DDroneModel::ALTITUDE_KD = 6;   
    const Real CPointMass3DDroneModel::ROLL_PITCH_KP = 12;
    const Real CPointMass3DDroneModel::ROLL_PITCH_KI = 0;
    const Real CPointMass3DDroneModel::ROLL_PITCH_KD = 6;
    const Real CPointMass3DDroneModel::ROOT_TWO = std::sqrt(2.0);
+   /* sensor noise coefficents*/
+   const Real CPointMass3DDroneModel::MEMS_GYRO_BIAS_STD_DEV = 1;
+   const Real CPointMass3DDroneModel::MEMS_GYRO_BIAS_MEAN = 0;
+   const Real CPointMass3DDroneModel::MEMS_GYRO_BIAS_INIT = 0.01;
+   const Real CPointMass3DDroneModel::MEMS_GYRO_RANDOM_WALK_INIT = 0.001;
+   const Real CPointMass3DDroneModel::MEMS_GYRO_NOISE_MEAN = 0;
+   const Real CPointMass3DDroneModel::MEMS_GYRO_NOISE_STD_DEV_X = 0.67;
+   const Real CPointMass3DDroneModel::MEMS_GYRO_NOISE_STD_DEV_Y = 0.78;
+   const Real CPointMass3DDroneModel::MEMS_GYRO_NOISE_STD_DEV_Z = 0.12;
+   const Real CPointMass3DDroneModel::MEMS_ACCEL_BIAS_STD_DEV = 1;
+   const Real CPointMass3DDroneModel::MEMS_ACCEL_BIAS_MEAN = 0;
+   const Real CPointMass3DDroneModel::MEMS_ACCEL_BIAS_INIT = 0.03;
+   const Real CPointMass3DDroneModel::MEMS_ACCEL_RANDOM_WALK_INIT = 0.003;
+   const Real CPointMass3DDroneModel::MEMS_ACCEL_NOISE_MEAN = 0;
+   const Real CPointMass3DDroneModel::MEMS_ACCEL_NOISE_STD_DEV_X =  0.1;
+   const Real CPointMass3DDroneModel::MEMS_ACCEL_NOISE_STD_DEV_Y = 0.1;
+   const Real CPointMass3DDroneModel::MEMS_ACCEL_NOISE_STD_DEV_Z = 0.12;
+
 
    /****************************************/
    /****************************************/
