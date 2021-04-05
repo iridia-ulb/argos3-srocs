@@ -51,7 +51,7 @@ namespace argos {
 
    private:
    
-      /** Random number generator */
+      /* Random number generator */
       CRandom::CRNG* m_pcRNG;
       /* pid controller */
       static Real CalculatePIDResponse(Real  f_cur_error,
