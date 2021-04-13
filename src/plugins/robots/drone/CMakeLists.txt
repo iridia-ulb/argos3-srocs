@@ -19,11 +19,11 @@ if(ARGOS_BUILD_FOR_SIMULATOR)
 #    simulator/drone_rangefinders_default_sensor.h
     simulator/drone_system_default_sensor.h
     simulator/pointmass3d_drone_model.h)
-  if(ARGOS_COMPILE_QTOPENGL)
+  if(ARGOS_QTOPENGL_FOUND)
     set(ARGOS3_HEADERS_PLUGINS_ROBOTS_DRONE_SIMULATOR
       ${ARGOS3_HEADERS_PLUGINS_ROBOTS_DRONE_SIMULATOR}
       simulator/qtopengl_drone.h)
-  endif(ARGOS_COMPILE_QTOPENGL)
+  endif(ARGOS_QTOPENGL_FOUND)
 elseif(ARGOS_BUILD_FOR STREQUAL "drone")
   # argos3/plugins/robots/drone/hardware
   set(ARGOS3_HEADERS_PLUGINS_ROBOTS_DRONE_HARDWARE
@@ -59,11 +59,11 @@ if(ARGOS_BUILD_FOR_SIMULATOR)
 #    simulator/drone_rangefinders_default_sensor.cpp
     simulator/drone_system_default_sensor.cpp
     simulator/pointmass3d_drone_model.cpp)
-  if(ARGOS_COMPILE_QTOPENGL)
+  if(ARGOS_QTOPENGL_FOUND)
     set(ARGOS3_SOURCES_PLUGINS_ROBOTS_DRONE
       ${ARGOS3_SOURCES_PLUGINS_ROBOTS_DRONE}
       simulator/qtopengl_drone.cpp)
-  endif(ARGOS_COMPILE_QTOPENGL)
+  endif(ARGOS_QTOPENGL_FOUND)
 elseif(ARGOS_BUILD_FOR STREQUAL "drone")
   # argos3/plugins/robots/drone/hardware
   set(ARGOS3_SOURCES_PLUGINS_ROBOTS_DRONE
@@ -80,16 +80,18 @@ endif(ARGOS_BUILD_FOR_SIMULATOR)
 
 if(ARGOS_BUILD_FOR_SIMULATOR)
   # Create a plug-in for the simulator
-  add_library(argos3srocs_${ARGOS_BUILD_FOR}_drone SHARED ${ARGOS3_SOURCES_PLUGINS_ROBOTS_DRONE})
-  target_link_libraries(argos3srocs_${ARGOS_BUILD_FOR}_drone
-    argos3srocs_${ARGOS_BUILD_FOR}_entities
-    ${ARGOS_CORE_LIBRARY}
-    ${ARGOS_POINTMASS3D_LIBRARY}
-    ${ARGOS_ENTITIES_LIBRARY})
-  if(ARGOS_COMPILE_QTOPENGL)
-    target_link_libraries(argos3srocs_${ARGOS_BUILD_FOR}_drone ${ARGOS_QTOPENGL_LIBRARY})
-  endif(ARGOS_COMPILE_QTOPENGL)
-  install(TARGETS argos3srocs_${ARGOS_BUILD_FOR}_drone
+  add_library(argos3plugin_${ARGOS_BUILD_FOR}_drone SHARED ${ARGOS3_SOURCES_PLUGINS_ROBOTS_DRONE})
+  target_link_libraries(argos3plugin_${ARGOS_BUILD_FOR}_drone
+    argos3core_${ARGOS_BUILD_FOR}
+    argos3plugin_${ARGOS_BUILD_FOR}_pointmass3d
+    argos3plugin_${ARGOS_BUILD_FOR}_genericrobot
+    argos3plugin_${ARGOS_BUILD_FOR}_entities
+    argos3plugin_${ARGOS_BUILD_FOR}_srocs_genericrobot
+    argos3plugin_${ARGOS_BUILD_FOR}_srocs_entities)
+  if(ARGOS_QTOPENGL_FOUND)
+    target_link_libraries(argos3plugin_${ARGOS_BUILD_FOR}_drone argos3plugin_${ARGOS_BUILD_FOR}_qtopengl)
+  endif(ARGOS_QTOPENGL_FOUND)
+  install(TARGETS argos3plugin_${ARGOS_BUILD_FOR}_drone
     RUNTIME DESTINATION bin
     LIBRARY DESTINATION lib/argos3
     ARCHIVE DESTINATION lib/argos3)
@@ -97,11 +99,10 @@ elseif(ARGOS_BUILD_FOR STREQUAL "drone")
   # Create an executable for the robot
   add_executable(argos3 ${ARGOS3_SOURCES_PLUGINS_ROBOTS_DRONE})
   target_link_libraries(argos3 tbb
-    argos3srocs_${ARGOS_BUILD_FOR}_genericrobot
-    ${ARGOS_CORE_LIBRARY}
-    ${LUA_LIBRARIES}
-    ${PTHREADS_LIBRARY}
-    ${IIO_LIBRARY}    
+    argos3core_${ARGOS_BUILD_FOR}
+    argos3plugin_${ARGOS_BUILD_FOR}_genericrobot
+    argos3plugin_${ARGOS_BUILD_FOR}_srocs_genericrobot
+    ${IIO_LIBRARY}
     ${APRILTAG_LIBRARY}
     ${TURBOJPEG_LIBRARY})
   install(TARGETS argos3
@@ -114,9 +115,9 @@ install(FILES ${ARGOS3_HEADERS_PLUGINS_ROBOTS_DRONE_CONTROLINTERFACE} DESTINATIO
 
 if(ARGOS_BUILD_FOR_SIMULATOR)
   install(FILES ${ARGOS3_HEADERS_PLUGINS_ROBOTS_DRONE_SIMULATOR} DESTINATION include/argos3/plugins/robots/drone/simulator)
-  if(ARGOS_COMPILE_QTOPENGL)
+  if(ARGOS_QTOPENGL_FOUND)
     install(DIRECTORY simulator/models DESTINATION include/argos3/plugins/simulator/visualizations/qt-opengl)
-  endif(ARGOS_COMPILE_QTOPENGL)
+  endif(ARGOS_QTOPENGL_FOUND)
 elseif(ARGOS_BUILD_FOR STREQUAL "drone")
   install(FILES ${ARGOS3_HEADERS_PLUGINS_ROBOTS_DRONE_HARDWARE} DESTINATION include/argos3/plugins/robots/drone/hardware)
 endif(ARGOS_BUILD_FOR_SIMULATOR)

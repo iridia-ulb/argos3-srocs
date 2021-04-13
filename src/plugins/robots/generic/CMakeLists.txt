@@ -48,13 +48,13 @@ endif(ARGOS_BUILD_FOR_SIMULATOR)
 #
 # Create generic robot plugin
 #
-add_library(argos3srocs_${ARGOS_BUILD_FOR}_genericrobot SHARED ${ARGOS3_SOURCES_PLUGINS_ROBOTS_GENERIC})
-target_link_libraries(argos3srocs_${ARGOS_BUILD_FOR}_genericrobot
-   ${ARGOS_CORE_LIBRARY})
+add_library(argos3plugin_${ARGOS_BUILD_FOR}_srocs_genericrobot SHARED ${ARGOS3_SOURCES_PLUGINS_ROBOTS_GENERIC})
+target_link_libraries(argos3plugin_${ARGOS_BUILD_FOR}_srocs_genericrobot
+   argos3core_${ARGOS_BUILD_FOR})
 if(ARGOS_BUILD_FOR_SIMULATOR)
-  target_link_libraries(argos3srocs_${ARGOS_BUILD_FOR}_genericrobot
-   ${ARGOS_ENTITIES_LIBRARY}
-   argos3srocs_${ARGOS_BUILD_FOR}_entities)
+  target_link_libraries(argos3plugin_${ARGOS_BUILD_FOR}_srocs_genericrobot
+   argos3plugin_${ARGOS_BUILD_FOR}_entities
+   argos3plugin_${ARGOS_BUILD_FOR}_srocs_entities)
 endif(ARGOS_BUILD_FOR_SIMULATOR)
 
 #
@@ -66,7 +66,8 @@ if(ARGOS_BUILD_FOR_SIMULATOR)
 else(ARGOS_BUILD_FOR_SIMULATOR)
   install(FILES ${ARGOS3_HEADERS_PLUGINS_ROBOTS_GENERIC_HARDWARE}      DESTINATION include/argos3/plugins/robots/generic/hardware)
 endif(ARGOS_BUILD_FOR_SIMULATOR)
-install(TARGETS argos3srocs_${ARGOS_BUILD_FOR}_genericrobot
+install(TARGETS argos3plugin_${ARGOS_BUILD_FOR}_srocs_genericrobot
   RUNTIME DESTINATION bin
   LIBRARY DESTINATION lib/argos3
   ARCHIVE DESTINATION lib/argos3)
+

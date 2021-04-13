@@ -1,16 +1,16 @@
 if(ARGOS_BUILD_FOR_SIMULATOR)
   # build the qtopengl user functions
-  if(ARGOS_COMPILE_QTOPENGL)
+  if(ARGOS_QTOPENGL_FOUND)
     add_library(builderbot_qtopengl_user_functions MODULE
       simulator/qt-opengl/builderbot_qtopengl_user_functions.h
       simulator/qt-opengl/builderbot_qtopengl_user_functions_widget.h
       simulator/qt-opengl/builderbot_qtopengl_user_functions.cpp
       simulator/qt-opengl/builderbot_qtopengl_user_functions_widget.cpp)
     target_link_libraries(builderbot_qtopengl_user_functions
-      argos3srocs_${ARGOS_BUILD_FOR}_entities
-      argos3srocs_${ARGOS_BUILD_FOR}_builderbot
-      ${ARGOS_QTOPENGL_LIBRARY})
-  endif(ARGOS_COMPILE_QTOPENGL)
+      argos3plugin_${ARGOS_BUILD_FOR}_srocs_entities
+      argos3plugin_${ARGOS_BUILD_FOR}_builderbot
+      argos3plugin_${ARGOS_BUILD_FOR}_qtopengl)
+  endif(ARGOS_QTOPENGL_FOUND)
   # configure and install the builderbot simulation tests
   configure_file(
     ${CMAKE_SOURCE_DIR}/testing/builderbot/simulator/test_builderbot.argos.in
@@ -42,7 +42,5 @@ if(ARGOS_BUILD_FOR_SIMULATOR)
     ${CMAKE_SOURCE_DIR}/testing/builderbot/simulator/example_block.lua
     ${CMAKE_BINARY_DIR}/testing/builderbot/example_block.lua
     COPYONLY)
-elseif(ARGOS_BUILD_FOR STREQUAL "builderbot")
-   set(ARGOS_TEST_DIR $ENV{HOME}/testing)
-   message("No tests added for the builderbot configuration")
 endif(ARGOS_BUILD_FOR_SIMULATOR)
+

@@ -26,11 +26,11 @@ if(ARGOS_BUILD_FOR_SIMULATOR)
     simulator/pipuck_leds_default_actuator.h
     simulator/pipuck_system_default_sensor.h
     simulator/pipuck_rangefinders_default_sensor.h)
-  if(ARGOS_COMPILE_QTOPENGL)
+  if(ARGOS_QTOPENGL_FOUND)
     set(ARGOS3_HEADERS_PLUGINS_ROBOTS_PIPUCK_SIMULATOR
       ${ARGOS3_HEADERS_PLUGINS_ROBOTS_PIPUCK_SIMULATOR}
       simulator/qtopengl_pipuck.h)
-  endif(ARGOS_COMPILE_QTOPENGL)
+  endif(ARGOS_QTOPENGL_FOUND)
 elseif(ARGOS_BUILD_FOR STREQUAL "pipuck")
   # argos3/plugins/robots/pi-puck/hardware
   set(ARGOS3_HEADERS_PLUGINS_ROBOTS_PIPUCK_HARDWARE
@@ -75,11 +75,11 @@ if(ARGOS_BUILD_FOR_SIMULATOR)
     simulator/pipuck_leds_default_actuator.cpp
     simulator/pipuck_system_default_sensor.cpp
     simulator/pipuck_rangefinders_default_sensor.cpp)
-  if(ARGOS_COMPILE_QTOPENGL)
+  if(ARGOS_QTOPENGL_FOUND)
     set(ARGOS3_SOURCES_PLUGINS_ROBOTS_PIPUCK
       ${ARGOS3_SOURCES_PLUGINS_ROBOTS_PIPUCK}
       simulator/qtopengl_pipuck.cpp)
-  endif(ARGOS_COMPILE_QTOPENGL)
+  endif(ARGOS_QTOPENGL_FOUND)
 elseif(ARGOS_BUILD_FOR STREQUAL "pipuck")
   # argos3/plugins/robots/pi-puck/hardware
   set(ARGOS3_SOURCES_PLUGINS_ROBOTS_PIPUCK
@@ -98,21 +98,23 @@ endif(ARGOS_BUILD_FOR_SIMULATOR)
 
 if(ARGOS_BUILD_FOR_SIMULATOR)
   # Create a plug-in for the simulator
-  add_library(argos3srocs_${ARGOS_BUILD_FOR}_pipuck SHARED ${ARGOS3_SOURCES_PLUGINS_ROBOTS_PIPUCK})
+  add_library(argos3plugin_${ARGOS_BUILD_FOR}_pipuck SHARED ${ARGOS3_SOURCES_PLUGINS_ROBOTS_PIPUCK})
   # Use double precision in Bullet, if ARGoS is using double precision
   if(ARGOS_USE_DOUBLE)
-    target_compile_definitions(argos3srocs_${ARGOS_BUILD_FOR}_pipuck PUBLIC BT_USE_DOUBLE_PRECISION)
+    target_compile_definitions(argos3plugin_${ARGOS_BUILD_FOR}_pipuck PUBLIC BT_USE_DOUBLE_PRECISION)
   endif(ARGOS_USE_DOUBLE)
-  target_link_libraries(argos3srocs_${ARGOS_BUILD_FOR}_pipuck
-    argos3srocs_${ARGOS_BUILD_FOR}_entities
-    ${ARGOS_CORE_LIBRARY}
-    ${ARGOS_DYNAMICS3D_LIBRARY}
-    ${ARGOS_DYNAMICS2D_LIBRARY}
-    ${ARGOS_ENTITIES_LIBRARY})
-  if(ARGOS_COMPILE_QTOPENGL)
-    target_link_libraries(argos3srocs_${ARGOS_BUILD_FOR}_pipuck ${ARGOS_QTOPENGL_LIBRARY})
-  endif(ARGOS_COMPILE_QTOPENGL)
-  install(TARGETS argos3srocs_${ARGOS_BUILD_FOR}_pipuck
+  target_link_libraries(argos3plugin_${ARGOS_BUILD_FOR}_pipuck
+    argos3core_${ARGOS_BUILD_FOR}   
+    argos3plugin_${ARGOS_BUILD_FOR}_dynamics3d
+    argos3plugin_${ARGOS_BUILD_FOR}_dynamics2d
+    argos3plugin_${ARGOS_BUILD_FOR}_genericrobot
+    argos3plugin_${ARGOS_BUILD_FOR}_entities
+    argos3plugin_${ARGOS_BUILD_FOR}_srocs_genericrobot
+    argos3plugin_${ARGOS_BUILD_FOR}_srocs_entities)
+  if(ARGOS_QTOPENGL_FOUND)
+    target_link_libraries(argos3plugin_${ARGOS_BUILD_FOR}_pipuck argos3plugin_${ARGOS_BUILD_FOR}_qtopengl)
+  endif(ARGOS_QTOPENGL_FOUND)
+  install(TARGETS argos3plugin_${ARGOS_BUILD_FOR}_pipuck
     RUNTIME DESTINATION bin
     LIBRARY DESTINATION lib/argos3
     ARCHIVE DESTINATION lib/argos3)
@@ -120,9 +122,9 @@ elseif(ARGOS_BUILD_FOR STREQUAL "pipuck")
   # Create an executable for the robot
   add_executable(argos3 ${ARGOS3_SOURCES_PLUGINS_ROBOTS_PIPUCK})
   target_link_libraries(argos3 stdc++fs
-    ${ARGOS_CORE_LIBRARY}
-    ${LUA_LIBRARIES}
-    ${PTHREADS_LIBRARY}
+    argos3core_${ARGOS_BUILD_FOR}
+    argos3plugin_${ARGOS_BUILD_FOR}_genericrobot
+    argos3plugin_${ARGOS_BUILD_FOR}_srocs_genericrobot
     ${APRILTAG_LIBRARY}
     ${IIO_LIBRARY}
     ${MEDIACTL_LIBRARY}
@@ -137,9 +139,9 @@ install(FILES ${ARGOS3_HEADERS_PLUGINS_ROBOTS_PIPUCK_CONTROLINTERFACE} DESTINATI
 
 if(ARGOS_BUILD_FOR_SIMULATOR)
   install(FILES ${ARGOS3_HEADERS_PLUGINS_ROBOTS_PIPUCK_SIMULATOR} DESTINATION include/argos3/plugins/robots/pi-puck/simulator)
-  if(ARGOS_COMPILE_QTOPENGL)
+  if(ARGOS_QTOPENGL_FOUND)
     install(DIRECTORY simulator/models DESTINATION include/argos3/plugins/simulator/visualizations/qt-opengl)
-  endif(ARGOS_COMPILE_QTOPENGL)
+  endif(ARGOS_QTOPENGL_FOUND)
 elseif(ARGOS_BUILD_FOR STREQUAL "pipuck")
   install(FILES ${ARGOS3_HEADERS_PLUGINS_ROBOTS_PIPUCK_HARDWARE} DESTINATION include/argos3/plugins/robots/pi-puck/hardware)
 endif(ARGOS_BUILD_FOR_SIMULATOR)

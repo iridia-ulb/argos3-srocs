@@ -1,54 +1,26 @@
-# find the include directory
-find_path (ARGOS_INCLUDE_DIR argos3/core/config.h)
-
-if(NOT ARGOS_INCLUDE_DIR)
-   message(FATAL_ERROR "Can not locate the header file: argos3/core/config.h")
-endif(NOT ARGOS_INCLUDE_DIR)
-
-# read the config.h file to get the installations configuration
-file(READ ${ARGOS_INCLUDE_DIR}/argos3/core/config.h ARGOS_CONFIGURATION)
-
-# parse the build_for variable
-string(REGEX MATCH "\#define ARGOS_BUILD_FOR \"([^\"]*)\"" UNUSED_VARIABLE ${ARGOS_CONFIGURATION})
-set(ARGOS_BUILD_FOR ${CMAKE_MATCH_1})
+#
+# What is ARGoS being built for?
+# Accepted values: "simulator" or a robot name (lowercase)
+#
+if(NOT DEFINED ARGOS_BUILD_FOR)
+  # Variable was not set, set to default value
+  set(ARGOS_BUILD_FOR "simulator" CACHE STRING "What is ARGoS being built for? \"simulator\" or a robot name (lowercase)")
+else(NOT DEFINED ARGOS_BUILD_FOR)
+  # Variable was set, make it public
+  set(ARGOS_BUILD_FOR ${ARGOS_BUILD_FOR} CACHE STRING "What is ARGoS being built for? \"simulator\" or a robot name (lowercase)")
+endif(NOT DEFINED ARGOS_BUILD_FOR)
+# Set a macro according to value set in ARGOS_BUILD_FOR
+add_definitions(-DARGOS_${ARGOS_BUILD_FOR}_BUILD)
+# Create a convenience variable for checks in the CMake files
 if(ARGOS_BUILD_FOR STREQUAL "simulator")
   set(ARGOS_BUILD_FOR_SIMULATOR TRUE)
 else(ARGOS_BUILD_FOR STREQUAL "simulator")
   set(ARGOS_BUILD_FOR_SIMULATOR FALSE)
 endif(ARGOS_BUILD_FOR STREQUAL "simulator")
 
-# check and set ARGOS_USE_DOUBLE
-if(${ARGOS_CONFIGURATION} MATCHES "\#define ARGOS_USE_DOUBLE")
-  set(ARGOS_USE_DOUBLE ON)
-else(${ARGOS_CONFIGURATION} MATCHES "\#define ARGOS_USE_DOUBLE")
-  set(ARGOS_USE_DOUBLE OFF)
-endif(${ARGOS_CONFIGURATION} MATCHES "\#define ARGOS_USE_DOUBLE")
-
-# check and set ARGOS_WITH_LUA
-if(${ARGOS_CONFIGURATION} MATCHES "\#define ARGOS_WITH_LUA")
-  set(ARGOS_WITH_LUA ON)
-else(${ARGOS_CONFIGURATION} MATCHES "\#define ARGOS_WITH_LUA")
-  set(ARGOS_WITH_LUA OFF)
-endif(${ARGOS_CONFIGURATION} MATCHES "\#define ARGOS_WITH_LUA")
-
-# check and set ARGOS_COMPILE_QTOPENGL
-if(${ARGOS_CONFIGURATION} MATCHES "\#define ARGOS_COMPILE_QTOPENGL")
-  set(ARGOS_COMPILE_QTOPENGL ON)
-else(${ARGOS_CONFIGURATION} MATCHES "\#define ARGOS_COMPILE_QTOPENGL")
-  set(ARGOS_COMPILE_QTOPENGL OFF)
-endif(${ARGOS_CONFIGURATION} MATCHES "\#define ARGOS_COMPILE_QTOPENGL")
-
-# check and set ARGOS_WITH_FREEIMAGE
-if(${ARGOS_CONFIGURATION} MATCHES "\#define ARGOS_WITH_FREEIMAGE")
-  set(ARGOS_WITH_FREEIMAGE ON)
-else(${ARGOS_CONFIGURATION} MATCHES "\#define ARGOS_WITH_FREEIMAGE")
-  set(ARGOS_WITH_FREEIMAGE OFF)
-endif(${ARGOS_CONFIGURATION} MATCHES "\#define ARGOS_WITH_FREEIMAGE")
-
-# check and set ARGOS_THREADSAFE_LOG
-if(${ARGOS_CONFIGURATION} MATCHES "\#define ARGOS_THREADSAFE_LOG")
-  set(ARGOS_THREADSAFE_LOG ON)
-else(${ARGOS_CONFIGURATION} MATCHES "\#define ARGOS_THREADSAFE_LOG")
-  set(ARGOS_THREADSAFE_LOG OFF)
-endif(${ARGOS_CONFIGURATION} MATCHES "\#define ARGOS_THREADSAFE_LOG")
-
+#
+# Optimize code for current platform?
+#
+if(NOT DEFINED ARGOS_BUILD_NATIVE)
+  option(ARGOS_BUILD_NATIVE "ON -> compile with platform-specific optimizations, OFF -> compile to portable binary" OFF)
+endif(NOT DEFINED ARGOS_BUILD_NATIVE)

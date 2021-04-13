@@ -7,13 +7,16 @@ execute_process(
   OUTPUT_VARIABLE ARGOS_PROCESSOR_ARCH)
 
 #
-# Select ISO C++14 if building for simulation, ISO C++17 if building for hardware
+# Set the compilation type
 #
-if(ARGOS_BUILD_FOR_SIMULATOR)
-   set(CMAKE_CXX_STANDARD 14)
-else(ARGOS_BUILD_FOR_SIMULATOR)
-   set(CMAKE_CXX_STANDARD 17)
-endif(ARGOS_BUILD_FOR_SIMULATOR)
+if(CMAKE_BUILD_TYPE STREQUAL "")
+  set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Choose the type of build, options are: None Debug Release RelWithDebInfo MinSizeRel ..." FORCE)
+endif(CMAKE_BUILD_TYPE STREQUAL "")
+
+#
+# Select ISO C++17
+#
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
@@ -24,14 +27,14 @@ set(CMAKE_C_FLAGS                  "${CMAKE_C_FLAGS} -Wall")
 if(ARGOS_BUILD_NATIVE)
   set(CMAKE_C_FLAGS                "${CMAKE_C_FLAGS} -mtune=native -march=native")
 endif(ARGOS_BUILD_NATIVE)
-set(CMAKE_C_FLAGS_RELEASE          "${CMAKE_C_FLAGS_RELEASE} -O2 -DNDEBUG")
+set(CMAKE_C_FLAGS_RELEASE          "${CMAKE_C_FLAGS_RELEASE} -Os -DNDEBUG")
 set(CMAKE_C_FLAGS_DEBUG            "${CMAKE_C_FLAGS_DEBUG} -ggdb3")
 set(CMAKE_C_FLAGS_RELWITHDEBINFO   "${CMAKE_C_FLAGS_RELWITHDEBINFO} ${CMAKE_C_FLAGS_DEBUG} ${CMAKE_C_FLAGS_RELEASE}")
 set(CMAKE_CXX_FLAGS                "${CMAKE_CXX_FLAGS} -Wall")
 if(ARGOS_BUILD_NATIVE)
   set(CMAKE_CXX_FLAGS              "${CMAKE_CXX_FLAGS} -mtune=native -march=native")
 endif(ARGOS_BUILD_NATIVE)
-set(CMAKE_CXX_FLAGS_RELEASE        "${CMAKE_CXX_FLAGS_RELEASE} -O2 -DNDEBUG")
+set(CMAKE_CXX_FLAGS_RELEASE        "${CMAKE_CXX_FLAGS_RELEASE} -Os -DNDEBUG")
 set(CMAKE_CXX_FLAGS_DEBUG          "${CMAKE_CXX_FLAGS_DEBUG} -ggdb3")
 set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} ${CMAKE_CXX_FLAGS_RELEASE} ${CMAKE_CXX_FLAGS_DEBUG}")
 
@@ -60,13 +63,7 @@ if(APPLE)
   set(CMAKE_EXE_LINKER_FLAGS_RELWITHDEBINFO "${CMAKE_EXE_LINKER_FLAGS_RELEASE} ${CMAKE_EXE_LINKER_FLAGS_DEBUG}")
 else(APPLE)
   # Linux
-  #
-  # Align doubles for higher performance
-  # Also: required by the PhysX engine
-  #set(ARGOS_PC_CFLAGS -malign-double)
   add_definitions(${ARGOS_PC_CFLAGS})
-  # Get rid of annoying warnings
-  add_definitions(-Wno-psabi)
   # Avoid discarding unused symbols to allow plugins to work
   set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,--no-as-needed")
   set(ARGOS_SHARED_LIBRARY_EXTENSION "so")
