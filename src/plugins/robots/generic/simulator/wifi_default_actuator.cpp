@@ -56,7 +56,7 @@ namespace argos {
          CTxOperation cTxOperation(*m_pcRadioEntity, m_lstMessages);
          /* Calculate the range of the transmitting radio */
          CVector3 cTxRange(1.0f,1.0f,1.0f);
-         cTxRange *= (m_pcRadioEntity->GetRange() * 0.5f);
+         cTxRange *= m_pcRadioEntity->GetRange();
          /* Get positional index */
          CPositionalIndex<CRadioEntity>* pcRadioIndex =
             &(m_pcRadioEntity->GetMedium().GetIndex());
