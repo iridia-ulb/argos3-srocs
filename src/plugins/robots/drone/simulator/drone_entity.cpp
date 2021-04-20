@@ -24,7 +24,7 @@ namespace argos {
    /****************************************/
    /****************************************/
 
-   static const Real WIFI_TRANSMISSION_RANGE = 10.0f;
+   const Real CDroneEntity::WIFI_TRANSMISSION_RANGE = 10.0;
 
    /****************************************/
    /****************************************/

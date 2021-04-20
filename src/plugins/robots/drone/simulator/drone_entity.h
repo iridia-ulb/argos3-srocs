@@ -89,14 +89,16 @@ namespace argos {
       virtual void UpdateComponents();
 
    private:
-
-      CControllableEntity*                   m_pcControllableEntity;
-      CDebugEntity*                          m_pcDebugEntity;
-      CDirectionalLEDEquippedEntity*         m_pcDirectionalLEDEquippedEntity;
-      CEmbodiedEntity*                       m_pcEmbodiedEntity;
-      CDroneFlightSystemEntity*              m_pcFlightSystemEntity;
-      CRadioEquippedEntity*                  m_pcRadioEquippedEntity;
-
+      /* components */
+      CControllableEntity*           m_pcControllableEntity;
+      CDebugEntity*                  m_pcDebugEntity;
+      CDirectionalLEDEquippedEntity* m_pcDirectionalLEDEquippedEntity;
+      CEmbodiedEntity*               m_pcEmbodiedEntity;
+      CDroneFlightSystemEntity*      m_pcFlightSystemEntity;
+      CRadioEquippedEntity*          m_pcRadioEquippedEntity;
+      /* constants */
+      static const Real WIFI_TRANSMISSION_RANGE;
+      /* debug flag */
       bool m_bDebug;
    };
 
