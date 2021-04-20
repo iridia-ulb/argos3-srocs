@@ -99,6 +99,14 @@ namespace argos {
          return *m_pcTagEquippedEntity;
       }
 
+      inline CRadioEquippedEntity& GetRadioEquippedEntity() {
+         return *m_pcRadioEquippedEntity;
+      }
+
+      inline const CRadioEquippedEntity& GetRadioEquippedEntity() const {
+         return *m_pcRadioEquippedEntity;
+      }
+
       inline bool IsDebug() const {
          return m_bDebug;
       }
@@ -112,7 +120,7 @@ namespace argos {
       CDirectionalLEDEquippedEntity*  m_pcDirectionalLEDEquippedEntity;
       CEmbodiedEntity*                m_pcEmbodiedEntity;
       CPiPuckDifferentialDriveEntity* m_pcDifferentialDriveEntity;
-      CRadioEquippedEntity*           m_pcWifiRadioEquippedEntity;
+      CRadioEquippedEntity*           m_pcRadioEquippedEntity;
       CTagEquippedEntity*             m_pcTagEquippedEntity;
 
       bool m_bDebug;
