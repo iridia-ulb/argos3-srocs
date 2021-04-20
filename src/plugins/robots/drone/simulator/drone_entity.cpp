@@ -36,6 +36,7 @@ namespace argos {
       m_pcDirectionalLEDEquippedEntity(nullptr),
       m_pcEmbodiedEntity(nullptr),
       m_pcFlightSystemEntity(nullptr),
+      m_pcRadioEquippedEntity(nullptr),
       m_bDebug(false) {}
 
    /****************************************/
@@ -57,14 +58,14 @@ namespace argos {
          /* create and initialize the flight system entity */
          m_pcFlightSystemEntity = 
             new CDroneFlightSystemEntity(this, "flight_system_0");
-         AddComponent(*m_pcFlightSystemEntity);
          m_pcFlightSystemEntity->Enable();
+         AddComponent(*m_pcFlightSystemEntity);
          /* create and initialize a radio equipped entity for WiFi */
-         m_pcWifiRadioEquippedEntity = new CRadioEquippedEntity(this, "radios_0");
-         AddComponent(*m_pcWifiRadioEquippedEntity);
-         m_pcWifiRadioEquippedEntity->AddRadio("wifi", CVector3(0.0f, 0.0f, 0.1f), sOriginAnchor, WIFI_TRANSMISSION_RANGE);
-         m_pcWifiRadioEquippedEntity->SetMedium(cWifiRadioMedium);
-         m_pcWifiRadioEquippedEntity->Enable();
+         m_pcRadioEquippedEntity = new CRadioEquippedEntity(this, "radios_0");
+         m_pcRadioEquippedEntity->AddRadio("wifi", CVector3(0.0f, 0.0f, 0.1f), sOriginAnchor, WIFI_TRANSMISSION_RANGE);
+         m_pcRadioEquippedEntity->SetMedium(cWifiRadioMedium);
+         m_pcRadioEquippedEntity->Enable();
+         AddComponent(*m_pcRadioEquippedEntity);
          /* create and initialize the directional LED equipped entity */
          m_pcDirectionalLEDEquippedEntity = new CDirectionalLEDEquippedEntity(this, "leds_0");
          m_pcDirectionalLEDEquippedEntity->AddLED("led_0",

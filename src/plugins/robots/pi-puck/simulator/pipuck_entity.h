@@ -35,6 +35,7 @@ namespace argos {
          m_pcDebugEntity(nullptr),
          m_pcEmbodiedEntity(nullptr),
          m_pcDifferentialDriveEntity(nullptr),
+         m_pcRadioEquippedEntity(nullptr),
          m_pcTagEquippedEntity(nullptr),
          m_bDebug(false) {}
 
@@ -91,20 +92,20 @@ namespace argos {
          return *m_pcEmbodiedEntity;
       }
 
-      inline CTagEquippedEntity& GetTagEquippedEntity() {
-         return *m_pcTagEquippedEntity;
-      }
-
-      inline const CTagEquippedEntity& GetTagEquippedEntity() const {
-         return *m_pcTagEquippedEntity;
-      }
-
       inline CRadioEquippedEntity& GetRadioEquippedEntity() {
          return *m_pcRadioEquippedEntity;
       }
 
       inline const CRadioEquippedEntity& GetRadioEquippedEntity() const {
          return *m_pcRadioEquippedEntity;
+      }
+
+      inline CTagEquippedEntity& GetTagEquippedEntity() {
+         return *m_pcTagEquippedEntity;
+      }
+
+      inline const CTagEquippedEntity& GetTagEquippedEntity() const {
+         return *m_pcTagEquippedEntity;
       }
 
       inline bool IsDebug() const {
