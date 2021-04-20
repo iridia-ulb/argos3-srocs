@@ -25,24 +25,30 @@ namespace argos {
       CCI_DroneFlightSystemSensor() :
          m_cPosition(CVector3::ZERO),
          m_cTargetPosition(CVector3::ZERO),
-         m_cTargetOrientation(CVector3::ZERO),
-         m_fHeight(0.0),
-         m_fBatteryRemaining(0.0),
          m_cOrientation(CVector3::ZERO),
+         m_cTargetOrientation(CVector3::ZERO),
          m_cVelocity(CVector3::ZERO),
-         m_cAngularVelocity(CVector3::ZERO) {}
+         m_cAngularVelocity(CVector3::ZERO),
+         m_cAccelerometer(CVector3::ZERO),
+         m_cMagnetometer(CVector3::ZERO),
+         m_cGyroscope(CVector3::ZERO),
+         m_fBatteryRemaining(0.0),
+         m_fHeight(0.0) {}
       
       virtual ~CCI_DroneFlightSystemSensor() {}
       
       virtual void Reset() {
          m_cPosition = CVector3::ZERO;
          m_cTargetPosition = CVector3::ZERO;
-         m_cTargetOrientation = CVector3::ZERO;
-         m_fHeight = 0.0;
-         m_fBatteryRemaining = 0.0;
          m_cOrientation = CVector3::ZERO;
+         m_cTargetOrientation = CVector3::ZERO;
          m_cVelocity = CVector3::ZERO;
          m_cAngularVelocity = CVector3::ZERO;
+         m_cAccelerometer = CVector3::ZERO;
+         m_cMagnetometer = CVector3::ZERO;
+         m_cGyroscope = CVector3::ZERO;
+         m_fBatteryRemaining = 0.0;
+         m_fHeight = 0.0;
       }
 
       const CVector3& GetPosition() const {
@@ -93,8 +99,6 @@ namespace argos {
       CVector3 m_cAccelerometer;
       CVector3 m_cMagnetometer;
       CVector3 m_cGyroscope;
-      Real m_fTemperature;
-      Real m_fBatteryVoltage;
       Real m_fBatteryRemaining;
       Real m_fHeight;
    };
