@@ -32,8 +32,9 @@ namespace argos {
          m_cAccelerometer(CVector3::ZERO),
          m_cMagnetometer(CVector3::ZERO),
          m_cGyroscope(CVector3::ZERO),
-         m_fBatteryRemaining(0.0),
-         m_fHeight(0.0) {}
+         m_fBatteryVoltage(0.0),
+         m_fHeight(0.0),
+         m_fTemperature(0.0) {}
       
       virtual ~CCI_DroneFlightSystemSensor() {}
       
@@ -47,8 +48,9 @@ namespace argos {
          m_cAccelerometer = CVector3::ZERO;
          m_cMagnetometer = CVector3::ZERO;
          m_cGyroscope = CVector3::ZERO;
-         m_fBatteryRemaining = 0.0;
+         m_fBatteryVoltage = 0.0;
          m_fHeight = 0.0;
+         m_fTemperature = 0.0;
       }
 
       const CVector3& GetPosition() const {
@@ -57,10 +59,6 @@ namespace argos {
 
       const CVector3& GetTargetPosition() const {
          return m_cTargetPosition;
-      }
-
-      const Real& GetHeight() const {
-         return m_fHeight;
       }
 
       const CVector3& GetOrientation() const {
@@ -79,8 +77,16 @@ namespace argos {
          return m_cAngularVelocity;
       }
 
-      const Real& GetBatteryRemaining() const {
-         return m_fBatteryRemaining;
+      const Real& GetBatteryVoltage() const {
+         return m_fBatteryVoltage;
+      }
+
+      const Real& GetHeight() const {
+         return m_fHeight;
+      }
+
+      const Real& GetTemperature() const {
+         return m_fTemperature;
       }
 
 #ifdef ARGOS_WITH_LUA
@@ -99,8 +105,9 @@ namespace argos {
       CVector3 m_cAccelerometer;
       CVector3 m_cMagnetometer;
       CVector3 m_cGyroscope;
-      Real m_fBatteryRemaining;
+      Real m_fBatteryVoltage;
       Real m_fHeight;
+      Real m_fTemperature;
    };
 }
 

@@ -19,6 +19,7 @@ namespace argos {
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Waddress-of-packed-member"
+#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
 #include <argos3/plugins/robots/drone/hardware/mavlink/common/mavlink.h>
 #pragma GCC diagnostic pop
 
