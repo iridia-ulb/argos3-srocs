@@ -132,7 +132,8 @@ namespace argos {
       const static Real YAW_KP; 
       const static Real YAW_KI; 
       const static Real YAW_KD; 
-      /* sensors noise constants*/
+      /* gyro sensor noise constants */
+      const static bool m_bEnableGyroNoise;
       const static Real MEMS_GYRO_NOISE_MEAN;
       const static Real MEMS_GYRO_BIAS_MEAN;
       const static Real MEMS_GYRO_BIAS_STD_DEV;
@@ -141,6 +142,8 @@ namespace argos {
       const static Real MEMS_GYRO_NOISE_STD_DEV_Z;
       const static Real MEMS_GYRO_RANDOM_WALK_INIT;
       const static Real MEMS_GYRO_BIAS_INIT;
+      /* accel sensor noise constants */
+      const static bool m_bEnableAccelNoise;
       const static Real MEMS_ACCEL_NOISE_MEAN;
       const static Real MEMS_ACCEL_BIAS_MEAN;
       const static Real MEMS_ACCEL_BIAS_STD_DEV;

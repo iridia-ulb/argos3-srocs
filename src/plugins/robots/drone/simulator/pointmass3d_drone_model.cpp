@@ -254,9 +254,9 @@ namespace argos
       };
       /* gyroscope sensor readings */
       cAngularAcceleration.Set(
-         cAngularAcceleration.GetX() + m_pcRNG->Gaussian(MEMS_GYRO_NOISE_STD_DEV_X, MEMS_GYRO_NOISE_MEAN) + m_fGyroBias,
-         cAngularAcceleration.GetY() + m_pcRNG->Gaussian(MEMS_GYRO_NOISE_STD_DEV_Y, MEMS_GYRO_NOISE_MEAN) + m_fGyroBias,
-         cAngularAcceleration.GetZ() + m_pcRNG->Gaussian(MEMS_GYRO_NOISE_STD_DEV_Z, MEMS_GYRO_NOISE_MEAN) + m_fGyroBias
+         cAngularAcceleration.GetX() + m_bEnableGyroNoise * (m_pcRNG->Gaussian(MEMS_GYRO_NOISE_STD_DEV_X, MEMS_GYRO_NOISE_MEAN) + m_fGyroBias),
+         cAngularAcceleration.GetY() + m_bEnableGyroNoise * (m_pcRNG->Gaussian(MEMS_GYRO_NOISE_STD_DEV_Y, MEMS_GYRO_NOISE_MEAN) + m_fGyroBias),
+         cAngularAcceleration.GetZ() + m_bEnableGyroNoise * (m_pcRNG->Gaussian(MEMS_GYRO_NOISE_STD_DEV_Z, MEMS_GYRO_NOISE_MEAN) + m_fGyroBias)
       );
       m_fGyroBias = m_fGyroBias + m_fAngleRandomWalk *  m_pcRNG->Gaussian(MEMS_GYRO_BIAS_STD_DEV, MEMS_GYRO_BIAS_MEAN);
       /* update the gyro bias angular random walk */
@@ -271,9 +271,9 @@ namespace argos
       m_cAngularVelocityPrev = m_cAngularVelocity;
       /* accelerometer sensor readings */
       cAcceleration.Set(
-         cAcceleration.GetX() + m_pcRNG->Gaussian(MEMS_ACCEL_NOISE_STD_DEV_X, MEMS_ACCEL_NOISE_MEAN) + m_fAccelBias,
-         cAcceleration.GetY() + m_pcRNG->Gaussian(MEMS_ACCEL_NOISE_STD_DEV_Y, MEMS_ACCEL_NOISE_MEAN) + m_fAccelBias,
-         cAcceleration.GetZ() + m_pcRNG->Gaussian(MEMS_ACCEL_NOISE_STD_DEV_Z, MEMS_ACCEL_NOISE_MEAN) + m_fAccelBias
+         cAcceleration.GetX() + m_bEnableAccelNoise * (m_pcRNG->Gaussian(MEMS_ACCEL_NOISE_STD_DEV_X, MEMS_ACCEL_NOISE_MEAN) + m_fAccelBias),
+         cAcceleration.GetY() + m_bEnableAccelNoise * (m_pcRNG->Gaussian(MEMS_ACCEL_NOISE_STD_DEV_Y, MEMS_ACCEL_NOISE_MEAN) + m_fAccelBias),
+         cAcceleration.GetZ() + m_bEnableAccelNoise * (m_pcRNG->Gaussian(MEMS_ACCEL_NOISE_STD_DEV_Z, MEMS_ACCEL_NOISE_MEAN) + m_fAccelBias)
       );
       m_fAccelBias = m_fAccelBias + m_fVelocityRandomWalk *  m_pcRNG->Gaussian(MEMS_ACCEL_BIAS_STD_DEV, MEMS_ACCEL_BIAS_MEAN);
       /* update the accel bias velocity random walk */
@@ -394,7 +394,8 @@ namespace argos
    const Real CPointMass3DDroneModel::ROLL_PITCH_KI = 0;
    const Real CPointMass3DDroneModel::ROLL_PITCH_KD = 6;
    const Real CPointMass3DDroneModel::ROOT_TWO = std::sqrt(2.0);
-   /* sensor noise coefficents*/
+   /* gyro sensor noise coefficents */
+   const bool CPointMass3DDroneModel:: m_bEnableGyroNoise = 0;
    const Real CPointMass3DDroneModel::MEMS_GYRO_BIAS_STD_DEV = 1;
    const Real CPointMass3DDroneModel::MEMS_GYRO_BIAS_MEAN = 0;
    const Real CPointMass3DDroneModel::MEMS_GYRO_BIAS_INIT = 0.01;
@@ -403,6 +404,8 @@ namespace argos
    const Real CPointMass3DDroneModel::MEMS_GYRO_NOISE_STD_DEV_X = 0.67;
    const Real CPointMass3DDroneModel::MEMS_GYRO_NOISE_STD_DEV_Y = 0.78;
    const Real CPointMass3DDroneModel::MEMS_GYRO_NOISE_STD_DEV_Z = 0.12;
+   /* accel sensor noise coefficents */
+   const bool CPointMass3DDroneModel:: m_bEnableAccelNoise = 0;
    const Real CPointMass3DDroneModel::MEMS_ACCEL_BIAS_STD_DEV = 1;
    const Real CPointMass3DDroneModel::MEMS_ACCEL_BIAS_MEAN = 0;
    const Real CPointMass3DDroneModel::MEMS_ACCEL_BIAS_INIT = 0.03;
