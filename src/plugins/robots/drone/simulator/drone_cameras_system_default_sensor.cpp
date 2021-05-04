@@ -330,7 +330,7 @@ namespace argos {
       /* TODO: Update the position and orientation calculations to avoid the use of matrices */
       CVector3 cTagPosition = m_cCameraToWorldTransform * c_tag.GetPosition();
       /* Direction of the tag should be pointing inside of the tag */
-      CQuaternion cTagOrientation = m_cCameraOrientation.Inverse() * c_tag.GetOrientation() * CQuaternion(CRadians(M_PI), CVector3(1,0,0));
+      CQuaternion cTagOrientation = m_cCameraOrientation.Inverse() * c_tag.GetOrientation() * CQuaternion(CRadians::PI, CVector3::X);
       /* transfer readings to the control interface */
       Tags.emplace_back(unId, cTagPosition, cTagOrientation, cCenterPixel, m_arrTagCornerPixels);
       return true;
