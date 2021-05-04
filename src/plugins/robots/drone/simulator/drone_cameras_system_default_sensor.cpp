@@ -329,7 +329,8 @@ namespace argos {
       catch(const std::logic_error& err_logic) {}
       /* TODO: Update the position and orientation calculations to avoid the use of matrices */
       CVector3 cTagPosition = m_cCameraToWorldTransform * c_tag.GetPosition();
-      CQuaternion cTagOrientation = m_cCameraOrientation.Inverse() * c_tag.GetOrientation();
+      /* Direction of the tag should be pointing inside of the tag */
+      CQuaternion cTagOrientation = m_cCameraOrientation.Inverse() * c_tag.GetOrientation() * CQuaternion(CRadians::PI, CVector3::X);
       /* transfer readings to the control interface */
       Tags.emplace_back(unId, cTagPosition, cTagOrientation, cCenterPixel, m_arrTagCornerPixels);
       return true;
