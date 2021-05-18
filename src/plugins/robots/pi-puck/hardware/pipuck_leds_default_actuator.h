@@ -16,6 +16,7 @@ struct iio_buffer;
 struct iio_channel; 
 
 #include <cmath>
+#include <optional>
 
 #include <argos3/plugins/robots/generic/hardware/actuator.h>
 #include <argos3/plugins/robots/pi-puck/control_interface/ci_pipuck_leds_actuator.h>
