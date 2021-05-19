@@ -185,9 +185,9 @@ namespace argos {
       GetNodeAttribute(t_interface, "capture_resolution", strCaptureResolution);
       GetNodeAttribute(t_interface, "processing_resolution", strProcessingResolution);
       GetNodeAttribute(t_interface, "processing_offset", strProcessingOffset);
-      ParseValues<UInt32>(strCaptureResolution, 2, m_arrCaptureResolution.data(), ',');
-      ParseValues<UInt32>(strProcessingResolution, 2, m_arrProcessingResolution.data(), ',');
-      ParseValues<UInt32>(strProcessingOffset, 2, m_arrProcessingOffset.data(), ',');
+      ParseValues<SInt32>(strCaptureResolution, 2, m_arrCaptureResolution.data(), ',');
+      ParseValues<SInt32>(strProcessingResolution, 2, m_arrProcessingResolution.data(), ',');
+      ParseValues<SInt32>(strProcessingOffset, 2, m_arrProcessingOffset.data(), ',');
       LOG << "[INFO] Added camera sensor: capture resolution = "
           << static_cast<int>(m_arrCaptureResolution[0])
           << "x"
@@ -203,8 +203,12 @@ namespace argos {
           << "]"
           << std::endl;
       /* allocate image memory */
-      if ((m_arrProcessingResolution[0] + m_arrProcessingOffset[0] > m_arrCaptureResolution[0]) ||
-          (m_arrProcessingResolution[1] + m_arrProcessingOffset[1] > m_arrCaptureResolution[1]))
+      if((m_arrCaptureResolution[0] < 0) || (m_arrCaptureResolution[1] < 0) ||
+         (m_arrProcessingResolution[0] < 0) || (m_arrProcessingResolution[1] < 0) ||
+         (m_arrProcessingOffset[0] < 0) || (m_arrProcessingOffset[1] < 0))
+         THROW_ARGOSEXCEPTION("Resolutions/offsets have to be positive")
+      if((m_arrProcessingResolution[0] + m_arrProcessingOffset[0] > m_arrCaptureResolution[0]) ||
+         (m_arrProcessingResolution[1] + m_arrProcessingOffset[1] > m_arrCaptureResolution[1]))
          THROW_ARGOSEXCEPTION("Processing resolution/offset exceeds capture resolution");
       m_ptImage =
          ::image_u8_create_alignment(m_arrCaptureResolution[0], m_arrCaptureResolution[1], 96);
@@ -387,9 +391,8 @@ namespace argos {
                m_arrProcessingResolution[0],
                m_arrProcessingResolution[1],
                m_ptImage->stride,
-               m_ptImage->buf +
-                  static_cast<size_t>(m_arrProcessingOffset[0] +
-                                      m_arrProcessingOffset[1] * m_ptImage->stride)
+               m_ptImage->buf + m_arrProcessingOffset[0] +
+                                m_arrProcessingOffset[1] * m_ptImage->stride
             };
             /* detect the tags */
             CVector2 cCenterPixel;
@@ -418,7 +421,7 @@ namespace argos {
                ::estimate_tag_pose(&m_tTagDetectionInfo, &tPose);
                CRotationMatrix3 cTagOrientation(tPose.R->data);
                CVector3 cTagPosition(tPose.t->data[0], tPose.t->data[1], tPose.t->data[2]);
-                /* copy readings */
+               /* copy readings */
                Tags.emplace_back(ptDetection->id, cTagPosition, cTagOrientation, cCenterPixel, arrCornerPixels);
             }
             /* destroy the readings array */
