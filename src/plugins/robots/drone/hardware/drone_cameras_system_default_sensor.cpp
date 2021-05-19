@@ -203,8 +203,11 @@ namespace argos {
           << "]"
           << std::endl;
       /* allocate image memory */
+      if ((m_arrProcessingResolution[0] + m_arrProcessingOffset[0] > m_arrCaptureResolution[0]) ||
+          (m_arrProcessingResolution[1] + m_arrProcessingOffset[1] > m_arrCaptureResolution[1]))
+         THROW_ARGOSEXCEPTION("Processing resolution/offset exceeds capture resolution");
       m_ptImage =
-         ::image_u8_create_alignment(m_arrProcessingResolution[0], m_arrProcessingResolution[1], 96);
+         ::image_u8_create_alignment(m_arrCaptureResolution[0], m_arrCaptureResolution[1], 96);
       /* update the tag detection info structure */
       m_tTagDetectionInfo.fx = m_sCalibration.CameraMatrix(0,0);
       m_tTagDetectionInfo.fy = m_sCalibration.CameraMatrix(1,1);
@@ -379,12 +382,21 @@ namespace argos {
                             m_ptImage->height,
                             ::TJPF_GRAY,
                             TJFLAG_FASTDCT);
+            /* crop ptImage to tImageProcess */
+            image_u8_t tImageProcess = {
+               .width = m_arrProcessingResolution[0],
+               .height = m_arrProcessingResolution[1],
+               .stride = m_ptImage->stride,
+               .buf = m_ptImage->buf +
+                      (u_int8_t)m_arrProcessingOffset[0] +
+                      (u_int8_t)(m_arrProcessingOffset[1] * m_ptImage->stride)
+            };
             /* detect the tags */
             CVector2 cCenterPixel;
             std::array<CVector2, 4> arrCornerPixels;
             /* run the apriltags algorithm */
             ::zarray_t* ptDetectionArray =
-               ::apriltag_detector_detect(m_ptTagDetector, m_ptImage);
+               ::apriltag_detector_detect(m_ptTagDetector, &tImageProcess);
             /* get the detected tags count */
             size_t unTagCount = static_cast<size_t>(::zarray_size(ptDetectionArray));
             /* reserve space for the tags */
