@@ -179,9 +179,9 @@ namespace argos {
       GetNodeAttribute(t_interface, "capture_resolution", strCaptureResolution);
       GetNodeAttribute(t_interface, "processing_resolution", strProcessingResolution);
       GetNodeAttribute(t_interface, "processing_offset", strProcessingOffset);
-      ParseValues<size_t>(strCaptureResolution, 2, m_arrCaptureResolution.data(), ',');
-      ParseValues<size_t>(strProcessingResolution, 2, m_arrProcessingResolution.data(), ',');
-      ParseValues<size_t>(strProcessingOffset, 2, m_arrProcessingOffset.data(), ',');
+      ParseValues<UInt32>(strCaptureResolution, 2, m_arrCaptureResolution.data(), ',');
+      ParseValues<UInt32>(strProcessingResolution, 2, m_arrProcessingResolution.data(), ',');
+      ParseValues<UInt32>(strProcessingOffset, 2, m_arrProcessingOffset.data(), ',');
       LOG << "[INFO] Added camera sensor: capture resolution = "
           << static_cast<int>(m_arrCaptureResolution[0])
           << "x"
@@ -197,13 +197,9 @@ namespace argos {
           << "]"
           << std::endl;
       /* allocate image memory */
-      if((m_arrCaptureResolution[0] < 0) || (m_arrCaptureResolution[1] < 0) ||
-         (m_arrProcessingResolution[0] < 0) || (m_arrProcessingResolution[1] < 0) ||
-         (m_arrProcessingOffset[0] < 0) || (m_arrProcessingOffset[1] < 0))
-         THROW_ARGOSEXCEPTION("Resolutions/offsets have to be positive")
       if((m_arrProcessingResolution[0] + m_arrProcessingOffset[0] > m_arrCaptureResolution[0]) ||
          (m_arrProcessingResolution[1] + m_arrProcessingOffset[1] > m_arrCaptureResolution[1]))
-         THROW_ARGOSEXCEPTION("Processing resolution/offset exceeds capture resolution");
+         THROW_ARGOSEXCEPTION("Requested processing resolution is out of bounds.");
       m_ptImage =
          ::image_u8_create_alignment(m_arrCaptureResolution[0], m_arrCaptureResolution[1], 96);
       /* update the tag detection info structure */
@@ -386,9 +382,8 @@ namespace argos {
                static_cast<int32_t>(m_arrProcessingResolution[1]),
                m_ptImage->stride,
                m_ptImage->buf +
-                  m_arrProcessingOffset[0] +
-                  m_arrProcessingOffset[1] * 
-                  static_cast<size_t>(m_ptImage->stride),
+                  static_cast<size_t>(m_arrProcessingOffset[0] +
+                                      m_arrProcessingOffset[1] * m_ptImage->stride),
             };
             /* detect the tags */
             CVector2 cCenterPixel;
