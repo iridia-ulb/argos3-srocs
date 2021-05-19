@@ -99,6 +99,11 @@ namespace argos {
          std::array<std::pair<UInt32, void*>, 2>::iterator m_itNextBuffer;
          /* frame counter */
          UInt32 unFrameId = 0;
+         /* save frame */
+         std::string m_strSavePathBasename;
+         void SavePNM(const image_u8_t* ps_image);
+         Real m_fTagMarkPixelRadius = 0;
+         UInt8 m_unTagMarkPixelIllumination = 0;
       };
 
       /* time at initialization */

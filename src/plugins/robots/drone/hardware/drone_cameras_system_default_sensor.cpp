@@ -134,6 +134,10 @@ namespace argos {
                          const TConfiguration& t_configuration,
                          TConfigurationNode& t_interface):
       SInterface(str_label, t_configuration) {
+      /* parse save image switch */
+      GetNodeAttributeOrDefault(t_interface, "save_as", m_strSavePathBasename, m_strSavePathBasename);
+      GetNodeAttributeOrDefault(t_interface, "tag_mark_radius", m_fTagMarkPixelRadius, m_fTagMarkPixelRadius);
+      GetNodeAttributeOrDefault(t_interface, "tag_mark_illumination", m_unTagMarkPixelIllumination, m_unTagMarkPixelIllumination);
       /* parse calibration data if provided */
       CVector2 cFocalLength;
       CVector2 cPrincipalPoint;
@@ -414,6 +418,17 @@ namespace argos {
                CVector3 cTagPosition(tPose.t->data[0], tPose.t->data[1], tPose.t->data[2]);
                /* copy readings */
                Tags.emplace_back(ptDetection->id, cTagPosition, cTagOrientation, cCenterPixel, arrCornerPixels);
+               /* mark tags */
+               if((!m_strSavePathBasename.empty()) && (m_fTagMarkPixelRadius != 0)) {
+                  ::image_u8_draw_circle(&tImageProcess, ptDetection->p[0][0], ptDetection->p[0][1], m_fTagMarkPixelRadius, m_unTagMarkPixelIllumination);
+                  ::image_u8_draw_circle(&tImageProcess, ptDetection->p[1][0], ptDetection->p[1][1], m_fTagMarkPixelRadius, m_unTagMarkPixelIllumination);
+                  ::image_u8_draw_circle(&tImageProcess, ptDetection->p[2][0], ptDetection->p[2][1], m_fTagMarkPixelRadius, m_unTagMarkPixelIllumination);
+                  ::image_u8_draw_circle(&tImageProcess, ptDetection->p[3][0], ptDetection->p[3][1], m_fTagMarkPixelRadius, m_unTagMarkPixelIllumination);
+               }
+            }
+            /* save image */
+            if(!m_strSavePathBasename.empty()) {
+               SavePNM(&tImageProcess);
             }
             /* destroy the readings array */
             ::apriltag_detections_destroy(ptDetectionArray);
@@ -523,6 +538,19 @@ namespace argos {
          eLedState = ELedState::Q4;
       }
       return eLedState;
+   }
+
+   /****************************************/
+   /****************************************/
+
+   void CDroneCamerasSystemDefaultSensor::SPhysicalInterface::SavePNM(const image_u8_t* ps_image) {
+      /* write to PNM file */
+      static UInt32 unFrame = 0;
+      std::string strFilename(m_strSavePathBasename);
+      strFilename += std::to_string(unFrame);
+      strFilename += ".pnm";
+      image_u8_write_pnm(ps_image, strFilename.c_str());
+      unFrame++;
    }
 
    /****************************************/
