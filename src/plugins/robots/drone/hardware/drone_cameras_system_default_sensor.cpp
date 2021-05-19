@@ -19,12 +19,6 @@
 #include <apriltag/common/zarray.h>
 #include <turbojpeg.h>
 
-/*
-root@up-core:~# find /usr -name "*jpeg*"
-/usr/lib/libjpeg.so.62
-/usr/lib/libjpeg.so.62.3.0
-*/
-
 #include <fcntl.h>
 #include <libv4l2.h>
 #include <linux/videodev2.h>
@@ -185,9 +179,9 @@ namespace argos {
       GetNodeAttribute(t_interface, "capture_resolution", strCaptureResolution);
       GetNodeAttribute(t_interface, "processing_resolution", strProcessingResolution);
       GetNodeAttribute(t_interface, "processing_offset", strProcessingOffset);
-      ParseValues<SInt32>(strCaptureResolution, 2, m_arrCaptureResolution.data(), ',');
-      ParseValues<SInt32>(strProcessingResolution, 2, m_arrProcessingResolution.data(), ',');
-      ParseValues<SInt32>(strProcessingOffset, 2, m_arrProcessingOffset.data(), ',');
+      ParseValues<size_t>(strCaptureResolution, 2, m_arrCaptureResolution.data(), ',');
+      ParseValues<size_t>(strProcessingResolution, 2, m_arrProcessingResolution.data(), ',');
+      ParseValues<size_t>(strProcessingOffset, 2, m_arrProcessingOffset.data(), ',');
       LOG << "[INFO] Added camera sensor: capture resolution = "
           << static_cast<int>(m_arrCaptureResolution[0])
           << "x"
@@ -388,11 +382,13 @@ namespace argos {
                             TJFLAG_FASTDCT);
             /* crop ptImage to tImageProcess */
             image_u8_t tImageProcess = {
-               m_arrProcessingResolution[0],
-               m_arrProcessingResolution[1],
+               static_cast<int32_t>(m_arrProcessingResolution[0]),
+               static_cast<int32_t>(m_arrProcessingResolution[1]),
                m_ptImage->stride,
-               m_ptImage->buf + m_arrProcessingOffset[0] +
-                                m_arrProcessingOffset[1] * m_ptImage->stride
+               m_ptImage->buf +
+                  m_arrProcessingOffset[0] +
+                  m_arrProcessingOffset[1] * 
+                  static_cast<size_t>(m_ptImage->stride),
             };
             /* detect the tags */
             CVector2 cCenterPixel;
