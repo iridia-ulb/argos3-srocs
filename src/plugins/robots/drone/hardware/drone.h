@@ -16,6 +16,8 @@ namespace argos {
 struct iio_context;
 struct iio_device;
 
+#include <optional>
+
 #include <argos3/core/utility/math/rng.h>
 #include <argos3/core/utility/math/vector3.h>
 #include <argos3/core/utility/networking/tcp_socket.h>

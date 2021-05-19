@@ -19,12 +19,6 @@
 #include <apriltag/common/zarray.h>
 #include <turbojpeg.h>
 
-/*
-root@up-core:~# find /usr -name "*jpeg*"
-/usr/lib/libjpeg.so.62
-/usr/lib/libjpeg.so.62.3.0
-*/
-
 #include <fcntl.h>
 #include <libv4l2.h>
 #include <linux/videodev2.h>
@@ -185,9 +179,9 @@ namespace argos {
       GetNodeAttribute(t_interface, "capture_resolution", strCaptureResolution);
       GetNodeAttribute(t_interface, "processing_resolution", strProcessingResolution);
       GetNodeAttribute(t_interface, "processing_offset", strProcessingOffset);
-      ParseValues<UInt32>(strCaptureResolution, 2, m_arrCaptureResolution.data(), ',');
-      ParseValues<UInt32>(strProcessingResolution, 2, m_arrProcessingResolution.data(), ',');
-      ParseValues<UInt32>(strProcessingOffset, 2, m_arrProcessingOffset.data(), ',');
+      ParseValues<size_t>(strCaptureResolution, 2, m_arrCaptureResolution.data(), ',');
+      ParseValues<size_t>(strProcessingResolution, 2, m_arrProcessingResolution.data(), ',');
+      ParseValues<size_t>(strProcessingOffset, 2, m_arrProcessingOffset.data(), ',');
       LOG << "[INFO] Added camera sensor: capture resolution = "
           << static_cast<int>(m_arrCaptureResolution[0])
           << "x"
@@ -203,8 +197,15 @@ namespace argos {
           << "]"
           << std::endl;
       /* allocate image memory */
+      if((m_arrCaptureResolution[0] < 0) || (m_arrCaptureResolution[1] < 0) ||
+         (m_arrProcessingResolution[0] < 0) || (m_arrProcessingResolution[1] < 0) ||
+         (m_arrProcessingOffset[0] < 0) || (m_arrProcessingOffset[1] < 0))
+         THROW_ARGOSEXCEPTION("Resolutions/offsets have to be positive")
+      if((m_arrProcessingResolution[0] + m_arrProcessingOffset[0] > m_arrCaptureResolution[0]) ||
+         (m_arrProcessingResolution[1] + m_arrProcessingOffset[1] > m_arrCaptureResolution[1]))
+         THROW_ARGOSEXCEPTION("Processing resolution/offset exceeds capture resolution");
       m_ptImage =
-         ::image_u8_create_alignment(m_arrProcessingResolution[0], m_arrProcessingResolution[1], 96);
+         ::image_u8_create_alignment(m_arrCaptureResolution[0], m_arrCaptureResolution[1], 96);
       /* update the tag detection info structure */
       m_tTagDetectionInfo.fx = m_sCalibration.CameraMatrix(0,0);
       m_tTagDetectionInfo.fy = m_sCalibration.CameraMatrix(1,1);
@@ -379,12 +380,22 @@ namespace argos {
                             m_ptImage->height,
                             ::TJPF_GRAY,
                             TJFLAG_FASTDCT);
+            /* crop ptImage to tImageProcess */
+            image_u8_t tImageProcess = {
+               static_cast<int32_t>(m_arrProcessingResolution[0]),
+               static_cast<int32_t>(m_arrProcessingResolution[1]),
+               m_ptImage->stride,
+               m_ptImage->buf +
+                  m_arrProcessingOffset[0] +
+                  m_arrProcessingOffset[1] * 
+                  static_cast<size_t>(m_ptImage->stride),
+            };
             /* detect the tags */
             CVector2 cCenterPixel;
             std::array<CVector2, 4> arrCornerPixels;
             /* run the apriltags algorithm */
             ::zarray_t* ptDetectionArray =
-               ::apriltag_detector_detect(m_ptTagDetector, m_ptImage);
+               ::apriltag_detector_detect(m_ptTagDetector, &tImageProcess);
             /* get the detected tags count */
             size_t unTagCount = static_cast<size_t>(::zarray_size(ptDetectionArray));
             /* reserve space for the tags */
@@ -406,7 +417,7 @@ namespace argos {
                ::estimate_tag_pose(&m_tTagDetectionInfo, &tPose);
                CRotationMatrix3 cTagOrientation(tPose.R->data);
                CVector3 cTagPosition(tPose.t->data[0], tPose.t->data[1], tPose.t->data[2]);
-                /* copy readings */
+               /* copy readings */
                Tags.emplace_back(ptDetection->id, cTagPosition, cTagOrientation, cCenterPixel, arrCornerPixels);
             }
             /* destroy the readings array */

@@ -80,9 +80,9 @@ namespace argos {
             CSquareMatrix<3> CameraMatrix;
          } m_sCalibration;
          /* sensor configuration */
-         std::array<UInt32, 2> m_arrCaptureResolution;
-         std::array<UInt32, 2> m_arrProcessingResolution;
-         std::array<UInt32, 2> m_arrProcessingOffset;
+         std::array<size_t, 2> m_arrCaptureResolution;
+         std::array<size_t, 2> m_arrProcessingResolution;
+         std::array<size_t, 2> m_arrProcessingOffset;
          /* tag detector data */
          ::image_u8_t* m_ptImage;
          ::apriltag_family* m_ptTagFamily;
