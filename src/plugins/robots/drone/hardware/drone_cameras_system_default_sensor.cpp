@@ -384,12 +384,12 @@ namespace argos {
                             TJFLAG_FASTDCT);
             /* crop ptImage to tImageProcess */
             image_u8_t tImageProcess = {
-               .width = m_arrProcessingResolution[0],
-               .height = m_arrProcessingResolution[1],
-               .stride = m_ptImage->stride,
-               .buf = m_ptImage->buf +
-                      (u_int8_t)m_arrProcessingOffset[0] +
-                      (u_int8_t)(m_arrProcessingOffset[1] * m_ptImage->stride)
+               m_arrProcessingResolution[0],
+               m_arrProcessingResolution[1],
+               m_ptImage->stride,
+               m_ptImage->buf +
+                  static_cast<size_t>(m_arrProcessingOffset[0] +
+                                      m_arrProcessingOffset[1] * m_ptImage->stride)
             };
             /* detect the tags */
             CVector2 cCenterPixel;
