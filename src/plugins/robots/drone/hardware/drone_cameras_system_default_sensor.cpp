@@ -203,8 +203,17 @@ namespace argos {
           << "]"
           << std::endl;
       /* allocate image memory */
+      if ((m_arrProcessingResolution[0] + m_arrProcessingOffset[0] > m_arrCaptureResolution[0]) ||
+          (m_arrProcessingResolution[1] + m_arrProcessingOffset[1] > m_arrCaptureResolution[1]))
+         THROW_ARGOSEXCEPTION("Processing resolution/offset exceeds capture resolution");
+      m_ptCaptureImage =
+         ::image_u8_create_alignment(m_arrCaptureResolution[0], m_arrCaptureResolution[1], 96);
       m_ptImage =
-         ::image_u8_create_alignment(m_arrProcessingResolution[0], m_arrProcessingResolution[1], 96);
+         ::image_u8_create_stride(m_arrProcessingResolution[0], m_arrProcessingResolution[1], m_ptCaptureImage->stride);
+      m_punImageBufBackup = m_ptImage->buf;
+      m_ptImage->buf = m_ptCaptureImage->buf +
+                       m_arrProcessingOffset[0] +
+                       m_arrProcessingOffset[1] * m_ptCaptureImage->stride;
       /* update the tag detection info structure */
       m_tTagDetectionInfo.fx = m_sCalibration.CameraMatrix(0,0);
       m_tTagDetectionInfo.fy = m_sCalibration.CameraMatrix(1,1);
@@ -218,6 +227,8 @@ namespace argos {
 
    CDroneCamerasSystemDefaultSensor::SPhysicalInterface::~SPhysicalInterface() {
       /* deallocate image memory */
+      ::image_u8_destroy(m_ptCaptureImage);
+      m_ptImage->buf = m_punImageBufBackup;
       ::image_u8_destroy(m_ptImage);
       /* uninitialize the apriltag components */
       ::apriltag_detector_remove_family(m_ptTagDetector, m_ptTagFamily);
@@ -373,10 +384,10 @@ namespace argos {
             ::tjDecompress2(m_ptTurboJpegInstance, 
                             static_cast<const unsigned char*>(m_itCurrentBuffer->second),
                             sBuffer.length,
-                            m_ptImage->buf,
-                            m_ptImage->width,
-                            m_ptImage->stride,
-                            m_ptImage->height,
+                            m_ptCaptureImage->buf,
+                            m_ptCaptureImage->width,
+                            m_ptCaptureImage->stride,
+                            m_ptCaptureImage->height,
                             ::TJPF_GRAY,
                             TJFLAG_FASTDCT);
             /* detect the tags */
