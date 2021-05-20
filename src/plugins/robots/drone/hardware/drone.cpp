@@ -215,7 +215,7 @@ namespace argos {
    /****************************************/
 
    void CDrone::Destroy() {
-      /* disable the controller */
+      /* destroy the controller */
       m_pcController->Destroy();
       /* delete actuators */
       for(CPhysicalActuator* pc_actuator : m_vecActuators)

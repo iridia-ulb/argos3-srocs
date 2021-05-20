@@ -216,6 +216,8 @@ namespace argos {
    /****************************************/
 
    void CPiPuck::Destroy() {
+      /* destroy the controller */
+      m_pcController->Destroy();
       /* delete actuators */
       for(CPhysicalActuator* pc_actuator : m_vecActuators)
          delete pc_actuator;
