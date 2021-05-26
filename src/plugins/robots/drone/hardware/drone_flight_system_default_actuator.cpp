@@ -70,7 +70,10 @@ namespace argos {
             m_pcPixhawk->GetInitialPosition().value();
          uint8_t unTargetSystem =
             m_pcPixhawk->GetTargetSystem().value();
-         CVector3& fTargetPosition = m_cTargetPosition.RotateZ(CRadians(cInitialOrientation.GetZ()));
+         CVector3& fTargetPosition = m_cTargetPosition;
+         /* ENU to NED */
+         fTargetPosition.Set(fTargetPosition.GetX(), -fTargetPosition.GetY(), -fTargetPosition.GetZ());
+         fTargetPosition.RotateZ(CRadians(cInitialOrientation.GetZ()));
          /* initialize a setpoint struct */
          mavlink_set_position_target_local_ned_t tSetpoint;
          tSetpoint.target_system    = m_pcPixhawk->GetTargetSystem().value();
@@ -80,7 +83,7 @@ namespace argos {
          tSetpoint.coordinate_frame = MAV_FRAME_LOCAL_NED;
          tSetpoint.x = fTargetPosition.GetX() + cInitialPosition.GetX();
          tSetpoint.y = fTargetPosition.GetY() + cInitialPosition.GetY();
-         tSetpoint.z = -fTargetPosition.GetZ() + cInitialPosition.GetZ();
+         tSetpoint.z = fTargetPosition.GetZ() + cInitialPosition.GetZ();
          tSetpoint.yaw = m_cTargetYawAngle.GetValue() + cInitialOrientation.GetZ();
          mavlink_message_t tMessage;
          mavlink_msg_set_position_target_local_ned_encode(unTargetSystem, 0, &tMessage, &tSetpoint);
