@@ -73,7 +73,6 @@ namespace argos {
          CVector3& fTargetPosition = m_cTargetPosition;
          /* ENU to NED */
          fTargetPosition.Set(fTargetPosition.GetX(), -fTargetPosition.GetY(), -fTargetPosition.GetZ());
-         /* rotate from the world frame to the body frame */
          fTargetPosition.RotateZ(CRadians(cInitialOrientation.GetZ()));
          /* initialize a setpoint struct */
          mavlink_set_position_target_local_ned_t tSetpoint;
