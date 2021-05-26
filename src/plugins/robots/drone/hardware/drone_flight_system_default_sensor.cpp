@@ -97,7 +97,7 @@ namespace argos {
          /* rotate back to the world frame */
          m_cPosition.RotateZ(CRadians(-cInitialOrientation.GetZ())); 
          /* NED to ENU */
-         m_cPosition.Set(m_cPosition.GetX(), -m_cPosition.GetY(), -m_cPosition.GetZ() )
+         m_cPosition.Set(m_cPosition.GetX(), -m_cPosition.GetY(), -m_cPosition.GetZ());
          m_cVelocity.Set(tReading.vx, -tReading.vy, -tReading.vz);
          /* clear out the read data */
          m_tLocalPositionNed.reset();
