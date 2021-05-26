@@ -123,9 +123,9 @@ namespace argos {
             m_pcPixhawk->GetInitialOrientation().emplace(m_cOrientation);
          }
          /* NED to ENU */
-         /* double-check the sign of m_cOrientation with real tests */
+         /* double-check the signs of m_cOrientation values with real tests */
          m_cOrientation.Set(-tReading.roll, -tReading.pitch, -tReading.yaw);
-         /* double-check the sign of m_cAngularVelocity with real tests */
+         /* double-check the signs of m_cAngularVelocity values with real tests */
          m_cAngularVelocity.Set(-tReading.rollspeed,
                                 -tReading.pitchspeed,
                                 -tReading.yawspeed);
