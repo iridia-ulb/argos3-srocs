@@ -89,11 +89,15 @@ namespace argos {
          const mavlink_local_position_ned_t& tReading =
             m_tLocalPositionNed.value();
          m_cPosition.Set(tReading.x, tReading.y, tReading.z);
-         m_cVelocity.Set(tReading.vx, tReading.vy, tReading.vz);
          /* set the initial position if not already set */
          if(!m_pcPixhawk->GetInitialPosition()) {
             m_pcPixhawk->GetInitialPosition().emplace(m_cPosition);
          }
+         CVector3& cInitialOrientation = m_pcPixhawk->GetInitialOrientation().value();
+         /* NED to ENU */
+         m_cPosition.RotateZ(CRadians(-cInitialOrientation.GetZ())); 
+         m_cPosition.Set(m_cPosition.GetX(), -m_cPosition.GetY(), -m_cPosition.GetZ());
+         m_cVelocity.Set(tReading.vx, -tReading.vy, -tReading.vz);
          /* clear out the read data */
          m_tLocalPositionNed.reset();
       }
@@ -101,6 +105,10 @@ namespace argos {
          const mavlink_position_target_local_ned_t &tReading =
              m_tPositionTargetLocalNed.value();
          m_cTargetPosition.Set(tReading.x, tReading.y, tReading.z);
+         CVector3& cInitialOrientation = m_pcPixhawk->GetInitialOrientation().value();
+         /* NED to ENU */
+         m_cTargetPosition.RotateZ(CRadians(-cInitialOrientation.GetZ()));
+         m_cTargetPosition.Set(m_cTargetPosition.GetX(), -m_cTargetPosition.GetY(), -m_cTargetPosition.GetZ());
          /* clear out the read data */
          m_tPositionTargetLocalNed.reset();
       }
@@ -108,13 +116,17 @@ namespace argos {
          const mavlink_attitude_t& tReading =
             m_tAttitude.value();
          m_cOrientation.Set(tReading.roll, tReading.pitch, tReading.yaw);
-         m_cAngularVelocity.Set(tReading.rollspeed,
-                                tReading.pitchspeed,
-                                tReading.yawspeed);
          /* set the initial orientation if not already set */
          if(!m_pcPixhawk->GetInitialOrientation()) {
             m_pcPixhawk->GetInitialOrientation().emplace(m_cOrientation);
          }
+         /* NED to ENU */
+         /* @Sinan TODO: double check the signs of m_cOrientation values with real tests */
+         m_cOrientation.Set(tReading.roll, -tReading.pitch, -tReading.yaw);
+         /* @Sinan TODO: double check the signs of m_cAngularVelocity values with real tests */
+         m_cAngularVelocity.Set(tReading.rollspeed,
+                                -tReading.pitchspeed,
+                                -tReading.yawspeed);
          /* clear out the read data */
          m_tAttitude.reset();
       }
@@ -124,7 +136,8 @@ namespace argos {
          CQuaternion cTargetOrientation(tReading.q[0], tReading.q[1], tReading.q[2], tReading.q[3]);
          CRadians cYaw, cPitch, cRoll;
          cTargetOrientation.ToEulerAngles(cYaw, cPitch, cRoll);
-         m_cTargetOrientation.Set(cRoll.GetValue(), cPitch.GetValue(), cYaw.GetValue());
+         /* NED to ENU */
+         m_cTargetOrientation.Set(cRoll.GetValue(), -cPitch.GetValue(), -cYaw.GetValue());
          /* clear out the read data */
          m_tAttitudeTarget.reset();
       }
