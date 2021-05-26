@@ -418,23 +418,23 @@ namespace argos
    const Real CPointMass3DDroneModel::MEMS_ACCEL_NOISE_STD_DEV_Z = 0;
 #else
    /* Gyro sensor noise coefficents */
-   const Real CPointMass3DDroneModel::MEMS_GYRO_BIAS_STD_DEV = 0.15;
+   const Real CPointMass3DDroneModel::MEMS_GYRO_BIAS_STD_DEV = 0.001;
    const Real CPointMass3DDroneModel::MEMS_GYRO_BIAS_MEAN = 0;
-   const Real CPointMass3DDroneModel::MEMS_GYRO_BIAS_INIT = 0.005;
-   const Real CPointMass3DDroneModel::MEMS_GYRO_RANDOM_WALK_INIT = 0.0001;
+   const Real CPointMass3DDroneModel::MEMS_GYRO_BIAS_INIT = 0.0007;
+   const Real CPointMass3DDroneModel::MEMS_GYRO_RANDOM_WALK_INIT = 0.0007;
    const Real CPointMass3DDroneModel::MEMS_GYRO_NOISE_MEAN = 0;
-   const Real CPointMass3DDroneModel::MEMS_GYRO_NOISE_STD_DEV_X = 0.12;
-   const Real CPointMass3DDroneModel::MEMS_GYRO_NOISE_STD_DEV_Y = 0.12;
-   const Real CPointMass3DDroneModel::MEMS_GYRO_NOISE_STD_DEV_Z = 0.12;
+   const Real CPointMass3DDroneModel::MEMS_GYRO_NOISE_STD_DEV_X = 0.25;
+   const Real CPointMass3DDroneModel::MEMS_GYRO_NOISE_STD_DEV_Y = 0.25;
+   const Real CPointMass3DDroneModel::MEMS_GYRO_NOISE_STD_DEV_Z = 0.1;
    /* Accelerometer sensor noise coefficents */
-   const Real CPointMass3DDroneModel::MEMS_ACCEL_BIAS_STD_DEV = 0.15;
+   const Real CPointMass3DDroneModel::MEMS_ACCEL_BIAS_STD_DEV = 0.002;
    const Real CPointMass3DDroneModel::MEMS_ACCEL_BIAS_MEAN = 0;
-   const Real CPointMass3DDroneModel::MEMS_ACCEL_BIAS_INIT = 0.005;
-   const Real CPointMass3DDroneModel::MEMS_ACCEL_RANDOM_WALK_INIT = 0.0001;
+   const Real CPointMass3DDroneModel::MEMS_ACCEL_BIAS_INIT = 0.0009;
+   const Real CPointMass3DDroneModel::MEMS_ACCEL_RANDOM_WALK_INIT = 0.0009;
    const Real CPointMass3DDroneModel::MEMS_ACCEL_NOISE_MEAN = 0;
-   const Real CPointMass3DDroneModel::MEMS_ACCEL_NOISE_STD_DEV_X =  0.05;
-   const Real CPointMass3DDroneModel::MEMS_ACCEL_NOISE_STD_DEV_Y = 0.05;
-   const Real CPointMass3DDroneModel::MEMS_ACCEL_NOISE_STD_DEV_Z = 0.05;
+   const Real CPointMass3DDroneModel::MEMS_ACCEL_NOISE_STD_DEV_X =  0.3;
+   const Real CPointMass3DDroneModel::MEMS_ACCEL_NOISE_STD_DEV_Y = 0.3;
+   const Real CPointMass3DDroneModel::MEMS_ACCEL_NOISE_STD_DEV_Z = 0.3;
 #endif
 
    /****************************************/
