@@ -85,7 +85,7 @@ namespace argos {
          tSetpoint.y = fTargetPosition.GetY() + cInitialPosition.GetY();
          tSetpoint.z = fTargetPosition.GetZ() + cInitialPosition.GetZ();
          /* ENU to NED */
-         /* double-check the sign of m_cTargetYawAngle with real tests */
+         /* @Sinan TODO: double check the sign of m_cTargetYawAngle with real tests */
          tSetpoint.yaw = -m_cTargetYawAngle.GetValue() + cInitialOrientation.GetZ();
          mavlink_message_t tMessage;
          mavlink_msg_set_position_target_local_ned_encode(unTargetSystem, 0, &tMessage, &tSetpoint);
