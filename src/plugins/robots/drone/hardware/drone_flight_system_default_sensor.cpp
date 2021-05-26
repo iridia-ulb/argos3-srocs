@@ -122,9 +122,9 @@ namespace argos {
          }
          /* NED to ENU */
          /* double-check the signs of m_cOrientation values with real tests */
-         m_cOrientation.Set(-tReading.roll, -tReading.pitch, -tReading.yaw);
+         m_cOrientation.Set(tReading.roll, -tReading.pitch, -tReading.yaw);
          /* double-check the signs of m_cAngularVelocity values with real tests */
-         m_cAngularVelocity.Set(-tReading.rollspeed,
+         m_cAngularVelocity.Set(tReading.rollspeed,
                                 -tReading.pitchspeed,
                                 -tReading.yawspeed);
          /* clear out the read data */
@@ -137,7 +137,7 @@ namespace argos {
          CRadians cYaw, cPitch, cRoll;
          cTargetOrientation.ToEulerAngles(cYaw, cPitch, cRoll);
          /* NED to ENU */
-         m_cTargetOrientation.Set(-cRoll.GetValue(), -cPitch.GetValue(), -cYaw.GetValue());
+         m_cTargetOrientation.Set(cRoll.GetValue(), -cPitch.GetValue(), -cYaw.GetValue());
          /* clear out the read data */
          m_tAttitudeTarget.reset();
       }
