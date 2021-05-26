@@ -73,6 +73,7 @@ namespace argos {
          CVector3& fTargetPosition = m_cTargetPosition;
          /* ENU to NED */
          fTargetPosition.Set(fTargetPosition.GetX(), -fTargetPosition.GetY(), -fTargetPosition.GetZ());
+         /* rotate from the world frame to the body frame */
          fTargetPosition.RotateZ(CRadians(cInitialOrientation.GetZ()));
          /* initialize a setpoint struct */
          mavlink_set_position_target_local_ned_t tSetpoint;
@@ -84,7 +85,9 @@ namespace argos {
          tSetpoint.x = fTargetPosition.GetX() + cInitialPosition.GetX();
          tSetpoint.y = fTargetPosition.GetY() + cInitialPosition.GetY();
          tSetpoint.z = fTargetPosition.GetZ() + cInitialPosition.GetZ();
-         tSetpoint.yaw = m_cTargetYawAngle.GetValue() + cInitialOrientation.GetZ();
+         /* ENU to NED */
+         /* double-check the sign of m_cTargetYawAngle with real tests */
+         tSetpoint.yaw = -m_cTargetYawAngle.GetValue() + cInitialOrientation.GetZ();
          mavlink_message_t tMessage;
          mavlink_msg_set_position_target_local_ned_encode(unTargetSystem, 0, &tMessage, &tSetpoint);
          try {
