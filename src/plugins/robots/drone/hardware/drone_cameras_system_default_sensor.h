@@ -70,8 +70,6 @@ namespace argos {
 
          virtual void Update();
 
-         virtual ELedState DetectLed(const CVector3& c_position);
-
       private:
          /* calibration data */
          struct SCalibration {

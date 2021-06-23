@@ -34,17 +34,6 @@
 #define IMAGE_BYTES_PER_PIXEL 2u
 #define TAG_SIDE_LENGTH 0.0235f
 
-#define DETECT_LED_WIDTH 6u
-#define DETECT_LED_HEIGHT 6u
-#define DETECT_LED_THRES_Q1_MIN_V 140u
-#define DETECT_LED_THRES_Q1_MIN_U 140u
-#define DETECT_LED_THRES_Q2_MIN_V 140u
-#define DETECT_LED_THRES_Q2_MAX_U 100u
-#define DETECT_LED_THRES_Q3_MAX_V 110u
-#define DETECT_LED_THRES_Q3_MAX_U 130u
-#define DETECT_LED_THRES_Q4_MAX_V 100u
-#define DETECT_LED_THRES_Q4_MIN_U 145u
-
 /* hint: the command "v4l2-ctl -d0 --list-formats-ext" lists formats for /dev/video0 */
 /* for testing with a set of images: https://raffaels-blog.de/en/post/fake-webcam/ */
 
@@ -430,99 +419,6 @@ namespace argos {
             THROW_ARGOSEXCEPTION_NESTED("Error updating the camera sensor", ex);
          }
       }
-   }
-
-   /****************************************/
-   /****************************************/
-
-   CDroneCamerasSystemDefaultSensor::ELedState
-      CDroneCamerasSystemDefaultSensor::SPhysicalInterface::DetectLed(const CVector3& c_position) {
-      /* project the LED position onto the sensor array */
-      CMatrix<3,1> cLedPosition;
-      cLedPosition(0) = c_position.GetX();
-      cLedPosition(1) = c_position.GetY();
-      cLedPosition(2) = c_position.GetZ();
-      const CMatrix<3,1> cProjection = m_sCalibration.CameraMatrix * cLedPosition;
-      CVector2 cCenter(cProjection(0,0) / cProjection(2,0),
-                       cProjection(1,0) / cProjection(2,0));
-      CVector2 cSize(DETECT_LED_WIDTH, DETECT_LED_HEIGHT);
-      /* declare ranges for truncation */
-      static const CRange<Real> m_cColumnRange(0.0f, m_arrProcessingResolution[0] - 1.0f);
-      static const CRange<Real> m_cRowRange(0.0f, m_arrProcessingResolution[1] - 1.0f);
-      /* calculate the corners of the region of interest */
-      CVector2 cMinCorner(cCenter - 0.5f * cSize);
-      CVector2 cMaxCorner(cCenter + 0.5f * cSize);
-      /* clamp the region of interest to the image size */
-      Real fColumnStart = cMinCorner.GetX();
-      Real fColumnEnd = cMaxCorner.GetX();
-      Real fRowStart = cMinCorner.GetY();
-      Real fRowEnd = cMaxCorner.GetY();
-      m_cColumnRange.TruncValue(fColumnStart);
-      m_cColumnRange.TruncValue(fColumnEnd);
-      m_cRowRange.TruncValue(fRowStart);
-      m_cRowRange.TruncValue(fRowEnd);
-      /* get the start/end indices */
-      UInt32 unColumnStart = static_cast<UInt32>(std::round(fColumnStart));
-      UInt32 unColumnEnd = static_cast<UInt32>(std::round(fColumnEnd));
-      UInt32 unRowStart = static_cast<UInt32>(std::round(fRowStart));
-      UInt32 unRowEnd = static_cast<UInt32>(std::round(fRowEnd));
-      /* column must start and end at an even number due to pixel format */
-      if(unColumnStart % 2) {
-         ++unColumnStart;
-      }
-      if(unColumnEnd % 2) {
-         --unColumnEnd;
-      }
-      /* initialize sums */
-      Real fWeightedSumU = 0.0f;
-      Real fSumY0 = 0.0f;
-      Real fWeightedSumV = 0.0f;
-      Real fSumY1 = 0.0f;
-      /* get a pointer to the current image data */
-      if(m_itCurrentBuffer == std::end(m_arrBuffers)) {
-         THROW_ARGOSEXCEPTION("Current buffer is not ready");
-      }
-      UInt8* punImageData = static_cast<UInt8*>(m_itCurrentBuffer->second);
-      /* extract the data */    
-      for(UInt32 un_row = unRowStart; un_row < unRowEnd; un_row += 1) {
-         UInt32 unRowIndex = un_row * m_arrProcessingResolution[0] * IMAGE_BYTES_PER_PIXEL;
-         for(UInt32 un_column = unColumnStart * IMAGE_BYTES_PER_PIXEL;
-             un_column < unColumnEnd * IMAGE_BYTES_PER_PIXEL;
-             un_column += (2 * IMAGE_BYTES_PER_PIXEL)) {
-            /* get a pointer to the start of the macro pixel */
-            UInt8* punMacroPixel = punImageData + unRowIndex + un_column;
-            /* extract the macro pixel */
-            fWeightedSumU += static_cast<Real>(punMacroPixel[0]) * punMacroPixel[1];
-            fSumY0 += static_cast<Real>(punMacroPixel[1]);
-            fWeightedSumV += static_cast<Real>(punMacroPixel[2]) * punMacroPixel[3];
-            fSumY1 += static_cast<Real>(punMacroPixel[3]);           
-         }
-      }
-      /* default values if fSumY1,0 are zero */
-      UInt8 unAverageU = 128u;
-      UInt8 unAverageV = 128u;     
-      if(fSumY0 != 0.0f) {
-         unAverageU = static_cast<UInt8>(std::round(fWeightedSumU / fSumY0));
-      }
-      if(fSumY1 != 0.0f) {
-         unAverageV = static_cast<UInt8>(std::round(fWeightedSumV / fSumY1));
-      }
-      /* initialize the LED state to off */
-      ELedState eLedState = ELedState::OFF;    
-      /* deduce the LED state from the UV values */
-      if((unAverageV > DETECT_LED_THRES_Q1_MIN_V) && (unAverageU > DETECT_LED_THRES_Q1_MIN_U)) {
-         eLedState = ELedState::Q1;
-      }
-      else if((unAverageV > DETECT_LED_THRES_Q2_MIN_V) && (unAverageU < DETECT_LED_THRES_Q2_MAX_U)) {
-         eLedState = ELedState::Q2;
-      }
-      else if((unAverageV < DETECT_LED_THRES_Q3_MAX_V) && (unAverageU < DETECT_LED_THRES_Q3_MAX_U)) {
-         eLedState = ELedState::Q3;
-      }
-      else if((unAverageV < DETECT_LED_THRES_Q4_MAX_V) && (unAverageU > DETECT_LED_THRES_Q4_MIN_U)) {
-         eLedState = ELedState::Q4;
-      }
-      return eLedState;
    }
 
    /****************************************/

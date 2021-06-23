@@ -24,14 +24,6 @@ namespace argos {
 
    public:
 
-      enum class ELedState : UInt8 {
-         OFF = 0,
-         Q1  = 1,
-         Q2  = 2,
-         Q3  = 3,
-         Q4  = 4
-      };
-
       struct STag {
          STag(UInt32 un_id,
               const CVector3& c_position,
@@ -67,7 +59,6 @@ namespace argos {
          /* methods */
          virtual void Enable();
          virtual void Disable();
-         virtual ELedState DetectLed(const CVector3& c_position) = 0;
          /* configuration data */
          const std::string& Label;
          const TConfiguration& Configuration;

@@ -61,37 +61,6 @@ namespace argos {
    /****************************************/
 
 #ifdef ARGOS_WITH_LUA
-   /*
-    * the stack must contain a single table with keys named x, y, and z
-    * which represent the X, Y, and Z components of a 3D vector
-    */
-   int LuaDroneCamerasSystemSensorDetectLed(lua_State* pt_lua_state) {
-      /* get camera */
-      CCI_DroneCamerasSystemSensor::SInterface* ps_interface =
-         static_cast<CCI_DroneCamerasSystemSensor::SInterface*>(
-            lua_touserdata(pt_lua_state, lua_upvalueindex(1)));
-      /* check parameters */
-      if(lua_gettop(pt_lua_state) != 1) {
-         std::string strErrorMessage("robot.cameras_system[");
-         strErrorMessage += ps_interface->Label;
-         strErrorMessage += "].detect_led() expects a single argument";
-         return luaL_error(pt_lua_state, strErrorMessage.c_str());
-      }
-      const CVector3& cPosition = CLuaVector3::ToVector3(pt_lua_state, 1);
-      /* get the LED state */
-      const CCI_DroneCamerasSystemSensor::ELedState& eLedState =
-         ps_interface->DetectLed(cPosition);
-      /* convert the LED state to an integer and push it onto the stack */
-      lua_pushinteger(pt_lua_state, static_cast<UInt8>(eLedState));
-      /* return a single result, the integer */
-      return 1;
-   }
-#endif
-
-   /****************************************/
-   /****************************************/
-
-#ifdef ARGOS_WITH_LUA
    void CCI_DroneCamerasSystemSensor::CreateLuaState(lua_State* pt_lua_state) {
       CLuaUtility::OpenRobotStateTable(pt_lua_state, "cameras_system");
       Visit([pt_lua_state] (SInterface& s_interface) {
@@ -112,11 +81,6 @@ namespace argos {
          lua_pushstring(pt_lua_state, "disable");
          lua_pushlightuserdata(pt_lua_state, &s_interface);
          lua_pushcclosure(pt_lua_state, &LuaDroneCamerasSystemSensorDisableCamera, 1);
-         lua_settable(pt_lua_state, -3);
-         /* push closure for the detect LED function */
-         lua_pushstring(pt_lua_state, "detect_led");
-         lua_pushlightuserdata(pt_lua_state, &s_interface);
-         lua_pushcclosure(pt_lua_state, &LuaDroneCamerasSystemSensorDetectLed, 1);
          lua_settable(pt_lua_state, -3);
          /* add a zero value for the current timestamp */
          CLuaUtility::AddToTable(pt_lua_state, "timestamp", 0.0f);

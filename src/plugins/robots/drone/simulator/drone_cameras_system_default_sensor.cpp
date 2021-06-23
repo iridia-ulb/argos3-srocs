@@ -11,14 +11,10 @@
 #include <argos3/core/simulator/entity/embodied_entity.h>
 #include <argos3/core/simulator/entity/controllable_entity.h>
 
-#include <argos3/plugins/simulator/media/directional_led_medium.h>
 #include <argos3/plugins/simulator/media/tag_medium.h>
 
 #define CAMERA_RANGE_MIN 0.001
 #define CAMERA_RANGE_MAX 1.800
-/* when detecting LEDs, an LED should be within 0.5 cm of the sampled location
-   this prevents the detection of adjacent LEDs on the stigmergic block */
-#define DETECT_LED_DIST_THRES 0.005
 
 namespace argos {
 
@@ -28,11 +24,9 @@ namespace argos {
    CDroneCamerasSystemDefaultSensor::CDroneCamerasSystemDefaultSensor() :
       m_pcControllableEntity(nullptr),
       m_pcEmbodiedEntity(nullptr),
-      m_pcLEDIndex(nullptr),
       m_pcTagIndex(nullptr),
       m_bShowFrustum(false),
-      m_bShowTagRays(false),
-      m_bShowLEDRays(false) {}
+      m_bShowTagRays(false) {}
 
    /****************************************/
    /****************************************/
@@ -69,12 +63,9 @@ namespace argos {
          /* show the frustum and detection rays */
          GetNodeAttributeOrDefault(t_tree, "show_frustum", m_bShowFrustum, m_bShowFrustum);
          GetNodeAttributeOrDefault(t_tree, "show_tag_rays", m_bShowTagRays, m_bShowTagRays);
-         GetNodeAttributeOrDefault(t_tree, "show_led_rays", m_bShowLEDRays, m_bShowLEDRays);
-         /* get indices */
+         /* get index */
          m_pcTagIndex =
             &(CSimulator::GetInstance().GetMedium<CTagMedium>("tags").GetIndex());
-         m_pcLEDIndex =
-            &(CSimulator::GetInstance().GetMedium<CDirectionalLEDMedium>("directional_leds").GetIndex());
       }
       catch(CARGoSException& ex) {
          THROW_ARGOSEXCEPTION_NESTED("Error initializing the drone cameras system sensor", ex);
@@ -148,7 +139,6 @@ namespace argos {
    void CDroneCamerasSystemDefaultSensor::
       SSimulatedInterface::Reset() {
       Tags.clear();
-      m_vecLedCache.clear();
    }
 
    /****************************************/
@@ -160,7 +150,6 @@ namespace argos {
       Timestamp += CPhysicsEngine::GetSimulationClockTick();
       /* clear out the readings from the last update */
       Tags.clear();
-      m_vecLedCache.clear();
       /* if the sensor is enabled */
       if(Enabled) {
          /* TODO move these sensor parameters to class wide to avoid recalling constructors */
@@ -252,10 +241,6 @@ namespace argos {
          m_cParent.GetTagIndex().ForEntitiesInBoxRange(cBoundingBoxPosition,
                                                        cBoundingBoxHalfExtents,
                                                        *this);
-         /* detect directional LEDs */
-         m_cParent.GetLEDIndex().ForEntitiesInBoxRange(cBoundingBoxPosition,
-                                                       cBoundingBoxHalfExtents,
-                                                       *this);
       }
    }
 
@@ -339,91 +324,6 @@ namespace argos {
    /****************************************/
    /****************************************/
 
-   bool CDroneCamerasSystemDefaultSensor::
-      SSimulatedInterface::operator()(CDirectionalLEDEntity& c_led) {
-      if(c_led.GetColor() == CColor::BLACK) {
-         return true;
-      }
-      if(GetAngleWithCamera(c_led) > c_led.GetObservableAngle()) {
-         return true;
-      }
-      const CVector3& cLedPosition = c_led.GetPosition();
-      if(IsInsideFrustum(cLedPosition) == false) {
-         return true;
-      }
-      m_cOcclusionCheckRay.SetEnd(cLedPosition);
-      if(GetEmbodiedEntitiesIntersectedByRay(m_vecIntersections, m_cOcclusionCheckRay)) {
-         CEntity& cEntityWithLED = c_led.GetRootEntity();
-         CEntity& cEntityWithCamera = m_cParent.GetControllableEntity().GetRootEntity();
-         for(const SEmbodiedEntityIntersectionItem& s_item : m_vecIntersections) {
-            CEntity& cIntersectionEntity = s_item.IntersectedEntity->GetRootEntity();
-            if(&cIntersectionEntity != &cEntityWithLED && &cIntersectionEntity != &cEntityWithCamera) {
-               /* led is occluded */
-               if(m_cParent.ShowLEDRays()) {
-                  std::vector<std::pair<bool, CRay3> >& vecCheckedRays =
-                     m_cParent.GetControllableEntity().GetCheckedRays();
-                  vecCheckedRays.emplace_back(true, m_cOcclusionCheckRay);
-               }
-               /* no more checks necessary, move on to the next tag */
-               return true;
-            }
-         }
-      }
-      m_vecLedCache.emplace_back(c_led.GetColor(), cLedPosition, ProjectOntoSensor(cLedPosition));
-      if(m_cParent.ShowLEDRays()) {
-            std::vector<std::pair<bool, CRay3> >& vecCheckedRays =
-               m_cParent.GetControllableEntity().GetCheckedRays();
-            vecCheckedRays.emplace_back(false, m_cOcclusionCheckRay);
-      }
-      return true;
-   }
-
-   /****************************************/
-   /****************************************/
-
-   CDroneCamerasSystemDefaultSensor::ELedState
-      CDroneCamerasSystemDefaultSensor::SSimulatedInterface::DetectLed(const CVector3& c_position) {
-      /* c_position is the led in camera's coordinate system, 
-         transfer it to global coordinate system */
-      CVector3 cLedPosition(c_position);
-      cLedPosition.Rotate(m_cCameraOrientation);
-      cLedPosition += m_cCameraPosition;
-      /* find the closest LED */
-      std::vector<SLed>::iterator itClosestLed =
-         std::min_element(std::begin(m_vecLedCache),
-                          std::end(m_vecLedCache),
-                          [&cLedPosition] (const SLed& s_lhs_led, const SLed& s_rhs_led) {
-         return (Distance(s_lhs_led.Position, cLedPosition) <
-                 Distance(s_rhs_led.Position, cLedPosition));
-      });
-      /* if no LEDs were found or if the closest LED is more than 0.5 cm away,
-         return ELedState::OFF */
-      if(itClosestLed == std::end(m_vecLedCache) ||
-         Distance(itClosestLed->Position, cLedPosition) > DETECT_LED_DIST_THRES) {
-         return ELedState::OFF;
-      }
-      /* At this point, we have the closest LED, estimate its state (mapped from
-         an exact color in simulation */
-      if(itClosestLed->Color == CColor::MAGENTA) {
-         return ELedState::Q1;
-      }
-      else if(itClosestLed->Color == CColor::ORANGE) {
-         return ELedState::Q2;
-      }
-      else if(itClosestLed->Color == CColor::GREEN) {
-         return ELedState::Q3;
-      }
-      else if(itClosestLed->Color == CColor::BLUE) {
-         return ELedState::Q4;
-      }
-      else {
-         return ELedState::OFF;
-      }
-   }
-
-   /****************************************/
-   /****************************************/
-
    CVector2 CDroneCamerasSystemDefaultSensor::SSimulatedInterface::GetResolution() const {
       return CVector2(CAMERA_RESOLUTION_X, CAMERA_RESOLUTION_Y);
    }
@@ -479,7 +379,7 @@ namespace argos {
                    "drone_cameras_system", "default",
                    "Michael Allwright [allsey87@gmail.com]",
                    "1.0",
-                   "The multi-camera sensor for the drone (detects tags and directional LEDs).",
+                   "The multi-camera sensor for the drone that detects tags.",
                    "Long description\n",
                    "Usable");
 }

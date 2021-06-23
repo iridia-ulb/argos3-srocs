@@ -22,7 +22,6 @@ namespace argos {
 #include <argos3/core/utility/math/plane.h>
 
 #include <argos3/plugins/simulator/entities/tag_entity.h>
-#include <argos3/plugins/simulator/entities/directional_led_entity.h>
 #include <argos3/plugins/robots/drone/control_interface/ci_drone_cameras_system_sensor.h>
 
 #include <vector>
@@ -51,8 +50,7 @@ namespace argos {
    private:
 
       struct SSimulatedInterface : SInterface,
-                                   CPositionalIndex<CTagEntity>::COperation,
-                                   CPositionalIndex<CDirectionalLEDEntity>::COperation {
+                                   CPositionalIndex<CTagEntity>::COperation {
          SSimulatedInterface(const std::string& str_label,
                              const CCI_DroneCamerasSystemSensor::TConfiguration& t_configuration,
                              const SAnchor& s_anchor,
@@ -66,10 +64,6 @@ namespace argos {
 
          virtual bool operator()(CTagEntity& c_tag);
 
-         virtual bool operator()(CDirectionalLEDEntity& c_led);
-
-         virtual ELedState DetectLed(const CVector3& c_position);
-   
          CVector2 GetResolution() const;
 
       private:
@@ -77,23 +71,6 @@ namespace argos {
          const SAnchor& Anchor;
 
          CDroneCamerasSystemDefaultSensor& m_cParent;
-
-         /* representation of an LED inside the frustum */
-         struct SLed {
-            SLed(const CColor& c_color,
-                 const CVector3& c_position,
-                 const CVector2& c_center) :
-               Color(c_color),
-               Position(c_position),
-               Center(c_center) {}
-            CColor Color;
-            CVector3 Position;
-            CVector2 Center;
-         };
-
-         const std::vector<SLed>& GetLedCache() const {
-            return m_vecLedCache;
-         }
 
          /* AprilTag corner offsets / ordering */
          // TODO make static, initialize in CPP
@@ -125,7 +102,6 @@ namespace argos {
          std::array<CVector2, 4> m_arrTagCornerPixels;
          CRay3 m_cOcclusionCheckRay;
          std::vector<SEmbodiedEntityIntersectionItem> m_vecIntersections;
-         std::vector<SLed> m_vecLedCache;
 
          /* utility methods */
          CRadians GetAngleWithCamera(const CPositionalEntity& c_entity) const;
@@ -141,10 +117,6 @@ namespace argos {
          return *m_pcEmbodiedEntity;
       }
 
-      CPositionalIndex<CDirectionalLEDEntity>& GetLEDIndex() {
-         return *m_pcLEDIndex;
-      }
-
       CPositionalIndex<CTagEntity>& GetTagIndex() {
          return *m_pcTagIndex;
       }
@@ -157,21 +129,14 @@ namespace argos {
          return m_bShowTagRays;
       }
 
-      bool ShowLEDRays() const {
-         return m_bShowLEDRays;
-      }
-
-
    private:
       CControllableEntity* m_pcControllableEntity;
       CEmbodiedEntity* m_pcEmbodiedEntity;
-      CPositionalIndex<CDirectionalLEDEntity>* m_pcLEDIndex;
       CPositionalIndex<CTagEntity>* m_pcTagIndex;
 
       /* debugging information */
       bool m_bShowFrustum;
       bool m_bShowTagRays;
-      bool m_bShowLEDRays;
 
       std::vector<SSimulatedInterface> m_vecSimulatedInterfaces;
 
