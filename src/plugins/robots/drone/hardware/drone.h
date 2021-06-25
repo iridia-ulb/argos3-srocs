@@ -62,6 +62,7 @@ namespace argos {
                 const std::string& str_controller_id,
                 const std::string& str_router_addr,
                 const std::string& str_pixhawk_conf,
+                const std::string& str_sensor_data_path,
                 UInt32 un_ticks_per_sec,
                 UInt32 un_length);
 
@@ -88,6 +89,10 @@ namespace argos {
 
       CPixhawk& GetPixhawk() {
          return m_cPixhawk;
+      }
+
+      const std::string& GetSensorDataPath() {
+         return m_strSensorDataPath;
       }
 
    private:
@@ -122,6 +127,9 @@ namespace argos {
 
       /* the vector of sensors */
       std::vector<CPhysicalSensor*> m_vecSensors;
+
+      /* path to where sensor data should be saved */
+      std::string m_strSensorDataPath;
 
       /* triggers for updating the sensors and actuators */
       iio_context* m_psContext;

@@ -40,8 +40,10 @@ namespace argos {
                      const std::string& str_controller_id,
                      const std::string& str_router_addr,
                      const std::string& str_pixhawk_conf,
+                     const std::string& str_sensor_data_path,
                      UInt32 un_ticks_per_sec,
                      UInt32 un_length) {
+      m_strSensorDataPath = str_sensor_data_path;
       m_unTicksPerSec = un_ticks_per_sec;
       m_unLength = un_length;
       try {        
@@ -218,11 +220,21 @@ namespace argos {
       /* destroy the controller */
       m_pcController->Destroy();
       /* delete actuators */
-      for(CPhysicalActuator* pc_actuator : m_vecActuators)
+      for(CPhysicalActuator* pc_actuator : m_vecActuators) {
+         CCI_Actuator* pcActuator = dynamic_cast<CCI_Actuator*>(pc_actuator);
+         if(pcActuator != nullptr) {
+            pcActuator->Destroy();
+         }
          delete pc_actuator;
+      }
       /* delete sensors */
-      for(CPhysicalSensor* pc_sensor : m_vecSensors)
+      for(CPhysicalSensor* pc_sensor : m_vecSensors) {
+         CCI_Sensor* pcSensor = dynamic_cast<CCI_Sensor*>(pc_sensor);
+         if(pcSensor != nullptr) {
+            pcSensor->Destroy();
+         }
          delete pc_sensor;
+      }
       /* delete the IIO library's context */
       iio_context_destroy(m_psContext);
       /* remove triggers */

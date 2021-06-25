@@ -29,6 +29,7 @@ struct v4l2_buffer;
 #include <argos3/core/utility/math/vector2.h>
 #include <argos3/core/utility/math/vector3.h>
 
+#include <argos3/plugins/robots/drone/hardware/drone.h>
 #include <argos3/plugins/robots/generic/hardware/sensor.h>
 #include <argos3/plugins/robots/drone/control_interface/ci_drone_cameras_system_sensor.h>
 
@@ -42,6 +43,8 @@ namespace argos {
       CDroneCamerasSystemDefaultSensor();
 
       virtual ~CDroneCamerasSystemDefaultSensor();
+
+      virtual void SetRobot(CRobot& c_robot);
 
       virtual void Init(TConfigurationNode& t_tree);
 
@@ -57,7 +60,8 @@ namespace argos {
       public:
          SPhysicalInterface(const std::string& str_label,
                             const TConfiguration& t_configuration,
-                            TConfigurationNode& t_interface);
+                            TConfigurationNode& t_interface,
+                            const std::string& str_save_path);
          ~SPhysicalInterface();
 
          void Open();
@@ -69,6 +73,10 @@ namespace argos {
          virtual void Disable() override;
 
          virtual void Update();
+
+         ticpp::Element& GetMetadata() {
+            return m_cMetadata;
+         }
 
       private:
          /* calibration data */
@@ -95,8 +103,11 @@ namespace argos {
          std::array<std::pair<UInt32, void*>, 2> m_arrBuffers;
          std::array<std::pair<UInt32, void*>, 2>::iterator m_itCurrentBuffer;
          std::array<std::pair<UInt32, void*>, 2>::iterator m_itNextBuffer;
-         /* frame counter */
-         UInt32 unFrameId = 0;
+         /* frame index */
+         UInt32 m_unFrameIndex = 0;
+         /* save frames */
+         std::string m_strSavePath;
+         ticpp::Element m_cMetadata;
       };
 
       /* time at initialization */
@@ -104,6 +115,9 @@ namespace argos {
 
       /* vector of interfaces */
       std::vector<SPhysicalInterface> m_vecPhysicalInterfaces;
+
+      /* path to save camera sensor data */
+      std::string m_strSensorDataPath;
 
       /****************************************/
       /****************************************/

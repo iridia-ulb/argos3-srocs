@@ -7,6 +7,7 @@
 
 #include "drone_cameras_system_default_sensor.h"
 
+#include <argos3/core/utility/configuration/tinyxml/ticpp.h>
 #include <argos3/core/utility/logging/argos_log.h>
 #include <argos3/core/utility/math/vector2.h>
 #include <argos3/core/utility/math/vector3.h>
@@ -31,7 +32,6 @@
 #include <algorithm>
 #include <execution>
 
-#define IMAGE_BYTES_PER_PIXEL 2u
 #define TAG_SIDE_LENGTH 0.0235f
 
 /* hint: the command "v4l2-ctl -d0 --list-formats-ext" lists formats for /dev/video0 */
@@ -49,6 +49,19 @@ namespace argos {
 
    CDroneCamerasSystemDefaultSensor::~CDroneCamerasSystemDefaultSensor() {}
    
+   /****************************************/
+   /****************************************/
+
+   void CDroneCamerasSystemDefaultSensor::SetRobot(CRobot& c_robot) {
+      CDrone* pcDrone = dynamic_cast<CDrone*>(&c_robot);
+      if(pcDrone == nullptr) {
+         THROW_ARGOSEXCEPTION("The drone cameras system sensor only works with the drone")
+      }
+      else {
+         m_strSensorDataPath = pcDrone->GetSensorDataPath();
+      }
+   }
+
    /****************************************/
    /****************************************/
 
@@ -71,7 +84,8 @@ namespace argos {
             else {
                m_vecPhysicalInterfaces.emplace_back(itConfig->first,
                                                     itConfig->second,
-                                                    *itInterface);
+                                                    *itInterface,
+                                                    m_strSensorDataPath);
             }
          }
          for(SPhysicalInterface& s_physical_interface : m_vecPhysicalInterfaces) {
@@ -88,6 +102,17 @@ namespace argos {
    /****************************************/
 
    void CDroneCamerasSystemDefaultSensor::Destroy() {
+      if(!m_strSensorDataPath.empty()) {
+         ticpp::Document cMetadata(m_strSensorDataPath + "/metadata.xml");
+         ticpp::Declaration cDecl("1.0", "", "");
+         cMetadata.InsertEndChild(cDecl);
+         ticpp::Element cRoot("cameras_system_metadata");
+         for(SPhysicalInterface& s_physical_interface : m_vecPhysicalInterfaces) {
+            cRoot.InsertEndChild(s_physical_interface.GetMetadata());
+         }
+         cMetadata.InsertEndChild(cRoot);
+         cMetadata.SaveFile();
+      }
       for(SPhysicalInterface& s_physical_interface : m_vecPhysicalInterfaces) {
             s_physical_interface.Close();
       }
@@ -121,8 +146,11 @@ namespace argos {
    CDroneCamerasSystemDefaultSensor::SPhysicalInterface::
       SPhysicalInterface(const std::string& str_label,
                          const TConfiguration& t_configuration,
-                         TConfigurationNode& t_interface):
-      SInterface(str_label, t_configuration) {
+                         TConfigurationNode& t_interface,
+                         const std::string& str_save_path):
+      SInterface(str_label, t_configuration),
+      m_strSavePath(str_save_path),
+      m_cMetadata("camera") {
       /* parse calibration data if provided */
       CVector2 cFocalLength;
       CVector2 cPrincipalPoint;
@@ -197,6 +225,9 @@ namespace argos {
       m_tTagDetectionInfo.cx = m_sCalibration.CameraMatrix(0,2);
       m_tTagDetectionInfo.cy = m_sCalibration.CameraMatrix(1,2);
       m_tTagDetectionInfo.tagsize = TAG_SIDE_LENGTH;
+      /* set attributes on the camera metadata tag */
+      m_cMetadata.SetAttribute("id", str_label);
+      m_cMetadata.SetAttribute("processing_offset", strProcessingOffset);
    }
 
    /****************************************/
@@ -406,14 +437,48 @@ namespace argos {
             }
             /* destroy the readings array */
             ::apriltag_detections_destroy(ptDetectionArray);
+            /* save frame data and metadata to files if a path to do so was specified */
+            if(!m_strSavePath.empty()) {
+               /* create a new frame node */
+               ticpp::Element cFrameElement("frame");
+               cFrameElement.SetAttribute("timestamp", Timestamp);
+               cFrameElement.SetAttribute("index", m_unFrameIndex);
+               /* write images to the save path */
+               std::string strBasename = m_strSavePath +
+                  "/frame" + std::to_string(m_unFrameIndex) +
+                  "_" + Label;
+               /* PNM image */
+               ticpp::Element cPnmElement("pnm");
+               cPnmElement.SetAttribute("path", strBasename + ".pnm");
+               cFrameElement.InsertEndChild(cPnmElement);
+               image_u8_write_pnm(&tImageProcess, (strBasename + ".pnm").c_str());
+               /* JPEG image */
+               ticpp::Element cJpegElement("jpeg");
+               cJpegElement.SetAttribute("path", strBasename + ".jpg");
+               cFrameElement.InsertEndChild(cJpegElement);
+               std::ofstream(strBasename + ".jpg")
+                  .write(static_cast<const char*>(m_itCurrentBuffer->second), sBuffer.length);
+               /* write metadata for each detection */
+               for(const STag& s_tag: Tags) {
+                  ticpp::Element cDetectionElement("detection");
+                  cDetectionElement.SetAttribute("id", s_tag.Id);
+                  for(UInt32 un_index = 0; un_index < s_tag.Corners.size(); un_index++) {
+                     cDetectionElement.SetAttribute('p' + std::to_string(un_index), s_tag.Corners[un_index]);
+                  }
+                  cDetectionElement.SetAttribute("c", s_tag.Center);
+                  cFrameElement.InsertEndChild(cDetectionElement);
+               }
+               m_cMetadata.InsertEndChild(cFrameElement);
+            }
             /* enqueue the next buffer */
             ::memset(&sBuffer, 0, sizeof(::v4l2_buffer));
             sBuffer.type = ::V4L2_BUF_TYPE_VIDEO_CAPTURE;
             sBuffer.memory = ::V4L2_MEMORY_MMAP;
             sBuffer.index = m_itNextBuffer->first;
             if(::ioctl(m_nCameraHandle, VIDIOC_QBUF, &sBuffer) < 0) {
-               THROW_ARGOSEXCEPTION("Can not enqueue used buffer");
+               THROW_ARGOSEXCEPTION("Could not enqueue used buffer");
             }
+            m_unFrameIndex += 1;
          }
          catch(CARGoSException& ex) {
             THROW_ARGOSEXCEPTION_NESTED("Error updating the camera sensor", ex);

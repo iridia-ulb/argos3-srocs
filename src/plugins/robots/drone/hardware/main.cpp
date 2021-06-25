@@ -68,6 +68,7 @@ int main(int n_argc, char** ppch_argv) {
       std::string strRouterAddr;
       std::string strControllerId;
       std::string strPixhawkConf;
+      std::string strSensorDataPath;
       CCommandLineArgParser cCommandLineArgParser;
       cCommandLineArgParser.AddFlag('h',
                     "help",
@@ -89,6 +90,10 @@ int main(int n_argc, char** ppch_argv) {
                                                      "router",
                                                      "the address and port of the message router",
                                                      strRouterAddr);
+      cCommandLineArgParser.AddArgument<std::string>('s',
+                                                     "sensor-data-path",
+                                                     "path to where sensor data should be saved",
+                                                     strSensorDataPath);
       /* Parse command line */
       cCommandLineArgParser.Parse(n_argc, ppch_argv);
       if(bUsageHelp) {
@@ -177,6 +182,7 @@ int main(int n_argc, char** ppch_argv) {
                    strControllerId,
                    strRouterAddr,
                    strPixhawkConf,
+                   strSensorDataPath,
                    unTicksPerSec,
                    unLength);
       RunScripts(m_vecPostInitScripts);
