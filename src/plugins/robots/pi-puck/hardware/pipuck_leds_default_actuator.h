@@ -1,11 +1,11 @@
 /**
- * @file <argos3/plugins/robots/pi-puck/hardware/pipuck_differential_drive_default_actuator.h>
+ * @file <argos3/plugins/robots/pi-puck/hardware/pipuck_leds_default_actuator.h>
  *
  * @author Michael Allwright - <allsey87@gmail.com>
  */
 
-#ifndef PIPUCK_DIFFERENTIAL_DRIVE_DEFAULT_ACTUATOR_H
-#define PIPUCK_DIFFERENTIAL_DRIVE_DEFAULT_ACTUATOR_H
+#ifndef PIPUCK_LEDS_DEFAULT_ACTUATOR_H
+#define PIPUCK_LEDS_DEFAULT_ACTUATOR_H
 
 namespace argos {
    class CPiPuckLEDsDefaultActuator;
