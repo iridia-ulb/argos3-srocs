@@ -6,6 +6,7 @@ set(ARGOS3_HEADERS_PLUGINS_ROBOTS_DRONE_CONTROLINTERFACE
   control_interface/ci_drone_cameras_system_sensor.h
   control_interface/ci_drone_flight_system_actuator.h
   control_interface/ci_drone_flight_system_sensor.h
+  control_interface/ci_drone_leds_actuator.h
   control_interface/ci_drone_rangefinders_sensor.h
   control_interface/ci_drone_system_sensor.h)
 if(ARGOS_BUILD_FOR_SIMULATOR)
@@ -16,6 +17,7 @@ if(ARGOS_BUILD_FOR_SIMULATOR)
     simulator/drone_flight_system_default_actuator.h
     simulator/drone_flight_system_default_sensor.h
     simulator/drone_flight_system_entity.h
+    simulator/drone_leds_default_actuator.h
 #    simulator/drone_rangefinders_default_sensor.h
     simulator/drone_system_default_sensor.h
     simulator/pointmass3d_drone_model.h)
@@ -31,6 +33,7 @@ elseif(ARGOS_BUILD_FOR STREQUAL "drone")
     hardware/drone_cameras_system_default_sensor.h
     hardware/drone_flight_system_default_actuator.h
     hardware/drone_flight_system_default_sensor.h
+#    hardware/drone_leds_default_actuator.h
     hardware/drone_rangefinders_default_sensor.h
     hardware/drone_system_default_sensor.h)
 endif(ARGOS_BUILD_FOR_SIMULATOR)
@@ -44,6 +47,7 @@ set(ARGOS3_SOURCES_PLUGINS_ROBOTS_DRONE
   control_interface/ci_drone_cameras_system_sensor.cpp
   control_interface/ci_drone_flight_system_actuator.cpp
   control_interface/ci_drone_flight_system_sensor.cpp
+  control_interface/ci_drone_leds_actuator.cpp
   control_interface/ci_drone_rangefinders_sensor.cpp
   control_interface/ci_drone_system_sensor.cpp)
 if(ARGOS_BUILD_FOR_SIMULATOR)
@@ -56,6 +60,7 @@ if(ARGOS_BUILD_FOR_SIMULATOR)
     simulator/drone_flight_system_default_actuator.cpp
     simulator/drone_flight_system_default_sensor.cpp
     simulator/drone_flight_system_entity.cpp
+    simulator/drone_leds_default_actuator.cpp
 #    simulator/drone_rangefinders_default_sensor.cpp
     simulator/drone_system_default_sensor.cpp
     simulator/pointmass3d_drone_model.cpp)
@@ -73,7 +78,8 @@ elseif(ARGOS_BUILD_FOR STREQUAL "drone")
     hardware/drone_cameras_system_default_sensor.cpp
     hardware/drone_flight_system_default_actuator.cpp
     hardware/drone_flight_system_default_sensor.cpp
-    hardware/drone_rangefinders_default_sensor.cpp   
+    hardware/drone_leds_default_actuator.cpp
+    hardware/drone_rangefinders_default_sensor.cpp
     hardware/drone_system_default_sensor.cpp
     hardware/main.cpp)
 endif(ARGOS_BUILD_FOR_SIMULATOR)

@@ -18,10 +18,10 @@ trajectory = {
 
 function init()
    time = 1
-   robot.directional_leds.set_single_color(1, "red")
-   robot.directional_leds.set_single_color(2, "red")
-   robot.directional_leds.set_single_color(3, "red")
-   robot.directional_leds.set_single_color(4, "red")
+   robot.leds.set_leds("blue")
+   robot.leds.set_led_index(1, "red")
+   robot.leds.set_led_index(2, "green")
+   robot.leds.set_led_index(3, "yellow")
 end
 
 function step()
