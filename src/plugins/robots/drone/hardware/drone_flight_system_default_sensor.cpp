@@ -88,27 +88,31 @@ namespace argos {
       if(m_tLocalPositionNed) {
          const mavlink_local_position_ned_t& tReading =
             m_tLocalPositionNed.value();
-         m_cPosition.Set(tReading.x, tReading.y, tReading.z);
-         /* set the initial position if not already set */
+         CVector3 cLocalPositionNed(tReading.x, tReading.y, tReading.z);
+         /* set the initial position if not already set, it should be in NED*/
          if(!m_pcPixhawk->GetInitialPosition()) {
-            m_pcPixhawk->GetInitialPosition().emplace(m_cPosition);
+            m_pcPixhawk->GetInitialPosition().emplace(cLocalPositionNed);
          }
-         CVector3& cInitialOrientation = m_pcPixhawk->GetInitialOrientation().value();
-         /* NED to ENU */
-         m_cPosition.RotateZ(CRadians(-cInitialOrientation.GetZ())); 
-         m_cPosition.Set(m_cPosition.GetX(), -m_cPosition.GetY(), -m_cPosition.GetZ());
+         if(m_pcPixhawk->GetInitialOrientation()) {
+            CVector3& cInitialOrientation = m_pcPixhawk->GetInitialOrientation().value();
+            /* NED to ENU */
+            cLocalPositionNed.RotateZ(CRadians(-cInitialOrientation.GetZ())); 
+            m_cPosition.Set(cLocalPositionNed.GetX(), -cLocalPositionNed.GetY(), -cLocalPositionNed.GetZ());
+         }
          m_cVelocity.Set(tReading.vx, -tReading.vy, -tReading.vz);
          /* clear out the read data */
          m_tLocalPositionNed.reset();
       }
       if (m_tPositionTargetLocalNed) {
-         const mavlink_position_target_local_ned_t &tReading =
-             m_tPositionTargetLocalNed.value();
-         m_cTargetPosition.Set(tReading.x, tReading.y, tReading.z);
-         CVector3& cInitialOrientation = m_pcPixhawk->GetInitialOrientation().value();
-         /* NED to ENU */
-         m_cTargetPosition.RotateZ(CRadians(-cInitialOrientation.GetZ()));
-         m_cTargetPosition.Set(m_cTargetPosition.GetX(), -m_cTargetPosition.GetY(), -m_cTargetPosition.GetZ());
+         if(m_pcPixhawk->GetInitialOrientation()) {
+            const mavlink_position_target_local_ned_t &tReading =
+                m_tPositionTargetLocalNed.value();
+            CVector3 cTargetPosition(tReading.x, tReading.y, tReading.z);
+            CVector3& cInitialOrientation = m_pcPixhawk->GetInitialOrientation().value();
+            /* NED to ENU */
+            cTargetPosition.RotateZ(CRadians(-cInitialOrientation.GetZ()));
+            m_cTargetPosition.Set(cTargetPosition.GetX(), -cTargetPosition.GetY(), -cTargetPosition.GetZ());
+         }
          /* clear out the read data */
          m_tPositionTargetLocalNed.reset();
       }
