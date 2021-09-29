@@ -88,16 +88,16 @@ namespace argos {
       if(m_tLocalPositionNed) {
          const mavlink_local_position_ned_t& tReading =
             m_tLocalPositionNed.value();
-         m_cPosition.Set(tReading.x, tReading.y, tReading.z);
+         CVector3 cLocalPositionNed(tReading.x, tReading.y, tReading.z);
          /* set the initial position if not already set, it should be in NED*/
          if(!m_pcPixhawk->GetInitialPosition()) {
-            m_pcPixhawk->GetInitialPosition().emplace(m_cPosition);
+            m_pcPixhawk->GetInitialPosition().emplace(cLocalPositionNed);
          }
          if(m_pcPixhawk->GetInitialOrientation()) {
             CVector3& cInitialOrientation = m_pcPixhawk->GetInitialOrientation().value();
             /* NED to ENU */
-            m_cPosition.RotateZ(CRadians(-cInitialOrientation.GetZ())); 
-            m_cPosition.Set(m_cPosition.GetX(), -m_cPosition.GetY(), -m_cPosition.GetZ());
+            cLocalPositionNed.RotateZ(CRadians(-cInitialOrientation.GetZ())); 
+            m_cPosition.Set(cLocalPositionNed.GetX(), -cLocalPositionNed.GetY(), -cLocalPositionNed.GetZ());
          }
          m_cVelocity.Set(tReading.vx, -tReading.vy, -tReading.vz);
          /* clear out the read data */
