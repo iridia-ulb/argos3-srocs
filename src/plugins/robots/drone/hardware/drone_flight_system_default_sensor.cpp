@@ -89,15 +89,17 @@ namespace argos {
          const mavlink_local_position_ned_t& tReading =
             m_tLocalPositionNed.value();
          m_cPosition.Set(tReading.x, tReading.y, tReading.z);
+         m_cVelocity.Set(tReading.vx, -tReading.vy, -tReading.vz);
          /* set the initial position if not already set */
          if(!m_pcPixhawk->GetInitialPosition()) {
             m_pcPixhawk->GetInitialPosition().emplace(m_cPosition);
          }
-         CVector3& cInitialOrientation = m_pcPixhawk->GetInitialOrientation().value();
-         /* NED to ENU */
-         m_cPosition.RotateZ(CRadians(-cInitialOrientation.GetZ())); 
-         m_cPosition.Set(m_cPosition.GetX(), -m_cPosition.GetY(), -m_cPosition.GetZ());
-         m_cVelocity.Set(tReading.vx, -tReading.vy, -tReading.vz);
+         /* convert the position from NED to ENU */
+         if(m_pcPixhawk->GetInitialOrientation()) {
+            CVector3& cInitialOrientation = m_pcPixhawk->GetInitialOrientation().value();
+            m_cPosition.RotateZ(CRadians(-cInitialOrientation.GetZ())); 
+            m_cPosition.Set(m_cPosition.GetX(), -m_cPosition.GetY(), -m_cPosition.GetZ());
+         }
          /* clear out the read data */
          m_tLocalPositionNed.reset();
       }
@@ -105,10 +107,12 @@ namespace argos {
          const mavlink_position_target_local_ned_t &tReading =
              m_tPositionTargetLocalNed.value();
          m_cTargetPosition.Set(tReading.x, tReading.y, tReading.z);
-         CVector3& cInitialOrientation = m_pcPixhawk->GetInitialOrientation().value();
-         /* NED to ENU */
-         m_cTargetPosition.RotateZ(CRadians(-cInitialOrientation.GetZ()));
-         m_cTargetPosition.Set(m_cTargetPosition.GetX(), -m_cTargetPosition.GetY(), -m_cTargetPosition.GetZ());
+         /* convert the position from NED to ENU */
+         if(m_pcPixhawk->GetInitialOrientation()) {
+            CVector3& cInitialOrientation = m_pcPixhawk->GetInitialOrientation().value();
+            m_cTargetPosition.RotateZ(CRadians(-cInitialOrientation.GetZ()));
+            m_cTargetPosition.Set(m_cTargetPosition.GetX(), -m_cTargetPosition.GetY(), -m_cTargetPosition.GetZ());
+         }
          /* clear out the read data */
          m_tPositionTargetLocalNed.reset();
       }
