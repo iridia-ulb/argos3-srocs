@@ -89,7 +89,7 @@ namespace argos {
          const mavlink_local_position_ned_t& tReading =
             m_tLocalPositionNed.value();
          m_cPosition.Set(tReading.x, tReading.y, tReading.z);
-         /* set the initial position if not already set */
+         /* set the initial position if not already set, it should be in NED*/
          if(!m_pcPixhawk->GetInitialPosition()) {
             m_pcPixhawk->GetInitialPosition().emplace(m_cPosition);
          }
