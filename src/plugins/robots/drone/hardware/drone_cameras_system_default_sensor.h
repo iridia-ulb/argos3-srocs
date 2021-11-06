@@ -89,6 +89,12 @@ namespace argos {
          std::array<UInt32, 2> m_arrCaptureResolution;
          std::array<UInt32, 2> m_arrProcessingResolution;
          std::array<UInt32, 2> m_arrProcessingOffset;
+         /* camera parameters */
+         UInt8 m_unCameraBrightness = 8;
+         UInt8 m_unCameraContrast = 8;
+         bool m_bCameraExposureAuto = true;
+         UInt16 m_unCameraExposureAbsoluteTime = 1250;
+         bool m_bExposureTimeSetFlag = false;
          /* tag detector data */
          std::string m_strTagFamilyName;
          Real m_fTagSideLength;

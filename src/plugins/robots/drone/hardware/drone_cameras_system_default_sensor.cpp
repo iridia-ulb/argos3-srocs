@@ -152,6 +152,11 @@ namespace argos {
       m_fTagSideLength(0.0235f),
       m_strSavePath(str_save_path),
       m_cMetadata("camera") {
+      /* parse camera parameters */
+      GetNodeAttributeOrDefault(t_interface, "camera_brightness", m_unCameraBrightness, m_unCameraBrightness);
+      GetNodeAttributeOrDefault(t_interface, "camera_contrast", m_unCameraContrast, m_unCameraContrast);
+      GetNodeAttributeOrDefault(t_interface, "camera_exposure_auto_mode", m_bCameraExposureAuto, m_bCameraExposureAuto);
+      GetNodeAttributeOrDefault(t_interface, "camera_exposure_absolute_time", m_unCameraExposureAbsoluteTime, m_unCameraExposureAbsoluteTime);
       /* parse calibration data if provided */
       CVector2 cFocalLength;
       CVector2 cPrincipalPoint;
@@ -283,6 +288,30 @@ namespace argos {
       sFormat.fmt.pix.field = V4L2_FIELD_NONE;
       if (::ioctl(m_nCameraHandle, VIDIOC_S_FMT, &sFormat) < 0)
          THROW_ARGOSEXCEPTION("Could not set the camera format");
+      /* set camera control brightness */
+      struct v4l2_control sBrightnessControl;
+      memset(&sBrightnessControl, 0, sizeof (sBrightnessControl));
+      sBrightnessControl.id = V4L2_CID_BRIGHTNESS;
+      sBrightnessControl.value = m_unCameraBrightness;
+      if (::ioctl(m_nCameraHandle, VIDIOC_S_CTRL, &sBrightnessControl) < 0)
+         THROW_ARGOSEXCEPTION("Could not set the camera brightness");
+      /* set camera control contrast */
+      struct v4l2_control sContrastControl;
+      memset(&sContrastControl, 0, sizeof (sContrastControl));
+      sContrastControl.id = V4L2_CID_CONTRAST;
+      sContrastControl.value = m_unCameraContrast;
+      if (::ioctl(m_nCameraHandle, VIDIOC_S_CTRL, &sContrastControl) < 0)
+         THROW_ARGOSEXCEPTION("Could not set the camera contrast");
+      /* set camera control exposure mode */
+      struct v4l2_control sExposureAutoModeControl;
+      memset(&sExposureAutoModeControl, 0, sizeof (sExposureAutoModeControl));
+      sExposureAutoModeControl.id = V4L2_CID_EXPOSURE_AUTO;
+      if (m_bCameraExposureAuto)
+         sExposureAutoModeControl.value = V4L2_EXPOSURE_APERTURE_PRIORITY;
+      else
+         sExposureAutoModeControl.value = V4L2_EXPOSURE_MANUAL;
+      if (::ioctl(m_nCameraHandle, VIDIOC_S_CTRL, &sExposureAutoModeControl) < 0)
+         THROW_ARGOSEXCEPTION("Could not set the camera exposure auto mode");
       /* request camera buffers */
       v4l2_requestbuffers sRequest;
       ::memset(&sRequest, 0, sizeof(sRequest));
@@ -401,6 +430,17 @@ namespace argos {
             sBuffer.index = m_itCurrentBuffer->first;
             if(::ioctl(m_nCameraHandle, VIDIOC_DQBUF, &sBuffer) < 0) {
                THROW_ARGOSEXCEPTION("Could not dequeue buffer");
+            }
+            /* set exposure time after first frame */
+            if ((!m_bCameraExposureAuto) && (!m_bExposureTimeSetFlag)) {
+               m_bExposureTimeSetFlag = true;
+               /* set camera control exposure time*/
+               struct v4l2_control sExposureTimeControl;
+               memset(&sExposureTimeControl, 0, sizeof (sExposureTimeControl));
+               sExposureTimeControl.id = V4L2_CID_EXPOSURE_ABSOLUTE;
+               sExposureTimeControl.value = m_unCameraExposureAbsoluteTime;
+               if (::ioctl(m_nCameraHandle, VIDIOC_S_CTRL, &sExposureTimeControl) < 0)
+                  THROW_ARGOSEXCEPTION("Could not set camera exposure time");
             }
             /* update the timestamp in the control interface */
             Timestamp = sBuffer.timestamp.tv_sec + (10e-6 * sBuffer.timestamp.tv_usec);
