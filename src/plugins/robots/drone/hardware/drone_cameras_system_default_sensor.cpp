@@ -232,7 +232,6 @@ namespace argos {
       m_ptImage =
          ::image_u8_create_alignment(m_arrCaptureResolution[0], m_arrCaptureResolution[1], 96);
       /* update the tag detection info structure */
-
       try {
          GetNodeAttribute(t_interface, "tag_side_length", m_fTagSideLength);
       }
