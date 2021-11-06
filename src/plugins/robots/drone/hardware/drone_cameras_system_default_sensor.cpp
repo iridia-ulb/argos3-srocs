@@ -34,8 +34,6 @@
 #include <algorithm>
 #include <execution>
 
-#define TAG_SIDE_LENGTH 0.0235f
-
 /* hint: the command "v4l2-ctl -d0 --list-formats-ext" lists formats for /dev/video0 */
 /* for testing with a set of images: https://raffaels-blog.de/en/post/fake-webcam/ */
 
@@ -151,6 +149,7 @@ namespace argos {
                          TConfigurationNode& t_interface,
                          const std::string& str_save_path):
       SInterface(str_label, t_configuration),
+      m_fTagSideLength(0.0235f),
       m_strSavePath(str_save_path),
       m_cMetadata("camera") {
       /* parse calibration data if provided */
@@ -233,11 +232,18 @@ namespace argos {
       m_ptImage =
          ::image_u8_create_alignment(m_arrCaptureResolution[0], m_arrCaptureResolution[1], 96);
       /* update the tag detection info structure */
+
+      try {
+         GetNodeAttribute(t_interface, "tag_side_length", m_fTagSideLength);
+      }
+      catch(CARGoSException& ex) {
+         LOGERR << "[WARNING] Tag side length not specified (using default length " << m_fTagSideLength << ")." << std::endl;
+      }
       m_tTagDetectionInfo.fx = m_sCalibration.CameraMatrix(0,0);
       m_tTagDetectionInfo.fy = m_sCalibration.CameraMatrix(1,1);
       m_tTagDetectionInfo.cx = m_sCalibration.CameraMatrix(0,2);
       m_tTagDetectionInfo.cy = m_sCalibration.CameraMatrix(1,2);
-      m_tTagDetectionInfo.tagsize = TAG_SIDE_LENGTH;
+      m_tTagDetectionInfo.tagsize = m_fTagSideLength;
       /* set attributes on the camera metadata tag */
       m_cMetadata.SetAttribute("id", str_label);
       m_cMetadata.SetAttribute("processing_offset", strProcessingOffset);

@@ -91,6 +91,7 @@ namespace argos {
          std::array<UInt32, 2> m_arrProcessingOffset;
          /* tag detector data */
          std::string m_strTagFamilyName;
+         Real m_fTagSideLength;
          ::image_u8_t* m_ptImage;
          ::apriltag_family* m_ptTagFamily;
          ::apriltag_detector* m_ptTagDetector;
