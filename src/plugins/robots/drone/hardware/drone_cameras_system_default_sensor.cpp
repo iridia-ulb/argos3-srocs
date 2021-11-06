@@ -15,6 +15,8 @@
 
 #include <apriltag/apriltag.h>
 #include <apriltag/apriltag_pose.h>
+#include <apriltag/tag16h5.h>
+#include <apriltag/tag25h9.h>
 #include <apriltag/tag36h11.h>
 #include <apriltag/common/image_u8.h>
 #include <apriltag/common/zarray.h>
@@ -175,7 +177,18 @@ namespace argos {
       cCameraMatrix(0,2) = cPrincipalPoint.GetX();
       cCameraMatrix(1,2) = cPrincipalPoint.GetY();
       /* initialize the apriltag components */
-      m_ptTagFamily = ::tag36h11_create();
+      GetNodeAttributeOrDefault(t_interface, "tag_family", m_strTagFamilyName, m_strTagFamilyName);
+      if (m_strTagFamilyName == "tag16h5")
+         m_ptTagFamily = ::tag16h5_create();
+      if (m_strTagFamilyName == "tag25h9")
+         m_ptTagFamily = ::tag25h9_create();
+      else if (m_strTagFamilyName == "tag36h11")
+         m_ptTagFamily = ::tag36h11_create();
+      else
+      {
+         LOGERR << "[WARNING] Tag family not specified (using tag36h11 by default)." << std::endl;
+         m_ptTagFamily = ::tag36h11_create();
+      }
       /* create the tag detector */
       m_ptTagDetector = ::apriltag_detector_create();
       /* add the tag family to the tag detector */
