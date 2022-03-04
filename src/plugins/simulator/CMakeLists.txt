@@ -1,3 +1,0 @@
-add_subdirectory(entities)
-add_subdirectory(physics_engines)
-add_subdirectory(visualizations)
